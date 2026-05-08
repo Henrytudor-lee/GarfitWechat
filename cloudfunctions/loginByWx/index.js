@@ -1,9 +1,10 @@
 // 云函数: loginByWx
-// 微信登录，自动创建或更新用户记录
+// 微信登录，自动创建或更新用户记录（PostgreSQL）
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const db = cloud.database();
+// cloud.instance 是 @cloudbase/node-sdk 的 CloudBase 实例，rdb() 直接可用
+const rdb = () => cloud.instance.rdb();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
@@ -15,42 +16,45 @@ exports.main = async (event, context) => {
 
   try {
     // 查询是否已有用户记录
-    const { data: existing } = await db.collection('users')
-      .where({ openid })
-      .limit(1)
-      .get();
+    const { data, error } = await rdb()
+      .from('users')
+      .select('*')
+      .eq('openid', openid)
+      .limit(1);
+
+    if (error) return { success: false, error: error.message };
 
     let user;
 
-    if (existing && existing.length > 0) {
+    if (data && data.length > 0) {
       // 更新登录信息
-      user = existing[0];
-      await db.collection('users').doc(user._id).update({
-        data: {
-          updated_at: db.serverDate(),
-        },
-      });
+      user = data[0];
+      const { error: err } = await rdb()
+        .from('users')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+      if (err) return { success: false, error: err.message };
     } else {
       // 新用户注册
-      const res = await db.collection('users').add({
-        data: {
+      const { data: newData, error: err } = await rdb()
+        .from('users')
+        .insert({
           openid,
           name: event.nickname || '',
           avatar: event.avatar || '',
           role: 'user',
           status: 1,
-          created_at: db.serverDate(),
-          updated_at: db.serverDate(),
-        },
-      });
-      user = { _id: res._id, openid, is_new: true };
+        })
+        .select();
+      if (err) return { success: false, error: err.message };
+      user = newData && newData.length > 0 ? newData[0] : { id: null, openid, is_new: true };
     }
 
     return {
       success: true,
       openid,
-      userId: user._id,
-      isNew: user.isNew || false,
+      userId: user.id,
+      isNew: !data || data.length === 0,
     };
   } catch (err) {
     return { success: false, error: err.message };
