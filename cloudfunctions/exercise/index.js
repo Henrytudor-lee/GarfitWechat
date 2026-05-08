@@ -3,14 +3,16 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const rdb = () => cloud.instance.rdb();
+const { CloudBase } = require('@cloudbase/node-sdk');
+const envId = cloud.DYNAMIC_CURRENT_ENV;
+const cloudbase = new CloudBase({ env: envId });
+const rdb = () => cloudbase.rdb();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
   const { action, exerciseId, sessionId, userId } = event;
 
-  // 解析 userId
   let uid = userId;
   if (!uid && openid) {
     const { data, error } = await rdb()

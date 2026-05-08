@@ -3,14 +3,17 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const rdb = () => cloud.instance.rdb();
+const { CloudBase } = require('@cloudbase/node-sdk');
+const envId = cloud.DYNAMIC_CURRENT_ENV;
+const cloudbase = new CloudBase({ env: envId });
+const rdb = () => cloudbase.rdb();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
   const { action, sessionId, userId } = event;
 
-  // 获取 userId（兼容 userId 参数直接传入）
+  // 获取 userId
   let uid = userId;
   if (!uid && openid) {
     const { data, error } = await rdb()
@@ -25,7 +28,6 @@ exports.main = async (event, context) => {
 
   try {
     if (action === 'create') {
-      // 检查是否有正在进行的训练
       const { data: running, error: err1 } = await rdb()
         .from('sessions')
         .select('*')
@@ -39,7 +41,6 @@ exports.main = async (event, context) => {
         return { success: true, session: running[0], resumed: true };
       }
 
-      // 创建新会话
       const { data: newData, error: err2 } = await rdb()
         .from('sessions')
         .insert({
@@ -51,7 +52,6 @@ exports.main = async (event, context) => {
         .select();
       if (err2) return { success: false, error: err2.message };
       const newSession = newData && newData.length > 0 ? newData[0] : null;
-
       return { success: true, sessionId: newSession ? newSession.id : null, resumed: false };
 
     } else if (action === 'getRunning') {
@@ -91,9 +91,7 @@ exports.main = async (event, context) => {
         .eq('id', sessionId);
       if (err2) return { success: false, error: err2.message };
 
-      // 更新连续训练天数
       await _updateStreak(uid);
-
       return { success: true };
 
     } else if (action === 'list') {
@@ -116,7 +114,6 @@ exports.main = async (event, context) => {
   }
 };
 
-// 更新连续训练天数
 async function _updateStreak(uid) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -130,7 +127,6 @@ async function _updateStreak(uid) {
   if (err1) return;
 
   if (!streak || streak.length === 0) {
-    // 第一天
     await rdb().from('user_streaks').insert({
       user_id: uid,
       streak: 1,
@@ -140,13 +136,9 @@ async function _updateStreak(uid) {
     const lastDate = new Date(streak[0].last_date);
     lastDate.setHours(0, 0, 0, 0);
     const diff = (today - lastDate) / (1000 * 60 * 60 * 24);
-
     let newStreak = streak[0].streak;
-    if (diff === 1) {
-      newStreak += 1; // 连续
-    } else if (diff !== 0) {
-      newStreak = 1; // 断了，重新计
-    }
+    if (diff === 1) newStreak += 1;
+    else if (diff !== 0) newStreak = 1;
 
     await rdb()
       .from('user_streaks')

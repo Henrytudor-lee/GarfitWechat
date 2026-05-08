@@ -3,8 +3,13 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-// cloud.instance 是 @cloudbase/node-sdk 的 CloudBase 实例，rdb() 直接可用
-const rdb = () => cloud.instance.rdb();
+// 直接使用 @cloudbase/node-sdk，不依赖 wx-server-sdk 的 wrapper
+const { CloudBase } = require('@cloudbase/node-sdk');
+
+// cloud.DYNAMIC_CURRENT_ENV 在云函数运行时是实际环境ID字符串（如 prod-xxx）
+const envId = cloud.DYNAMIC_CURRENT_ENV;
+const cloudbase = new CloudBase({ env: envId });
+const rdb = () => cloudbase.rdb();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();

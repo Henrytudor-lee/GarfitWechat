@@ -3,7 +3,10 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const rdb = () => cloud.instance.rdb();
+const { CloudBase } = require('@cloudbase/node-sdk');
+const envId = cloud.DYNAMIC_CURRENT_ENV;
+const cloudbase = new CloudBase({ env: envId });
+const rdb = () => cloudbase.rdb();
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
@@ -22,7 +25,6 @@ exports.main = async (event, context) => {
     const uid = user[0].id;
 
     if (event.action === 'get') {
-      // 合并用户信息 + 等级 + 连续天数
       const [{ data: streak }, { data: level }] = await Promise.all([
         rdb().from('user_streaks').select('*').eq('user_id', uid).limit(1),
         rdb().from('user_levels').select('*').eq('user_id', uid).limit(1),
