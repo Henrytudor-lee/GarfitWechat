@@ -1,0 +1,149 @@
+/* pages/favorites/index.wxss — garcia-fitness-new style */
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 24rpx 24rpx 200rpx;
+}
+
+.page-header {
+  margin-bottom: 24rpx;
+}
+
+.page-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-subtitle {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 4rpx;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 40rpx;
+}
+.empty-icon {
+  font-size: 80rpx;
+  color: #ccf200;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 16rpx;
+}
+.empty-hint {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #52525b;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+}
+.empty-sub {
+  font-size: 22rpx;
+  color: #3f3f46;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.exercise-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20rpx;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+
+.card-img-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+}
+
+.card-info {
+  flex: 1;
+  padding: 16rpx 20rpx;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-name {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 4rpx;
+}
+
+.card-en {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8rpx;
+}
+
+.card-tags {
+  display: flex;
+  gap: 8rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 3rpx 12rpx;
+  background: rgba(204, 242, 0, 0.15);
+  color: #ccf200;
+  border-radius: 100rpx;
+  font-size: 18rpx;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tag-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #71717a;
+}
+
+.remove-btn {
+  width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #52525b;
+  align-self: center;
+  flex-shrink: 0;
+}

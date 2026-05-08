@@ -1,185 +1,166 @@
-// index.js
+// pages/index/index.js — garcia-fitness-new style
+const app = getApp();
+
 Page({
   data: {
-    showTip: false,
-    powerList: [
-      {
-        title: "云托管",
-        tip: "不限语言的全托管容器服务",
-        showItem: false,
-        item: [
-          {
-            type: "cloudbaserun",
-            title: "云托管调用",
-          },
-        ],
-      },
-      {
-        title: "云函数",
-        tip: "安全、免鉴权运行业务代码",
-        showItem: false,
-        item: [
-          {
-            type: "getOpenId",
-            title: "获取OpenId",
-          },
-          {
-            type: "getMiniProgramCode",
-            title: "生成小程序码",
-          },
-        ],
-      },
-      {
-        title: "数据库",
-        tip: "安全稳定的文档型数据库",
-        showItem: false,
-        item: [
-          {
-            type: "createCollection",
-            title: "创建集合",
-          },
-          {
-            type: "selectRecord",
-            title: "增删改查记录",
-          },
-          // {
-          //   title: '聚合操作',
-          //   page: 'sumRecord',
-          // },
-        ],
-      },
-      {
-        title: "云存储",
-        tip: "自带CDN加速文件存储",
-        showItem: false,
-        item: [
-          {
-            type: "uploadFile",
-            title: "上传文件",
-          },
-        ],
-      },
-      {
-        title: "AI 接入能力",
-        tip: "云开发 AI 接入能力",
-        showItem: false,
-        item: [
-          {
-            type: "model-guide",
-            title: "大模型对话指引",
-          },
-        ],
-      },
-      {
-        title: "AI 智能开发小程序",
-        tip: "连接 AI 开发工具与 MCP 开发小程序",
-        type: "ai-assistant",
-        skipEnvCheck: true,
-        showItem: false,
-        item: [],
-      },
-    ],
-    haveCreateCollection: false,
-    title: "",
-    content: "",
+    runningSession: null,
+    elapsedTime: '00:00:00',
+    totalVolume: 0,
+    exerciseCount: 0,
+    restTime: '--:--',
+    exerciseGroups: [],
+    recentSessions: [],
+    imgPrefix: '',
+    timer: null,
+    sessionStartMs: 0,
   },
-  onClickPowerInfo(e) {
-    const app = getApp();
-    const index = e.currentTarget.dataset.index;
-    const powerList = this.data.powerList;
-    const selectedItem = powerList[index];
-    
-    // 检查是否跳过环境配置检测
-    if (!selectedItem.skipEnvCheck && !app.globalData.env) {
-      wx.showModal({
-        title: "提示",
-        content: "请在 `miniprogram/app.js` 中正确配置 `env` 参数",
-      });
+
+  onLoad() {
+    this.setData({ imgPrefix: app.globalData.imagePrefix });
+  },
+
+  onShow() {
+    this._loadData();
+  },
+
+  onUnload() {
+    if (this.data.timer) clearInterval(this.data.timer);
+  },
+
+  async _loadData() {
+    wx.showLoading({ title: 'LOADING...', mask: true });
+
+    // Login
+    const loginRes = await wx.cloud.callFunction({ name: 'loginByWx' });
+    if (!loginRes.result || !loginRes.result.success) {
+      wx.hideLoading();
       return;
     }
-    if (selectedItem.link) {
-      wx.navigateTo({
-        url: `../web/index?url=${selectedItem.link}&title=${selectedItem.title}`,
-      });
-    } else if (selectedItem.type) {
-      wx.navigateTo({
-        url: `/pages/example/index?envId=${this.data.selectedEnv?.envId}&type=${selectedItem.type}`,
-      });
-    } else if (selectedItem.page) {
-      wx.navigateTo({
-        url: `/pages/${selectedItem.page}/index`,
-      });
-    } else if (
-      selectedItem.title === "数据库" &&
-      !this.data.haveCreateCollection
-    ) {
-      this.onClickDatabase(powerList, selectedItem);
+    const userId = loginRes.result.userId;
+    app.globalData.userId = userId;
+
+    // Load running session + recent sessions in parallel
+    const [runRes, recentRes] = await Promise.all([
+      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning', userId } }),
+      wx.cloud.callFunction({ name: 'session', data: { action: 'list', userId, page: 1, pageSize: 5 } }),
+    ]);
+
+    wx.hideLoading();
+
+    if (runRes.result && runRes.result.session) {
+      const session = runRes.result.session;
+      this.setData({ runningSession: session });
+      this._startTimer(session.start_time);
+      this._loadExerciseGroups(session._id);
     } else {
-      selectedItem.showItem = !selectedItem.showItem;
-      this.setData({
-        powerList,
+      this.setData({ runningSession: null, exerciseGroups: [] });
+    }
+
+    if (recentRes.result && recentRes.result.sessions) {
+      const sessions = recentRes.result.sessions.map(s => {
+        const d = new Date(s.start_time);
+        const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+        const mins = Math.floor((s.duration || 0) / 60);
+        return { ...s, dateStr, durationStr: `${mins} MIN` };
       });
+      this.setData({ recentSessions: sessions });
     }
   },
 
-  jumpPage(e) {
-    const { type, page } = e.currentTarget.dataset;
-    console.log("jump page", type, page);
-    if (type) {
-      wx.navigateTo({
-        url: `/pages/example/index?envId=${this.data.selectedEnv?.envId}&type=${type}`,
-      });
-    } else {
-      wx.navigateTo({
-        url: `/pages/${page}/index?envId=${this.data.selectedEnv?.envId}`,
-      });
-    }
-  },
-
-  onClickDatabase(powerList, selectedItem) {
-    wx.showLoading({
-      title: "",
+  async _loadExerciseGroups(sessionId) {
+    const res = await wx.cloud.callFunction({
+      name: 'exercise',
+      data: { action: 'list', sessionId },
     });
-    wx.cloud
-      .callFunction({
-        name: "quickstartFunctions",
-        data: {
-          type: "createCollection",
-        },
-      })
-      .then((resp) => {
-        if (resp.result.success) {
-          this.setData({
-            haveCreateCollection: true,
+    if (res.result && res.result.success) {
+      // Group by exercise_id
+      const map = {};
+      for (const ex of res.result.exercises || []) {
+        if (!map[ex.exercise_id]) {
+          map[ex.exercise_id] = { ...ex, sets: [] };
+        }
+        if (ex.weight > 0 || ex.reps > 0) {
+          map[ex.exercise_id].sets.push({
+            weight: ex.weight,
+            unit: ex.weight_unit,
+            reps: ex.reps,
           });
         }
-        selectedItem.showItem = !selectedItem.showItem;
-        this.setData({
-          powerList,
+      }
+      const groups = Object.values(map);
+      const volume = groups.reduce((sum, g) =>
+        sum + g.sets.reduce((s, set) => s + (set.weight || 0) * (set.reps || 0), 0), 0);
+      this.setData({
+        exerciseGroups: groups,
+        exerciseCount: groups.length,
+        totalVolume: Math.round(volume),
+      });
+    }
+  },
+
+  _startTimer(startTime) {
+    if (this.data.timer) clearInterval(this.data.timer);
+    const startMs = new Date(startTime).getTime();
+    this.setData({ sessionStartMs: startMs });
+    const update = () => {
+      const diff = Math.floor((Date.now() - startMs) / 1000);
+      const h = Math.floor(diff / 3600);
+      const m = Math.floor((diff % 3600) / 60);
+      const s = diff % 60;
+      this.setData({
+        elapsedTime: `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`,
+      });
+    };
+    update();
+    const timer = setInterval(update, 500);
+    this.setData({ timer });
+  },
+
+  async startWorkout() {
+    wx.showLoading({ title: 'STARTING...', mask: true });
+    const res = await wx.cloud.callFunction({
+      name: 'session',
+      data: { action: 'create', userId: app.globalData.userId },
+    });
+    wx.hideLoading();
+    if (res.result && res.result.success) {
+      const session = res.result.session || { _id: res.result.sessionId, start_time: new Date().toISOString() };
+      this.setData({ runningSession: session, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
+      this._startTimer(session.start_time || new Date().toISOString());
+    }
+  },
+
+  async stopWorkout() {
+    wx.showModal({
+      title: 'END TRAINING',
+      content: 'Are you sure you want to end this training session?',
+      confirmColor: '#ccf200',
+      success: async (res) => {
+        if (!res.confirm) return;
+        wx.showLoading({ title: 'ENDING...', mask: true });
+        const r = await wx.cloud.callFunction({
+          name: 'session',
+          data: { action: 'finish', sessionId: this.data.runningSession._id, userId: app.globalData.userId },
         });
         wx.hideLoading();
-      })
-      .catch((e) => {
-        wx.hideLoading();
-        const { errCode, errMsg } = e;
-        if (errMsg.includes("Environment not found")) {
-          this.setData({
-            showTip: true,
-            title: "云开发环境未找到",
-            content:
-              "如果已经开通云开发，请检查环境ID与 `miniprogram/app.js` 中的 `env` 参数是否一致。",
-          });
-          return;
+        if (r.result && r.result.success) {
+          if (this.data.timer) clearInterval(this.data.timer);
+          this.setData({ runningSession: null, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, elapsedTime: '00:00:00' });
+          wx.showToast({ title: 'TRAINING COMPLETE!', icon: 'success' });
+          this._loadData();
         }
-        if (errMsg.includes("FunctionName parameter could not be found")) {
-          this.setData({
-            showTip: true,
-            title: "请上传云函数",
-            content:
-              "在'cloudfunctions/quickstartFunctions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
-          });
-          return;
-        }
-      });
+      },
+    });
+  },
+
+  goToLibrary() {
+    wx.navigateTo({ url: '/pages/library/index?select=true' });
+  },
+
+  onExerciseTap(e) {
+    const item = e.currentTarget.dataset.item;
+    wx.navigateTo({
+      url: `/pages/exercise-detail/index?id=${item.exercise_id || item._id}&name=${encodeURIComponent(item.name_zh || item.name)}`,
+    });
   },
 });

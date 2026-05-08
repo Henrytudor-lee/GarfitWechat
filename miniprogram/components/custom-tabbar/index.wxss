@@ -1,0 +1,93 @@
+/* components/custom-tabbar/index.wxss — garcia-fitness-new bottom nav */
+.tabbar-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* FAB — bottom-right, above nav */
+.fab {
+  position: absolute;
+  bottom: 140rpx;
+  right: 32rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: #ccf200;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30rpx rgba(204, 242, 0, 0.5);
+  z-index: 1000;
+}
+
+.fab-icon {
+  font-size: 64rpx;
+  color: #000;
+  font-weight: 300;
+  line-height: 1;
+  margin-top: -6rpx;
+}
+
+.fab-icon-img {
+  width: 56rpx;
+  height: 56rpx;
+}
+
+/* Bottom Tab Bar */
+.tabbar {
+  width: 100%;
+  height: 120rpx;
+  background: rgba(0, 0, 0, 0.80);
+  backdrop-filter: blur(40rpx);
+  -webkit-backdrop-filter: blur(40rpx);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 16rpx;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.tab-icon-wrap {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon-img {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.tab-item.active .tab-icon-img {
+  filter: brightness(0) saturate(100%) invert(80%) sepia(90%) saturate(500%) hue-rotate(30deg);
+}
+
+.tab-label {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 18rpx;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #71717a;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.tab-item.active .tab-label {
+  color: #ccf200;
+}

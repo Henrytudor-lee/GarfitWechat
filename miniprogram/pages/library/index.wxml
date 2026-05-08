@@ -1,0 +1,153 @@
+<!--pages/library/index.wxml—garcia-fitness-new style-->
+<view class="page">
+
+  <!-- Top App Bar -->
+  <appbar />
+
+  <!-- Page Header -->
+  <view class="page-header">
+    <view class="page-title">EXERCISE LIBRARY</view>
+    <view class="page-subtitle">Access 7000+ professional movements</view>
+  </view>
+
+  <!-- Search -->
+  <view class="search-bar">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      placeholder="SEARCH EXERCISES..."
+      placeholder-class="search-placeholder"
+      value="{{keyword}}"
+      bindinput="onSearchInput"
+      bindconfirm="onSearch"
+    />
+  </view>
+
+  <!-- Equipment Filters -->
+  <view class="filter-section">
+    <view class="filter-label">EQUIPMENT</view>
+    <scroll-view class="filter-scroll" scroll-x>
+      <view class="filter-row">
+        <view
+          class="filter-chip {{selectedEquipment === null ? 'active' : ''}}"
+          bindtap="onEquipmentTap"
+          data-id="{{null}}"
+        >ALL</view>
+        <view
+          wx:for="{{equipmentList}}"
+          wx:key="id"
+          class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}"
+          bindtap="onEquipmentTap"
+          data-id="{{item.id}}"
+        >{{item.name.toUpperCase()}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Muscle Filters -->
+  <view class="filter-section">
+    <view class="filter-label">MUSCLE FOCUS</view>
+    <view class="muscle-row">
+      <view
+        wx:for="{{muscleList}}"
+        wx:key="id"
+        class="muscle-chip {{selectedMuscle === item.id ? 'active' : ''}}"
+        bindtap="onMuscleTap"
+        data-id="{{item.id}}"
+      >{{item.name.toUpperCase()}}</view>
+    </view>
+  </view>
+
+  <!-- Exercise Grid -->
+  <view wx:if="{{loading && list.length === 0}}" class="loading-state">LOADING...</view>
+  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">NO EXERCISES FOUND</view>
+
+  <view wx:else class="exercise-grid">
+    <view
+      class="exercise-card"
+      wx:for="{{list}}"
+      wx:key="_id"
+      data-item="{{item}}"
+      bindtap="onExerciseTap"
+    >
+      <!-- Image -->
+      <view class="card-img-wrap">
+        <image
+          wx:if="{{item.image_name}}"
+          class="card-img"
+          src="{{imgPrefix}}/{{item.image_name}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="card-img-placeholder">🏋️</view>
+        <view class="card-gradient"></view>
+        <view wx:if="{{item.is_favorite}}" class="fav-badge">FAV</view>
+        <view wx:if="{{item.video_file}}" class="play-overlay">▶</view>
+      </view>
+      <!-- Card Footer -->
+      <view class="card-footer">
+        <view class="card-top">
+          <view class="card-name">{{item.name}}</view>
+          <view class="card-info-btn" catchtap="openDetail" data-item="{{item}}">ⓘ</view>
+        </view>
+        <view class="card-tags">
+          <text class="chip chip-neutral">{{item.equipment_name || 'OTHER'}}</text>
+          <text wx:if="{{item.muscle_name}}" class="chip">{{item.muscle_name}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">LOAD MORE</view>
+  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
+
+  <!-- Exercise Detail Bottom Sheet -->
+  <view wx:if="{{selectedExercise}}" class="sheet-mask" bindtap="closeSheet">
+    <view class="sheet" catchtap="">
+      <view class="sheet-handle"></view>
+
+      <!-- Media -->
+      <view class="sheet-media">
+        <video
+          wx:if="{{selectedExercise.video_file}}"
+          class="sheet-video"
+          src="{{vidPrefix}}/{{selectedExercise.video_file}}"
+          controls
+          show-center-play-btn
+        />
+        <image
+          wx:else
+          class="sheet-img"
+          src="{{imgPrefix}}/{{selectedExercise.image_name}}"
+          mode="aspectFill"
+        />
+      </view>
+
+      <!-- Scrollable Content -->
+      <scroll-view class="sheet-scroll" scroll-y>
+        <view class="sheet-content">
+          <view class="sheet-name">{{selectedExercise.name_zh || selectedExercise.name}}</view>
+          <view class="sheet-en">{{selectedExercise.name}}</view>
+          <view class="sheet-tags">
+            <text class="chip chip-neutral">{{selectedExercise.equipment_name || 'OTHER'}}</text>
+            <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{selectedExercise.muscle_name}}</text>
+            <text class="chip chip-neutral">{{selectedExercise.exercise_type || 'STRENGTH'}}</text>
+          </view>
+          <view class="sheet-id">#{{selectedExercise._id || selectedExercise.id}}</view>
+        </view>
+      </scroll-view>
+
+      <!-- Action Button -->
+      <view class="sheet-action">
+        <button
+          class="sheet-btn"
+          bindtap="{{isSelectMode ? 'doSelect' : 'addToWorkout'}}"
+          data-item="{{selectedExercise}}"
+        >{{isSelectMode ? 'SELECT EXERCISE' : 'ADD TO WORKOUT'}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Custom Tab Bar -->
+  <custom-tabbar active="library" />
+
+</view>

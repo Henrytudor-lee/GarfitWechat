@@ -1,0 +1,378 @@
+/* pages/library/index.wxss — garcia-fitness-new style */
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding-top: 100rpx;
+  padding-left: 24rpx;
+  padding-right: 24rpx;
+  padding-bottom: 200rpx;
+}
+
+/* Page Header */
+.page-header {
+  padding: 24rpx 0 20rpx;
+}
+
+.page-title {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  margin-bottom: 8rpx;
+}
+
+.page-subtitle {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* Search */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20rpx;
+  padding: 0 24rpx;
+  height: 88rpx;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.search-icon {
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+  background: transparent;
+  border: none;
+  outline: none;
+  letter-spacing: 0.05em;
+}
+
+.search-placeholder {
+  color: #3f3f46;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  font-size: 22rpx;
+}
+
+/* Filter Sections */
+.filter-section {
+  margin-bottom: 20rpx;
+}
+
+.filter-label {
+  font-size: 18rpx;
+  font-weight: 800;
+  color: #52525b;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12rpx;
+  padding-left: 4rpx;
+}
+
+.filter-scroll {
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.filter-chip {
+  display: inline-block;
+  padding: 14rpx 28rpx;
+  border-radius: 100rpx;
+  font-size: 20rpx;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.05);
+  color: #71717a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.filter-chip.active {
+  background: #ccf200;
+  color: #000;
+  border-color: #ccf200;
+}
+
+.muscle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.muscle-chip {
+  padding: 10rpx 20rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.05);
+  color: #71717a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.muscle-chip.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Exercise Grid — 2 columns */
+.exercise-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.exercise-card {
+  width: calc(50% - 8rpx);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.card-img-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64rpx;
+}
+
+.card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+}
+
+.fav-badge {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  background: #ccf200;
+  color: #000;
+  font-size: 16rpx;
+  font-weight: 900;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  letter-spacing: 0.05em;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  color: rgba(204, 242, 0, 0.8);
+  opacity: 0;
+}
+
+.card-footer {
+  padding: 16rpx;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10rpx;
+}
+
+.card-name {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  flex: 1;
+  margin-right: 8rpx;
+}
+
+.card-info-btn {
+  font-size: 24rpx;
+  color: #52525b;
+  flex-shrink: 0;
+}
+
+.card-tags {
+  display: flex;
+  gap: 6rpx;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-block;
+  padding: 3rpx 10rpx;
+  background: rgba(204, 242, 0, 0.15);
+  color: #ccf200;
+  border-radius: 6rpx;
+  font-size: 16rpx;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #71717a;
+}
+
+/* States */
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #3f3f46;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.load-more, .no-more {
+  text-align: center;
+  padding: 30rpx 0;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #52525b;
+  letter-spacing: 0.1em;
+}
+
+/* Bottom Sheet */
+.sheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.sheet {
+  background: #1a1a1a;
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sheet-handle {
+  width: 80rpx;
+  height: 8rpx;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4rpx;
+  margin: 20rpx auto;
+  flex-shrink: 0;
+}
+
+.sheet-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  flex-shrink: 0;
+}
+
+.sheet-video, .sheet-img {
+  width: 100%;
+  height: 100%;
+}
+
+.sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sheet-content {
+  padding: 24rpx;
+}
+
+.sheet-name {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 36rpx;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6rpx;
+}
+
+.sheet-en {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16rpx;
+}
+
+.sheet-tags {
+  display: flex;
+  gap: 10rpx;
+  flex-wrap: wrap;
+  margin-bottom: 16rpx;
+}
+
+.sheet-id {
+  font-size: 20rpx;
+  color: #52525b;
+  font-weight: 700;
+}
+
+.sheet-action {
+  padding: 0 24rpx 40rpx;
+  flex-shrink: 0;
+}
+
+.sheet-btn {
+  width: 100%;
+  background: #ccf200;
+  color: #000;
+  border-radius: 100rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 28rpx;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  line-height: 2.6;
+}
+.sheet-btn::after { border: none; }

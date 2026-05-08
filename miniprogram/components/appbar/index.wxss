@@ -1,0 +1,53 @@
+/* components/appbar/index.wxss */
+.appbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 88rpx;
+  background: rgba(0, 0, 0, 0.70);
+  backdrop-filter: blur(24rpx);
+  -webkit-backdrop-filter: blur(24rpx);
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32rpx;
+  z-index: 999;
+  padding-top: env(safe-area-inset-top);
+  box-sizing: content-box;
+}
+
+.appbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.appbar-logo {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.appbar-title {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #ccf200;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.appbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.appbar-lang {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #71717a;
+  letter-spacing: 0.1em;
+}

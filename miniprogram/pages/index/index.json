@@ -1,6 +1,10 @@
 {
-  "navigationBarTitleText": "基础能力",
+  "navigationBarTitleText": "GFIT",
+  "navigationBarBackgroundColor": "#000000",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "custom",
   "usingComponents": {
-    "cloud-tip-modal": "/components/cloudTipModal/index"
+    "appbar": "/components/appbar/index",
+    "custom-tabbar": "/components/custom-tabbar/index"
   }
 }

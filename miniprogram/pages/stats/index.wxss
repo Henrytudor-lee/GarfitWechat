@@ -1,0 +1,207 @@
+/* pages/stats/index.wxss */
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 100rpx 24rpx 200rpx;
+}
+
+.page-header {
+  margin-bottom: 32rpx;
+}
+
+.page-title {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-subtitle {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 4rpx;
+}
+
+/* 顶部统计卡片 */
+.stats-grid {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx 16rpx;
+}
+
+.stat-card-value {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 8rpx;
+}
+
+/* Section */
+.section-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16rpx;
+}
+
+/* 条形图 */
+.bar-chart {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.bar-label {
+  font-size: 22rpx;
+  color: #a1a1aa;
+  font-weight: 600;
+  width: 120rpx;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #ccf200;
+  border-radius: 8rpx;
+  transition: width 0.5s ease;
+}
+
+.bar-value {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  width: 80rpx;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* 选择器 */
+.select-wrap {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.select-label {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12rpx;
+}
+
+.select {
+  width: 100%;
+  background: transparent;
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+  border: none;
+  outline: none;
+  appearance: none;
+}
+
+.select option {
+  background: #1c1c1c;
+  color: #fff;
+}
+
+/* 最大重量卡片 */
+.max-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.max-card-grid {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.max-item {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  text-align: center;
+}
+
+.max-num {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 48rpx;
+  font-weight: 900;
+  color: #ccf200;
+  line-height: 1;
+}
+
+.max-label {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 6rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  color: #52525b;
+  font-size: 26rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.3;
+}

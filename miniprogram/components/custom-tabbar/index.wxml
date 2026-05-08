@@ -1,0 +1,27 @@
+<!--components/custom-tabbar/index.wxml—garcia-fitness-new bottom nav-->
+<view class="tabbar-wrap">
+  <!-- FAB -->
+  <view class="fab" catchtap="onFabTap">
+    <image src="/images/icons/add.svg" class="fab-icon-img" />
+  </view>
+
+  <!-- Bottom Nav -->
+  <view class="tabbar">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="id"
+      class="tab-item {{active === item.id ? 'active' : ''}}"
+      catchtap="switchTab"
+      data-id="{{item.id}}"
+      data-url="{{item.url}}"
+    >
+      <view class="tab-icon-wrap">
+        <image
+          src="{{active === item.id ? item.iconActive : item.icon}}"
+          class="tab-icon-img"
+        />
+      </view>
+      <text class="tab-label">{{item.label}}</text>
+    </view>
+  </view>
+</view>
