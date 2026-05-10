@@ -54,7 +54,7 @@
     <view class="modal-content">
 
       <!-- STEP 1: Pick Exercise -->
-      <view wx:if="{{step === 'pick'}}">
+      <view wx:if="{{step === 'pick'}}" style="flex:1;display:flex;flex-direction:column;min-height:0;">
 
         <!-- Search -->
         <view class="search-bar">
