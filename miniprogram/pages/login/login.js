@@ -19,6 +19,10 @@ Page({
     }
   },
 
+  getUserInfo(e) {
+    console.log(e);
+  },
+
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
     this.setData({ avatarUrl });
@@ -27,6 +31,7 @@ Page({
 
   onNicknameInput(e) {
     this.setData({ nickname: e.detail.value });
+    this._updateCanLogin();
   },
 
   onNicknameBlur(e) {
