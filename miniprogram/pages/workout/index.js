@@ -14,9 +14,11 @@ Page({
     inputWeight: '',
     inputReps: '',
     weightUnit: 'kg',
+    imgPrefix: '',
   },
 
   onLoad() {
+    this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
     this._checkSession();
   },
 
@@ -99,12 +101,14 @@ Page({
             _id: ex._id,
             name: ex.name,
             name_zh: ex.name_zh || ex.name,
+            image_name: ex.image_name || null,
             exercise_id: ex.exercise_id,
             sets: [],
           };
         }
         if (ex.weight > 0 || ex.reps > 0) {
           map[ex.exercise_id].sets.push({
+            _id: ex._id,
             weight: ex.weight,
             unit: ex.weight_unit,
             reps: ex.reps,
@@ -152,6 +156,7 @@ Page({
       exercise_id: exercise._id,
       name: exercise.name,
       name_zh: exercise.name_zh || exercise.name,
+      image_name: exercise.image_name || null,
       sets: [],
     };
     this.setData({ exerciseList: [...this.data.exerciseList, newItem] });

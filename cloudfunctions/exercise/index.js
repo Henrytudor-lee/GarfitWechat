@@ -43,7 +43,7 @@ if (action === 'add') {
       const { session_id } = event;
       if (!session_id) return { success: false, error: '缺少 session_id' };
       const [rows] = await getPool().query(
-        'SELECT * FROM exercises WHERE session_id = ? ORDER BY create_time ASC',
+        'SELECT e.*, l.image_name, l.name as library_name FROM exercises e LEFT JOIN exercises_library l ON e.exercise_id = l.id WHERE e.session_id = ? ORDER BY e.create_time ASC',
         [session_id]);
       return { success: true, exercises: rows };
 

@@ -77,15 +77,41 @@
   margin-bottom: 20rpx;
 }
 
+.item-image-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+  background: #f0f0f0;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+}
+
+.item-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  font-size: 48rpx;
+}
+
 .exercise-item {
   background: #fff;
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 16rpx;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
+
+
 
 .item-name {
   font-size: 30rpx;

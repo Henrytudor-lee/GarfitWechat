@@ -4,17 +4,17 @@
 
     <!-- Header -->
     <view class="modal-header">
-      <view class="exercise-info">
-        <image wx:if="{{group.image_name}}" class="exercise-img" src="{{imgPrefix}}/{{group.image_name}}" mode="aspectFill" />
-        <view wx:else class="exercise-img exercise-img-placeholder">🏋️</view>
-        <view class="exercise-text">
-          <view class="exercise-name">{{group.name}}</view>
-          <view class="exercise-sets">{{sets.length}} {{sets.length === 1 ? 'set' : 'sets'}}</view>
+      <view class="header-left">
+        <image wx:if="{{group.image_name}}" class="header-img" src="{{imgPrefix}}{{group.image_name}}" mode="aspectFill" />
+        <view wx:else class="header-img header-img-placeholder">🏋️</view>
+        <view class="header-text">
+          <view class="header-name">{{group.name_zh || group.name}}</view>
+          <view class="header-sets">{{sets.length}} {{sets.length === 1 ? 'set' : 'sets'}}</view>
         </view>
       </view>
       <view class="header-actions">
-        <view class="action-btn" bindtap="addSet">+</view>
-        <view class="action-btn action-btn-close" bindtap="closeModal">✕</view>
+        <view class="action-btn-add" bindtap="addSet">+</view>
+        <view class="action-btn-close" bindtap="closeModal">✕</view>
       </view>
     </view>
 
