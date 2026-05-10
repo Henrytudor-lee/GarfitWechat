@@ -35,7 +35,7 @@ if (action === 'add') {
       const userId = sessions.length > 0 ? sessions[0].user_id : null;
 
       const [result] = await getPool().query(
-        'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+        'INSERT INTO exercises (session_id, openid, user_id, exercise_id, name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
         [session_id, _openid, userId, exercise_id, name, parseFloat(weight) || 0, parseInt(reps) || 0, (event.weight_unit || 'kg')]);
       return { success: true, exerciseId: result.insertId };
 
@@ -43,7 +43,7 @@ if (action === 'add') {
       const { session_id } = event;
       if (!session_id) return { success: false, error: '缺少 session_id' };
       const [rows] = await getPool().query(
-        'SELECT * FROM exercises WHERE session_id = ? ORDER BY created_at ASC',
+        'SELECT * FROM exercises WHERE session_id = ? ORDER BY create_time ASC',
         [session_id]);
       return { success: true, exercises: rows };
 
@@ -54,7 +54,7 @@ if (action === 'add') {
       const [rows] = await getPool().query(
         `SELECT weight, reps, weight_unit, create_time
          FROM exercises
-         WHERE _openid = ? AND exercise_id = ?
+         WHERE openid = ? AND exercise_id = ?
          ORDER BY weight DESC, create_time DESC
          LIMIT 1`,
         [openid, exercise_id]);
@@ -64,14 +64,14 @@ if (action === 'add') {
       const { id, session_id, weight, reps, openid: callerOpenid } = event;
       if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
       await getPool().query(
-        'UPDATE exercises SET weight = ?, reps = ? WHERE id = ? AND session_id = ? AND _openid = ?',
+        'UPDATE exercises SET weight = ?, reps = ? WHERE id = ? AND session_id = ? AND openid = ?',
         [parseFloat(weight) || 0, parseInt(reps) || 0, id, session_id, callerOpenid]);
       return { success: true };
 
     } else if (action === 'delete') {
       const { id, session_id, openid: callerOpenid } = event;
       if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
-      await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
+        await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND openid = ?', [id, session_id, callerOpenid]);
       return { success: true };
 
     } else {
