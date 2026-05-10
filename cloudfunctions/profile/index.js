@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
   if (!openid) return { success: false, error: '未登录' };
 
   try {
-    const [[user]] = await getPool().query('SELECT * FROM users WHERE openid = ? LIMIT 1', [openid]);
+    const [[user]] = await getPool().query('SELECT * FROM users WHERE _openid = ? LIMIT 1', [openid]);
     if (!user) return { success: false, error: '用户不存在' };
 
     if (event.action === 'get') {

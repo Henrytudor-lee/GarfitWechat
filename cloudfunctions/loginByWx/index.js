@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
   if (!openid) return { success: false, error: '无法获取 openid' };
 
   try {
-    const [rows] = await getPool().query('SELECT * FROM users WHERE openid = ? LIMIT 1', [openid]);
+    const [rows] = await getPool().query('SELECT * FROM users WHERE _openid = ? LIMIT 1', [openid]);
 
     if (rows.length > 0) {
       await getPool().query('UPDATE users SET updated_at = NOW() WHERE id = ?', [rows[0].id]);
@@ -35,7 +35,7 @@ exports.main = async (event, context) => {
     }
 
     const [result] = await getPool().query(
-      'INSERT INTO users (openid, name, avatar, role, status) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO users (_openid, name, avatar, role, status) VALUES (?, ?, ?, ?, ?)',
       [openid, event.nickname || '', event.avatar || '', 'user', 1]
     );
     return { success: true, userId: result.insertId, isNew: true };
