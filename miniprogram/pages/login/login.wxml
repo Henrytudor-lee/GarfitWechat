@@ -1,0 +1,33 @@
+<!-- pages/login/login.wxml — dark theme login page -->
+<view class="page">
+  <view class="logo-area">
+    <view class="logo-icon">💪</view>
+    <view class="logo-title">GFIT</view>
+    <view class="logo-sub">YOUR FITNESS PLATFORM</view>
+  </view>
+
+  <view class="login-card">
+    <view class="login-desc">登录后获取完整功能</view>
+
+    <button
+      class="login-btn {{loading ? 'loading' : ''}}"
+      bindtap="handleLogin"
+      disabled="{{loading}}"
+    >
+      <view class="btn-content">
+        <text class="btn-icon">👤</text>
+        <text class="btn-text">{{loading ? '登录中...' : '微信授权登录'}}</text>
+      </view>
+    </button>
+
+    <view class="login-note">
+      点击上方按钮即表示同意
+      <text class="link">《用户协议》</text>和
+      <text class="link">《隐私政策》</text>
+    </view>
+  </view>
+
+  <view class="skip-area">
+    <view class="skip-btn" bindtap="handleGuest">游客模式</view>
+  </view>
+</view>

@@ -19,7 +19,6 @@ Page({
   },
 
   onLoad() {
-    const app = getApp();
     this.setData({ imgPrefix: app.globalData.imagePrefix });
   },
 
@@ -29,16 +28,6 @@ Page({
 
   async loadData() {
     wx.showLoading({ title: 'LOADING...', mask: true });
-
-    // Ensure logged in
-    let userId = app.globalData.userId;
-    if (!userId) {
-      const loginRes = await wx.cloud.callFunction({ name: 'loginByWx' });
-      if (loginRes.result && loginRes.result.success) {
-        userId = loginRes.result.userId;
-        app.globalData.userId = userId;
-      }
-    }
 
     const [profileRes, statsRes] = await Promise.all([
       wx.cloud.callFunction({ name: 'profile', data: { action: 'get' } }),
@@ -59,8 +48,8 @@ Page({
 
     this.setData({
       userInfo: {
-        nickname: profile.nickname || 'ATHLETE',
-        avatarUrl: profile.avatar_url || '',
+        nickname: profile.name || 'ATHLETE',
+        avatarUrl: profile.avatar || '',
       },
       stats,
       levelInfo: {
@@ -105,7 +94,7 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.clearStorageSync();
-          wx.reLaunch({ url: '/pages/index/index' });
+          wx.reLaunch({ url: '/pages/login/login' });
         }
       },
     });

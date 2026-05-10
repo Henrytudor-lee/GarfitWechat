@@ -6,6 +6,7 @@ App({
     imagePrefix: 'cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036/media/images',
     videoPrefix: 'cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036/media/videos',
     userInfo: null,
+    userId: null,
     openid: null,
   },
   onLaunch: function () {
@@ -16,6 +17,16 @@ App({
         env: this.globalData.env,
         traceUser: true,
       });
+    }
+
+    // 检测登录状态，未登录则跳转登录页
+    const userId = wx.getStorageSync('userId');
+    const openid = wx.getStorageSync('openid');
+    if (!userId) {
+      wx.reLaunch({ url: '/pages/login/login' });
+    } else {
+      this.globalData.userId = userId;
+      this.globalData.openid = openid || null;
     }
   },
 });

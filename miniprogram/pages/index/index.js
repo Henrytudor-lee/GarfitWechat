@@ -30,19 +30,10 @@ Page({
   async _loadData() {
     wx.showLoading({ title: 'LOADING...', mask: true });
 
-    // Login
-    const loginRes = await wx.cloud.callFunction({ name: 'loginByWx' });
-    if (!loginRes.result || !loginRes.result.success) {
-      wx.hideLoading();
-      return;
-    }
-    const userId = loginRes.result.userId;
-    app.globalData.userId = userId;
-
     // Load running session + recent sessions in parallel
     const [runRes, recentRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning', userId } }),
-      wx.cloud.callFunction({ name: 'session', data: { action: 'list', userId, page: 1, pageSize: 5 } }),
+      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning' } }),
+      wx.cloud.callFunction({ name: 'session', data: { action: 'list', page: 1, pageSize: 5 } }),
     ]);
 
     wx.hideLoading();
@@ -51,7 +42,7 @@ Page({
       const session = runRes.result.session;
       this.setData({ runningSession: session });
       this._startTimer(session.start_time);
-      this._loadExerciseGroups(session._id);
+      this._loadExerciseGroups(session.id);
     } else {
       this.setData({ runningSession: null, exerciseGroups: [] });
     }
@@ -120,11 +111,11 @@ Page({
     wx.showLoading({ title: 'STARTING...', mask: true });
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'create', userId: app.globalData.userId },
+      data: { action: 'create' },
     });
     wx.hideLoading();
     if (res.result && res.result.success) {
-      const session = res.result.session || { _id: res.result.sessionId, start_time: new Date().toISOString() };
+      const session = res.result.session || { id: res.result.sessionId, start_time: new Date().toISOString() };
       this.setData({ runningSession: session, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
       this._startTimer(session.start_time || new Date().toISOString());
     }
@@ -140,7 +131,7 @@ Page({
         wx.showLoading({ title: 'ENDING...', mask: true });
         const r = await wx.cloud.callFunction({
           name: 'session',
-          data: { action: 'finish', sessionId: this.data.runningSession._id, userId: app.globalData.userId },
+          data: { action: 'finish', sessionId: this.data.runningSession.id },
         });
         wx.hideLoading();
         if (r.result && r.result.success) {
@@ -160,7 +151,7 @@ Page({
   onExerciseTap(e) {
     const item = e.currentTarget.dataset.item;
     wx.navigateTo({
-      url: `/pages/exercise-detail/index?id=${item.exercise_id || item._id}&name=${encodeURIComponent(item.name_zh || item.name)}`,
+      url: `/pages/exercise-detail/index?id=${item.exercise_id || item.id}&name=${encodeURIComponent(item.name_zh || item.name)}`,
     });
   },
 });

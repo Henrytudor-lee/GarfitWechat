@@ -31,14 +31,14 @@ exports.main = async (event, context) => {
 
     if (rows.length > 0) {
       await getPool().query('UPDATE users SET updated_at = NOW() WHERE id = ?', [rows[0].id]);
-      return { success: true, userId: rows[0].id, isNew: false };
+      return { success: true, userId: rows[0].id, openid, isNew: false };
     }
 
     const [result] = await getPool().query(
       'INSERT INTO users (_openid, name, avatar, role, status) VALUES (?, ?, ?, ?, ?)',
       [openid, event.nickname || '', event.avatar || '', 'user', 1]
     );
-    return { success: true, userId: result.insertId, isNew: true };
+    return { success: true, userId: result.insertId, openid, isNew: true };
   } catch (err) {
     return { success: false, error: err.message };
   }
