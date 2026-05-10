@@ -19,7 +19,7 @@
   </view>
 
   <!-- Quick Stats -->
-  <view class="stats-row">
+  <view class="stats-row" wx:if="{{isLoggedIn}}">
     <view class="stat-item">
       <view class="stat-val">{{stats.totalWorkouts || 0}}</view>
       <view class="stat-key">SESSIONS</view>
@@ -37,7 +37,7 @@
   </view>
 
   <!-- Level Card -->
-  <view class="level-card">
+  <view class="level-card" wx:if="{{isLoggedIn}}">
     <view class="level-left">
       <view class="level-label">CURRENT LEVEL</view>
       <view class="level-name">{{levelInfo.name || 'BEGINNER'}}</view>
@@ -49,14 +49,14 @@
   </view>
 
   <!-- XP Bar -->
-  <view class="xp-bar-wrap">
+  <view class="xp-bar-wrap" wx:if="{{isLoggedIn}}">
     <view class="xp-track">
       <view class="xp-fill" style="width: {{xpPercent || 0}}%"></view>
     </view>
   </view>
 
   <!-- Menu List -->
-  <view class="menu-list">
+  <view class="menu-list" wx:if="{{isLoggedIn}}">
     <view class="menu-item" bindtap="goToFavorites">
       <text class="menu-icon">♥</text>
       <text class="menu-text">FAVORITES</text>
@@ -80,7 +80,7 @@
   </view>
 
   <!-- Sign Out -->
-  <button class="btn-danger" bindtap="onSignOut">SIGN OUT</button>
+  <button class="btn-danger" wx:if="{{isLoggedIn}}" bindtap="onSignOut">SIGN OUT</button>
 
   <!-- Custom Tab Bar -->
   <custom-tabbar active="profile" />
