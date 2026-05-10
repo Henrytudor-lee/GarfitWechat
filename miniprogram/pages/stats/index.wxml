@@ -13,22 +13,22 @@
   <!-- Summary Stats Row -->
   <view wx:if="{{hasData}}" class="stats-grid">
     <view class="stat-card">
-      <view class="stat-card-icon">📅</view>
+      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-calendar.svg" mode="aspectFit" />
       <view class="stat-card-value">{{totalSessions}}</view>
       <view class="stat-card-label">SESSIONS</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-icon">🔥</view>
+      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-flame.svg" mode="aspectFit" />
       <view class="stat-card-value">{{currentStreak}}</view>
       <view class="stat-card-label">STREAK</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-icon">⚡</view>
+      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-activity.svg" mode="aspectFit" />
       <view class="stat-card-value">{{weekWorkouts}}</view>
       <view class="stat-card-label">THIS WEEK</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-icon">🏋️</view>
+      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-dumbbell.svg" mode="aspectFit" />
       <view class="stat-card-value stat-card-value-small">{{totalVolume}}kg</view>
       <view class="stat-card-label">TOTAL VOLUME</view>
     </view>
@@ -92,7 +92,7 @@
 
   <!-- No data state -->
   <view wx:if="{{!hasData && !loading}}" class="empty-state">
-    <text class="empty-icon">📊</text>
+    <image class="empty-icon" src="{{imgPrefix}}/images/icons/icon-chart.svg" mode="aspectFit" />
     <text class="empty-text">NO TRAINING DATA YET</text>
     <text class="empty-subtext">Start a workout to see your stats</text>
   </view>
@@ -100,17 +100,17 @@
   <!-- Max Record Cards -->
   <view wx:if="{{maxRecord}}" class="max-record-grid">
     <view class="max-record-card">
-      <view class="max-record-icon">🎯</view>
+      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-target.svg" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.weight}}</view>
       <view class="max-record-unit">KG</view>
     </view>
     <view class="max-record-card">
-      <view class="max-record-icon">📈</view>
+      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-chart.svg" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.reps}}</view>
       <view class="max-record-unit">REPS</view>
     </view>
     <view class="max-record-card">
-      <view class="max-record-icon">✅</view>
+      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-check.svg" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.totalSets}}</view>
       <view class="max-record-unit">TOTAL SETS</view>
     </view>
