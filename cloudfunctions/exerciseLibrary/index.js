@@ -1,87 +1,87 @@
-// 云函数: exerciseLibrary — 腾讯云 PostgreSQL RDB
-// API: https://github.com/supabase/postgrest-js
+// 云函数: exerciseLibrary — 腾讯云 MySQL
+const mysql = require('mysql2/promise');
+
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const rdb = () => cloud.instance.rdb();
+let pool = null;
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.MYSQL_HOST,
+      port: parseInt(process.env.MYSQL_PORT || '3306'),
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+      waitForConnections: true,
+      connectionLimit: 5,
+      queueLimit: 0,
+    });
+  }
+  return pool;
+}
 
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext();
-  const { action, keyword, bodyPart, equipmentId, page = 1, pageSize = 20 } = event;
+  const { action, keyword, bodyPart, equipmentId, id, exerciseId, page = 1, pageSize = 20 } = event;
 
   try {
     if (action === 'list') {
-      let q = rdb().from('exercises_library')
-        .select('id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite');
+      let sql = 'SELECT id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE 1=1';
+      const params = [];
 
       if (keyword) {
-        q = q.or(`name.ilike.%${keyword}%,name_zh.ilike.%${keyword}%`);
+        sql += ' AND (name LIKE ? OR name_zh LIKE ?)';
+        params.push(`%${keyword}%`, `%${keyword}%`);
       }
       if (bodyPart) {
-        q = q.or(`body_part_id.eq.${bodyPart},body_part_id.like.%${bodyPart}%`);
+        sql += ' AND (body_part_id = ? OR body_part_id LIKE ? OR body_part_id LIKE ? OR body_part_id LIKE ?)';
+        params.push(bodyPart, `${bodyPart},%`, `%,${bodyPart},%`, `%,${bodyPart}`);
       }
       if (equipmentId) {
-        q = q.or(`equipment_id.eq.${equipmentId},equipment_id.like.%${equipmentId}%`);
+        sql += ' AND (equipment_id = ? OR equipment_id LIKE ? OR equipment_id LIKE ? OR equipment_id LIKE ?)';
+        params.push(equipmentId, `${equipmentId},%`, `%,${equipmentId},%`, `%,${equipmentId}`);
       }
 
-      const offset = (page - 1) * pageSize;
-      const { data, error } = await q
-        .order('name_zh', { ascending: true })
-        .limit(pageSize)
-        .range(offset, offset + pageSize - 1);
+      sql += ' ORDER BY name_zh ASC LIMIT ? OFFSET ?';
+      params.push(pageSize, (page - 1) * pageSize);
 
-      if (error) return { success: false, error: error.message };
-      return { success: true, list: data || [], page, pageSize };
+      const [rows] = await getPool().query(sql, params);
+      return { success: true, list: rows, page, pageSize };
 
     } else if (action === 'detail') {
-      const { id } = event;
       if (!id) return { success: false, error: '缺少 id' };
-
-      const { data, error } = await rdb()
-        .from('exercises_library')
-        .select('*')
-        .eq('id', id)
-        .limit(1)
-        .single();
-      if (error) return { success: false, error: error.message };
-      return { success: true, item: data || null };
+      const [rows] = await getPool().query(
+        'SELECT * FROM exercises_library WHERE id = ? LIMIT 1',
+        [id]
+      );
+      return { success: true, item: rows[0] || null };
 
     } else if (action === 'favorites') {
-      const { data, error } = await rdb()
-        .from('exercises_library')
-        .select('id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite')
-        .eq('is_favorite', 1)
-        .order('name_zh', { ascending: true });
-      if (error) return { success: false, error: error.message };
-      return { success: true, list: data || [] };
+      const [rows] = await getPool().query(
+        'SELECT id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE is_favorite = 1 ORDER BY name_zh ASC'
+      );
+      return { success: true, list: rows };
 
     } else if (action === 'toggleFavorite') {
-      const { exerciseId } = event;
       if (!exerciseId) return { success: false, error: '缺少 exerciseId' };
+      const [existing] = await getPool().query(
+        'SELECT is_favorite FROM exercises_library WHERE id = ? LIMIT 1',
+        [exerciseId]
+      );
+      if (!existing || existing.length === 0) return { success: false, error: '动作不存在' };
 
-      const { data, error } = await rdb()
-        .from('exercises_library')
-        .select('is_favorite')
-        .eq('id', exerciseId)
-        .limit(1)
-        .maybeSingle();
-      if (error || !data) return { success: false, error: error ? error.message : '动作不存在' };
-
-      const newVal = data.is_favorite === 1 ? 0 : 1;
-      const { error: err } = await rdb()
-        .from('exercises_library')
-        .update({ is_favorite: newVal })
-        .eq('id', exerciseId);
-      if (err) return { success: false, error: err.message };
+      const newVal = existing[0].is_favorite === 1 ? 0 : 1;
+      await getPool().query(
+        'UPDATE exercises_library SET is_favorite = ? WHERE id = ?',
+        [newVal, exerciseId]
+      );
       return { success: true, is_favorite: newVal };
 
     } else if (action === 'count') {
-      const { data, error } = await rdb()
-        .from('exercises_library')
-        .select('id', { count: 'exact', head: true })
-        .limit(1);
-      if (error) return { success: false, error: error.message };
-      return { success: true, total: 0 };
+      const [rows] = await getPool().query(
+        'SELECT COUNT(*) as total FROM exercises_library'
+      );
+      return { success: true, total: rows[0].total };
     }
 
     return { success: false, error: '未知 action' };
