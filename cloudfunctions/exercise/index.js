@@ -54,7 +54,7 @@ if (action === 'add') {
       const [rows] = await getPool().query(
         `SELECT weight, reps, weight_unit, create_time
          FROM exercises
-         WHERE openid = ? AND exercise_id = ?
+         WHERE _openid = ? AND exercise_id = ?
          ORDER BY weight DESC, create_time DESC
          LIMIT 1`,
         [openid, exercise_id]);
