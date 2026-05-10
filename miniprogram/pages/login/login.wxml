@@ -9,7 +9,7 @@
   <view class="login-card">
     <view class="login-desc">登录后获取完整功能</view>
 
-    <!-- 头像选择（open-type 触发微信头像选择器） -->
+    <!-- 头像选择 -->
     <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <view class="avatar-wrapper">
         <image
@@ -21,7 +21,7 @@
       </view>
     </button>
 
-    <!-- 昵称输入（type=nickname 调起微信昵称键盘） -->
+    <!-- 昵称输入 -->
     <view class="nickname-wrap">
       <input
         type="nickname"
@@ -33,6 +33,16 @@
         bindblur="onNicknameBlur"
       />
     </view>
+
+    <!-- 手机号授权（必须） -->
+    <button
+      class="phone-btn {{phoneNumber ? 'done' : ''}}"
+      open-type="getPhoneNumber"
+      bindgetphonenumber="onGetPhoneNumber"
+    >
+      <text class="phone-icon">{{phoneNumber ? '✓' : '📱'}}</text>
+      <text class="phone-text">{{phoneNumber || '授权手机号'}}</text>
+    </button>
 
     <!-- 确认登录 -->
     <button
