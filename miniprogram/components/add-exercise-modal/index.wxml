@@ -1,0 +1,203 @@
+<!--components/add-exercise-modal/index.wxml-->
+<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+  <view class="modal-sheet" catchtap="">
+
+    <!-- Drag Handle -->
+    <view class="drag-handle"></view>
+
+    <!-- Header -->
+    <view class="modal-header">
+      <view class="header-left">
+        <view wx:if="{{step === 'pick' && selectedMuscleOpen}}" class="header-btn" bindtap="closeMuscleMenu">✕</view>
+        <block wx:elif="{{step === 'pick'}}">
+          <view class="header-btn" bindtap="toggleMuscleMenu">🏅 {{muscleLabel}}</view>
+        </block>
+        <block wx:else>
+          <view class="header-btn back-btn" bindtap="goBack">← Back</view>
+        </block>
+      </view>
+
+      <view class="header-title">{{step === 'pick' ? 'ADD EXERCISE' : 'SET WEIGHT'}}</view>
+
+      <view class="header-right">
+        <view class="header-btn" bindtap="closeModal">✕</view>
+      </view>
+    </view>
+
+    <!-- Muscle Sidebar -->
+    <view wx:if="{{selectedMuscleOpen && step === 'pick'}}" class="muscle-sidebar">
+      <view
+        class="muscle-item {{selectedMuscle === 0 ? 'active' : ''}}"
+        bindtap="selectMuscle"
+        data-id="0"
+      >All Muscles</view>
+      <view
+        wx:for="{{muscleList}}"
+        wx:key="id"
+        class="muscle-item {{selectedMuscle === item.id ? 'active' : ''}}"
+        bindtap="selectMuscle"
+        data-id="{{item.id}}"
+      >{{item.name}}</view>
+    </view>
+
+    <!-- Content Area -->
+    <view class="modal-content">
+
+      <!-- STEP 1: Pick Exercise -->
+      <view wx:if="{{step === 'pick'}}">
+
+        <!-- Search -->
+        <view class="search-bar">
+          <text class="search-icon">🔍</text>
+          <input
+            class="search-input"
+            placeholder="SEARCH EXERCISES..."
+            placeholder-class="search-placeholder"
+            value="{{keyword}}"
+            bindinput="onSearchInput"
+            bindconfirm="onSearch"
+          />
+        </view>
+
+        <!-- Equipment Filters -->
+        <view class="filter-section">
+          <scroll-view class="filter-scroll" scroll-x>
+            <view class="filter-row">
+              <view
+                class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}"
+                bindtap="selectEquipment"
+                data-id="0"
+              >ALL</view>
+              <view
+                wx:for="{{equipmentList}}"
+                wx:key="id"
+                class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}"
+                bindtap="selectEquipment"
+                data-id="{{item.id}}"
+              >{{item.name.toUpperCase()}}</view>
+            </view>
+          </scroll-view>
+        </view>
+
+        <!-- Exercise Grid -->
+        <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore">
+          <view wx:if="{{loading && list.length === 0}}" class="loading-state">LOADING...</view>
+          <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">NO EXERCISES FOUND</view>
+
+          <view wx:else class="grid-inner">
+            <view
+              wx:for="{{list}}"
+              wx:key="_id"
+              class="exercise-card"
+              data-item="{{item}}"
+              bindtap="onExerciseTap"
+            >
+              <view class="card-img-wrap">
+                <image
+                  wx:if="{{item.image_name}}"
+                  class="card-img"
+                  src="{{imgPrefix}}/{{item.image_name}}"
+                  mode="aspectFill"
+                />
+                <view wx:else class="card-img-placeholder">🏋️</view>
+                <view class="card-gradient"></view>
+                <view wx:if="{{item.is_favorite}}" class="fav-badge">WORKED</view>
+              </view>
+              <view class="card-footer">
+                <view class="card-name">{{item.name}}</view>
+              </view>
+            </view>
+          </view>
+
+          <view wx:if="{{loadingMore}}" class="load-more">LOADING MORE...</view>
+          <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
+        </scroll-view>
+      </view>
+
+      <!-- STEP 2: Set Weight/Reps -->
+      <view wx:if="{{step === 'set'}}">
+
+        <!-- Selected Exercise Card -->
+        <view class="selected-exercise-card">
+          <image
+            wx:if="{{selectedItem.image_name}}"
+            class="selected-img"
+            src="{{imgPrefix}}/{{selectedItem.image_name}}"
+            mode="aspectFill"
+          />
+          <view wx:else class="selected-img selected-img-placeholder">🏋️</view>
+          <view class="selected-info">
+            <view class="selected-name">{{selectedItem.name_zh || selectedItem.name}}</view>
+            <view class="selected-tags">
+              <text class="tag">{{selectedItem.equipment_name || 'OTHER'}}</text>
+              <text class="tag tag-neutral">{{selectedItem.muscle_name || ''}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Last Time -->
+        <view wx:if="{{historyMax}}" class="history-bar">
+          <text class="history-label">Last time:</text>
+          <view class="history-val" bindtap="applyHistory">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</view>
+        </view>
+
+        <!-- Weight Input -->
+        <view class="input-section">
+          <view class="input-label">WEIGHT ({{unit}})</view>
+          <view class="input-row">
+            <view class="input-btn" bindtap="decWeight">−</view>
+            <input
+              class="input-field"
+              type="digit"
+              value="{{weight}}"
+              bindinput="onWeightInput"
+              placeholder="0"
+            />
+            <view class="input-btn" bindtap="incWeight">+</view>
+          </view>
+        </view>
+
+        <!-- Unit Toggle -->
+        <view class="unit-toggle">
+          <view
+            class="unit-btn {{unit === 'kg' ? 'active' : ''}}"
+            bindtap="setUnit"
+            data-unit="kg"
+          >KG</view>
+          <view
+            class="unit-btn {{unit === 'lb' ? 'active' : ''}}"
+            bindtap="setUnit"
+            data-unit="lb"
+          >LB</view>
+        </view>
+
+        <!-- Reps Input -->
+        <view class="input-section">
+          <view class="input-label">REPS</view>
+          <view class="input-row">
+            <view class="input-btn" bindtap="decReps">−</view>
+            <input
+              class="input-field"
+              type="number"
+              value="{{reps}}"
+              bindinput="onRepsInput"
+              placeholder="0"
+            />
+            <view class="input-btn" bindtap="incReps">+</view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- Bottom Confirm Button (Step 2 only) -->
+    <view wx:if="{{step === 'set'}}" class="modal-footer">
+      <button
+        class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}"
+        bindtap="confirmAdd"
+        disabled="{{weight < 0 || reps <= 0 || submitting}}"
+      >{{submitting ? 'ADDING...' : 'ADD TO WORKOUT'}}</button>
+    </view>
+
+  </view>
+</view>

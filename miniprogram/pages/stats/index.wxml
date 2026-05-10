@@ -1,4 +1,4 @@
-<!--pages/stats/index.wxml—garcia-fitness-new style-->
+<!--pages/stats/index.wxml—garcia-fitness-new style with charts-->
 <view class="page">
 
   <!-- Top App Bar -->
@@ -10,67 +10,36 @@
     <view class="page-subtitle-text">YOUR PERFORMANCE DATA</view>
   </view>
 
-  <!-- Summary Stats -->
-  <view class="stats-grid">
+  <!-- Summary Stats Row -->
+  <view wx:if="{{hasData}}" class="stats-grid">
     <view class="stat-card">
-      <view class="stat-card-value">{{stats.totalWorkouts || 0}}</view>
+      <view class="stat-card-icon">📅</view>
+      <view class="stat-card-value">{{totalSessions}}</view>
       <view class="stat-card-label">SESSIONS</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-value">{{stats.currentStreak || 0}}</view>
+      <view class="stat-card-icon">🔥</view>
+      <view class="stat-card-value">{{currentStreak}}</view>
       <view class="stat-card-label">STREAK</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-value">{{stats.weekWorkouts || 0}}</view>
+      <view class="stat-card-icon">⚡</view>
+      <view class="stat-card-value">{{weekWorkouts}}</view>
       <view class="stat-card-label">THIS WEEK</view>
     </view>
     <view class="stat-card">
-      <view class="stat-card-value stat-card-value-small">{{stats.totalVolume || 0}}</view>
-      <view class="stat-card-label">TOTAL KG</view>
+      <view class="stat-card-icon">🏋️</view>
+      <view class="stat-card-value stat-card-value-small">{{totalVolume}}kg</view>
+      <view class="stat-card-label">TOTAL VOLUME</view>
     </view>
   </view>
 
-  <!-- Exercise Selector -->
-  <view class="select-wrap">
-    <view class="select-label">EXERCISE MAX RECORD</view>
-    <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
-      <view class="select-display">
-        <text>{{selectedExerciseName || '— CHOOSE EXERCISE —'}}</text>
-        <text class="select-arrow">›</text>
-      </view>
-    </picker>
-  </view>
-
-  <!-- No data -->
-  <view wx:if="{{exerciseList.length === 0}}" class="empty-state">
-    <text class="empty-icon">📊</text>
-    <text>NO TRAINING DATA YET</text>
-  </view>
-
-  <!-- Max Record -->
-  <view wx:if="{{maxRecord}}" class="max-card">
-    <view class="section-title">MAX RECORD</view>
-    <view class="max-card-grid">
-      <view class="max-item">
-        <view class="max-num">{{maxRecord.weight}}</view>
-        <view class="max-label">KG</view>
-      </view>
-      <view class="max-item">
-        <view class="max-num">{{maxRecord.reps}}</view>
-        <view class="max-label">REPS</view>
-      </view>
-      <view class="max-item">
-        <view class="max-num">{{maxRecord.totalSets}}</view>
-        <view class="max-label">TOTAL SETS</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- Weekly Volume Bar Chart — last 7 days -->
-  <view wx:if="{{weeklyVolume.length > 0}}" class="bar-chart">
+  <!-- Weekly Volume Bar Chart — last 8 weeks -->
+  <view wx:if="{{weeklyVolume.length > 0}}" class="glass-card chart-card">
     <view class="section-title">WEEKLY VOLUME</view>
+    <view class="section-subtitle">LAST 8 WEEKS</view>
     <view class="bar-rows">
-      <view class="bar-row" wx:for="{{weeklyVolume}}" wx:key="day">
+      <view class="bar-row" wx:for="{{weeklyVolume}}" wx:key="iso">
         <text class="bar-label">{{item.label}}</text>
         <view class="bar-track">
           <view class="bar-fill" style="width: {{item.percent}}%"></view>
@@ -80,15 +49,83 @@
     </view>
   </view>
 
-  <!-- Most Trained Muscle Groups -->
-  <view wx:if="{{mostTrained.length > 0}}" class="muscle-list">
-    <view class="section-title">MOST TRAINED</view>
-    <view class="muscle-items">
-      <view class="muscle-item" wx:for="{{mostTrained}}" wx:key="name">
-        <text class="muscle-name">{{item.name}}</text>
-        <text class="muscle-count">{{item.count}} sessions</text>
+  <!-- Muscle Distribution -->
+  <view wx:if="{{muscleDistribution.length > 0}}" class="glass-card chart-card">
+    <view class="section-title">MUSCLE DISTRIBUTION</view>
+    <view class="muscle-chart-wrap">
+      <canvas canvas-id="muscleChart" class="pie-chart-canvas" />
+      <view class="muscle-legend">
+        <view class="muscle-legend-item" wx:for="{{muscleDistribution}}" wx:key="name">
+          <view class="muscle-dot" style="background: {{item.color}}"></view>
+          <text class="muscle-legend-name">{{item.name}}</text>
+          <text class="muscle-legend-val">{{item.value}}kg</text>
+        </view>
       </view>
     </view>
+  </view>
+
+  <!-- Most Trained Exercises -->
+  <view wx:if="{{mostTrained.length > 0}}" class="glass-card chart-card">
+    <view class="section-title">MOST TRAINED</view>
+    <view class="freq-list">
+      <view class="freq-item" wx:for="{{mostTrained}}" wx:key="name">
+        <text class="freq-name">{{item.name}}</text>
+        <text class="freq-count">{{item.count}} SETS</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Exercise Selector -->
+  <view class="glass-card select-wrap">
+    <view class="select-header">
+      <text class="select-label">EXERCISE MAX RECORD</text>
+    </view>
+    <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
+      <view class="select-display">
+        <text class="{{selectedExerciseName ? 'select-text-active' : 'select-text-placeholder'}}">
+          {{selectedExerciseName || '— CHOOSE EXERCISE —'}}
+        </text>
+        <text class="select-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- No data state -->
+  <view wx:if="{{!hasData && !loading}}" class="empty-state">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">NO TRAINING DATA YET</text>
+    <text class="empty-subtext">Start a workout to see your stats</text>
+  </view>
+
+  <!-- Max Record Cards -->
+  <view wx:if="{{maxRecord}}" class="max-record-grid">
+    <view class="max-record-card">
+      <view class="max-record-icon">🎯</view>
+      <view class="max-record-num">{{maxRecord.weight}}</view>
+      <view class="max-record-unit">KG</view>
+    </view>
+    <view class="max-record-card">
+      <view class="max-record-icon">📈</view>
+      <view class="max-record-num">{{maxRecord.reps}}</view>
+      <view class="max-record-unit">REPS</view>
+    </view>
+    <view class="max-record-card">
+      <view class="max-record-icon">✅</view>
+      <view class="max-record-num">{{maxRecord.totalSets}}</view>
+      <view class="max-record-unit">TOTAL SETS</view>
+    </view>
+  </view>
+
+  <!-- Weight Progress Chart -->
+  <view wx:if="{{weightRecords.length > 0}}" class="glass-card chart-card">
+    <view class="section-title">WEIGHT PROGRESS</view>
+    <view class="section-subtitle">{{weightRecords.length}} RECORDS</view>
+    <canvas canvas-id="weightChart" class="weight-chart-canvas" />
+  </view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="loading-text">LOADING...</text>
   </view>
 
   <!-- Custom Tab Bar -->

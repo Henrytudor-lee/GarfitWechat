@@ -1,4 +1,4 @@
-<!--pages/index/index.wxml—garcia-fitness-new style-->
+<!--pages/index/index.wxml—garcia-fitness-new style with bento stats, date picker, rest timer-->
 <view class="page">
 
   <!-- Top App Bar -->
@@ -82,22 +82,116 @@
     </view>
   </view>
 
-  <!-- Recent Sessions -->
-  <view class="section" wx:if="{{recentSessions.length > 0}}">
+  <!-- History Bento Section -->
+  <view class="section">
     <view class="section-header">
-      <text class="section-title">RECENT</text>
-      <text class="section-link" bindtap="goToHistory">VIEW ALL</text>
+      <text class="section-title">HISTORY</text>
+      <view
+        class="date-picker-btn"
+        bindtap="openDatePicker"
+      >{{displayDate}}</view>
     </view>
-    <view class="recent-list">
-      <view class="recent-item" wx:for="{{recentSessions}}" wx:key="_id">
-        <view class="recent-date">{{item.dateStr}}</view>
-        <view class="recent-info">
-          <text class="recent-stat">{{item.durationStr}}</text>
-          <text class="recent-stat">{{item.exerciseCount || 0}} EXERCISES</text>
+
+    <!-- Sessions for selected date -->
+    <view wx:if="{{historySessions.length > 0}}" class="history-session-list">
+      <view
+        class="history-session-item"
+        wx:for="{{historySessions}}"
+        wx:key="_id"
+        data-session="{{item}}"
+        bindtap="onHistorySessionTap"
+      >
+        <view class="history-session-time">{{item.timeStr}}</view>
+        <view class="history-session-info">
+          <text class="history-session-stat">{{item.durationStr}}</text>
+          <text class="history-session-stat">{{item.exerciseCount || 0}} EXERCISES</text>
         </view>
       </view>
     </view>
+
+    <!-- Bento Grid (shown when no sessions for selected date) -->
+    <view wx:else class="bento-grid">
+      <view class="bento-card bento-today">
+        <view class="bento-label">TODAY</view>
+        <view class="bento-day">{{todayDay}}</view>
+        <view class="bento-month text-primary">{{todayMonth}}</view>
+        <view class="bento-progress-bar">
+          <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
+        </view>
+      </view>
+      <view class="bento-card bento-yesterday">
+        <view class="bento-label">YESTERDAY</view>
+        <view class="bento-day">{{yesterdayDay}}</view>
+        <view class="bento-month text-muted">{{yesterdayMonth}}</view>
+        <view class="bento-progress-bar">
+          <view class="bento-progress-fill muted" style="width: 0%"></view>
+        </view>
+      </view>
+      <view class="bento-card bento-monthly">
+        <view class="bento-label">MONTHLY VOL</view>
+        <view class="bento-big-num text-primary">0 KG</view>
+        <view class="bento-hint text-primary">START TRACKING</view>
+        <view class="bento-bg-icon">📊</view>
+      </view>
+    </view>
   </view>
+
+  <!-- Custom Date Picker Modal -->
+  <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker">
+    <view class="picker-modal" catchtap="noop">
+      <!-- Month navigation -->
+      <view class="picker-header">
+        <view class="picker-nav" bindtap="prevMonth">
+          <text class="picker-nav-arrow">‹</text>
+        </view>
+        <view class="picker-month-label">{{pickerYearLabel}}</view>
+        <view class="picker-nav" bindtap="nextMonth">
+          <text class="picker-nav-arrow">›</text>
+        </view>
+      </view>
+      <!-- Day headers -->
+      <view class="picker-day-headers">
+        <text class="picker-day-h" wx:for="{{dayNames}}" wx:key="index">{{item}}</text>
+      </view>
+      <!-- Days grid -->
+      <view class="picker-days-grid">
+        <view
+          wx:for="{{calendarDays}}"
+          wx:key="index"
+          class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}"
+          bindtap="selectDay"
+          data-day="{{item.day}}"
+        >{{item.day}}</view>
+      </view>
+      <!-- Today shortcut -->
+      <view class="picker-today-btn" bindtap="goToToday">TODAY</view>
+    </view>
+  </view>
+
+  <!-- Edit Exercise Modal -->
+  <edit-exercise-modal
+    isOpen="{{showEditModal}}"
+    group="{{editingGroup}}"
+    sessionId="{{currentSessionId}}"
+    bind:close="onEditModalClose"
+    bind:saved="onEditModalSaved"
+  />
+
+  <!-- Session Detail Modal -->
+  <session-detail-modal
+    isOpen="{{showSessionDetailModal}}"
+    session="{{viewingSession}}"
+    sessionId="{{viewingSessionId}}"
+    bind:close="onSessionDetailClose"
+  />
+
+  <!-- Workout Summary Modal -->
+  <workout-summary-modal
+    isOpen="{{showWorkoutSummary}}"
+    session="{{workoutSummarySession}}"
+    exerciseList="{{workoutSummaryExercises}}"
+    bind:close="onWorkoutSummaryClose"
+  />
 
   <!-- Custom Tab Bar -->
   <custom-tabbar active="training" />

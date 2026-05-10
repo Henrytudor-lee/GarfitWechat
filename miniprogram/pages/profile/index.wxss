@@ -235,3 +235,21 @@
   width: 100%;
 }
 .btn-danger::after { border: none; }
+
+/* Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue */
+.color-neutral-600 { color: #52525b; }
+.color-orange { color: #f97316; }
+.color-yellow { color: #facc15; }
+.color-lime { color: #a3e635; }
+.color-green { color: #4ade80; }
+.color-teal { color: #2dd4bf; }
+.color-blue { color: #60a5fa; }
+
+/* Trophy color tiers by level: 1=gray, 2=orange, 3=yellow, 4=lime, 5=green, 6+=blue */
+.color-trophy-rookie { color: #52525b; }
+.color-trophy-beginner { color: #f97316; }
+.color-trophy-intermediate { color: #facc15; }
+.color-trophy-advanced { color: #a3e635; }
+.color-trophy-expert { color: #4ade80; }
+.color-trophy-elite { color: #60a5fa; }
+

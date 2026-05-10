@@ -298,3 +298,288 @@
   color: #71717a;
   letter-spacing: 0.05em;
 }
+
+/* ====== History Bento Grid ====== */
+.history-session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.history-session-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-session-time {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ccf200;
+}
+
+.history-session-info {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.history-session-stat {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #71717a;
+  letter-spacing: 0.05em;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+}
+
+.bento-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-label {
+  font-size: 18rpx;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.bento-day {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 72rpx;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin: 8rpx 0 4rpx;
+}
+
+.bento-month {
+  font-size: 20rpx;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bento-month.text-primary { color: #ccf200; }
+.bento-month.text-muted { color: rgba(255, 255, 255, 0.25); }
+
+.bento-progress-bar {
+  width: 100%;
+  height: 6rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 100rpx;
+  overflow: hidden;
+  margin-top: 16rpx;
+}
+
+.bento-progress-fill {
+  height: 100%;
+  background: #ccf200;
+  border-radius: 100rpx;
+}
+
+.bento-progress-fill.muted {
+  background: rgba(255, 255, 255, 0.2);
+  width: 0% !important;
+}
+
+.bento-monthly {
+  grid-column: 1 / -1;
+  min-height: 240rpx;
+}
+
+.bento-big-num {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 72rpx;
+  font-weight: 900;
+  color: #ccf200;
+  line-height: 1;
+  margin: 8rpx 0 4rpx;
+}
+
+.bento-hint {
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(204, 242, 0, 0.6);
+}
+
+.bento-bg-icon {
+  position: absolute;
+  right: -20rpx;
+  bottom: -20rpx;
+  font-size: 140rpx;
+  opacity: 0.05;
+}
+
+.text-primary { color: #ccf200; }
+
+/* Date Picker Button */
+.date-picker-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12rpx;
+  padding: 8rpx 20rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+/* ====== Custom Date Picker Modal ====== */
+.picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8rpx);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.picker-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.picker-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: 580rpx;
+  background: rgba(28, 28, 28, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 32rpx;
+  padding: 32rpx;
+  z-index: 1000;
+  box-shadow: 0 24rpx 80rpx rgba(0, 0, 0, 0.6);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.picker-overlay.show .picker-modal {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.picker-nav {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.picker-nav-arrow {
+  font-size: 36rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+.picker-month-label {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.picker-day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8rpx;
+}
+
+.picker-day-h {
+  text-align: center;
+  font-size: 20rpx;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.30);
+  padding: 8rpx 0;
+}
+
+.picker-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx;
+}
+
+.picker-day-cell {
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  color: rgba(255, 255, 255, 0.50);
+  transition: background 0.15s;
+}
+
+.picker-day-cell.empty {
+  background: transparent;
+}
+
+.picker-day-cell:not(.empty):active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.picker-day-cell.today {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.picker-day-cell.selected {
+  background: #ccf200;
+  color: #000;
+  font-weight: 800;
+}
+
+.picker-today-btn {
+  margin-top: 20rpx;
+  width: 100%;
+  padding: 16rpx 0;
+  background: rgba(204, 242, 0, 0.10);
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #ccf200;
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.picker-today-btn:active {
+  background: rgba(204, 242, 0, 0.20);
+}

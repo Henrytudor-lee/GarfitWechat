@@ -1,0 +1,67 @@
+<!--components/workout-summary-modal/index.wxml-->
+<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+  <view class="modal-sheet" catchtap="">
+
+    <!-- Celebration Header -->
+    <view class="summary-header">
+      <view class="celebration-icon">🎉</view>
+      <view class="summary-title">WORKOUT COMPLETE!</view>
+      <view class="summary-subtitle">Great job finishing your training session</view>
+    </view>
+
+    <!-- Stats Grid -->
+    <view class="stats-grid">
+      <view class="stat-card">
+        <view class="stat-value">{{getExerciseCount()}}</view>
+        <view class="stat-label">EXERCISES</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-value">{{getTotalSets()}}</view>
+        <view class="stat-label">TOTAL SETS</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-value">{{getTotalReps()}}</view>
+        <view class="stat-label">TOTAL REPS</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-value">{{getTotalVolume()}}</view>
+        <view class="stat-label">VOLUME ({{session && session.weight_unit || 'kg'}})</view>
+      </view>
+    </view>
+
+    <!-- Exercise Breakdown -->
+    <view class="breakdown-section">
+      <view class="breakdown-title">EXERCISE BREAKDOWN</view>
+      <scroll-view class="breakdown-list" scroll-y>
+        <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="_id">
+          <view class="item-info">
+            <image
+              wx:if="{{item.image_name}}"
+              class="item-img"
+              src="{{imgPrefix}}/{{item.image_name}}"
+              mode="aspectFill"
+            />
+            <view wx:else class="item-img item-img-placeholder">🏋️</view>
+            <view class="item-text">
+              <view class="item-name">{{item.name_zh || item.name}}</view>
+              <view class="item-sets-info">{{item.sets.length}} sets</view>
+            </view>
+          </view>
+          <view class="item-summary">
+            <text wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
+              {{s.weight}}{{s.weight_unit || 'kg'}}×{{s.reps}}{{index < item.sets.length - 1 ? ', ' : ''}}
+            </text>
+            <text wx:if="{{!item.sets || item.sets.length === 0}}">No sets recorded</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- Action Buttons -->
+    <view class="modal-footer">
+      <button class="btn-secondary" bindtap="closeModal">VIEW HISTORY</button>
+      <button class="btn-primary" bindtap="closeModal">DONE</button>
+    </view>
+
+  </view>
+</view>

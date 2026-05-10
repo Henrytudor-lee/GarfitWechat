@@ -65,9 +65,21 @@ exports.main = async (event, context) => {
       const page = parseInt(event.page || 1);
       const pageSize = parseInt(event.pageSize || 20);
       const offset = (page - 1) * pageSize;
-      const [rows] = await getPool().query(
-        'SELECT * FROM sessions WHERE _openid = ? ORDER BY start_time DESC LIMIT ? OFFSET ?',
-        [openid, pageSize, offset]);
+      const { date } = event; // YYYY-MM-DD filter
+
+      let sql = 'SELECT * FROM sessions WHERE _openid = ?';
+      const params = [openid];
+
+      if (date) {
+        // Match sessions where start_time falls on the given date (local date)
+        sql += " AND DATE(start_time) = ?";
+        params.push(date);
+      }
+
+      sql += ' ORDER BY start_time DESC LIMIT ? OFFSET ?';
+      params.push(pageSize, offset);
+
+      const [rows] = await getPool().query(sql, params);
       return { success: true, sessions: rows, page, pageSize };
 
     } else if (action === 'getById') {

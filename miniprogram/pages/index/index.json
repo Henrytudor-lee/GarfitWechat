@@ -5,6 +5,9 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "appbar": "/components/appbar/index",
-    "custom-tabbar": "/components/custom-tabbar/index"
+    "custom-tabbar": "/components/custom-tabbar/index",
+    "edit-exercise-modal": "/components/edit-exercise-modal/index",
+    "session-detail-modal": "/components/session-detail-modal/index",
+    "workout-summary-modal": "/components/workout-summary-modal/index"
   }
 }
