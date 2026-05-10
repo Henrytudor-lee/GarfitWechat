@@ -96,11 +96,32 @@
   font-weight: 500;
   color: #aaa;
   border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.muscle-icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex-shrink: 0;
+}
+
+.muscle-item-name {
+  flex: 1;
 }
 
 .muscle-item.active {
   background: rgba(204, 242, 0, 0.15);
   color: #ccf200;
+}
+
+.muscle-item.active .muscle-icon {
+  opacity: 1;
+}
+
+.muscle-item .muscle-icon {
+  opacity: 0.6;
 }
 
 /* Content Area */

@@ -44,7 +44,10 @@
         class="muscle-item {{selectedMuscle === item.id ? 'active' : ''}}"
         bindtap="selectMuscle"
         data-id="{{item.id}}"
-      >{{item.name}}</view>
+      >
+        <image wx:if="{{item.icon}}" class="muscle-icon" src="{{imgPrefix}}/images/body-icons/{{item.icon}}" mode="aspectFit" />
+        <text class="muscle-item-name">{{item.name}}</text>
+      </view>
     </view>
 
     <!-- Content Area -->
