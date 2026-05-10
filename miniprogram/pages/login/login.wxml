@@ -57,7 +57,6 @@
     </button>
 
     <view class="login-note">
-      点击登录即表示同意
       <text class="link">《用户协议》</text>和
       <text class="link">《隐私政策》</text>
     </view>

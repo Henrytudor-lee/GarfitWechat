@@ -51,11 +51,22 @@ Page({
     wx.showLoading({ title: '登录中...', mask: true });
 
     try {
+      // 1. 先调 wx.login() 获取 code
+      const loginRes = await wx.login();
+      if (!loginRes.code) {
+        wx.hideLoading();
+        wx.showModal({ title: '登录失败', content: '获取登录凭证失败，请稍后重试', showCancel: false });
+        this.setData({ loading: false });
+        return;
+      }
+
       const { avatarUrl, nickname, phoneNumber: inputPhone } = this.data;
 
-      const loginRes = await wx.cloud.callFunction({
+      // 2. 把 code 发给云函数，在云函数端调 auth.code2Session
+      const res = await wx.cloud.callFunction({
         name: 'loginByWx',
         data: {
+          code: loginRes.code,
           nickname: nickname.trim(),
           avatar: avatarUrl,
           phoneNumber: inputPhone.trim(),
@@ -64,17 +75,17 @@ Page({
 
       wx.hideLoading();
 
-      if (!loginRes.result || !loginRes.result.success) {
+      if (!res.result || !res.result.success) {
         wx.showModal({
           title: '登录失败',
-          content: loginRes.result?.error || '请稍后重试',
+          content: res.result?.error || '请稍后重试',
           showCancel: false,
         });
         this.setData({ loading: false });
         return;
       }
 
-      const { userId, openid, phoneNumber } = loginRes.result;
+      const { userId, openid, phoneNumber } = res.result;
       app.globalData.userId = userId;
       app.globalData.openid = openid;
       app.globalData.userInfo = { nickname: nickname.trim(), avatar: avatarUrl };
