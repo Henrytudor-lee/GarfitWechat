@@ -1,64 +1,60 @@
-// 云函数: profile
-// 用户资料读写 / 等级信息（PostgreSQL）
+// 云函数: profile — 腾讯云 MySQL
+const mysql = require('mysql2/promise');
+
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const { CloudBase } = require('@cloudbase/node-sdk');
-const envId = cloud.DYNAMIC_CURRENT_ENV;
-const cloudbase = new CloudBase({ env: envId });
-const rdb = () => cloudbase.rdb();
+let pool = null;
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.MYSQL_HOST,
+      port: parseInt(process.env.MYSQL_PORT || '3306'),
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+      waitForConnections: true,
+      connectionLimit: 5,
+      queueLimit: 0,
+    });
+  }
+  return pool;
+}
 
-exports.main = async (event, context) => {
+exports.main = async (event, context) => {{
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
+  if (!openid) return {{ success: false, error: '未登录' }};
 
-  if (!openid) return { success: false, error: '未登录' };
+  try {{
+    const [[user]] = await getPool().query('SELECT * FROM users WHERE openid = ? LIMIT 1', [openid]);
+    if (!user) return {{ success: false, error: '用户不存在' }};
 
-  try {
-    const { data: user, error: err0 } = await rdb()
-      .from('users')
-      .select('*')
-      .eq('openid', openid)
-      .limit(1);
-    if (err0) return { success: false, error: err0.message };
-    if (!user || user.length === 0) return { success: false, error: '用户不存在' };
-    const uid = user[0].id;
+    if (event.action === 'get') {{
+      const [[streak]] = await getPool().query('SELECT streak FROM user_streaks WHERE user_id = ?', [user.id]);
+      const [[level]] = await getPool().query('SELECT level, label, score FROM user_levels WHERE user_id = ?', [user.id]);
+      return {{ success: true, profile: {{
+        id: user.id, name: user.name, avatar: user.avatar, role: user.role,
+        streak: streak ? streak.streak : 0,
+        level: level ? level.level : 1, label: level ? level.label : 'ROOKIE', score: level ? level.score : 0,
+      }}}};
+    }}
 
-    if (event.action === 'get') {
-      const [{ data: streak }, { data: level }] = await Promise.all([
-        rdb().from('user_streaks').select('*').eq('user_id', uid).limit(1),
-        rdb().from('user_levels').select('*').eq('user_id', uid).limit(1),
-      ]);
+    if (event.action === 'update') {{
+      const {{ nickname, avatar }} = event;
+      if (nickname !== undefined || avatar !== undefined) {{
+        const fields = []; const vals = [];
+        if (nickname !== undefined) {{ fields.push('name = ?'); vals.push(nickname); }}
+        if (avatar !== undefined) {{ fields.push('avatar = ?'); vals.push(avatar); }}
+        fields.push('updated_at = NOW()');
+        vals.push(user.id);
+        await getPool().query(`UPDATE users SET ${{fields.join(', ')}} WHERE id = ?`, vals);
+      }}
+      return {{ success: true }};
+    }}
 
-      return {
-        success: true,
-        profile: {
-          ...user[0],
-          streak: streak && streak.length > 0 ? streak[0].streak : 0,
-          level: level && level.length > 0 ? level[0].level : 1,
-          label: level && level.length > 0 ? level[0].label : 'ROOKIE',
-          score: level && level.length > 0 ? level[0].score : 0,
-        },
-      };
-    }
-
-    if (event.action === 'update') {
-      const { nickname, avatar } = event;
-      const updateData = {};
-      if (nickname !== undefined) updateData.name = nickname;
-      if (avatar !== undefined) updateData.avatar = avatar;
-      updateData.updated_at = new Date().toISOString();
-
-      const { error: err } = await rdb()
-        .from('users')
-        .update(updateData)
-        .eq('id', uid);
-      if (err) return { success: false, error: err.message };
-      return { success: true };
-    }
-
-    return { success: false, error: '未知 action' };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-};
+    return {{ success: false, error: '未知 action' }};
+  }} catch (err) {{
+    return {{ success: false, error: err.message }};
+  }}
+}};

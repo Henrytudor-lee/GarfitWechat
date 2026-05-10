@@ -1,148 +1,90 @@
-// 云函数: session
-// 训练会话管理 — create / getRunning / finish / list（PostgreSQL）
+// 云函数: session — 腾讯云 MySQL
+const mysql = require('mysql2/promise');
+
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const { CloudBase } = require('@cloudbase/node-sdk');
-const envId = cloud.DYNAMIC_CURRENT_ENV;
-const cloudbase = new CloudBase({ env: envId });
-const rdb = () => cloudbase.rdb();
+let pool = null;
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.MYSQL_HOST,
+      port: parseInt(process.env.MYSQL_PORT || '3306'),
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+      waitForConnections: true,
+      connectionLimit: 5,
+      queueLimit: 0,
+    });
+  }
+  return pool;
+}
 
-exports.main = async (event, context) => {
+exports.main = async (event, context) => {{
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
-  const { action, sessionId, userId } = event;
+  const {{ action, sessionId }} = event;
 
-  // 获取 userId
-  let uid = userId;
-  if (!uid && openid) {
-    const { data, error } = await rdb()
-      .from('users')
-      .select('id')
-      .eq('openid', openid)
-      .limit(1);
-    if (error) return { success: false, error: error.message };
-    if (!data || data.length === 0) return { success: false, error: '用户未找到' };
-    uid = data[0].id;
-  }
+  if (!openid) return {{ success: false, error: '未登录' }};
 
-  try {
-    if (action === 'create') {
-      const { data: running, error: err1 } = await rdb()
-        .from('sessions')
-        .select('*')
-        .eq('user_id', uid)
-        .eq('is_done', 0)
-        .eq('status', 'running')
-        .limit(1);
-      if (err1) return { success: false, error: err1.message };
+  const [[user]] = await getPool().query('SELECT id FROM users WHERE openid = ? LIMIT 1', [openid]);
+  if (!user) return {{ success: false, error: '用户不存在' }};
+  const uid = user.id;
 
-      if (running && running.length > 0) {
-        return { success: true, session: running[0], resumed: true };
-      }
+  try {{
+    if (action === 'create') {{
+      const [running] = await getPool().query(
+        'SELECT * FROM sessions WHERE user_id = ? AND is_done = 0 LIMIT 1', [uid]);
+      if (running.length > 0) return {{ success: true, session: running[0], resumed: true }};
 
-      const { data: newData, error: err2 } = await rdb()
-        .from('sessions')
-        .insert({
-          user_id: uid,
-          start_time: new Date().toISOString(),
-          status: 'running',
-          is_done: 0,
-        })
-        .select();
-      if (err2) return { success: false, error: err2.message };
-      const newSession = newData && newData.length > 0 ? newData[0] : null;
-      return { success: true, sessionId: newSession ? newSession.id : null, resumed: false };
+      const [result] = await getPool().query(
+        'INSERT INTO sessions (user_id, start_time, status, is_done) VALUES (?, NOW(), ?, 0)',
+        [uid, 'running']);
+      const [newSess] = await getPool().query('SELECT * FROM sessions WHERE id = ?', [result.insertId]);
+      return {{ success: true, sessionId: result.insertId, session: newSess[0], resumed: false }};
 
-    } else if (action === 'getRunning') {
-      const { data, error: err } = await rdb()
-        .from('sessions')
-        .select('*')
-        .eq('user_id', uid)
-        .eq('is_done', 0)
-        .eq('status', 'running')
-        .limit(1);
-      if (err) return { success: false, error: err.message };
-      return { success: true, session: data && data.length > 0 ? data[0] : null };
+    }} else if (action === 'getRunning') {{
+      const [rows] = await getPool().query(
+        'SELECT * FROM sessions WHERE user_id = ? AND is_done = 0 LIMIT 1', [uid]);
+      return {{ success: true, session: rows[0] || null }};
 
-    } else if (action === 'finish') {
-      if (!sessionId) return { success: false, error: '缺少 sessionId' };
+    }} else if (action === 'finish') {{
+      if (!sessionId) return {{ success: false, error: '缺少 sessionId' }};
+      const [sessions] = await getPool().query('SELECT * FROM sessions WHERE id = ?', [sessionId]);
+      if (sessions.length === 0) return {{ success: false, error: '会话不存在' }};
 
-      const { data: session, error: err1 } = await rdb()
-        .from('sessions')
-        .select('*')
-        .eq('id', sessionId)
-        .limit(1);
-      if (err1) return { success: false, error: err1.message };
-      if (!session || session.length === 0) return { success: false, error: '会话不存在' };
+      const start = new Date(sessions[0].start_time);
+      const duration = Math.floor((Date.now() - start) / 1000);
+      await getPool().query(
+        'UPDATE sessions SET end_time = NOW(), duration = ?, status = ?, is_done = 1 WHERE id = ?',
+        [duration, 'completed', sessionId]);
 
-      const now = new Date();
-      const start = new Date(session[0].start_time);
-      const duration = Math.floor((now - start) / 1000);
+      const today = new Date().toISOString().slice(0, 10);
+      const [[streak]] = await getPool().query('SELECT * FROM user_streaks WHERE user_id = ?', [uid]);
+      if (!streak) {{
+        await getPool().query('INSERT INTO user_streaks (user_id, streak, last_date) VALUES (?, 1, ?)', [uid, today]);
+      }} else {{
+        const last = new Date(streak.last_date);
+        const diff = (new Date(today) - last) / 86400000;
+        let newStreak = streak.streak;
+        if (diff === 1) newStreak += 1;
+        else if (diff !== 0) newStreak = 1;
+        await getPool().query('UPDATE user_streaks SET streak = ?, last_date = ? WHERE user_id = ?', [newStreak, today, uid]);
+      }}
+      return {{ success: true }};
 
-      const { error: err2 } = await rdb()
-        .from('sessions')
-        .update({
-          end_time: now.toISOString(),
-          duration,
-          status: 'completed',
-          is_done: 1,
-        })
-        .eq('id', sessionId);
-      if (err2) return { success: false, error: err2.message };
+    }} else if (action === 'list') {{
+      const page = parseInt(event.page || 1);
+      const pageSize = parseInt(event.pageSize || 20);
+      const [rows] = await getPool().query(
+        'SELECT * FROM sessions WHERE user_id = ? AND is_done = 1 ORDER BY start_time DESC LIMIT ? OFFSET ?',
+        [uid, pageSize, (page - 1) * pageSize]);
+      return {{ success: true, sessions: rows, page, pageSize }};
+    }}
 
-      await _updateStreak(uid);
-      return { success: true };
-
-    } else if (action === 'list') {
-      const { page = 1, pageSize = 20 } = event;
-      const offset = (page - 1) * pageSize;
-      const { data, error: err } = await rdb()
-        .from('sessions')
-        .select('*')
-        .eq('user_id', uid)
-        .eq('is_done', 1)
-        .order('start_time', { ascending: false })
-        .range(offset, offset + pageSize - 1);
-      if (err) return { success: false, error: err.message };
-      return { success: true, sessions: data || [], page, pageSize };
-    }
-
-    return { success: false, error: '未知 action' };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-};
-
-async function _updateStreak(uid) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayStr = today.toISOString().slice(0, 10);
-
-  const { data: streak, error: err1 } = await rdb()
-    .from('user_streaks')
-    .select('*')
-    .eq('user_id', uid)
-    .limit(1);
-  if (err1) return;
-
-  if (!streak || streak.length === 0) {
-    await rdb().from('user_streaks').insert({
-      user_id: uid,
-      streak: 1,
-      last_date: todayStr,
-    });
-  } else {
-    const lastDate = new Date(streak[0].last_date);
-    lastDate.setHours(0, 0, 0, 0);
-    const diff = (today - lastDate) / (1000 * 60 * 60 * 24);
-    let newStreak = streak[0].streak;
-    if (diff === 1) newStreak += 1;
-    else if (diff !== 0) newStreak = 1;
-
-    await rdb()
-      .from('user_streaks')
-      .update({ streak: newStreak, last_date: todayStr })
-      .eq('user_id', uid);
-  }
-}
+    return {{ success: false, error: '未知 action' }};
+  }} catch (err) {{
+    return {{ success: false, error: err.message }};
+  }}
+}};
