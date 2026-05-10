@@ -1,10 +1,5 @@
 <!--components/custom-tabbar/index.wxml—garcia-fitness-new bottom nav-->
 <view class="tabbar-wrap">
-  <!-- FAB -->
-  <view class="fab" catchtap="onFabTap">
-    <image src="/images/icons/add.svg" class="fab-icon-img" />
-  </view>
-
   <!-- Bottom Nav -->
   <view class="tabbar">
     <view

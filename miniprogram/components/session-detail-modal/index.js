@@ -60,8 +60,8 @@ Component({
         name: 'exercise',
         data: {
           action: 'list',
-          sessionId: this.data.sessionId,
-          userId: app.globalData.userId,
+          session_id: this.data.sessionId,
+          openid: app.globalData.openid,
         },
       });
 

@@ -1,6 +1,13 @@
 // components/workout-summary-modal/index.js
 const app = getApp();
 
+const formatDuration = (seconds) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m} min`;
+};
+
 Component({
   properties: {
     isOpen: {
@@ -70,6 +77,25 @@ Component({
 
     getExerciseCount() {
       return this.data.exerciseList.length;
+    },
+
+    getDurationStr() {
+      const s = this.data.session;
+      if (!s) return '--';
+      const duration = s.duration || s.elapsedSeconds || 0;
+      return formatDuration(duration);
+    },
+
+    getDateStr() {
+      const s = this.data.session;
+      if (!s) return '';
+      const d = new Date(s.start_time || s.created_at);
+      return d.toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' });
+    },
+
+    getGroupVolume(group) {
+      if (!group.sets) return 0;
+      return group.sets.reduce((sum, s) => sum + (s.weight || 0) * (s.reps || 0), 0);
     },
   },
 });

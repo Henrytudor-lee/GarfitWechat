@@ -115,11 +115,16 @@ Page({
     const locale = wx.getStorageSync('locale') || 'en';
     const theme = wx.getStorageSync('theme') || 'dark';
 
-    this.setData({ isLoggedIn: true, locale, theme });
+    const userInfo = {
+      nickname: wx.getStorageSync('userName') || '',
+      avatarUrl: wx.getStorageSync('avatarUrl') || '',
+    };
+
+    this.setData({ isLoggedIn: true, locale, theme, userInfo });
 
     const [streakRes, levelRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'profile', data: { action: 'getStreak' } }),
-      wx.cloud.callFunction({ name: 'profile', data: { action: 'getLevel' } }),
+      wx.cloud.callFunction({ name: 'profile', data: { action: 'getStreak', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'profile', data: { action: 'getLevel', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -161,7 +166,7 @@ Page({
               const avatarUrl = uploadRes.fileID;
               wx.cloud.callFunction({
                 name: 'profile',
-                data: { action: 'updateAvatar', userId, avatarUrl },
+                data: { action: 'updateAvatar', openid: app.globalData.openid, avatarUrl },
               });
               wx.setStorageSync('avatarUrl', avatarUrl);
             },

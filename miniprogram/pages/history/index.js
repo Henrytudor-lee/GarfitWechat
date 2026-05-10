@@ -19,7 +19,7 @@ Page({
 
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'list', page: 1, pageSize: 100 },
+      data: { action: 'list', page: 1, pageSize: 100, openid: app.globalData.openid },
     });
 
     this.setData({ loading: false });

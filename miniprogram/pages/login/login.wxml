@@ -7,8 +7,8 @@
   </view>
 
   <view class="login-card">
-    <button class="wx-login-btn" bindtap="handleWxLogin">
-      <text>微信一键登录</text>
+    <button class="wx-login-btn" bindtap="handleWxLogin" hover-class="none">
+      微信一键登录
     </button>
   </view>
 </view>

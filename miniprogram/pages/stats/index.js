@@ -39,7 +39,7 @@ Page({
     this.setData({ loading: true });
 
     const [statsRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'stats', data: { action: 'summary' } }),
+      wx.cloud.callFunction({ name: 'stats', data: { action: 'summary', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -137,11 +137,11 @@ Page({
     const [recRes, recordsRes] = await Promise.all([
       wx.cloud.callFunction({
         name: 'stats',
-        data: { action: 'exerciseMax', exercise_id: exercise.id },
+        data: { action: 'exerciseMax', exercise_id: exercise.id, openid: app.globalData.openid },
       }),
       wx.cloud.callFunction({
         name: 'stats',
-        data: { action: 'exerciseRecords', exercise_id: exercise.id },
+        data: { action: 'exerciseRecords', exercise_id: exercise.id, openid: app.globalData.openid },
       }),
     ]);
     wx.hideLoading();
@@ -171,18 +171,18 @@ Page({
 
     // Use F2 canvas chart via wx-charts compatible approach
     const query = wx.createSelectorQuery().in(this);
-    query.select('#weight-chart-canvas').node((res) => {
+    query.select('#weightChart').node((res) => {
       const canvas = res.node;
       if (!canvas) return;
 
       const ctx = canvas.getContext('2d');
       const dpr = wx.getSystemInfoSync().pixelRatio;
-      canvas.width = canvas.width * dpr;
-      canvas.height = canvas.height * dpr;
+      canvas.width = res.width * dpr;
+      canvas.height = res.height * dpr;
       ctx.scale(dpr, dpr);
 
       // Draw a simple bar chart manually on canvas
-      this._drawBarChart(ctx, chartData, canvas.width / dpr, canvas.height / dpr);
+      this._drawBarChart(ctx, chartData, res.width, res.height);
     }).exec();
   },
 

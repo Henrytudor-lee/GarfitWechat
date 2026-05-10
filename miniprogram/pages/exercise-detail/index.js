@@ -47,14 +47,14 @@ Page({
     // Get or create running session
     const runRes = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'getRunning' },
+      data: { action: 'getRunning', openid: app.globalData.openid },
     });
 
     let sessionId;
     if (!runRes.result || !runRes.result.session) {
       const createRes = await wx.cloud.callFunction({
         name: 'session',
-        data: { action: 'create' },
+        data: { action: 'create', openid: app.globalData.openid },
       });
       if (!createRes.result || !createRes.result.success) return;
       sessionId = createRes.result.sessionId || (createRes.result.session && createRes.result.session.id);
@@ -66,7 +66,8 @@ Page({
       name: 'exercise',
       data: {
         action: 'add',
-        sessionId,
+        session_id: sessionId,
+        openid: app.globalData.openid,
         exercise_id: exercise.id,
         name: exercise.name_zh || exercise.name,
         weight: 0,

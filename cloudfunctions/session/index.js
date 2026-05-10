@@ -22,8 +22,7 @@ function getPool() {
 }
 
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext();
-  const openid = wxContext.OPENID;
+  const openid = event.openid;
   const { action } = event;
 
   if (!openid) return { success: false, error: '未登录' };
@@ -35,9 +34,13 @@ exports.main = async (event, context) => {
         [openid]);
       if (running.length > 0) return { success: true, session: running[0], resumed: true };
 
+      // Get user_id from users table
+      const [[user]] = await getPool().query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
+      const userId = user ? user.id : null;
+
       const [result] = await getPool().query(
-        "INSERT INTO sessions (_openid, start_time, status) VALUES (?, NOW(), 'active')",
-        [openid]);
+        "INSERT INTO sessions (_openid, user_id, start_time, status) VALUES (?, ?, NOW(), 'active')",
+        [openid, userId]);
       const [newSess] = await getPool().query('SELECT * FROM sessions WHERE id = ?', [result.insertId]);
       return { success: true, sessionId: result.insertId, session: newSess[0], resumed: false };
 
@@ -48,8 +51,9 @@ exports.main = async (event, context) => {
       return { success: true, session: rows[0] || null };
 
     } else if (action === 'finish') {
-      const { id } = event;
-      if (!id) return { success: false, error: '缺少 id' };
+      const { sessionId, session_id } = event;
+      const id = sessionId || session_id;
+      if (!id) return { success: false, error: '缺少 sessionId 或 session_id' };
 
       const [sessions] = await getPool().query(
         'SELECT * FROM sessions WHERE id = ? AND _openid = ? LIMIT 1',
@@ -65,13 +69,12 @@ exports.main = async (event, context) => {
       const page = parseInt(event.page || 1);
       const pageSize = parseInt(event.pageSize || 20);
       const offset = (page - 1) * pageSize;
-      const { date } = event; // YYYY-MM-DD filter
+      const { date } = event;
 
       let sql = 'SELECT * FROM sessions WHERE _openid = ?';
       const params = [openid];
 
       if (date) {
-        // Match sessions where start_time falls on the given date (local date)
         sql += " AND DATE(start_time) = ?";
         params.push(date);
       }

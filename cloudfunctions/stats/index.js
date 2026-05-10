@@ -22,8 +22,7 @@ function getPool() {
 }
 
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext();
-  const openid = wxContext.OPENID;
+  const openid = event.openid;
   const { action } = event;
 
   if (!openid) return { success: false, error: '未登录' };

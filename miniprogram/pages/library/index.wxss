@@ -133,20 +133,22 @@
   border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Exercise Grid — 2 columns */
+/* Exercise Grid — 2 columns using grid (card is not a direct child) */
 .exercise-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
   margin-top: 24rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .exercise-card {
-  width: calc(50% - 8rpx);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24rpx;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .card-img-wrap {

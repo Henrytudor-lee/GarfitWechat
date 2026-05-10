@@ -157,7 +157,7 @@ Page({
 
     const runRes = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'getRunning', userId },
+      data: { action: 'getRunning', openid: app.globalData.openid },
     });
 
     let sessionId;
@@ -165,7 +165,7 @@ Page({
       // Start session first
       const createRes = await wx.cloud.callFunction({
         name: 'session',
-        data: { action: 'create', userId },
+        data: { action: 'create', openid: app.globalData.openid },
       });
       if (!createRes.result || !createRes.result.success) return;
       sessionId = (createRes.result && (createRes.result.sessionId || (createRes.result.session && createRes.result.session._id)));
@@ -178,8 +178,8 @@ Page({
       name: 'exercise',
       data: {
         action: 'add',
-        sessionId,
-        userId,
+        session_id: sessionId,
+        openid: app.globalData.openid,
         exercise_id: item._id,
         name: item.name_zh || item.name,
         weight: 0,

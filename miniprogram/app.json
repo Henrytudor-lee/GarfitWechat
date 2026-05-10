@@ -6,7 +6,6 @@
     "pages/stats/index",
     "pages/profile/index",
     "pages/exercise-detail/index",
-    "pages/favorites/index",
     "pages/history/index",
     "pages/workout/index"
   ],
@@ -17,7 +16,47 @@
     "navigationBarTitleText": "GFIT",
     "navigationBarTextStyle": "white"
   },
-  "usingComponents": {},
+  "tabBar": {
+    "custom": true,
+    "color": "#52525b",
+    "selectedColor": "#ccf200",
+    "backgroundColor": "#131313",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "Training",
+        "iconPath": "images/icons/dumbbell.png",
+        "selectedIconPath": "images/icons/dumbbell-active.png"
+      },
+      {
+        "pagePath": "pages/library/index",
+        "text": "Library",
+        "iconPath": "images/icons/library.png",
+        "selectedIconPath": "images/icons/library-active.png"
+      },
+      {
+        "pagePath": "pages/stats/index",
+        "text": "Stats",
+        "iconPath": "images/icons/bar-chart.png",
+        "selectedIconPath": "images/icons/bar-chart-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "Profile",
+        "iconPath": "images/icons/user.png",
+        "selectedIconPath": "images/icons/user-active.png"
+      }
+    ]
+  },
+  "usingComponents": {
+    "custom-tabbar": "/components/custom-tabbar/index",
+    "appbar": "/components/appbar/index",
+    "add-exercise-modal": "/components/add-exercise-modal/index",
+    "edit-exercise-modal": "/components/edit-exercise-modal/index",
+    "session-detail-modal": "/components/session-detail-modal/index",
+    "workout-summary-modal": "/components/workout-summary-modal/index"
+  },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"

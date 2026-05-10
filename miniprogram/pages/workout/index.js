@@ -42,7 +42,7 @@ Page({
     wx.showLoading({ title: '加载中...' });
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'getRunning', userId: app.globalData.userId },
+      data: { action: 'getRunning', openid: app.globalData.openid },
     });
     wx.hideLoading();
 
@@ -85,8 +85,8 @@ Page({
       name: 'exercise',
       data: {
         action: 'list',
-        sessionId: this.data.session._id,
-        userId: app.globalData.userId,
+        session_id: this.data.session._id,
+        openid: app.globalData.openid,
       },
     });
     if (res.result && res.result.success) {
@@ -120,7 +120,7 @@ Page({
     wx.showLoading({ title: '创建训练...' });
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'create', userId: app.globalData.userId },
+      data: { action: 'create', openid: app.globalData.openid },
     });
     wx.hideLoading();
 
@@ -194,14 +194,13 @@ Page({
       name: 'exercise',
       data: {
         action: 'add',
-        sessionId: this.data.session._id,
-        userId: app.globalData.userId,
+        session_id: this.data.session._id,
+        openid: app.globalData.openid,
         exercise_id: selectedExercise.exercise_id,
         name: selectedExercise.name,
         weight: inputWeight || 0,
         weight_unit: this.data.weightUnit,
         reps: parseInt(inputReps) || 0,
-        sequence: selectedIndex,
       },
     });
 
@@ -229,7 +228,7 @@ Page({
           wx.showLoading({ title: '结束训练...' });
           const r = await wx.cloud.callFunction({
             name: 'session',
-            data: { action: 'finish', sessionId: this.data.session._id, userId: app.globalData.userId },
+            data: { action: 'finish', session_id: this.data.session._id, openid: app.globalData.openid },
           });
           wx.hideLoading();
           if (r.result && r.result.success) {

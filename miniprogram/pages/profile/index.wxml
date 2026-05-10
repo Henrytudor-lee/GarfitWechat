@@ -6,7 +6,7 @@
     <!-- Avatar + Camera Button -->
     <view class="avatar-container">
       <view class="avatar-glow"></view>
-      <image class="avatar-img" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+      <image class="avatar-img" src="{{userInfo.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"/>
       <button class="camera-btn" bindtap="changeAvatar">
         <text class="camera-icon">✦</text>
       </button>
@@ -116,5 +116,8 @@
     <!-- Version -->
     <view class="version-text">{{locale === 'en' ? 'GARCIAL FITNESS V1.0.2 - STABLE' : 'GARCIAL FITNESS V1.0.2 - 稳定版'}}</view>
   </block>
+
+  <!-- Custom Tab Bar -->
+  <custom-tabbar active="profile" />
 
 </view>

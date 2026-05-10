@@ -227,13 +227,13 @@ Component({
 
       try {
         const res = await wx.cloud.callFunction({
-          name: 'exercise',
-          data: {
-            action: 'getMaxWeight',
-            exerciseId: item._id || item.id,
-            userId,
-          },
-        });
+        name: 'exercise',
+        data: {
+          action: 'getMaxWeight',
+          exerciseId: item._id || item.id,
+          openid: app.globalData.openid,
+        },
+      });
 
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
@@ -299,8 +299,8 @@ Component({
           name: 'exercise',
           data: {
             action: 'add',
-            sessionId,
-            userId,
+            session_id: sessionId,
+            openid: app.globalData.openid,
             exercise_id: selectedItem._id || selectedItem.id,
             name: selectedItem.name_zh || selectedItem.name,
             weight,

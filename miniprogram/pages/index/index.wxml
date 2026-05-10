@@ -35,7 +35,7 @@
   </button>
 
   <!-- Floating FAB - Add Exercise -->
-  <view class="fab" wx:if="{{runningSession}}" bindtap="goToLibrary">
+  <view class="fab" wx:if="{{runningSession}}" bindtap="openAddModal">
     <text class="fab-icon">+</text>
   </view>
 
@@ -167,6 +167,14 @@
       <view class="picker-today-btn" bindtap="goToToday">TODAY</view>
     </view>
   </view>
+
+  <!-- Add Exercise Modal -->
+  <add-exercise-modal
+    isOpen="{{showAddModal}}"
+    sessionId="{{currentSessionId}}"
+    bind:close="onAddModalClose"
+    bind:exerciseadded="onAddModalExerciseAdded"
+  />
 
   <!-- Edit Exercise Modal -->
   <edit-exercise-modal

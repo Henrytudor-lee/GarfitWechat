@@ -47,6 +47,7 @@ Page({
     workoutSummarySession: null,
     workoutSummaryExercises: [],
     currentSessionId: null,
+    showAddModal: false,
   },
 
   onLoad() {
@@ -88,8 +89,8 @@ Page({
     wx.showLoading({ title: 'LOADING...', mask: true });
 
     const [runRes, recentRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning' } }),
-      wx.cloud.callFunction({ name: 'session', data: { action: 'list', page: 1, pageSize: 5 } }),
+      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'session', data: { action: 'list', page: 1, pageSize: 5, openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -123,7 +124,7 @@ Page({
   async _loadExerciseGroups(sessionId) {
     const res = await wx.cloud.callFunction({
       name: 'exercise',
-      data: { action: 'list', sessionId },
+      data: { action: 'list', session_id: sessionId, openid: app.globalData.openid },
     });
     if (res.result && res.result.success) {
       const map = {};
@@ -314,7 +315,7 @@ Page({
     // Fetch sessions for the given date
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'list', date: historyDate },
+      data: { action: 'list', date: historyDate, openid: app.globalData.openid },
     });
     if (res.result && res.result.sessions) {
       const sessions = res.result.sessions.map(s => {
@@ -327,13 +328,6 @@ Page({
     } else {
       this.setData({ historySessions: [] });
     }
-  },
-
-  onHistorySessionTap(e) {
-    const session = e.currentTarget.dataset.session;
-    wx.navigateTo({
-      url: `/pages/history/index?sessionId=${session._id || session.id}`,
-    });
   },
 
   // ---- Workout controls ----
@@ -357,7 +351,7 @@ Page({
     wx.showLoading({ title: 'STARTING...', mask: true });
     const res = await wx.cloud.callFunction({
       name: 'session',
-      data: { action: 'create' },
+      data: { action: 'create', openid: app.globalData.openid },
     });
     wx.hideLoading();
     if (res.result && res.result.success) {
@@ -387,7 +381,7 @@ Page({
         }
         const r = await wx.cloud.callFunction({
           name: 'session',
-          data: { action: 'finish', sessionId },
+          data: { action: 'finish', session_id: sessionId, openid: app.globalData.openid },
         });
         wx.hideLoading();
         if (r.result && r.result.success) {
@@ -436,8 +430,9 @@ Page({
 
   onEditModalSaved() {
     this.setData({ showEditModal: false, editingGroup: null });
-    if (this.data.runningSession) {
-      this._loadExerciseGroups(this.data.runningSession.id);
+    const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
+    if (sessionId) {
+      this._loadExerciseGroups(sessionId);
     }
   },
 
@@ -460,6 +455,22 @@ Page({
     this.setData({ showWorkoutSummary: false, workoutSummarySession: null, workoutSummaryExercises: [] });
   },
 
+  openAddModal() {
+    this.setData({ showAddModal: true });
+  },
+
+  onAddModalClose() {
+    this.setData({ showAddModal: false });
+  },
+
+  onAddModalExerciseAdded() {
+    this.setData({ showAddModal: false });
+    const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
+    if (sessionId) {
+      this._loadExerciseGroups(sessionId);
+    }
+  },
+
   async addExerciseToSession(item) {
     if (!this.data.runningSession) return;
     const sessionId = this.data.currentSessionId || this.data.runningSession.id || this.data.runningSession._id;
@@ -468,7 +479,8 @@ Page({
       name: 'exercise',
       data: {
         action: 'add',
-        sessionId,
+        session_id: sessionId,
+        openid: app.globalData.openid,
         exercise_id: item._id || item.id,
         name: item.name_zh || item.name,
         weight: 0,

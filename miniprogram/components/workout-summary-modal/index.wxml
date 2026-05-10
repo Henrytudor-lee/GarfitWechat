@@ -1,40 +1,48 @@
 <!--components/workout-summary-modal/index.wxml-->
 <view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
-  <view class="modal-sheet" catchtap="">
+  <view class="modal-card" catchtap="">
 
-    <!-- Celebration Header -->
-    <view class="summary-header">
-      <view class="celebration-icon">🎉</view>
-      <view class="summary-title">WORKOUT COMPLETE!</view>
-      <view class="summary-subtitle">Great job finishing your training session</view>
+    <!-- Background decoration -->
+    <view class="card-bg"></view>
+    <view class="bg-blob blob-1"></view>
+    <view class="bg-blob blob-2"></view>
+
+    <!-- Header -->
+    <view class="card-header">
+      <view class="brand">GFIT</view>
+      <view class="check-circle">
+        <text class="check-icon">✓</text>
+      </view>
+      <view class="complete-label">Workout Complete</view>
     </view>
 
-    <!-- Stats Grid -->
-    <view class="stats-grid">
-      <view class="stat-card">
-        <view class="stat-value">{{getExerciseCount()}}</view>
-        <view class="stat-label">EXERCISES</view>
+    <!-- Stats Row -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <view class="stat-val">{{getExerciseCount()}}</view>
+        <view class="stat-lbl">Exercises</view>
       </view>
-      <view class="stat-card">
-        <view class="stat-value">{{getTotalSets()}}</view>
-        <view class="stat-label">TOTAL SETS</view>
+      <view class="stat-sep"></view>
+      <view class="stat-item">
+        <view class="stat-val">{{getDurationStr()}}</view>
+        <view class="stat-lbl">Duration</view>
       </view>
-      <view class="stat-card">
-        <view class="stat-value">{{getTotalReps()}}</view>
-        <view class="stat-label">TOTAL REPS</view>
-      </view>
-      <view class="stat-card">
-        <view class="stat-value">{{getTotalVolume()}}</view>
-        <view class="stat-label">VOLUME ({{session && session.weight_unit || 'kg'}})</view>
+      <view class="stat-sep"></view>
+      <view class="stat-item">
+        <view class="stat-val">{{getTotalVolume()}} kg</view>
+        <view class="stat-lbl">Volume</view>
       </view>
     </view>
+
+    <!-- Divider -->
+    <view class="divider"></view>
 
     <!-- Exercise Breakdown -->
-    <view class="breakdown-section">
-      <view class="breakdown-title">EXERCISE BREAKDOWN</view>
-      <scroll-view class="breakdown-list" scroll-y>
+    <view class="breakdown-title">Exercise Summary</view>
+    <scroll-view class="breakdown-scroll" scroll-y>
+      <view class="breakdown-list">
         <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="_id">
-          <view class="item-info">
+          <view class="item-row">
             <image
               wx:if="{{item.image_name}}"
               class="item-img"
@@ -42,23 +50,33 @@
               mode="aspectFill"
             />
             <view wx:else class="item-img item-img-placeholder">🏋️</view>
-            <view class="item-text">
+            <view class="item-info">
               <view class="item-name">{{item.name_zh || item.name}}</view>
-              <view class="item-sets-info">{{item.sets.length}} sets</view>
+              <view class="item-sets">{{item.sets.length}} sets</view>
+            </view>
+            <view class="item-vol">
+              <text class="vol-num">{{getGroupVolume(item)}}</text>
+              <text class="vol-unit">kg</text>
             </view>
           </view>
-          <view class="item-summary">
-            <text wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
-              {{s.weight}}{{s.weight_unit || 'kg'}}×{{s.reps}}{{index < item.sets.length - 1 ? ', ' : ''}}
-            </text>
-            <text wx:if="{{!item.sets || item.sets.length === 0}}">No sets recorded</text>
+          <!-- Sets grid: 2 columns -->
+          <view class="sets-grid">
+            <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
+              <text class="set-num">{{index + 1}}</text>
+              <text class="set-val">{{s.weight > 0 ? s.weight : '—'}} {{s.weight_unit || 'kg'}}</text>
+              <text class="set-sep">×</text>
+              <text class="set-reps">{{s.reps}} reps</text>
+            </view>
           </view>
         </view>
-      </scroll-view>
-    </view>
+      </view>
+    </scroll-view>
+
+    <!-- Date Footer -->
+    <view class="date-footer">{{getDateStr()}}</view>
 
     <!-- Action Buttons -->
-    <view class="modal-footer">
+    <view class="card-footer">
       <button class="btn-secondary" bindtap="closeModal">VIEW HISTORY</button>
       <button class="btn-primary" bindtap="closeModal">DONE</button>
     </view>

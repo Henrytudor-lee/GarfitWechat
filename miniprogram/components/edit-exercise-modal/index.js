@@ -136,6 +136,7 @@ Component({
                 action: 'update',
                 id: s.id,
                 session_id: this.data.sessionId,
+                openid: app.globalData.openid,
                 weight: s.weight,
                 reps: s.reps,
                 weight_unit: s.weight_unit,
@@ -149,6 +150,7 @@ Component({
               data: {
                 action: 'add',
                 session_id: this.data.sessionId,
+                openid: app.globalData.openid,
                 exercise_id: group.exercise_id,
                 name: group.name,
                 weight: s.weight,
@@ -167,6 +169,7 @@ Component({
               action: 'delete',
               id: s.id,
               session_id: this.data.sessionId,
+              openid: app.globalData.openid,
             },
           });
         }
