@@ -108,6 +108,21 @@ Page({
   },
 
   async startWorkout() {
+    const userId = wx.getStorageSync('userId');
+    if (!userId) {
+      wx.showModal({
+        title: 'LOGIN REQUIRED',
+        content: 'Please login first to start training.',
+        confirmText: 'LOGIN',
+        confirmColor: '#ccf200',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/login/login' });
+          }
+        },
+      });
+      return;
+    }
     wx.showLoading({ title: 'STARTING...', mask: true });
     const res = await wx.cloud.callFunction({
       name: 'session',

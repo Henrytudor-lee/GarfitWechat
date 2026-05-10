@@ -9,8 +9,13 @@
     <view class="avatar-wrap">
       <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
     </view>
-    <view class="profile-name">{{userInfo.nickname || 'ATHLETE'}}</view>
-    <view class="profile-sub">MEMBER SINCE {{memberSince || '—'}}</view>
+    <block wx:if="{{isLoggedIn}}">
+      <view class="profile-name">{{userInfo.nickname || 'ATHLETE'}}</view>
+      <view class="profile-sub">MEMBER SINCE {{memberSince || '—'}}</view>
+    </block>
+    <block wx:else>
+      <button class="login-btn" bindtap="goToLogin">LOGIN / REGISTER</button>
+    </block>
   </view>
 
   <!-- Quick Stats -->

@@ -11,6 +11,7 @@ const LEVEL_THRESHOLDS = [
 
 Page({
   data: {
+    isLoggedIn: false,
     userInfo: {},
     stats: {},
     levelInfo: {},
@@ -27,7 +28,14 @@ Page({
   },
 
   async loadData() {
-    wx.showLoading({ title: 'LOADING...', mask: true });
+    const userId = wx.getStorageSync('userId');
+    if (!userId) {
+      this.setData({ isLoggedIn: false });
+      wx.hideLoading();
+      return;
+    }
+
+    this.setData({ isLoggedIn: true });
 
     const [profileRes, statsRes] = await Promise.all([
       wx.cloud.callFunction({ name: 'profile', data: { action: 'get' } }),
@@ -98,5 +106,9 @@ Page({
         }
       },
     });
+  },
+
+  goToLogin() {
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 });

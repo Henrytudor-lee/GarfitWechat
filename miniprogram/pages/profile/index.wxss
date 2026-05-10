@@ -46,6 +46,23 @@
   text-transform: uppercase;
 }
 
+/* Login / Register Button (guest state) */
+.login-btn {
+  margin-top: 8rpx;
+  background: #ccf200;
+  color: #000;
+  border-radius: 100rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 28rpx;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  padding: 0 48rpx;
+  line-height: 2.4;
+}
+.login-btn::after { border: none; }
+
 /* Stats Row */
 .stats-row {
   display: flex;

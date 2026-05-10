@@ -12,51 +12,28 @@
     <!-- 头像选择 -->
     <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       <view class="avatar-wrapper">
-        <image
-          class="avatar-img"
-          src="{{avatarUrl || '/assets/default-avatar.png'}}"
-          mode="aspectFill"
-        />
+        <image class="avatar-img" src="{{avatarUrl || '/assets/default-avatar.png'}}" mode="aspectFill" />
         <view class="avatar-overlay">点击更换</view>
       </view>
     </button>
 
     <!-- 昵称输入 -->
     <view class="nickname-wrap">
-      <input
-        type="nickname"
-        class="nickname-input"
-        placeholder="点击输入昵称"
-        placeholder-class="nickname-placeholder"
-        value="{{nickname}}"
-        bindinput="onNicknameInput"
-        bindblur="onNicknameBlur"
-      />
+      <input type="nickname" class="nickname-input" placeholder="点击输入昵称" placeholder-class="nickname-placeholder" value="{{nickname}}" bindinput="onNicknameInput" bindblur="onNicknameBlur" />
     </view>
 
     <!-- 手机号输入 -->
     <view class="phone-wrap">
-      <input
-        type="number"
-        class="phone-input"
-        placeholder="输入手机号"
-        placeholder-class="phone-placeholder"
-        maxlength="11"
-        value="{{phoneNumber}}"
-        bindinput="onPhoneInput"
-      />
+      <input type="number" class="phone-input" placeholder="输入手机号" placeholder-class="phone-placeholder" maxlength="11" value="{{phoneNumber}}" bindinput="onPhoneInput" />
     </view>
 
     <!-- 确认登录 -->
-    <button
-      class="login-btn {{loading || !canLogin ? 'disabled' : ''}}"
-      bindtap="handleLogin"
-      disabled="{{loading || !canLogin}}"
-    >
+    <button class="login-btn {{loading || !canLogin ? 'disabled' : ''}}" bindtap="handleLogin" disabled="{{loading || !canLogin}}">
       <text>{{loading ? '登录中...' : '确认登录'}}</text>
     </button>
 
     <view class="login-note">
+      点击登录即表示同意
       <text class="link">《用户协议》</text>和
       <text class="link">《隐私政策》</text>
     </view>
