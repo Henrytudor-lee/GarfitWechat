@@ -1,4 +1,4 @@
-<!-- pages/login/login.wxml — dark theme login page -->
+<!-- pages/login/login.wxml — 新版微信授权方式 -->
 <view class="page">
   <view class="logo-area">
     <view class="logo-icon">💪</view>
@@ -9,19 +9,42 @@
   <view class="login-card">
     <view class="login-desc">登录后获取完整功能</view>
 
-    <button
-      class="login-btn {{loading ? 'loading' : ''}}"
-      bindtap="handleLogin"
-      disabled="{{loading}}"
-    >
-      <view class="btn-content">
-        <text class="btn-icon">👤</text>
-        <text class="btn-text">{{loading ? '登录中...' : '微信授权登录'}}</text>
+    <!-- 头像选择（open-type 触发微信头像选择器） -->
+    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <view class="avatar-wrapper">
+        <image
+          class="avatar-img"
+          src="{{avatarUrl || '/assets/default-avatar.png'}}"
+          mode="aspectFill"
+        />
+        <view class="avatar-overlay">点击更换</view>
       </view>
     </button>
 
+    <!-- 昵称输入（type=nickname 调起微信昵称键盘） -->
+    <view class="nickname-wrap">
+      <input
+        type="nickname"
+        class="nickname-input"
+        placeholder="点击输入昵称"
+        placeholder-class="nickname-placeholder"
+        value="{{nickname}}"
+        bindinput="onNicknameInput"
+        bindblur="onNicknameBlur"
+      />
+    </view>
+
+    <!-- 确认登录 -->
+    <button
+      class="login-btn {{loading || !canLogin ? 'disabled' : ''}}"
+      bindtap="handleLogin"
+      disabled="{{loading || !canLogin}}"
+    >
+      <text>{{loading ? '登录中...' : '确认登录'}}</text>
+    </button>
+
     <view class="login-note">
-      点击上方按钮即表示同意
+      点击登录即表示同意
       <text class="link">《用户协议》</text>和
       <text class="link">《隐私政策》</text>
     </view>
