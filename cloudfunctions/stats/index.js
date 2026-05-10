@@ -21,14 +21,14 @@ function getPool() {
   return pool;
 }
 
-exports.main = async (event, context) => {{
+exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
-  if (!openid) return {{ success: false, error: '未登录' }};
+  if (!openid) return { success: false, error: '未登录' };
 
-  try {{
+  try {
     const [[user]] = await getPool().query('SELECT id FROM users WHERE openid = ? LIMIT 1', [openid]);
-    if (!user) return {{ success: false, error: '用户不存在' }};
+    if (!user) return { success: false, error: '用户不存在' };
     const uid = user.id;
 
     const weekStart = new Date();
@@ -46,19 +46,22 @@ exports.main = async (event, context) => {{
     const [[[weekCount]]] = await getPool().query(
       'SELECT COUNT(*) as n FROM sessions WHERE user_id = ? AND is_done = 1 AND start_time >= ?', [uid, weekStart]);
 
-    return {{ success: true, stats: {{
-      totalWorkouts: totalSessions.n,
-      totalExercises: totalExercises.n,
-      currentStreak: streakRow ? streakRow.streak : 0,
-      level: levelRow ? levelRow.level : 1,
-      label: levelRow ? levelRow.label : 'ROOKIE',
-      score: levelRow ? levelRow.score : 0,
-      weekWorkouts: weekCount.n,
-      recentSessions: recent.map(s => ({{
-        id: s.id, date: s.start_time, duration: s.duration || 0,
-      }})),
-    }}}};
-  }} catch (err) {{
-    return {{ success: false, error: err.message }};
-  }}
-}};
+    return {
+      success: true,
+      stats: {
+        totalWorkouts: totalSessions ? totalSessions.n : 0,
+        totalExercises: totalExercises ? totalExercises.n : 0,
+        currentStreak: streakRow ? streakRow.streak : 0,
+        level: levelRow ? levelRow.level : 1,
+        label: levelRow ? levelRow.label : 'ROOKIE',
+        score: levelRow ? levelRow.score : 0,
+        weekWorkouts: weekCount ? weekCount.n : 0,
+        recentSessions: recent ? recent.map(s => ({
+          id: s.id, date: s.start_time, duration: s.duration || 0,
+        })) : [],
+      },
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};

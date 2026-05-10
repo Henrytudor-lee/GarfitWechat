@@ -21,40 +21,43 @@ function getPool() {
   return pool;
 }
 
-exports.main = async (event, context) => {{
+exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
-  if (!openid) return {{ success: false, error: '未登录' }};
+  if (!openid) return { success: false, error: '未登录' };
 
-  try {{
+  try {
     const [[user]] = await getPool().query('SELECT * FROM users WHERE openid = ? LIMIT 1', [openid]);
-    if (!user) return {{ success: false, error: '用户不存在' }};
+    if (!user) return { success: false, error: '用户不存在' };
 
-    if (event.action === 'get') {{
+    if (event.action === 'get') {
       const [[streak]] = await getPool().query('SELECT streak FROM user_streaks WHERE user_id = ?', [user.id]);
       const [[level]] = await getPool().query('SELECT level, label, score FROM user_levels WHERE user_id = ?', [user.id]);
-      return {{ success: true, profile: {{
-        id: user.id, name: user.name, avatar: user.avatar, role: user.role,
-        streak: streak ? streak.streak : 0,
-        level: level ? level.level : 1, label: level ? level.label : 'ROOKIE', score: level ? level.score : 0,
-      }}}};
-    }}
+      return {
+        success: true,
+        profile: {
+          id: user.id, name: user.name, avatar: user.avatar, role: user.role,
+          streak: streak ? streak.streak : 0,
+          level: level ? level.level : 1, label: level ? level.label : 'ROOKIE', score: level ? level.score : 0,
+        },
+      };
+    }
 
-    if (event.action === 'update') {{
-      const {{ nickname, avatar }} = event;
-      if (nickname !== undefined || avatar !== undefined) {{
+    if (event.action === 'update') {
+      const { nickname, avatar } = event;
+      if (nickname !== undefined || avatar !== undefined) {
         const fields = []; const vals = [];
-        if (nickname !== undefined) {{ fields.push('name = ?'); vals.push(nickname); }}
-        if (avatar !== undefined) {{ fields.push('avatar = ?'); vals.push(avatar); }}
+        if (nickname !== undefined) { fields.push('name = ?'); vals.push(nickname); }
+        if (avatar !== undefined) { fields.push('avatar = ?'); vals.push(avatar); }
         fields.push('updated_at = NOW()');
         vals.push(user.id);
-        await getPool().query(`UPDATE users SET ${{fields.join(', ')}} WHERE id = ?`, vals);
-      }}
-      return {{ success: true }};
-    }}
+        await getPool().query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, vals);
+      }
+      return { success: true };
+    }
 
-    return {{ success: false, error: '未知 action' }};
-  }} catch (err) {{
-    return {{ success: false, error: err.message }};
-  }}
-}};
+    return { success: false, error: '未知 action' };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
