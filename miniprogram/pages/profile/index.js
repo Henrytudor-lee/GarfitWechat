@@ -29,7 +29,8 @@ Page({
 
   async loadData() {
     const userId = wx.getStorageSync('userId');
-    if (!userId) {
+    const isGuest = wx.getStorageSync('isGuest');
+    if (!userId || isGuest) {
       this.setData({ isLoggedIn: false });
       wx.hideLoading();
       return;

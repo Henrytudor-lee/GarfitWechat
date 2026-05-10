@@ -109,7 +109,8 @@ Page({
 
   async startWorkout() {
     const userId = wx.getStorageSync('userId');
-    if (!userId) {
+    const isGuest = wx.getStorageSync('isGuest');
+    if (!userId || isGuest) {
       wx.showModal({
         title: 'LOGIN REQUIRED',
         content: 'Please login first to start training.',

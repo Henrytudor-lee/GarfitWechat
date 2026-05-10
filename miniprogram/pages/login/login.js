@@ -96,6 +96,7 @@ Page({
       app.globalData.userInfo = { nickname: nickname.trim(), avatar: avatarUrl };
       wx.setStorageSync('userId', userId);
       wx.setStorageSync('openid', openid);
+      wx.setStorageSync('isGuest', false);
       if (phoneNumber) {
         wx.setStorageSync('phoneNumber', phoneNumber);
       }
@@ -118,7 +119,10 @@ Page({
   handleGuest() {
     const guestId = 'guest_' + Date.now();
     app.globalData.userId = guestId;
+    app.globalData.openid = null;
     wx.setStorageSync('userId', guestId);
+    wx.setStorageSync('openid', '');
+    wx.setStorageSync('isGuest', true);
     wx.reLaunch({ url: '/pages/index/index' });
   },
 });
