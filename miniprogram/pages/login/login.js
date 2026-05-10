@@ -12,6 +12,10 @@ Page({
     loading: false,
   },
 
+  onGetPhoneNumber(e) {
+    console.log('getphonenumber event', e)
+  },
+
   onLoad() {
     // 检查是否已有手机号（从 storage 读）
     const phone = wx.getStorageSync('phoneNumber');
@@ -37,6 +41,7 @@ Page({
   },
 
   onGetPhoneNumber(e) {
+    console.log(e);
     // 已授权过则不再重复请求
     if (this.data.hasPhone) return;
 
