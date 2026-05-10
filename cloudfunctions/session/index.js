@@ -32,23 +32,29 @@ exports.main = async (event, context) => {
       const [running] = await getPool().query(
         "SELECT * FROM sessions WHERE _openid = ? AND status = 'active' LIMIT 1",
         [openid]);
-      if (running.length > 0) return { success: true, session: running[0], resumed: true };
+      if (running.length > 0) {
+        const r = running[0];
+        return { success: true, session: { ...r, start_time: new Date(r.start_time).toISOString() }, resumed: true };
+      }
 
       // Get user_id from users table
       const [[user]] = await getPool().query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
       const userId = user ? user.id : null;
 
       const [result] = await getPool().query(
-        "INSERT INTO sessions (_openid, user_id, start_time, status) VALUES (?, ?, NOW(), 'active')",
+        "INSERT INTO sessions (_openid, user_id, start_time, status) VALUES (?, ?, UTC_TIMESTAMP(), 'active')",
         [openid, userId]);
       const [newSess] = await getPool().query('SELECT * FROM sessions WHERE id = ?', [result.insertId]);
-      return { success: true, sessionId: result.insertId, session: newSess[0], resumed: false };
+      // Convert to UTC ISO 8601 string for frontend compatibility
+      const startTimeISO = new Date(newSess[0].start_time).toISOString();
+      return { success: true, sessionId: result.insertId, session: { ...newSess[0], start_time: startTimeISO }, resumed: false };
 
     } else if (action === 'getRunning') {
       const [rows] = await getPool().query(
         "SELECT * FROM sessions WHERE _openid = ? AND status = 'active' LIMIT 1",
         [openid]);
-      return { success: true, session: rows[0] || null };
+      const session = rows[0] ? { ...rows[0], start_time: new Date(rows[0].start_time).toISOString() } : null;
+      return { success: true, session };
 
     } else if (action === 'finish') {
       const { sessionId, session_id } = event;
@@ -83,7 +89,8 @@ exports.main = async (event, context) => {
       params.push(pageSize, offset);
 
       const [rows] = await getPool().query(sql, params);
-      return { success: true, sessions: rows, page, pageSize };
+      const sessions = rows.map(s => ({ ...s, start_time: new Date(s.start_time).toISOString() }));
+      return { success: true, sessions, page, pageSize };
 
     } else if (action === 'getById') {
       const { id } = event;
@@ -91,7 +98,8 @@ exports.main = async (event, context) => {
       const [rows] = await getPool().query(
         'SELECT * FROM sessions WHERE id = ? AND _openid = ? LIMIT 1',
         [id, openid]);
-      return { success: true, session: rows[0] || null };
+      const session = rows[0] ? { ...rows[0], start_time: new Date(rows[0].start_time).toISOString() } : null;
+      return { success: true, session };
 
     } else if (action === 'delete') {
       const { id } = event;

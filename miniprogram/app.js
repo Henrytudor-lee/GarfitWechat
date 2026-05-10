@@ -19,11 +19,38 @@ App({
       });
     }
 
-    // 跳过登录检查，改为由各页面自行判断
-    // 已登录用户的数据从 storage 恢复即可
+    // 静默自动登录：优先从 storage 恢复，若无则调 wx.login + loginByWx 云函数
     const userId = wx.getStorageSync('userId');
     const openid = wx.getStorageSync('openid');
     if (userId) this.globalData.userId = userId;
     if (openid) this.globalData.openid = openid;
+
+    if (!openid) {
+      this.doSilentLogin();
+    }
+  },
+
+  doSilentLogin: function () {
+    wx.login({
+      success: (loginRes) => {
+        if (!loginRes.code) return;
+        wx.cloud.callFunction({
+          name: 'loginByWx',
+          data: { code: loginRes.code },
+          success: (res) => {
+            if (res.result && res.result.openid) {
+              const { openid, userId } = res.result;
+              this.globalData.openid = openid;
+              this.globalData.userId = userId;
+              wx.setStorageSync('openid', openid);
+              wx.setStorageSync('userId', userId);
+            }
+          },
+          fail: () => {
+            // 静默失败，不弹窗
+          },
+        });
+      },
+    });
   },
 });

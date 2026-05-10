@@ -35,7 +35,7 @@ if (action === 'add') {
       const userId = sessions.length > 0 ? sessions[0].user_id : null;
 
       const [result] = await getPool().query(
-        'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name, weight, reps, weight_unit, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+        'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
         [session_id, _openid, userId, exercise_id, name, parseFloat(weight) || 0, parseInt(reps) || 0, (event.weight_unit || 'kg')]);
       return { success: true, exerciseId: result.insertId };
 

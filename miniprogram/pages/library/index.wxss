@@ -362,6 +362,7 @@
 .sheet-action {
   padding: 0 24rpx 40rpx;
   flex-shrink: 0;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom, 0px));
 }
 
 .sheet-btn {

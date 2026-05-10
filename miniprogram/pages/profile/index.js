@@ -140,11 +140,22 @@ Page({
     });
   },
 
-  goToLogin() {
-    wx.navigateTo({ url: '/pages/login/login' });
+  // Handle logout — clear storage and trigger silent re-login
+  handleLogout() {
+    wx.showModal({
+      title: 'LOG OUT',
+      content: 'Are you sure you want to sign out?',
+      confirmColor: '#ef4444',
+      success: (res) => {
+        if (res.confirm) {
+          wx.clearStorageSync();
+          app.globalData.userId = null;
+          app.globalData.openid = null;
+          app.doSilentLogin();
+        }
+      },
+    });
   },
-
-  // Change avatar via album picker
   changeAvatar() {
     wx.chooseImage({
       count: 1,
@@ -193,20 +204,5 @@ Page({
     wx.setStorageSync('theme', next);
     this.setData({ theme: next });
     wx.showToast({ title: next === 'dark' ? 'Theme: Dark' : 'Theme: Light', icon: 'none' });
-  },
-
-  // Handle logout
-  handleLogout() {
-    wx.showModal({
-      title: 'LOG OUT',
-      content: 'Are you sure you want to sign out?',
-      confirmColor: '#ef4444',
-      success: (res) => {
-        if (res.confirm) {
-          wx.clearStorageSync();
-          wx.reLaunch({ url: '/pages/login/login' });
-        }
-      },
-    });
-  },
+  }
 });

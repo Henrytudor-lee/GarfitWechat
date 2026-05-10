@@ -101,9 +101,17 @@
   <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
 
   <!-- Exercise Detail Bottom Sheet -->
-  <view wx:if="{{selectedExercise}}" class="sheet-mask" bindtap="closeSheet">
-    <view class="sheet" catchtap="">
-      <view class="sheet-handle"></view>
+  <view class="sheet-mask {{selectedExercise ? 'show' : ''}}" catchtouchmove="noop">
+    <view class="sheet" catchtap="noop">
+
+      <!-- Close Handle -->
+      <view class="sheet-handle" bindtap="closeSheet"></view>
+
+      <!-- Header with close -->
+      <view class="sheet-header">
+        <text class="sheet-title">{{selectedExercise.name_zh || selectedExercise.name}}</text>
+        <view class="sheet-close" bindtap="closeSheet">✕</view>
+      </view>
 
       <!-- Media -->
       <view class="sheet-media">
@@ -113,6 +121,8 @@
           src="{{vidPrefix}}/{{selectedExercise.video_file}}"
           controls
           show-center-play-btn
+          enable-play-gesture
+          bindtap="onVideoTap"
         />
         <image
           wx:else
@@ -125,14 +135,12 @@
       <!-- Scrollable Content -->
       <scroll-view class="sheet-scroll" scroll-y>
         <view class="sheet-content">
-          <view class="sheet-name">{{selectedExercise.name_zh || selectedExercise.name}}</view>
           <view class="sheet-en">{{selectedExercise.name}}</view>
           <view class="sheet-tags">
             <text class="chip chip-neutral">{{selectedExercise.equipment_name || 'OTHER'}}</text>
             <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{selectedExercise.muscle_name}}</text>
             <text class="chip chip-neutral">{{selectedExercise.exercise_type || 'STRENGTH'}}</text>
           </view>
-          <view class="sheet-id">#{{selectedExercise._id || selectedExercise.id}}</view>
         </view>
       </scroll-view>
 

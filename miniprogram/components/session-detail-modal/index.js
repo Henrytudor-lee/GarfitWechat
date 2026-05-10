@@ -27,9 +27,11 @@ Component({
     'isOpen': function(isOpen) {
       if (isOpen) {
         this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
-        if (this.data.sessionId) {
-          this._loadExercises();
-        }
+      }
+    },
+    'isOpen, sessionId': function(isOpen, sessionId) {
+      if (isOpen && sessionId) {
+        this._loadExercises();
       }
     },
     'session': function(session) {
