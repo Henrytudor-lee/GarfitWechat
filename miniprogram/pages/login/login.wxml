@@ -34,15 +34,18 @@
       />
     </view>
 
-    <!-- 手机号授权（必须） -->
-    <button
-      class="phone-btn {{phoneNumber ? 'done' : ''}}"
-      open-type="getPhoneNumber"
-      bindgetphonenumber="onGetPhoneNumber"
-    >
-      <text class="phone-icon">{{phoneNumber ? '✓' : '📱'}}</text>
-      <text class="phone-text">{{phoneNumber || '授权手机号'}}</text>
-    </button>
+    <!-- 手机号输入 -->
+    <view class="phone-wrap">
+      <input
+        type="number"
+        class="phone-input"
+        placeholder="输入手机号"
+        placeholder-class="phone-placeholder"
+        maxlength="11"
+        value="{{phoneNumber}}"
+        bindinput="onPhoneInput"
+      />
+    </view>
 
     <!-- 确认登录 -->
     <button

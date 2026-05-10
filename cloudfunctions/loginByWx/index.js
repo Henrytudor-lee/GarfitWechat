@@ -1,7 +1,6 @@
 // 云函数: loginByWx — 腾讯云 MySQL
 const mysql = require('mysql2/promise');
 const cloud = require('wx-server-sdk');
-const https = require('https');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
@@ -22,49 +21,6 @@ function getPool() {
   return pool;
 }
 
-function wxGet(url, body = null) {
-  return new Promise((resolve, reject) => {
-    const bodyStr = body ? JSON.stringify(body) : '';
-    const options = {
-      method: body ? 'POST' : 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(bodyStr),
-      },
-    };
-    const req = https.request(url, options, res => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); }
-        catch { reject(new Error(data)); }
-      });
-    });
-    req.on('error', reject);
-    if (bodyStr) req.write(bodyStr);
-    req.end();
-  });
-}
-
-async function getAccessToken() {
-  const appid = process.env.WX_APPID;
-  const secret = process.env.WX_APPSECRET;
-  if (!appid || !secret) throw new Error('未配置 WX_APPID/WX_APPSECRET');
-  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appid}&secret=${secret}`;
-  const res = await wxGet(url);
-  if (!res.access_token) throw new Error('获取 access_token 失败');
-  return res.access_token;
-}
-
-// 用 code 换取手机号（code 只能用一次）
-async function getPhoneNumber(code) {
-  const token = await getAccessToken();
-  const url = `https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=${token}`;
-  const res = await wxGet(url, { code });
-  if (res.errcode !== 0) throw new Error('获取手机号失败: ' + (res.errmsg || res.errcode));
-  return res.phone_info && res.phone_info.phoneNumber;
-}
-
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
@@ -74,7 +30,7 @@ exports.main = async (event, context) => {
     const [rows] = await getPool().query('SELECT * FROM users WHERE _openid = ? LIMIT 1', [openid]);
 
     if (rows.length > 0) {
-      // 老用户：只更新资料，不强制要求手机号
+      // 老用户：只更新资料
       const updates = ['updated_at = NOW()'];
       const vals = [];
       if (event.nickname) { updates.push('name = ?'); vals.push(event.nickname); }
@@ -94,16 +50,9 @@ exports.main = async (event, context) => {
     }
 
     // 新用户：必须有手机号
-    let phoneNumber = event.phoneNumber || null;
-    if (!phoneNumber && event.phoneCode) {
-      try {
-        phoneNumber = await getPhoneNumber(event.phoneCode);
-      } catch (phoneErr) {
-        console.error('获取手机号失败:', phoneErr.message);
-      }
-    }
-    if (!phoneNumber) {
-      return { success: false, error: '请先授权手机号' };
+    const phoneNumber = event.phoneNumber ? event.phoneNumber.trim() : '';
+    if (!phoneNumber || phoneNumber.length !== 11) {
+      return { success: false, error: '请输入有效的11位手机号' };
     }
 
     const [result] = await getPool().query(

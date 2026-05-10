@@ -5,19 +5,13 @@ Page({
   data: {
     avatarUrl: '',
     nickname: '',
-    phoneCode: '',      // 存 code，确认时一起发
-    phoneNumber: '',    // 存展示用
-    hasPhone: false,    // 老用户已有手机号
+    phoneNumber: '',
+    hasPhone: false,
     canLogin: false,
     loading: false,
   },
 
-  onGetPhoneNumber(e) {
-    console.log('getphonenumber event', e)
-  },
-
   onLoad() {
-    // 检查是否已有手机号（从 storage 读）
     const phone = wx.getStorageSync('phoneNumber');
     if (phone) {
       this.setData({ phoneNumber: phone, hasPhone: true });
@@ -37,27 +31,16 @@ Page({
 
   onNicknameBlur(e) {
     this.setData({ nickname: e.detail.value });
+  },
+
+  onPhoneInput(e) {
+    this.setData({ phoneNumber: e.detail.value });
     this._updateCanLogin();
   },
 
-  onGetPhoneNumber(e) {
-    console.log(e);
-    // 已授权过则不再重复请求
-    if (this.data.hasPhone) return;
-
-    if (e.detail.code) {
-      this.setData({
-        phoneCode: e.detail.code,
-        phoneNumber: '已授权',
-      });
-      this._updateCanLogin();
-    }
-  },
-
   _updateCanLogin() {
-    const { avatarUrl, nickname, phoneCode, hasPhone } = this.data;
-    // 有手机号（已存或新授权）即可
-    const hasPhoneAuth = hasPhone || phoneCode;
+    const { avatarUrl, nickname, phoneNumber, hasPhone } = this.data;
+    const hasPhoneAuth = hasPhone || (phoneNumber && phoneNumber.length === 11);
     this.setData({ canLogin: !!avatarUrl && !!nickname.trim() && !!hasPhoneAuth });
   },
 
@@ -68,14 +51,14 @@ Page({
     wx.showLoading({ title: '登录中...', mask: true });
 
     try {
-      const { avatarUrl, nickname, phoneCode } = this.data;
+      const { avatarUrl, nickname, phoneNumber: inputPhone } = this.data;
 
       const loginRes = await wx.cloud.callFunction({
         name: 'loginByWx',
         data: {
           nickname: nickname.trim(),
           avatar: avatarUrl,
-          phoneCode,  // 新用户才有时才传
+          phoneNumber: inputPhone.trim(),
         },
       });
 
