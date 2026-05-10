@@ -13,7 +13,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70vh;
+  height: 85vh;
   background: #131313;
   border-radius: 32rpx 32rpx 0 0;
   display: flex;
@@ -201,9 +201,10 @@
 
 /* Exercise Grid - SCROLLABLE */
 .exercise-grid {
-  height: 50vh;
+  height: 60vh;
   overflow-y: auto;
-  padding: 0 32rpx 220rpx;
+  padding: 0 10rpx 80rpx 10rpx;
+  box-sizing: border-box;
 }
 
 .loading-state,
