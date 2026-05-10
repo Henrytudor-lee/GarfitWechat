@@ -24,39 +24,58 @@ function getPool() {
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
+  const { action } = event;
+
   if (!openid) return { success: false, error: '未登录' };
 
   try {
-    const [[user]] = await getPool().query('SELECT * FROM users WHERE _openid = ? LIMIT 1', [openid]);
-    if (!user) return { success: false, error: '用户不存在' };
-
-    if (event.action === 'get') {
-      const [[streak]] = await getPool().query('SELECT streak FROM user_streaks WHERE user_id = ?', [user.id]);
-      const [[level]] = await getPool().query('SELECT level, label, score FROM user_levels WHERE user_id = ?', [user.id]);
+    if (action === 'get') {
+      const [[user]] = await getPool().query(
+        'SELECT name, avatar, phone, level, score, created_at FROM users WHERE _openid = ? LIMIT 1',
+        [openid]);
+      if (!user) return { success: false, error: '用户不存在' };
       return {
         success: true,
         profile: {
-          id: user.id, name: user.name, avatar: user.avatar, role: user.role,
-          streak: streak ? streak.streak : 0,
-          level: level ? level.level : 1, label: level ? level.label : 'ROOKIE', score: level ? level.score : 0,
+          name: user.name,
+          avatar: user.avatar,
+          phone: user.phone,
+          level: user.level,
+          score: user.score,
+          created_at: user.created_at,
         },
       };
-    }
 
-    if (event.action === 'update') {
-      const { nickname, avatar } = event;
-      if (nickname !== undefined || avatar !== undefined) {
-        const fields = []; const vals = [];
-        if (nickname !== undefined) { fields.push('name = ?'); vals.push(nickname); }
-        if (avatar !== undefined) { fields.push('avatar = ?'); vals.push(avatar); }
-        fields.push('updated_at = NOW()');
-        vals.push(user.id);
-        await getPool().query(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, vals);
+    } else if (action === 'update') {
+      const [[user]] = await getPool().query(
+        'SELECT id FROM users WHERE _openid = ? LIMIT 1',
+        [openid]);
+      if (!user) return { success: false, error: '用户不存在' };
+
+      const { name, avatar } = event;
+      const fields = [];
+      const vals = [];
+
+      if (name !== undefined && name !== '') {
+        fields.push('name = ?');
+        vals.push(name);
+      }
+      if (avatar !== undefined && avatar !== '') {
+        fields.push('avatar = ?');
+        vals.push(avatar);
+      }
+
+      if (fields.length > 0) {
+        vals.push(openid);
+        await getPool().query(
+          `UPDATE users SET ${fields.join(', ')} WHERE _openid = ?`,
+          vals);
       }
       return { success: true };
-    }
 
-    return { success: false, error: '未知 action' };
+    } else {
+      return { success: false, error: '未知 action' };
+    }
   } catch (err) {
     return { success: false, error: err.message };
   }

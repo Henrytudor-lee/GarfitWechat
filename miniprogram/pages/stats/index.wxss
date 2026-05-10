@@ -18,13 +18,30 @@
   letter-spacing: 0.1em;
 }
 
-.page-subtitle {
+.page-title-text {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-subtitle-text {
   font-size: 22rpx;
   color: #71717a;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   margin-top: 4rpx;
+}
+
+.stat-card-value-small {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
 }
 
 /* 顶部统计卡片 */
@@ -200,8 +217,56 @@
   font-size: 26rpx;
 }
 
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 16rpx;
-  opacity: 0.3;
+.select-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0 4rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.select-arrow {
+  font-size: 36rpx;
+  color: #ccf200;
+  font-weight: 700;
+}
+
+/* Most Trained Muscle Groups */
+.muscle-list {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.muscle-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.muscle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12rpx;
+}
+
+.muscle-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.muscle-count {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
 }

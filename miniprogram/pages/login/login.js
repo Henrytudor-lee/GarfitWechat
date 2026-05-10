@@ -1,63 +1,19 @@
-// pages/login/login.js
+// pages/login/login.js — 极简微信登录
 const app = getApp();
 
 Page({
   data: {
-    avatarUrl: '',
-    nickname: '',
-    phoneNumber: '',
-    hasPhone: false,
-    canLogin: false,
     loading: false,
   },
 
-  onLoad() {
-    const phone = wx.getStorageSync('phoneNumber');
-    if (phone) {
-      this.setData({ phoneNumber: phone, hasPhone: true });
-      this._updateCanLogin();
-    }
-  },
-
-  getUserInfo(e) {
-    console.log(e);
-  },
-
-  onChooseAvatar(e) {
-    const { avatarUrl } = e.detail;
-    this.setData({ avatarUrl });
-    this._updateCanLogin();
-  },
-
-  onNicknameInput(e) {
-    this.setData({ nickname: e.detail.value });
-    this._updateCanLogin();
-  },
-
-  onNicknameBlur(e) {
-    this.setData({ nickname: e.detail.value });
-    this._updateCanLogin();
-  },
-
-  onPhoneInput(e) {
-    this.setData({ phoneNumber: e.detail.value });
-    this._updateCanLogin();
-  },
-
-  _updateCanLogin() {
-    const { avatarUrl, nickname, phoneNumber, hasPhone } = this.data;
-    const hasPhoneAuth = hasPhone || (phoneNumber && phoneNumber.length === 11);
-    this.setData({ canLogin: !!avatarUrl && !!nickname.trim() && !!hasPhoneAuth });
-  },
-
-  async handleLogin() {
-    if (!this.data.canLogin || this.data.loading) return;
+  async handleWxLogin() {
+    if (this.data.loading) return;
     this.setData({ loading: true });
 
     wx.showLoading({ title: '登录中...', mask: true });
 
     try {
-      // 1. 先调 wx.login() 获取 code
+      // 1. wx.login 获取 code
       const loginRes = await wx.login();
       if (!loginRes.code) {
         wx.hideLoading();
@@ -66,17 +22,10 @@ Page({
         return;
       }
 
-      const { avatarUrl, nickname, phoneNumber: inputPhone } = this.data;
-
-      // 2. 把 code 发给云函数，在云函数端调 auth.code2Session
+      // 2. 发给云函数，在云函数端调 auth.code2Session 换 openid
       const res = await wx.cloud.callFunction({
         name: 'loginByWx',
-        data: {
-          code: loginRes.code,
-          nickname: nickname.trim(),
-          avatar: avatarUrl,
-          phoneNumber: inputPhone.trim(),
-        },
+        data: { code: loginRes.code },
       });
 
       wx.hideLoading();
@@ -91,16 +40,12 @@ Page({
         return;
       }
 
-      const { userId, openid, phoneNumber } = res.result;
+      const { userId, openid } = res.result;
       app.globalData.userId = userId;
       app.globalData.openid = openid;
-      app.globalData.userInfo = { nickname: nickname.trim(), avatar: avatarUrl };
       wx.setStorageSync('userId', userId);
       wx.setStorageSync('openid', openid);
       wx.setStorageSync('isGuest', false);
-      if (phoneNumber) {
-        wx.setStorageSync('phoneNumber', phoneNumber);
-      }
 
       wx.reLaunch({ url: '/pages/index/index' });
 
@@ -115,15 +60,5 @@ Page({
         });
       }
     }
-  },
-
-  handleGuest() {
-    const guestId = 'guest_' + Date.now();
-    app.globalData.userId = guestId;
-    app.globalData.openid = null;
-    wx.setStorageSync('userId', guestId);
-    wx.setStorageSync('openid', '');
-    wx.setStorageSync('isGuest', true);
-    wx.reLaunch({ url: '/pages/index/index' });
   },
 });

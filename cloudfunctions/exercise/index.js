@@ -24,50 +24,44 @@ function getPool() {
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
-  const { action, exerciseId, sessionId } = event;
+  const { action } = event;
 
   if (!openid) return { success: false, error: '未登录' };
 
-  const [[user]] = await getPool().query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
-  if (!user) return { success: false, error: '用户不存在' };
-  const uid = user.id;
-
   try {
     if (action === 'add') {
-      const { exercise_id, name, weight, weight_unit, reps, sequence } = event;
-      if (!exercise_id || !name) return { success: false, error: '缺少必填字段' };
+      const { session_id, exercise_id, name, weight, reps } = event;
+      if (!session_id || !exercise_id || !name) return { success: false, error: '缺少必填字段' };
       const [result] = await getPool().query(
-        'INSERT INTO exercises (session_id, user_id, exercise_id, name, sequence, weight, weight_unit, reps) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [sessionId || null, uid, exercise_id, name, parseInt(sequence) || 0, parseFloat(weight) || 0, weight_unit || 'kg', parseInt(reps) || 0]);
+        'INSERT INTO exercises (session_id, exercise_id, name, weight, reps, weight_unit, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())',
+        [session_id, exercise_id, name, parseFloat(weight) || 0, parseInt(reps) || 0, 'kg']);
       return { success: true, exerciseId: result.insertId };
 
+    } else if (action === 'list') {
+      const { session_id } = event;
+      if (!session_id) return { success: false, error: '缺少 session_id' };
+      const [rows] = await getPool().query(
+        'SELECT * FROM exercises WHERE session_id = ? ORDER BY created_at ASC',
+        [session_id]);
+      return { success: true, exercises: rows };
+
     } else if (action === 'update') {
-      if (!exerciseId) return { success: false, error: '缺少 exerciseId' };
-      const { weight, weight_unit, reps, sequence } = event;
-      const fields = []; const vals = [];
-      if (weight !== undefined) { fields.push('weight = ?'); vals.push(parseFloat(weight)); }
-      if (weight_unit !== undefined) { fields.push('weight_unit = ?'); vals.push(weight_unit); }
-      if (reps !== undefined) { fields.push('reps = ?'); vals.push(parseInt(reps)); }
-      if (sequence !== undefined) { fields.push('sequence = ?'); vals.push(parseInt(sequence)); }
-      fields.push('update_time = NOW()');
-      vals.push(exerciseId);
-      await getPool().query(`UPDATE exercises SET ${fields.join(', ')} WHERE id = ?`, vals);
+      const { id, session_id, weight, reps } = event;
+      if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
+      await getPool().query(
+        'UPDATE exercises SET weight = ?, reps = ? WHERE id = ? AND session_id = ?',
+        [parseFloat(weight) || 0, parseInt(reps) || 0, id, session_id]);
       return { success: true };
 
     } else if (action === 'delete') {
-      if (!exerciseId) return { success: false, error: '缺少 exerciseId' };
-      await getPool().query('DELETE FROM exercises WHERE id = ?', [exerciseId]);
+      const { id, session_id } = event;
+      if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
+      await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ?', [id, session_id]);
       return { success: true };
 
-    } else if (action === 'list') {
-      if (!sessionId) return { success: false, error: '缺少 sessionId' };
-      const [rows] = await getPool().query(
-        'SELECT * FROM exercises WHERE session_id = ? AND user_id = ? ORDER BY sequence ASC',
-        [sessionId, uid]);
-      return { success: true, exercises: rows };
+    } else {
+      return { success: false, error: '未知 action' };
     }
-
-    return { success: false, error: '未知 action' };
   } catch (err) {
     return { success: false, error: err.message };
   }

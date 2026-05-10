@@ -27,38 +27,72 @@ exports.main = async (event, context) => {
   if (!openid) return { success: false, error: '未登录' };
 
   try {
-    const [[user]] = await getPool().query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
-    if (!user) return { success: false, error: '用户不存在' };
-    const uid = user.id;
+    // totalWorkouts: count of finished sessions
+    const [[totalWorkoutsRow]] = await getPool().query(
+      "SELECT COUNT(*) as n FROM sessions WHERE _openid = ? AND status = 'finished'",
+      [openid]);
+    const totalWorkouts = totalWorkoutsRow ? totalWorkoutsRow.n : 0;
 
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-    weekStart.setHours(0, 0, 0, 0);
+    // currentStreak: count of consecutive days with finished sessions in last 30 days
+    const [[streakRow]] = await getPool().query(
+      "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
+      [openid]);
 
-    const [[[totalSessions]], [[totalExercises]], [[streakRow]], [[levelRow]], [recent]] = await Promise.all([
-      getPool().query('SELECT COUNT(*) as n FROM sessions WHERE user_id = ? AND is_done = 1', [uid]),
-      getPool().query('SELECT COUNT(*) as n FROM exercises WHERE user_id = ?', [uid]),
-      getPool().query('SELECT streak FROM user_streaks WHERE user_id = ?', [uid]),
-      getPool().query('SELECT level, label, score FROM user_levels WHERE user_id = ?', [uid]),
-      getPool().query('SELECT * FROM sessions WHERE user_id = ? AND is_done = 1 ORDER BY start_time DESC LIMIT 7', [uid]),
-    ]);
+    let currentStreak = 0;
+    if (streakRow) {
+      const today = new Date().toISOString().slice(0, 10);
+      const lastDate = new Date(streakRow.day);
+      const daysSinceLast = (new Date(today) - lastDate) / 86400000;
+      if (daysSinceLast <= 1) {
+        // Count consecutive days
+        const [allDays] = await getPool().query(
+          "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
+          [openid]);
+        let streak = 0;
+        let prevDate = null;
+        for (const row of allDays) {
+          const d = new Date(row.day);
+          if (!prevDate) {
+            streak = 1;
+          } else {
+            const diff = (prevDate - d) / 86400000;
+            if (diff === 1) {
+              streak++;
+            } else {
+              break;
+            }
+          }
+          prevDate = d;
+        }
+        currentStreak = streak;
+      }
+    }
 
-    const [[[weekCount]]] = await getPool().query(
-      'SELECT COUNT(*) as n FROM sessions WHERE user_id = ? AND is_done = 1 AND start_time >= ?', [uid, weekStart]);
+    // totalVolume: sum of weight * reps for finished sessions
+    const [[volumeRow]] = await getPool().query(
+      "SELECT COALESCE(SUM(e.weight * e.reps), 0) as total FROM exercises e JOIN sessions s ON e.session_id = s.id WHERE s._openid = ? AND s.status = 'finished'",
+      [openid]);
+    const totalVolume = volumeRow ? Number(volumeRow.total) : 0;
+
+    // weekWorkouts: count of finished sessions in last 7 days
+    const [[weekCountRow]] = await getPool().query(
+      "SELECT COUNT(*) as n FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+      [openid]);
+    const weekWorkouts = weekCountRow ? weekCountRow.n : 0;
+
+    // weeklyVolume: daily volume for last 28 days
+    const [weeklyVolume] = await getPool().query(
+      "SELECT DATE(s.start_time) as day, COALESCE(SUM(e.weight * e.reps), 0) as volume FROM exercises e JOIN sessions s ON e.session_id = s.id WHERE s._openid = ? AND s.status = 'finished' AND s.start_time >= DATE_SUB(CURDATE(), INTERVAL 28 DAY) GROUP BY DATE(s.start_time) ORDER BY day ASC",
+      [openid]);
 
     return {
       success: true,
       stats: {
-        totalWorkouts: totalSessions ? totalSessions.n : 0,
-        totalExercises: totalExercises ? totalExercises.n : 0,
-        currentStreak: streakRow ? streakRow.streak : 0,
-        level: levelRow ? levelRow.level : 1,
-        label: levelRow ? levelRow.label : 'ROOKIE',
-        score: levelRow ? levelRow.score : 0,
-        weekWorkouts: weekCount ? weekCount.n : 0,
-        recentSessions: recent ? recent.map(s => ({
-          id: s.id, date: s.start_time, duration: s.duration || 0,
-        })) : [],
+        totalWorkouts,
+        currentStreak,
+        totalVolume,
+        weekWorkouts,
+        weeklyVolume,
       },
     };
   } catch (err) {

@@ -19,12 +19,14 @@ App({
       });
     }
 
-    // 读取登录状态，不强制的登录跳转，让用户自由访问首页
+    // 检测登录状态，未登录则跳转登录页
     const userId = wx.getStorageSync('userId');
     const openid = wx.getStorageSync('openid');
     if (userId) {
       this.globalData.userId = userId;
       this.globalData.openid = openid || null;
+    } else {
+      wx.reLaunch({ url: '/pages/login/login' });
     }
   },
 });

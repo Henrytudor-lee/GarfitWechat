@@ -1,26 +1,103 @@
 // pages/profile/index.js — garcia-fitness-new style
 const app = getApp();
 
-const LEVEL_THRESHOLDS = [
-  { level: 1, name: 'ROOKIE', xp: 0 },
-  { level: 2, name: 'WARRIOR', xp: 100 },
-  { level: 3, name: 'FIGHTER', xp: 300 },
-  { level: 4, name: 'ATHLETE', xp: 600 },
-  { level: 5, name: 'CHAMPION', xp: 1000 },
-];
+const I18N = {
+  en: {
+    profile: {
+      title: 'PROFILE',
+      login_required: 'NOT LOGGED IN',
+      login_hint: 'Sign in to track your fitness journey',
+      login_btn: 'LOGIN / REGISTER',
+      active_streak: 'ACTIVE STREAK',
+      days: 'days',
+      level: 'LEVEL',
+      lv: 'LV.',
+      language: 'LANGUAGE',
+      theme: 'THEME',
+      dark: 'Dark',
+      light: 'Light',
+      ai_coach: 'AI COACH',
+      soon: 'COMING SOON',
+      ai_subtitle: 'PERSONALIZED GUIDANCE',
+      settings: 'SETTINGS',
+      settings_sub: 'APP PREFERENCES',
+      logout: 'LOG OUT',
+      logout_sub: 'SIGN OUT OF YOUR ACCOUNT',
+      version: 'GARCIAL FITNESS V1.0.2 - STABLE',
+    }
+  },
+  zh: {
+    profile: {
+      title: '个人资料',
+      login_required: '未登录',
+      login_hint: '登录以开始健身之旅',
+      login_btn: '登录 / 注册',
+      active_streak: '连续训练',
+      days: '天',
+      level: '等级',
+      lv: 'LV.',
+      language: '语言',
+      theme: '主题',
+      dark: '深色',
+      light: '浅色',
+      ai_coach: 'AI 教练',
+      soon: '即将推出',
+      ai_subtitle: '个性化指导',
+      settings: '设置',
+      settings_sub: '应用偏好',
+      logout: '退出登录',
+      logout_sub: '退出当前账户',
+      version: 'GARCIAL FITNESS V1.0.2 - 稳定版',
+    }
+  }
+};
+
+function t(key, locale) {
+  const dict = I18N[locale] || I18N.en;
+  const keys = key.split('.');
+  let val = dict;
+  for (const k of keys) val = val[k];
+  return val || key;
+}
+
+// Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
+function getFlameColor(streak) {
+  if (streak === 0) return 'color-neutral-600';
+  if (streak <= 7) return 'color-orange';
+  if (streak <= 30) return 'color-yellow';
+  if (streak <= 60) return 'color-lime';
+  if (streak <= 120) return 'color-green';
+  if (streak <= 360) return 'color-teal';
+  return 'color-blue';
+}
+
+// Trophy color by level: ROOKIE=gray, BEGINNER=orange, INTERMEDIATE=yellow, ADVANCED=lime, EXPERT=green, ELITE=blue
+function getTrophyColor(lv) {
+  if (lv <= 1) return 'color-neutral-600';
+  if (lv === 2) return 'color-orange';
+  if (lv === 3) return 'color-yellow';
+  if (lv === 4) return 'color-lime';
+  if (lv === 5) return 'color-green';
+  return 'color-blue';
+}
 
 Page({
   data: {
     isLoggedIn: false,
     userInfo: {},
-    stats: {},
-    levelInfo: {},
-    memberSince: '',
-    xpPercent: 0,
+    streak: 0,
+    levelInfo: { label: 'ROOKIE', lv: 1, score: 0 },
+    locale: 'en',
+    theme: 'dark',
+    flameColor: 'color-neutral-600',
+    trophyColor: 'color-neutral-600',
+    version: 'V1.0.2 - STABLE',
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix });
+    const locale = wx.getStorageSync('locale') || 'en';
+    const theme = wx.getStorageSync('theme') || 'dark';
+    this.setData({ imgPrefix: app.globalData.imagePrefix, locale, theme });
   },
 
   async onShow() {
@@ -29,75 +106,94 @@ Page({
 
   async loadData() {
     const userId = wx.getStorageSync('userId');
-    const isGuest = wx.getStorageSync('isGuest');
-    if (!userId || isGuest) {
+    if (!userId) {
       this.setData({ isLoggedIn: false });
       wx.hideLoading();
       return;
     }
 
-    this.setData({ isLoggedIn: true });
+    const locale = wx.getStorageSync('locale') || 'en';
+    const theme = wx.getStorageSync('theme') || 'dark';
 
-    const [profileRes, statsRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'profile', data: { action: 'get' } }),
-      wx.cloud.callFunction({ name: 'stats', data: {} }),
+    this.setData({ isLoggedIn: true, locale, theme });
+
+    const [streakRes, levelRes] = await Promise.all([
+      wx.cloud.callFunction({ name: 'profile', data: { action: 'getStreak' } }),
+      wx.cloud.callFunction({ name: 'profile', data: { action: 'getLevel' } }),
     ]);
 
     wx.hideLoading();
 
-    const profile = (profileRes.result && profileRes.result.profile) || {};
-    const stats = (statsRes.result && statsRes.result.stats) || {};
-
-    // Build level info
-    const level = profile.level || 1;
-    const score = profile.score || 0;
-    const current = LEVEL_THRESHOLDS.find(l => l.level === level) || LEVEL_THRESHOLDS[0];
-    const next = LEVEL_THRESHOLDS.find(l => l.level === level + 1);
-    const xpPercent = next ? Math.min(100, Math.round(((score - current.xp) / (next.xp - current.xp)) * 100)) : 100;
+    const streak = (streakRes.result && streakRes.result.streak) || 0;
+    const levelData = (levelRes.result && levelRes.result.data) || { label: 'ROOKIE', lv: 1, score: 0 };
 
     this.setData({
-      userInfo: {
-        nickname: profile.name || 'ATHLETE',
-        avatarUrl: profile.avatar || '',
-      },
-      stats,
-      levelInfo: {
-        level,
-        name: current.name,
-        currentXp: score,
-        nextXp: next ? next.xp : score,
-      },
-      memberSince: profile.created_at
-        ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()
-        : '—',
-      xpPercent,
+      streak,
+      levelInfo: levelData,
+      flameColor: getFlameColor(streak),
+      trophyColor: getTrophyColor(levelData.lv),
     });
   },
 
-  goToFavorites() {
-    wx.navigateTo({ url: '/pages/favorites/index' });
+  goToLogin() {
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 
-  goToHistory() {
-    wx.navigateTo({ url: '/pages/history/index' });
-  },
-
-  onShareTap() {
-    wx.showShareMenu({ withShareTicket: true });
-    wx.showToast({ title: 'SHARE VIA ...', icon: 'none' });
-  },
-
-  onAboutTap() {
-    wx.showModal({
-      title: 'ABOUT',
-      content: 'GARCIAL FITNESS v1.0\nBuilt with 💪',
-      showCancel: false,
+  // Change avatar via album picker
+  changeAvatar() {
+    wx.chooseImage({
+      count: 1,
+      sourceType: ['album'],
+      success: (res) => {
+        const tempFilePath = res.tempFilePaths[0];
+        // Save to local storage immediately for display
+        wx.setStorageSync('avatarTemp', tempFilePath);
+        this.setData({
+          'userInfo.avatarUrl': tempFilePath,
+        });
+        // Sync to cloud
+        const userId = wx.getStorageSync('userId');
+        if (userId) {
+          wx.cloud.uploadFile({
+            cloudPath: `avatars/${userId}_${Date.now()}.jpg`,
+            filePath: tempFilePath,
+            success: (uploadRes) => {
+              const avatarUrl = uploadRes.fileID;
+              wx.cloud.callFunction({
+                name: 'profile',
+                data: { action: 'updateAvatar', userId, avatarUrl },
+              });
+              wx.setStorageSync('avatarUrl', avatarUrl);
+            },
+          });
+        }
+        wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
+      },
     });
   },
 
-  onSignOut() {
+  // Toggle language EN <-> CN
+  toggleLanguage() {
+    const current = wx.getStorageSync('locale') || 'en';
+    const next = current === 'en' ? 'zh' : 'en';
+    wx.setStorageSync('locale', next);
+    this.setData({ locale: next });
+    wx.showToast({ title: next === 'en' ? 'Language: EN' : '语言: 中文', icon: 'none' });
+  },
+
+  // Toggle theme dark <-> light
+  toggleTheme() {
+    const current = wx.getStorageSync('theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    wx.setStorageSync('theme', next);
+    this.setData({ theme: next });
+    wx.showToast({ title: next === 'dark' ? 'Theme: Dark' : 'Theme: Light', icon: 'none' });
+  },
+
+  // Handle logout
+  handleLogout() {
     wx.showModal({
-      title: 'SIGN OUT',
+      title: 'LOG OUT',
       content: 'Are you sure you want to sign out?',
       confirmColor: '#ef4444',
       success: (res) => {
@@ -107,9 +203,5 @@ Page({
         }
       },
     });
-  },
-
-  goToLogin() {
-    wx.navigateTo({ url: '/pages/login/login' });
   },
 });

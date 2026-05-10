@@ -34,6 +34,11 @@
     {{runningSession ? 'END TRAINING' : 'QUICK START'}}
   </button>
 
+  <!-- Floating FAB - Add Exercise -->
+  <view class="fab" wx:if="{{runningSession}}" bindtap="goToLibrary">
+    <text class="fab-icon">+</text>
+  </view>
+
   <!-- Current Workout -->
   <view class="section">
     <view class="section-header">
@@ -81,6 +86,7 @@
   <view class="section" wx:if="{{recentSessions.length > 0}}">
     <view class="section-header">
       <text class="section-title">RECENT</text>
+      <text class="section-link" bindtap="goToHistory">VIEW ALL</text>
     </view>
     <view class="recent-list">
       <view class="recent-item" wx:for="{{recentSessions}}" wx:key="_id">

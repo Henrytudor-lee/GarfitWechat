@@ -156,6 +156,15 @@
   color: #ccf200;
 }
 
+.section-link {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #ccf200;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* Exercise Card */
 .exercise-list {
   display: flex;

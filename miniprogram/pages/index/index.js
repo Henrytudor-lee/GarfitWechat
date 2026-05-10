@@ -20,6 +20,13 @@ Page({
   },
 
   onShow() {
+    // Check if an exercise was selected from library while session was running
+    const chosen = getApp().globalData.chosenExercise;
+    if (chosen && this.data.runningSession) {
+      getApp().globalData.chosenExercise = null;
+      this.addExerciseToSession(chosen);
+      return;
+    }
     this._loadData();
   },
 
@@ -169,5 +176,29 @@ Page({
     wx.navigateTo({
       url: `/pages/exercise-detail/index?id=${item.exercise_id || item.id}&name=${encodeURIComponent(item.name_zh || item.name)}`,
     });
+  },
+
+  async addExerciseToSession(item) {
+    if (!this.data.runningSession) return;
+    wx.showLoading({ title: 'ADDING...', mask: true });
+    const res = await wx.cloud.callFunction({
+      name: 'exercise',
+      data: {
+        action: 'add',
+        sessionId: this.data.runningSession.id,
+        exercise_id: item._id || item.id,
+        name: item.name_zh || item.name,
+        weight: 0,
+        reps: 0,
+      },
+    });
+    wx.hideLoading();
+    if (res.result && res.result.success) {
+      this._loadExerciseGroups(this.data.runningSession.id);
+    }
+  },
+
+  goToHistory() {
+    wx.navigateTo({ url: '/pages/history/index' });
   },
 });
