@@ -36,6 +36,7 @@ Page({
 
   onNicknameBlur(e) {
     this.setData({ nickname: e.detail.value });
+    this._updateCanLogin();
   },
 
   onPhoneInput(e) {
