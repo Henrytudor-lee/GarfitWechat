@@ -37,17 +37,17 @@ const MUSCLE_LIST = [
   { id: 2,  name: 'Chest',        icon: 'chest.png' },
   { id: 3,  name: 'Hips',         icon: 'hips.png' },
   { id: 4,  name: 'Back',         icon: 'back.png' },
-  { id: 5,  name: 'Upper Arms',   icon: 'upper_arms.png' },
+  { id: 5,  name: 'Upper Arms',   icon: 'shoulders.png' },
   { id: 6,  name: 'Shoulders',    icon: 'shoulders.png' },
   { id: 7,  name: 'Forearms',     icon: 'forearms.png' },
   { id: 8,  name: 'Calves',       icon: 'calves.png' },
-  { id: 9,  name: 'Neck',         icon: 'neck.png' },
+  { id: 9,  name: 'Neck',          icon: 'neck.png' },
   { id: 10, name: 'Cardio',       icon: 'cardio.png' },
   { id: 12, name: 'Waist',        icon: 'waist.png' },
   { id: 17, name: 'Biceps',       icon: 'biceps.png' },
-  { id: 18, name: 'Triceps',      icon: 'triceps.png' },
-  { id: 19, name: 'Quadriceps',   icon: 'quadriceps.png' },
-  { id: 20, name: 'Hamstrings',   icon: 'hamstrings.png' },
+  { id: 18, name: 'Triceps',       icon: 'triceps.png' },
+  { id: 19, name: 'Quadriceps',    icon: 'quadriceps.png' },
+  { id: 20, name: 'Hamstrings',    icon: 'hamstrings.png' },
 ];
 
 const BODY_PART_MAP = {
