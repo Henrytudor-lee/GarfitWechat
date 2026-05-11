@@ -2,34 +2,34 @@
 const app = getApp();
 
 const EQUIPMENT_LIST = [
-  { id: 1, name: 'Barbell' },
-  { id: 2, name: 'Body weight' },
-  { id: 3, name: 'Cable' },
-  { id: 4, name: 'Dumbbell' },
-  { id: 5, name: 'EZ Barbell' },
-  { id: 6, name: 'Leverage machine' },
-  { id: 7, name: 'Sled machine' },
-  { id: 8, name: 'Smith machine' },
-  { id: 9, name: 'Weighted' },
-  { id: 10, name: 'Assisted' },
-  { id: 11, name: 'Band' },
-  { id: 12, name: 'Battling Rope' },
-  { id: 13, name: 'Bosu ball' },
-  { id: 14, name: 'Hammer' },
-  { id: 15, name: 'Kettlebell' },
-  { id: 16, name: 'Medicine Ball' },
-  { id: 17, name: 'Olympic barbell' },
-  { id: 18, name: 'Power Sled' },
-  { id: 19, name: 'Resistance Band' },
-  { id: 20, name: 'Roll' },
-  { id: 21, name: 'Rollball' },
-  { id: 22, name: 'Rope' },
-  { id: 23, name: 'Stability ball' },
-  { id: 24, name: 'Stick' },
-  { id: 25, name: 'Suspension' },
-  { id: 26, name: 'Trap bar' },
-  { id: 27, name: 'Vibrate Plate' },
-  { id: 28, name: 'Wheel roller' },
+  { id: 1,  name: 'Barbell',         icon: 'barbell.png' },
+  { id: 2,  name: 'Body weight',     icon: 'bodyweight.png' },
+  { id: 3,  name: 'Cable',           icon: 'cable.png' },
+  { id: 4,  name: 'Dumbbell',        icon: 'dumbell.png' },
+  { id: 5,  name: 'EZ Barbell',      icon: 'ez_barbell.png' },
+  { id: 6,  name: 'Leverage machine',icon: 'leverage_machine.png' },
+  { id: 7,  name: 'Sled machine',    icon: 'sled_machine.png' },
+  { id: 8,  name: 'Smith machine',    icon: 'smith_machine.png' },
+  { id: 9,  name: 'Weighted',        icon: 'weighted.png' },
+  { id: 10, name: 'Assisted',        icon: 'A.png' },
+  { id: 11, name: 'Band',            icon: 'band.png' },
+  { id: 12, name: 'Battling Rope',   icon: 'battling_rope.png' },
+  { id: 13, name: 'Bosu ball',       icon: 'bosu_ball.png' },
+  { id: 14, name: 'Hammer',          icon: 'H.png' },
+  { id: 15, name: 'Kettlebell',      icon: 'kettlebell.png' },
+  { id: 16, name: 'Medicine Ball',   icon: 'medicine_ball.png' },
+  { id: 17, name: 'Olympic barbell', icon: 'barbell.png' },
+  { id: 18, name: 'Power Sled',     icon: 'power_sled.png' },
+  { id: 19, name: 'Resistance Band', icon: 'resistance_band.png' },
+  { id: 20, name: 'Roll',           icon: 'roll.png' },
+  { id: 21, name: 'Rollball',       icon: 'rollball.png' },
+  { id: 22, name: 'Rope',           icon: 'rope.png' },
+  { id: 23, name: 'Stability ball',  icon: 'stability_ball.png' },
+  { id: 24, name: 'Stick',          icon: 'ST.png' },
+  { id: 25, name: 'Suspension',     icon: 'suspension.png' },
+  { id: 26, name: 'Trap bar',       icon: 'trap_bar.png' },
+  { id: 27, name: 'Vibrate Plate',  icon: 'VP.png' },
+  { id: 28, name: 'Wheel roller',   icon: 'wheel_roller.png' },
 ];
 
 const MUSCLE_LIST = [
@@ -65,6 +65,16 @@ const EQUIP_MAP = {
   '18': 'Power Sled', '19': 'Resistance Band', '20': 'Roll',
   '21': 'Rollball', '22': 'Rope', '23': 'Stability ball', '24': 'Stick',
   '25': 'Suspension', '26': 'Trap bar', '27': 'Vibrate Plate', '28': 'Wheel roller',
+};
+const EQUIP_ICON_MAP = {
+  '1': 'barbell.png', '2': 'bodyweight.png', '3': 'cable.png', '4': 'dumbell.png',
+  '5': 'ez_barbell.png', '6': 'leverage_machine.png', '7': 'sled_machine.png',
+  '8': 'smith_machine.png', '9': 'weighted.png', '10': 'A.png',
+  '11': 'band.png', '12': 'battling_rope.png', '13': 'bosu_ball.png', '14': 'H.png',
+  '15': 'kettlebell.png', '16': 'medicine_ball.png', '17': 'barbell.png',
+  '18': 'power_sled.png', '19': 'resistance_band.png', '20': 'roll.png',
+  '21': 'rollball.png', '22': 'rope.png', '23': 'stability_ball.png', '24': 'ST.png',
+  '25': 'suspension.png', '26': 'trap_bar.png', '27': 'VP.png', '28': 'wheel_roller.png',
 };
 
 Component({
@@ -231,6 +241,7 @@ Component({
         const items = (res.result.list || []).map(item => ({
           ...item,
           equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
+          equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
           muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
         }));
 

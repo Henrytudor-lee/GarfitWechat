@@ -39,7 +39,10 @@
           class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}"
           bindtap="onEquipmentTap"
           data-id="{{item.id}}"
-        >{{item.name.toUpperCase()}}</view>
+        >
+          <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
+          <text>{{item.name.toUpperCase()}}</text>
+        </view>
       </view>
     </scroll-view>
   </view>
@@ -90,6 +93,7 @@
           <view class="card-info-btn" catchtap="openDetail" data-item="{{item}}">ⓘ</view>
         </view>
         <view class="card-tags">
+          <image wx:if="{{item.equipment_icon}}" class="chip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
           <text class="chip chip-neutral">{{item.equipment_name || 'OTHER'}}</text>
           <text wx:if="{{item.muscle_name}}" class="chip">{{item.muscle_name}}</text>
         </view>

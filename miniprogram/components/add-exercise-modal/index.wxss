@@ -182,12 +182,14 @@
 }
 
 .filter-chip {
-  display: inline-block;
-  padding: 12rpx 24rpx;
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 4rpx 8rpx;
   border-radius: 30rpx;
   font-size: 22rpx;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.2);
   color: #888;
   flex-shrink: 0;
   border: 1rpx solid rgba(255, 255, 255, 0.08);
@@ -197,6 +199,13 @@
   background: #ccf200;
   color: #000;
   border-color: #ccf200;
+}
+
+.filter-chip .equip-icon {
+  width: 60rpx;
+  height: 60rpx;
+  flex-shrink: 0;
+  border-radius: 8rpx;
 }
 
 /* Exercise Grid - SCROLLABLE */
@@ -296,6 +305,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.card-equip-icon {
+  width: 48rpx;
+  height: 48rpx;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8rpx;
 }
 
 /* STEP 2: Set Weight/Reps */

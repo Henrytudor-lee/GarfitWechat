@@ -91,7 +91,9 @@
 }
 
 .filter-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
   padding: 14rpx 28rpx;
   border-radius: 100rpx;
   font-size: 20rpx;
@@ -108,6 +110,13 @@
   background: #ccf200;
   color: #000;
   border-color: #ccf200;
+}
+
+.filter-chip .equip-icon {
+  width: 26rpx;
+  height: 26rpx;
+  flex-shrink: 0;
+  border-radius: 6rpx;
 }
 
 .muscle-row {
@@ -254,6 +263,12 @@
 .chip-neutral {
   background: rgba(255, 255, 255, 0.08);
   color: #71717a;
+}
+
+.chip-icon {
+  width: 22rpx;
+  height: 22rpx;
+  flex-shrink: 0;
 }
 
 /* States */

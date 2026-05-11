@@ -9,14 +9,14 @@
     <view class="modal-header">
       <view class="header-left">
         <view wx:if="{{step === 'pick' && selectedMuscleOpen}}" class="header-btn" bindtap="closeMuscleMenu">
-          <image class="header-btn-icon" src="{{imgPrefix}}/images/icons/icon-close.svg" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
         </view>
         <block wx:elif="{{step === 'pick'}}">
           <view class="header-btn" bindtap="toggleMuscleMenu">🏅 {{muscleLabel}}</view>
         </block>
         <block wx:else>
           <view class="header-btn back-btn" bindtap="goBack">
-            <image class="header-btn-icon" src="{{imgPrefix}}/images/icons/icon-back.svg" mode="aspectFit" />
+            <image class="header-btn-icon" src="{{imgPrefix}}/icons/icon-back.svg" mode="aspectFit" />
             Back
           </view>
         </block>
@@ -26,7 +26,7 @@
 
       <view class="header-right">
         <view class="header-btn" bindtap="closeModal">
-          <image class="header-btn-icon" src="{{imgPrefix}}/images/icons/icon-close.svg" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
         </view>
       </view>
     </view>
@@ -45,7 +45,7 @@
         bindtap="selectMuscle"
         data-id="{{item.id}}"
       >
-        <image wx:if="{{item.icon}}" class="muscle-icon" src="{{imgPrefix}}/images/body-icons/{{item.icon}}" mode="aspectFit" />
+        <image wx:if="{{item.icon}}" class="muscle-icon" src="{{imgPrefix}}/body-icons/{{item.icon}}" mode="aspectFit" />
         <text class="muscle-item-name">{{item.name}}</text>
       </view>
     </view>
@@ -59,7 +59,7 @@
         <!-- Search -->
         <view class="search-bar">
           <view class="search-icon-wrap">
-            <image src="{{imgPrefix}}/images/icons/icon-search.svg" mode="aspectFit" style="width:28rpx;height:28rpx;opacity:0.5;" />
+            <image src="{{imgPrefix}}/icons/icon-search.svg" mode="aspectFit" style="width:28rpx;height:28rpx;opacity:0.5;" />
           </view>
           <input
             class="search-input"
@@ -86,7 +86,10 @@
                 class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}"
                 bindtap="selectEquipment"
                 data-id="{{item.id}}"
-              >{{item.name.toUpperCase()}}</view>
+              >
+                <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
+                <text>{{item.name.toUpperCase()}}</text>
+              </view>
             </view>
           </scroll-view>
         </view>
@@ -117,6 +120,7 @@
               </view>
               <view class="card-footer">
                 <view class="card-name">{{item.name}}</view>
+                <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
               </view>
             </view>
           </view>
