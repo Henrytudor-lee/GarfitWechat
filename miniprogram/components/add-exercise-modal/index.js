@@ -33,21 +33,21 @@ const EQUIPMENT_LIST = [
 ];
 
 const MUSCLE_LIST = [
-  { id: 1, name: 'Thighs', icon: 'quadriceps.svg' },
-  { id: 2, name: 'Chest', icon: 'chest.svg' },
-  { id: 3, name: 'Hips', icon: 'hips.svg' },
-  { id: 4, name: 'Back', icon: 'back.svg' },
-  { id: 5, name: 'Upper Arms', icon: '' },
-  { id: 6, name: 'Shoulders', icon: 'shoulders.svg' },
-  { id: 7, name: 'Forearms', icon: 'forearms.svg' },
-  { id: 8, name: 'Calves', icon: 'calves.svg' },
-  { id: 9, name: 'Neck', icon: 'neck.svg' },
-  { id: 10, name: 'Cardio', icon: 'cardio.svg' },
-  { id: 12, name: 'Waist', icon: 'waist.svg' },
-  { id: 17, name: 'Biceps', icon: 'biceps.svg' },
-  { id: 18, name: 'Triceps', icon: 'triceps.svg' },
-  { id: 19, name: 'Quadriceps', icon: 'quadriceps.svg' },
-  { id: 20, name: 'Hamstrings', icon: 'hamstrings.svg' },
+  { id: 1,  name: 'Thighs',      icon: 'quadriceps.png' },
+  { id: 2,  name: 'Chest',        icon: 'chest.png' },
+  { id: 3,  name: 'Hips',         icon: 'hips.png' },
+  { id: 4,  name: 'Back',         icon: 'back.png' },
+  { id: 5,  name: 'Upper Arms',   icon: 'upper_arms.png' },
+  { id: 6,  name: 'Shoulders',    icon: 'shoulders.png' },
+  { id: 7,  name: 'Forearms',     icon: 'forearms.png' },
+  { id: 8,  name: 'Calves',       icon: 'calves.png' },
+  { id: 9,  name: 'Neck',         icon: 'neck.png' },
+  { id: 10, name: 'Cardio',       icon: 'cardio.png' },
+  { id: 12, name: 'Waist',        icon: 'waist.png' },
+  { id: 17, name: 'Biceps',       icon: 'biceps.png' },
+  { id: 18, name: 'Triceps',      icon: 'triceps.png' },
+  { id: 19, name: 'Quadriceps',   icon: 'quadriceps.png' },
+  { id: 20, name: 'Hamstrings',   icon: 'hamstrings.png' },
 ];
 
 const BODY_PART_MAP = {
