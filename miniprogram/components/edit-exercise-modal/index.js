@@ -19,6 +19,7 @@ Component({
 
   data: {
     sets: [],
+    activeSetsCount: 0,
     saving: false,
     imgPrefix: '',
   },
@@ -26,16 +27,20 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen && this.data.group) {
+        const sets = this.data.group.sets.map(s => ({ ...s }));
         this.setData({
           imgPrefix: app.globalData.imagePrefix || '',
-          sets: this.data.group.sets.map(s => ({ ...s })),
+          sets,
+          activeSetsCount: sets.filter(s => !s.deleted).length,
         });
       }
     },
     'group': function(group) {
       if (group && this.data.isOpen) {
+        const sets = group.sets.map(s => ({ ...s }));
         this.setData({
-          sets: group.sets.map(s => ({ ...s })),
+          sets,
+          activeSetsCount: sets.filter(s => !s.deleted).length,
         });
       }
     },
@@ -59,10 +64,11 @@ Component({
       this.setData({ sets });
     },
 
-    deleteSet(index) {
+    deleteSet(event) {
+      const index = event.target.dataset.index;
       const sets = [...this.data.sets];
-      sets[index] = { ...sets[index], _deleted: true };
-      this.setData({ sets });
+      sets[index] = { ...sets[index], deleted: true };
+      this.setData({ sets, activeSetsCount: sets.filter(s => !s.deleted).length });
     },
 
     addSet() {
@@ -74,15 +80,18 @@ Component({
         weight_unit: last?.weight_unit || 'kg',
         sequence: this.data.sets.length,
       };
-      this.setData({ sets: [...this.data.sets, newSet] });
+      const sets = [...this.data.sets, newSet];
+      this.setData({ sets, activeSetsCount: sets.filter(s => !s.deleted).length });
     },
 
-    incWeight(index) {
+    incWeight(e) {
+      const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
       this.updateSet(index, 'weight', s.weight + 2.5);
     },
 
-    decWeight(index) {
+    decWeight(e) {
+      const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
       this.updateSet(index, 'weight', Math.max(0, s.weight - 2.5));
     },
@@ -93,12 +102,14 @@ Component({
       this.updateSet(index, 'weight', value);
     },
 
-    incReps(index) {
+    incReps(e) {
+      const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
       this.updateSet(index, 'reps', s.reps + 1);
     },
 
-    decReps(index) {
+    decReps(e) {
+      const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
       this.updateSet(index, 'reps', Math.max(1, s.reps - 1));
     },
@@ -111,8 +122,8 @@ Component({
 
     setUnit(e) {
       const index = e.currentTarget.dataset.index;
-      const unit = e.currentTarget.dataset.unit;
-      this.updateSet(index, 'weight_unit', unit);
+      const u = e.currentTarget.dataset.weight_unit;
+      this.updateSet(index, 'weight_unit', u);
     },
 
     async saveAll() {
@@ -125,7 +136,7 @@ Component({
 
         for (let i = 0; i < sets.length; i++) {
           const s = sets[i];
-          if (s._deleted) continue;
+          if (s.deleted) continue;
 
           const original = group.sets.find(os => os.id === s.id);
 
@@ -152,7 +163,10 @@ Component({
                 session_id: this.data.sessionId,
                 openid: app.globalData.openid,
                 exercise_id: group.exercise_id,
-                name: group.name,
+                name_zh: group.name_zh,
+                name_en: group.name_en || null,
+                image_name: group.image_name || null,
+                video_name: group.video_name || null,
                 weight: s.weight,
                 reps: s.reps,
                 weight_unit: s.weight_unit,
@@ -161,7 +175,13 @@ Component({
           }
         }
 
-        const toDelete = sets.filter(s => s._deleted && s.id <= Date.now() - 100000);
+        const toDelete = sets.filter(s => {
+          if (!s.deleted) return false;
+          // DB records have small integer ids — always delete
+          if (s.id < 1e12) return true;
+          // Client-side temporary ids (Date.now()) — only delete if older than 100s
+          return s.id <= Date.now() - 100000;
+        });
         for (const s of toDelete) {
           await wx.cloud.callFunction({
             name: 'exercise',

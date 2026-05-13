@@ -117,7 +117,13 @@
   font-size: 30rpx;
   font-weight: 600;
   color: #1A1A2E;
-  margin-bottom: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+.item-sub {
+  font-size: 22rpx;
+  color: #888;
+  margin-bottom: 6rpx;
 }
 
 .item-sets {

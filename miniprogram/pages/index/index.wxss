@@ -206,14 +206,13 @@
 .exercise-content {
   flex: 1;
   padding: 16rpx 20rpx;
-  justify-content: center;
   display: flex;
   flex-direction: column;
 }
 
 .exercise-name {
   font-family: 'Lexend Deca', sans-serif;
-  font-size: 28rpx;
+  font-size: 20rpx;
   font-weight: 800;
   color: #fff;
   text-transform: uppercase;

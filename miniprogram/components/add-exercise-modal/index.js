@@ -112,7 +112,7 @@ Component({
     selectedItem: null,
     weight: 0,
     reps: 0,
-    unit: 'kg',
+    weight_unit: 'kg',
     historyMax: null,
     submitting: false,
   },
@@ -156,7 +156,7 @@ Component({
         selectedItem: null,
         weight: 0,
         reps: 0,
-        unit: 'kg',
+        weight_unit: 'kg',
         historyMax: null,
         submitting: false,
       });
@@ -284,10 +284,10 @@ Component({
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
           this.setData({
-            historyMax: { weight: d.weight, reps: d.reps, unit: d.weight_unit || 'kg' },
+            historyMax: { weight: d.weight, reps: d.reps, weight_unit: d.weight_unit || 'kg' },
             weight: d.weight,
             reps: d.reps || 0,
-            unit: d.weight_unit || 'kg',
+            weight_unit: d.weight_unit || 'kg',
           });
         }
       } catch (err) {
@@ -327,12 +327,12 @@ Component({
     },
 
     setUnit(e) {
-      const u = e.currentTarget.dataset.unit;
-      this.setData({ unit: u });
+      const u = e.currentTarget.dataset.weight_unit;
+      this.setData({ weight_unit: u });
     },
 
     async confirmAdd() {
-      const { selectedItem, weight, reps, unit, submitting } = this.data;
+      const { selectedItem, weight, reps, weight_unit, submitting } = this.data;
       if (!selectedItem || weight < 0 || reps <= 0 || submitting) return;
 
       this.setData({ submitting: true });
@@ -348,10 +348,13 @@ Component({
             session_id: sessionId,
             openid: app.globalData.openid,
             exercise_id: selectedItem._id || selectedItem.id,
-            name: selectedItem.name_zh || selectedItem.name,
+            name_zh: selectedItem.name_zh || selectedItem.name,
+            name_en: selectedItem.name || null,
+            image_name: selectedItem.image_name || null,
+            video_name: selectedItem.video_name || null,
             weight,
             reps,
-            weight_unit: unit,
+            weight_unit: weight_unit,
           },
         });
 

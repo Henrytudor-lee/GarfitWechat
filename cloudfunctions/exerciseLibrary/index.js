@@ -26,7 +26,7 @@ exports.main = async (event, context) => {
 
   try {
     if (action === 'list') {
-      let sql = 'SELECT id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE 1=1';
+      let sql = 'SELECT id,name,name_zh,image_name,video_name,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE 1=1';
       const params = [];
 
       if (keyword) {
@@ -58,7 +58,7 @@ exports.main = async (event, context) => {
 
     } else if (action === 'favorites') {
       const [rows] = await getPool().query(
-        'SELECT id,name,name_zh,image_name,video_name,video_file,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE is_favorite = 1 ORDER BY name_zh ASC'
+        'SELECT id,name,name_zh,image_name,video_name,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE is_favorite = 1 ORDER BY name_zh ASC'
       );
       return { success: true, list: rows };
 

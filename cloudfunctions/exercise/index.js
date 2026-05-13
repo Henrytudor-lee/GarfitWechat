@@ -26,24 +26,24 @@ exports.main = async (event, context) => {
   const openid = event.openid;
 
   try {
-if (action === 'add') {
-      const { session_id, exercise_id, name, weight, reps } = event;
-      if (!session_id || !exercise_id || !name) return { success: false, error: '缺少必填字段' };
+    if (action === 'add') {
+      const { session_id, exercise_id, name_zh, name_en, image_name, video_name, weight, reps, weight_unit } = event;
+      if (!session_id || !exercise_id || !name_zh) return { success: false, error: '缺少必填字段' };
       // Get _openid and user_id from the session
       const [sessions] = await getPool().query('SELECT _openid, user_id FROM sessions WHERE id = ?', [session_id]);
       const _openid = sessions.length > 0 ? sessions[0]._openid : null;
       const userId = sessions.length > 0 ? sessions[0].user_id : null;
 
       const [result] = await getPool().query(
-        'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
-        [session_id, _openid, userId, exercise_id, name, parseFloat(weight) || 0, parseInt(reps) || 0, (event.weight_unit || 'kg')]);
+        'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name_zh, name_en, image_name, video_name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
+        [session_id, _openid, userId, exercise_id, name_zh, name_en || null, image_name || null, video_name || null, parseFloat(weight) || 0, parseInt(reps) || 0, (weight_unit || 'kg')]);
       return { success: true, exerciseId: result.insertId };
 
     } else if (action === 'list') {
       const { session_id } = event;
       if (!session_id) return { success: false, error: '缺少 session_id' };
       const [rows] = await getPool().query(
-        'SELECT e.*, l.image_name, l.name as library_name FROM exercises e LEFT JOIN exercises_library l ON e.exercise_id = l.id WHERE e.session_id = ? ORDER BY e.create_time ASC',
+        'SELECT * FROM exercises WHERE session_id = ? ORDER BY create_time ASC',
         [session_id]);
       return { success: true, exercises: rows };
 
@@ -61,17 +61,17 @@ if (action === 'add') {
       return { success: true, data: rows[0] || null };
 
     } else if (action === 'update') {
-      const { id, session_id, weight, reps, openid: callerOpenid } = event;
+      const { id, session_id, weight, reps, openid: callerOpenid, weight_unit } = event;
       if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
       await getPool().query(
-        'UPDATE exercises SET weight = ?, reps = ? WHERE id = ? AND session_id = ? AND _openid = ?',
-        [parseFloat(weight) || 0, parseInt(reps) || 0, id, session_id, callerOpenid]);
+        'UPDATE exercises SET weight = ?, reps = ?, weight_unit = ? WHERE id = ? AND session_id = ? AND _openid = ?',
+        [parseFloat(weight) || 0, parseInt(reps) || 0, (weight_unit || 'kg'), id, session_id, callerOpenid]);
       return { success: true };
 
     } else if (action === 'delete') {
       const { id, session_id, openid: callerOpenid } = event;
       if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
-        await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
+      await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
       return { success: true };
 
     } else {

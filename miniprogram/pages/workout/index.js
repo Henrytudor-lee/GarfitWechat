@@ -13,7 +13,7 @@ Page({
     selectedIndex: -1,
     inputWeight: '',
     inputReps: '',
-    weightUnit: 'kg',
+    weight_unit: 'kg',
     imgPrefix: '',
   },
 
@@ -110,7 +110,7 @@ Page({
           map[ex.exercise_id].sets.push({
             _id: ex._id,
             weight: ex.weight,
-            unit: ex.weight_unit,
+            weight_unit: ex.weight_unit,
             reps: ex.reps,
           });
         }
@@ -156,7 +156,11 @@ Page({
       exercise_id: exercise._id,
       name: exercise.name,
       name_zh: exercise.name_zh || exercise.name,
+      name_en: exercise.name_en || exercise.name,
       image_name: exercise.image_name || null,
+      video_name: exercise.video_name || null,
+      muscle_name: exercise.muscle_name || '',
+      equipment_name: exercise.equipment_name || '',
       sets: [],
     };
     this.setData({ exerciseList: [...this.data.exerciseList, newItem] });
@@ -171,7 +175,7 @@ Page({
       selectedIndex: index,
       inputWeight: '',
       inputReps: '',
-      weightUnit: 'kg',
+      weight_unit: 'kg',
     });
   },
 
@@ -202,9 +206,12 @@ Page({
         session_id: this.data.session._id,
         openid: app.globalData.openid,
         exercise_id: selectedExercise.exercise_id,
-        name: selectedExercise.name,
+        name_zh: selectedExercise.name_zh || selectedExercise.name,
+        name_en: selectedExercise.name || null,
+        image_name: selectedExercise.image_name || null,
+        video_name: selectedExercise.video_name || null,
         weight: inputWeight || 0,
-        weight_unit: this.data.weightUnit,
+        weight_unit: this.data.weight_unit,
         reps: parseInt(inputReps) || 0,
       },
     });
@@ -212,7 +219,7 @@ Page({
     if (res.result && res.result.success) {
       const newSet = {
         weight: parseFloat(inputWeight) || 0,
-        unit: this.data.weightUnit,
+        weight_unit: this.data.weight_unit,
         reps: parseInt(inputReps) || 0,
       };
       const list = [...this.data.exerciseList];

@@ -159,7 +159,7 @@
 
         <!-- Weight Input -->
         <view class="input-section">
-          <view class="input-label">WEIGHT ({{unit}})</view>
+          <view class="input-label">WEIGHT ({{weight_unit}})</view>
           <view class="input-row">
             <view class="input-btn" bindtap="decWeight">−</view>
             <input
@@ -176,14 +176,14 @@
         <!-- Unit Toggle -->
         <view class="unit-toggle">
           <view
-            class="unit-btn {{unit === 'kg' ? 'active' : ''}}"
+            class="unit-btn {{weight_unit === 'kg' ? 'active' : ''}}"
             bindtap="setUnit"
-            data-unit="kg"
+            data-weight-unit="kg"
           >KG</view>
           <view
-            class="unit-btn {{unit === 'lb' ? 'active' : ''}}"
+            class="unit-btn {{weight_unit === 'lb' ? 'active' : ''}}"
             bindtap="setUnit"
-            data-unit="lb"
+            data-weight-unit="lb"
           >LB</view>
         </view>
 

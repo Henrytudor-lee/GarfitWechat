@@ -31,6 +31,7 @@
         </view>
         <view class="item-info">
           <view class="item-name">{{item.name_zh || item.name}}</view>
+          <view class="item-sub" wx:if="{{item.muscle_name || item.equipment_name}}">{{item.muscle_name}}{{item.muscle_name && item.equipment_name ? ' · ' : ''}}{{item.equipment_name}}</view>
           <view class="item-sets">
             <text class="set-tag" wx:for="{{item.sets}}" wx:for-item="s" wx:key="_id">
               {{s.weight}}{{s.unit}} × {{s.reps}}

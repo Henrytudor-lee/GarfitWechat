@@ -134,8 +134,13 @@ Page({
         }
         if (ex.weight > 0 || ex.reps > 0) {
           map[ex.exercise_id].sets.push({
+            id: ex.id,
             weight: ex.weight,
-            unit: ex.weight_unit,
+            weight_unit: ex.weight_unit,
+            name_zh: ex.name_zh,
+            name_en: ex.name_en,
+            image_name: ex.image_name,
+            video_name: ex.video_name,
             reps: ex.reps,
           });
         }
@@ -404,7 +409,7 @@ Page({
     this.setData({
       showEditModal: true,
       editingGroup: item,
-      currentSessionId: this.data.runningSession ? this.data.runningSession.id : null,
+      currentSessionId: this.data.runningSession ? (this.data.runningSession._id || this.data.runningSession.id) : null,
     });
   },
 
@@ -466,7 +471,10 @@ Page({
         session_id: sessionId,
         openid: app.globalData.openid,
         exercise_id: item._id || item.id,
-        name: item.name_zh || item.name,
+        name_zh: item.name_zh || item.name,
+        name_en: item.name || null,
+        image_name: item.image_name || null,
+        video_name: item.video_name || null,
         weight: 0,
         reps: 0,
       },
