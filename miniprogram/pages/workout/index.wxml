@@ -34,11 +34,12 @@
           <view class="item-sub" wx:if="{{item.muscle_name || item.equipment_name}}">{{item.muscle_name}}{{item.muscle_name && item.equipment_name ? ' · ' : ''}}{{item.equipment_name}}</view>
           <view class="item-sets">
             <text class="set-tag" wx:for="{{item.sets}}" wx:for-item="s" wx:key="_id">
-              {{s.weight}}{{s.unit}} × {{s.reps}}
+              {{s.weight}}{{s.weight_unit}} × {{s.reps}}
             </text>
             <text class="set-empty" wx:if="{{!item.sets || item.sets.length === 0}}">未设置</text>
           </view>
         </view>
+        <view class="item-volume-badge" wx:if="{{item.totalVolume > 0}}">{{item.totalVolume}}</view>
         <view class="item-actions">
           <view class="action-btn add-set" catchtap="openAddSet" data-index="{{index}}">+组</view>
           <view class="action-btn edit-btn" catchtap="editExercise" data-item="{{item}}" data-index="{{index}}">编辑</view>

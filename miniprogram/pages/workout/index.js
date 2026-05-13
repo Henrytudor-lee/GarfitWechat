@@ -101,18 +101,22 @@ Page({
             _id: ex._id,
             name: ex.name,
             name_zh: ex.name_zh || ex.name,
+            name_en: ex.name_en || ex.name,
             image_name: ex.image_name || null,
             exercise_id: ex.exercise_id,
             sets: [],
+            totalVolume: 0,
           };
         }
         if (ex.weight > 0 || ex.reps > 0) {
+          const vol = (ex.weight || 0) * (ex.reps || 0);
           map[ex.exercise_id].sets.push({
             _id: ex._id,
             weight: ex.weight,
             weight_unit: ex.weight_unit,
             reps: ex.reps,
           });
+          map[ex.exercise_id].totalVolume += vol;
         }
       }
       const list = Object.values(map);

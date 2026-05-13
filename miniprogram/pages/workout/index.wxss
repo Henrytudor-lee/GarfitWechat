@@ -6,6 +6,23 @@
   background: #F6F6F6;
 }
 
+.item-volume-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  background: #ccf200;
+  color: #1A1A2E;
+  border-radius: 20rpx;
+  padding: 4rpx 14rpx;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.item-actions {
+  display: flex;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
 .workout-header {
   background: linear-gradient(135deg, #1A1A2E, #16213E);
   padding: 40rpx 32rpx;
@@ -111,7 +128,10 @@
   align-items: center;
 }
 
-
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
 
 .item-name {
   font-size: 30rpx;
@@ -144,11 +164,6 @@
 .set-empty {
   font-size: 22rpx;
   color: #BBB;
-}
-
-.item-actions {
-  display: flex;
-  gap: 12rpx;
 }
 
 .action-btn {

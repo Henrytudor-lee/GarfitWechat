@@ -177,24 +177,31 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20rpx;
   overflow: hidden;
-  display: flex;
-  align-items: stretch;
 }
 
-.exercise-img-wrap {
+.ec-header {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  gap: 12rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.ec-img-wrap {
   width: 120rpx;
   height: 120rpx;
-  flex-shrink: 0;
+  border-radius: 16rpx;
   overflow: hidden;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.03);
 }
 
-.exercise-img {
+.ec-img {
   width: 100%;
   height: 100%;
 }
 
-.exercise-img-placeholder {
+.ec-img-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
@@ -203,46 +210,99 @@
   font-size: 48rpx;
 }
 
-.exercise-content {
+.ec-info {
   flex: 1;
-  padding: 16rpx 20rpx;
+  min-width: 0;
+}
+
+.ec-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+}
+
+.ec-sets-count {
+  font-size: 24rpx;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.ec-volume {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
 }
 
-.exercise-name {
-  font-family: 'Lexend Deca', sans-serif;
-  font-size: 20rpx;
-  font-weight: 800;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 2rpx;
+.ec-vol-num {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ccf200;
 }
 
-.exercise-en {
+.ec-vol-label {
   font-size: 20rpx;
   color: #71717a;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8rpx;
 }
 
-.sets-tags {
+.ec-sets-grid {
+  padding: 24rpx;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.ec-set-item {
   display: flex;
-  gap: 8rpx;
-  flex-wrap: wrap;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  column-gap: 16rpx;
 }
 
-.set-tag {
-  background: rgba(204, 242, 0, 0.15);
-  color: #ccf200;
-  border-radius: 100rpx;
-  padding: 2rpx 12rpx;
-  font-size: 18rpx;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+.ec-set-num {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #131313;
+  font-size: 20rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ec-set-val {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #fff;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ec-set-val.reps {
+  flex: .7;
+  text-align: end;
+}
+
+.ec-set-unit {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 400;
+}
+
+.ec-set-sep {
+  font-size: 22rpx;
+  color: #fff;
+  flex-shrink: 0;
 }
 
 /* Empty Card */

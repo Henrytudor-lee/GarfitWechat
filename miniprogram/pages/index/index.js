@@ -130,22 +130,23 @@ Page({
       const map = {};
       for (const ex of res.result.exercises || []) {
         if (!map[ex.exercise_id]) {
-          map[ex.exercise_id] = { ...ex, sets: [] };
+          map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0 };
         }
         if (ex.weight > 0 || ex.reps > 0) {
+          const vol = (ex.weight || 0) * (ex.reps || 0);
           map[ex.exercise_id].sets.push({
             id: ex.id,
             weight: ex.weight,
             weight_unit: ex.weight_unit,
-            name_zh: ex.name_zh,
-            name_en: ex.name_en,
-            image_name: ex.image_name,
-            video_name: ex.video_name,
             reps: ex.reps,
           });
+          map[ex.exercise_id].totalVolume += vol;
         }
       }
-      const groups = Object.values(map);
+      const groups = Object.values(map).map(g => ({
+        ...g,
+        totalVolume: Math.round(g.totalVolume),
+      }));
       const volume = groups.reduce((sum, g) =>
         sum + g.sets.reduce((s, set) => s + (set.weight || 0) * (set.reps || 0), 0), 0);
       this.setData({
