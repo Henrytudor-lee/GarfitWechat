@@ -1,0 +1,102 @@
+# fitness_wechat 项目上下文
+
+## 基本信息
+- **项目类型**: 微信小程序 + 云开发（腾讯云 CloudBase）+ PostgreSQL
+- **路径**: /Volumes/world/program/fitness_wechat
+- **运行**: 微信开发者工具打开此目录
+- **分支**: master，已与 origin 同步
+
+## 项目结构
+```
+cloudfunctions/     # 8个云函数
+  exercise/         # 动作记录增删改查（add/list/update/delete/getMaxWeight）
+  exerciseLibrary/   # 动作库查询（list/detail/favorites/toggleFavorite/count）
+  session/          # 训练会话（create/getRunning/finish/list/getById/delete）
+  loginByWx/       # 微信登录
+  profile/          # 用户资料
+  stats/           # 统计数据
+
+miniprogram/pages/  # 6个页面
+  index/           # 当前训练页（首页，含计时器）
+  workout/         # 训练记录页
+  library/         # 动作库浏览
+  exercise-detail/ # 动作详情
+  history/         # 历史记录
+  stats/           # 统计页
+
+miniprogram/components/  # 6个组件
+  edit-exercise-modal/   # 编辑动作弹窗
+  add-exercise-modal/    # 添加动作弹窗
+  session-detail-modal/  # 训练详情弹窗
+  workout-summary-modal/ # 训练总结弹窗
+  appbar/          # 顶部导航栏
+  custom-tabbar/   # 自定义tabbar
+```
+
+## 数据库核心表
+
+### exercises（训练动作记录）
+| 字段 | 说明 |
+|------|------|
+| id | 自增主键 |
+| session_id | 关联 sessions.id |
+| exercise_id | 关联 exercises_library.id |
+| name_zh | 中文名称（NOT NULL） |
+| name_en | 英文名称 |
+| image_name | 图片文件名 |
+| video_name | 视频文件名 |
+| weight | 重量数值 |
+| weight_unit | 单位（默认 'kg'，统一 camelCase） |
+| reps | 次数 |
+| _openid | 微信 openid（数据隔离） |
+
+### sessions（训练会话）
+- id, user_id, start_time, end_time, duration, status, is_done
+
+### exercises_library（动作库）
+- id, name, name_zh, image_name, video_name, equipment_id, body_part_id, is_favorite
+
+## 关键约定
+
+1. **weight_unit 统一用 camelCase** — 不得用 `unit` 或 `weightUnit`，所有 INSERT/UPDATE/SELECT 保持一致
+2. **_openid 数据隔离** — 前端传 openid 到云函数，后端 WHERE 条件必须含 `_openid`
+3. **image 前缀**：`cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036/media/images`
+4. **云函数调用规范**：
+   - exercise/add: 必须字段 session_id, exercise_id, name_zh, weight_unit
+   - exercise/list: 返回 exercises 表所有字段，JOIN exercises_library 取 name_zh/en/image_name/video_name
+   - exercise/update: weight, reps, weight_unit 三字段同时更新
+   - exercise/delete: 需要 id + session_id + openid
+
+## UI 样式参考
+**参考项目**: garcia-fitness-new（/Volumes/world/program/garcia-fitness-new）
+
+运动卡片布局：
+- header：左侧图片(120rpx圆角) + 名称 + "X sets" + 右侧总重量
+- sets：2列 grid，gap-2（16rpx），padding p-3（24rpx）
+- 每格：绿色圆圈序号 + 白色数字 + 白色 × + 白色数字 + 白色单位
+
+**关键色值**：
+- accent: #ccf200
+- 背景: #131313
+- 序号圆圈: 底 #ccf200，数字 #131313
+- × 符号: 白色 #fff
+- 单位（kg/reps）: 白色 #fff
+- 次要文字: #71717a
+
+## 当前状态
+
+### 已完成
+- 运动卡片 2 列 grid 样式（和 garcia-fitness-new 对齐）
+- 总重量标签改为 "TOTAL VOLUME"
+- weight_unit 字段统一命名
+- edit-exercise-modal 删除逻辑修复
+- muscle/equipment 英文名显示
+- total volume badge
+
+### 待处理
+- [ ] body-icons/*.png 删除未提交（14个文件已从文件系统删除）
+- [ ] pages/workout/index.js 三处 session 调用用了 userId 而非 openid（需修正）
+
+## git 状态
+- HEAD: master @ 03a9dd1
+- 未提交: miniprogram/images/body-icons/*.png（已删除未 commit）
