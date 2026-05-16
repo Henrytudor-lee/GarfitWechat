@@ -208,13 +208,14 @@
 }
 
 .filter-chip .equip-name {
-  display: none;
   font-size: 22rpx;
   font-weight: 700;
+  white-space: nowrap;
+  color: #888;
 }
 
 .filter-chip.active .equip-name {
-  display: inline;
+  color: #000;
 }
 
 .filter-chip .equip-icon {

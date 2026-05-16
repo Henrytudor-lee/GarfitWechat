@@ -11,7 +11,7 @@
  Target Server Version : 80030 (8.0.30-cynos-3.1.16.003)
  File Encoding         : 65001
 
- Date: 12/05/2026 23:27:57
+ Date: 16/05/2026 21:14:33
 */
 
 SET NAMES utf8mb4;
@@ -31,6 +31,8 @@ CREATE TABLE `users` (
   `role` varchar(64) DEFAULT NULL,
   `status` tinyint NOT NULL DEFAULT '1',
   `phone` varchar(11) DEFAULT NULL COMMENT '手机号',
+  `favor_exercises` varchar(255) DEFAULT NULL COMMENT '用户喜爱的动作id列表',
+  `practiced_exercises` varchar(255) DEFAULT NULL COMMENT '标识用户训练过的动作id列表',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
 
