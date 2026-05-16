@@ -12,7 +12,14 @@
           <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
         </view>
         <block wx:elif="{{step === 'pick'}}">
-          <view class="header-btn" bindtap="toggleMuscleMenu">🏅 {{muscleLabel}}</view>
+          <view class="header-btn" bindtap="toggleMuscleMenu">
+            <image
+              class="header-btn-icon"
+              src="{{muscleIcon || (imgPrefix + '/icons/all.png')}}"
+              mode="aspectFit"
+            />
+            <text class="header-btn-text">{{muscleLabel}}</text>
+          </view>
         </block>
         <block wx:else>
           <view class="header-btn back-btn" bindtap="goBack">

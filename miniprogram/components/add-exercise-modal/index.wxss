@@ -73,6 +73,12 @@
   height: 36rpx;
 }
 
+.header-btn-text {
+  font-size: 26rpx;
+  color: #ccf200;
+  font-weight: 600;
+}
+
 .back-btn {
   color: #ccf200;
 }

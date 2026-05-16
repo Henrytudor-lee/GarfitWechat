@@ -120,11 +120,9 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen) {
-        this._reset();
-        this.setData({
-          imgPrefix: app.globalData.imagePrefix || '',
-          vidPrefix: app.globalData.videoPrefix || '',
-        });
+        const imgPrefix = app.globalData.imagePrefix || '';
+        const vidPrefix = app.globalData.videoPrefix || '';
+        this._reset(imgPrefix, vidPrefix);
         this.loadList(true);
 
         // If preselected, go directly to set step
@@ -141,7 +139,7 @@ Component({
   },
 
   methods: {
-    _reset() {
+    _reset(imgPrefix, vidPrefix) {
       this.setData({
         step: 'pick',
         selectedMuscleOpen: false,
@@ -159,11 +157,15 @@ Component({
         weight_unit: 'kg',
         historyMax: null,
         submitting: false,
+        imgPrefix: imgPrefix || '',
+        vidPrefix: vidPrefix || '',
+        muscleIcon: imgPrefix ? `${imgPrefix}/all.png` : '',
+        muscleLabel: 'All Muscles',
       });
     },
 
     closeModal() {
-      this._reset();
+      this._reset(this.data.imgPrefix, this.data.vidPrefix);
       this.triggerEvent('close');
     },
 
@@ -193,7 +195,15 @@ Component({
 
     selectMuscle(e) {
       const id = e.currentTarget.dataset.id;
-      this.setData({ selectedMuscle: id, selectedMuscleOpen: false, page: 1, list: [] });
+      const muscleItem = MUSCLE_LIST.find(m => m.id === id);
+      this.setData({
+        selectedMuscle: id,
+        selectedMuscleOpen: false,
+        page: 1,
+        list: [],
+        muscleIcon: muscleItem ? `${app.globalData.imagePrefix || ''}/body-icons/${muscleItem.icon}` : '',
+        muscleLabel: id === 0 ? 'All Muscles' : (muscleItem ? muscleItem.name : ''),
+      });
       this.loadList(true);
     },
 

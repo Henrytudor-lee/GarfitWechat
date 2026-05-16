@@ -94,8 +94,7 @@ miniprogram/components/  # 6个组件
 - total volume badge
 
 ### 待处理
-- [ ] body-icons/*.png 删除未提交（14个文件已从文件系统删除）
-- [ ] pages/workout/index.js 三处 session 调用用了 userId 而非 openid（需修正）
+（无）
 
 ## git 状态
 - HEAD: master @ 03a9dd1
