@@ -86,7 +86,7 @@
                 class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}"
                 bindtap="selectEquipment"
                 data-id="0"
-              >ALL</view>
+              >ALL <text wx:if="{{selectedEquipment === 0}}" class="equip-name">Muscles</text></view>
               <view
                 wx:for="{{equipmentList}}"
                 wx:key="id"
@@ -95,7 +95,7 @@
                 data-id="{{item.id}}"
               >
                 <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
-                <text class="equip-name">{{item.name.toUpperCase()}}</text>
+                <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item.name}}</text>
               </view>
             </view>
           </scroll-view>
