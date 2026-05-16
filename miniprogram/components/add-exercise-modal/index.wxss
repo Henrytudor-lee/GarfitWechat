@@ -539,6 +539,18 @@
   border: none;
 }
 
+.step2-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.step2-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Step 2 video */
 .video-wrap {
   margin: 0 32rpx 24rpx;

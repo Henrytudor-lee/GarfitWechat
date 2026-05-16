@@ -143,7 +143,9 @@
       </view>
 
       <!-- STEP 2: Set Weight/Reps -->
-      <view wx:if="{{step === 'set'}}">
+      <view wx:if="{{step === 'set'}}" class="step2-wrap">
+
+        <scroll-view scroll-y class="step2-scroll">
 
         <!-- Selected Exercise Card -->
         <view class="selected-exercise-card">
@@ -242,6 +244,8 @@
             <view class="input-btn" bindtap="incReps">+</view>
           </view>
         </view>
+
+        </scroll-view>
 
       </view>
     </view>
