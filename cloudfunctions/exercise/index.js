@@ -74,6 +74,61 @@ exports.main = async (event, context) => {
       await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
       return { success: true };
 
+    } else if (action === 'toggleFavorite') {
+      const { exercise_id } = event;
+      if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
+      if (!openid) return { success: false, error: '缺少 openid' };
+
+      // Fetch current favor_exercises
+      const [users] = await getPool().query('SELECT favor_exercises FROM users WHERE _openid = ?', [openid]);
+      const raw = users.length > 0 ? users[0].favor_exercises : null;
+      const current = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+
+      let updated;
+      if (Array.isArray(current) && current.includes(exercise_id)) {
+        updated = current.filter(id => id !== exercise_id);
+      } else {
+        updated = Array.isArray(current) ? [...current, exercise_id] : [exercise_id];
+      }
+
+      await getPool().query(
+        'UPDATE users SET favor_exercises = ? WHERE _openid = ?',
+        [JSON.stringify(updated), openid]
+      );
+      return { success: true, favor_exercises: updated };
+
+    } else if (action === 'markPracticed') {
+      // Non-blocking: fire and forget — add exercise to user's practiced_exercises
+      const { exercise_id } = event;
+      if (!exercise_id || !openid) return { success: false };
+      try {
+        const [users] = await getPool().query('SELECT practiced_exercises FROM users WHERE _openid = ?', [openid]);
+        const raw = users.length > 0 ? users[0].practiced_exercises : null;
+        const current = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+        const arr = Array.isArray(current) ? current : [];
+        if (!arr.includes(exercise_id)) {
+          arr.push(exercise_id);
+          await getPool().query(
+            'UPDATE users SET practiced_exercises = ? WHERE _openid = ?',
+            [JSON.stringify(arr), openid]
+          );
+        }
+      } catch (err) {
+        console.error('markPracticed error:', err.message);
+      }
+      return { success: true };
+
+    } else if (action === 'getUserExercises') {
+      // Returns user's favor_exercises and practiced_exercises arrays
+      if (!openid) return { success: false, error: '缺少 openid' };
+      const [users] = await getPool().query('SELECT favor_exercises, practiced_exercises FROM users WHERE _openid = ?', [openid]);
+      if (users.length === 0) return { success: true, favor_exercises: [], practiced_exercises: [] };
+      const favorRaw = users[0].favor_exercises;
+      const practicedRaw = users[0].practiced_exercises;
+      const favor = favorRaw ? (typeof favorRaw === 'string' ? JSON.parse(favorRaw) : favorRaw) : [];
+      const practiced = practicedRaw ? (typeof practicedRaw === 'string' ? JSON.parse(practicedRaw) : practicedRaw) : [];
+      return { success: true, favor_exercises: Array.isArray(favor) ? favor : [], practiced_exercises: Array.isArray(practiced) ? practiced : [] };
+
     } else {
       return { success: false, error: '未知 action' };
     }

@@ -83,7 +83,11 @@
         />
         <view wx:else class="card-img-placeholder">🏋️</view>
         <view class="card-gradient"></view>
-        <view wx:if="{{item.is_favorite}}" class="fav-badge">FAV</view>
+        <view wx:if="{{item.is_practiced}}" class="done-badge">DONE</view>
+        <view class="fav-icon-wrap {{item.is_favorite ? 'active' : ''}}" catchtap="onFavoriteTap" data-id="{{item._id}}">
+          <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
+          <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
+        </view>
         <view wx:if="{{item.video_file}}" class="play-overlay">▶</view>
       </view>
       <!-- Card Footer -->

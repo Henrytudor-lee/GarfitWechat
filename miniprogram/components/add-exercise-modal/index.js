@@ -123,6 +123,8 @@ Component({
     submitting: false,
     weightChips: [10, 20, 30, 40, 50],
     repsChips: [4, 8, 10, 12, 15, 20],
+    favorExercises: [],   // array of exercise_ids
+    practicedExercises: [], // array of exercise_ids
   },
 
   observers: {
@@ -131,6 +133,7 @@ Component({
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
         this._reset(imgPrefix, vidPrefix);
+        this._loadUserExercises();  // load user's favor/practiced lists
         this.loadList(true);
       } else {
         this._listLoaded = false;
@@ -166,7 +169,27 @@ Component({
         vidPrefix: vidPrefix || '',
         muscleIcon: imgPrefix ? `${imgPrefix}/icons/all.png` : '',
         muscleLabel: 'Muscles',
+        favorExercises: [],
+        practicedExercises: [],
       });
+    },
+
+    async _loadUserExercises() {
+      if (!app.globalData.openid) return;
+      try {
+        const res = await wx.cloud.callFunction({
+          name: 'exercise',
+          data: { action: 'getUserExercises', openid: app.globalData.openid },
+        });
+        if (res.result && res.result.success) {
+          this.setData({
+            favorExercises: res.result.favor_exercises || [],
+            practicedExercises: res.result.practiced_exercises || [],
+          });
+        }
+      } catch (err) {
+        console.error('_loadUserExercises failed', err);
+      }
     },
 
     closeModal() {
@@ -239,7 +262,7 @@ Component({
 
       this.setData({ loading: reset, loadingMore: !reset });
 
-      const { keyword, selectedEquipment, selectedMuscle } = this.data;
+      const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises } = this.data;
 
       const res = await wx.cloud.callFunction({
         name: 'exerciseLibrary',
@@ -256,16 +279,28 @@ Component({
       this.setData({ loading: false, loadingMore: false });
 
       if (res.result && res.result.success) {
-        const items = (res.result.list || []).map(item => ({
-          ...item,
-          equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
-          equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-          muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
-          muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
-        }));
+        const items = (res.result.list || []).map(item => {
+          const id = item._id;
+          return {
+            ...item,
+            equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
+            equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
+            muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
+            muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
+            is_favorite: favorExercises.includes(id),
+            is_practiced: practicedExercises.includes(id),
+          };
+        });
+
+        // Sort: practiced first, then favorited, then rest
+        const sorted = items.sort((a, b) => {
+          if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
+          if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
+          return 0;
+        });
 
         this.setData({
-          list: reset ? items : [...this.data.list, ...items],
+          list: reset ? sorted : [...this.data.list, ...sorted],
           hasMore: items.length >= this.data.pageSize,
           page: page + 1,
         });
@@ -367,6 +402,17 @@ Component({
       try {
         const userId = app.globalData.userId;
         const sessionId = this.data.sessionId;
+        const exId = selectedItem._id || selectedItem.id;
+
+        // Fire markPracticed asynchronously — non-blocking
+        wx.cloud.callFunction({
+          name: 'exercise',
+          data: {
+            action: 'markPracticed',
+            exercise_id: exId,
+            openid: app.globalData.openid,
+          },
+        });
 
         const res = await wx.cloud.callFunction({
           name: 'exercise',
@@ -374,7 +420,7 @@ Component({
             action: 'add',
             session_id: sessionId,
             openid: app.globalData.openid,
-            exercise_id: selectedItem._id || selectedItem.id,
+            exercise_id: exId,
             name_zh: selectedItem.name_zh || selectedItem.name,
             name_en: selectedItem.name || null,
             image_name: selectedItem.image_name || null,
@@ -398,6 +444,33 @@ Component({
       } finally {
         this.setData({ submitting: false });
       }
+    },
+
+    onFavoriteTap(e) {
+      const id = e.currentTarget.dataset.id;
+      const { favorExercises } = this.data;
+      const isFav = favorExercises.includes(id);
+
+      // Optimistic update
+      const newFav = isFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
+      this.setData({ favorExercises: newFav });
+
+      // Update list items
+      const list = this.data.list.map(item => {
+        if (item._id === id) return { ...item, is_favorite: !isFav };
+        return item;
+      });
+      this.setData({ list });
+
+      // Call cloud function
+      wx.cloud.callFunction({
+        name: 'exercise',
+        data: {
+          action: 'toggleFavorite',
+          exercise_id: id,
+          openid: app.globalData.openid,
+        },
+      });
     },
   },
 });

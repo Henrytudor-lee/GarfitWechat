@@ -299,7 +299,7 @@
   background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
 }
 
-.fav-badge {
+.done-badge {
   position: absolute;
   top: 8rpx;
   left: 8rpx;
@@ -309,6 +309,28 @@
   font-weight: 700;
   padding: 4rpx 10rpx;
   border-radius: 10rpx;
+}
+
+.fav-icon-wrap {
+  position: absolute;
+  bottom: 8rpx;
+  left: 8rpx;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+}
+
+.fav-icon-wrap image {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.fav-icon-wrap.active {
+  background: rgba(204, 242, 0, 0.3);
 }
 
 .card-footer {

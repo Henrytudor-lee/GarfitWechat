@@ -94,6 +94,8 @@ Page({
     vidPrefix: '',
     selectedExercise: null,
     isSelectMode: false,
+    favorExercises: [],
+    practicedExercises: [],
   },
 
   onLoad(opts) {
@@ -102,7 +104,26 @@ Page({
       vidPrefix: app.globalData.videoPrefix,
       isSelectMode: opts.select === 'true',
     });
+    this._loadUserExercises();
     this.loadList(true);
+  },
+
+  async _loadUserExercises() {
+    if (!app.globalData.openid) return;
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'exercise',
+        data: { action: 'getUserExercises', openid: app.globalData.openid },
+      });
+      if (res.result && res.result.success) {
+        this.setData({
+          favorExercises: res.result.favor_exercises || [],
+          practicedExercises: res.result.practiced_exercises || [],
+        });
+      }
+    } catch (err) {
+      console.error('_loadUserExercises failed', err);
+    }
   },
 
   async loadList(reset = false) {
@@ -127,15 +148,28 @@ Page({
     this.setData({ loading: false });
 
     if (res.result && res.result.success) {
-      let items = (res.result.list || []).map(item => ({
-        ...item,
-        equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
-        equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-        muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
-      }));
+      const { favorExercises, practicedExercises } = this.data;
+      let items = (res.result.list || []).map(item => {
+        const id = item._id;
+        return {
+          ...item,
+          equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
+          equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
+          muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
+          is_favorite: favorExercises.includes(id),
+          is_practiced: practicedExercises.includes(id),
+        };
+      });
+
+      // Sort: practiced first, then favorited, then rest
+      const sorted = items.sort((a, b) => {
+        if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
+        if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
+        return 0;
+      });
 
       this.setData({
-        list: reset ? items : [...this.data.list, ...items],
+        list: reset ? sorted : [...this.data.list, ...sorted],
         hasMore: items.length >= this.data.pageSize,
         page: page + 1,
       });
@@ -193,6 +227,31 @@ Page({
   },
 
   noop() {},
+
+  onFavoriteTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const { favorExercises } = this.data;
+    const isFav = favorExercises.includes(id);
+
+    // Optimistic update
+    const newFav = isFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
+    this.setData({ favorExercises: newFav });
+
+    const list = this.data.list.map(item => {
+      if (item._id === id) return { ...item, is_favorite: !isFav };
+      return item;
+    });
+    this.setData({ list });
+
+    wx.cloud.callFunction({
+      name: 'exercise',
+      data: {
+        action: 'toggleFavorite',
+        exercise_id: id,
+        openid: app.globalData.openid,
+      },
+    });
+  },
 
   onVideoTap(e) {
     // 阻止事件冒泡到 sheet 和 mask，不关闭弹框
