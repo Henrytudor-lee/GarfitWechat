@@ -24,7 +24,7 @@
     <scroll-view class="exercise-list" scroll-y>
       <view class="section-title">今日动作 ({{exerciseList.length}})</view>
 
-      <view class="exercise-item" wx:for="{{exerciseList}}" wx:key="_id">
+      <view class="exercise-item" wx:for="{{exerciseList}}" wx:key="id">
         <view class="item-image-wrap">
           <image wx:if="{{item.image_name}}" class="item-image" src="{{imgPrefix}}{{item.image_name}}" mode="aspectFill" />
           <view wx:else class="item-image-placeholder">🏋️</view>
@@ -33,7 +33,7 @@
           <view class="item-name">{{item.name_zh || item.name}}</view>
           <view class="item-sub" wx:if="{{item.muscle_name || item.equipment_name}}">{{item.muscle_name}}{{item.muscle_name && item.equipment_name ? ' · ' : ''}}{{item.equipment_name}}</view>
           <view class="item-sets">
-            <text class="set-tag" wx:for="{{item.sets}}" wx:for-item="s" wx:key="_id">
+            <text class="set-tag" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
               {{s.weight}}{{s.weight_unit}} × {{s.reps}}
             </text>
             <text class="set-empty" wx:if="{{!item.sets || item.sets.length === 0}}">未设置</text>

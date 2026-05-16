@@ -38,7 +38,7 @@
       <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">NO EXERCISES RECORDED</view>
 
       <view wx:else class="exercise-groups">
-        <view class="group-card" wx:for="{{exerciseList}}" wx:key="_id">
+        <view class="group-card" wx:for="{{exerciseList}}" wx:key="id">
           <view class="group-header">
             <image
               wx:if="{{item.image_name}}"

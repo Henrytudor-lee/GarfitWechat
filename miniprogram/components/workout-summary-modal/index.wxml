@@ -41,7 +41,7 @@
     <view class="breakdown-title">Exercise Summary</view>
     <scroll-view class="breakdown-scroll" scroll-y>
       <view class="breakdown-list">
-        <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="_id">
+        <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="id">
           <view class="item-row">
             <image
               wx:if="{{item.image_name}}"

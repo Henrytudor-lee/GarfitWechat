@@ -150,7 +150,7 @@ Page({
     if (res.result && res.result.success) {
       const { favorExercises, practicedExercises } = this.data;
       let items = (res.result.list || []).map(item => {
-        const id = item._id;
+        const id = item.id;
         return {
           ...item,
           equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
@@ -238,7 +238,7 @@ Page({
     this.setData({ favorExercises: newFav });
 
     const list = this.data.list.map(item => {
-      if (item._id === id) return { ...item, is_favorite: !isFav };
+      if (item.id === id) return { ...item, is_favorite: !isFav };
       return item;
     });
     this.setData({ list });
@@ -292,7 +292,7 @@ Page({
         action: 'add',
         session_id: sessionId,
         openid: app.globalData.openid,
-        exercise_id: item._id,
+        exercise_id: item.id,
         name_zh: item.name_zh || item.name,
         name_en: item.name || null,
         image_name: item.image_name || null,

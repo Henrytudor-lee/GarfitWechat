@@ -45,7 +45,7 @@
 
   <!-- Action Buttons -->
   <view class="action-bar">
-    <view class="action-btn {{isFavorite ? 'fav-active' : ''}}" bindtap="toggleFavorite">
+    <view class="action-btn {{isFavorite ? 'fav-active' : ''}}" bindtap="toggleFavorite" data-id="{{exercise.id}}">
       <text>{{isFavorite ? '♥' : '♡'}}</text>
       <text class="action-label">FAVORITE</text>
     </view>

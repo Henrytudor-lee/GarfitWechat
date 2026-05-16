@@ -281,7 +281,7 @@ Component({
 
       if (res.result && res.result.success) {
         const items = (res.result.list || []).map(item => {
-          const id = item._id;
+          const id = item.id;
           return {
             ...item,
             equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
@@ -331,7 +331,7 @@ Component({
         name: 'exercise',
         data: {
           action: 'getMaxWeight',
-          exerciseId: item._id || item.id,
+          exerciseId: item.id,
           openid: app.globalData.openid,
         },
       });
@@ -403,7 +403,7 @@ Component({
       try {
         const userId = app.globalData.userId;
         const sessionId = this.data.sessionId;
-        const exId = selectedItem._id || selectedItem.id;
+        const exId = selectedItem.id;
 
         // Fire markPracticed asynchronously — non-blocking
         wx.cloud.callFunction({
@@ -458,7 +458,7 @@ Component({
 
       // Update list items
       const list = this.data.list.map(item => {
-        if (item._id === id) return { ...item, is_favorite: !isFav };
+        if (item.id === id) return { ...item, is_favorite: !isFav };
         return item;
       });
       this.setData({ list });

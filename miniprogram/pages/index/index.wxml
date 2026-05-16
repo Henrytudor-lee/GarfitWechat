@@ -105,7 +105,7 @@
       <view
         class="history-session-item"
         wx:for="{{historySessions}}"
-        wx:key="_id"
+        wx:key="id"
         data-session="{{item}}"
         bindtap="onHistorySessionTap"
       >
