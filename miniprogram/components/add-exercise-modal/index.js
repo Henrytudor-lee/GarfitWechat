@@ -159,7 +159,7 @@ Component({
         submitting: false,
         imgPrefix: imgPrefix || '',
         vidPrefix: vidPrefix || '',
-        muscleIcon: imgPrefix ? `${imgPrefix}/all.png` : '',
+        muscleIcon: imgPrefix ? `${imgPrefix}/icons/all.png` : '',
         muscleLabel: 'All Muscles',
       });
     },
@@ -196,12 +196,13 @@ Component({
     selectMuscle(e) {
       const id = e.currentTarget.dataset.id;
       const muscleItem = MUSCLE_LIST.find(m => m.id === id);
+      const imgPrefix = app.globalData.imagePrefix || '';
       this.setData({
         selectedMuscle: id,
         selectedMuscleOpen: false,
         page: 1,
         list: [],
-        muscleIcon: muscleItem ? `${app.globalData.imagePrefix || ''}/body-icons/${muscleItem.icon}` : '',
+        muscleIcon: id === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
         muscleLabel: id === 0 ? 'All Muscles' : (muscleItem ? muscleItem.name : ''),
       });
       this.loadList(true);
