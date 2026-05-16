@@ -129,15 +129,7 @@ Component({
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
         this._reset(imgPrefix, vidPrefix);
-        if (!this._listLoaded) {
-          this._listLoaded = true;
-          this.loadList(true);
-        }
-
-        // If preselected, go directly to set step
-        if (this.data.preselectedExercise) {
-          this._selectExercise(this.data.preselectedExercise);
-        }
+        this.loadList(true);
       } else {
         this._listLoaded = false;
       }
