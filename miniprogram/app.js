@@ -24,6 +24,8 @@ App({
     const openid = wx.getStorageSync('openid');
     if (userId) this.globalData.userId = userId;
     if (openid) this.globalData.openid = openid;
+    this.globalData.favorExercises = wx.getStorageSync('favorExercises') || [];
+    this.globalData.practicedExercises = wx.getStorageSync('practicedExercises') || [];
 
     if (!openid) {
       await this.doSilentLogin();
@@ -40,11 +42,15 @@ App({
             data: { code: loginRes.code },
             success: (res) => {
               if (res.result && res.result.openid) {
-                const { openid, userId } = res.result;
+                const { openid, userId, favor_exercises, practiced_exercises } = res.result;
                 this.globalData.openid = openid;
                 this.globalData.userId = userId;
+                this.globalData.favorExercises = favor_exercises || [];
+                this.globalData.practicedExercises = practiced_exercises || [];
                 wx.setStorageSync('openid', openid);
                 wx.setStorageSync('userId', userId);
+                wx.setStorageSync('favorExercises', favor_exercises || []);
+                wx.setStorageSync('practicedExercises', practiced_exercises || []);
               }
               resolve();
             },

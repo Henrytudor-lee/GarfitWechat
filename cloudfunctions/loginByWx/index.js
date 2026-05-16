@@ -56,12 +56,16 @@ exports.main = async (event, context) => {
 
     // 2. 查老用户
     const [rows] = await getPool().query(
-      'SELECT id FROM users WHERE _openid = ? LIMIT 1',
+      'SELECT id, favor_exercises, practiced_exercises FROM users WHERE _openid = ? LIMIT 1',
       [openid]
     );
 
     if (rows.length > 0) {
-      return { success: true, userId: rows[0].id, openid };
+      const favorRaw = rows[0].favor_exercises || '';
+      const practicedRaw = rows[0].practiced_exercises || '';
+      const favor = favorRaw ? favorRaw.split(',').filter(Boolean).map(Number) : [];
+      const practiced = practicedRaw ? practicedRaw.split(',').filter(Boolean).map(Number) : [];
+      return { success: true, userId: rows[0].id, openid, favor_exercises: favor, practiced_exercises: practiced };
     }
 
     // 3. 新用户注册
@@ -70,7 +74,7 @@ exports.main = async (event, context) => {
       [openid, 'user', 1]
     );
 
-    return { success: true, userId: result.insertId, openid };
+    return { success: true, userId: result.insertId, openid, favor_exercises: [], practiced_exercises: [] };
 
   } catch (err) {
     return { success: false, error: err.message };

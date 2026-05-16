@@ -148,6 +148,7 @@ Component({
 
   methods: {
     _reset(imgPrefix, vidPrefix) {
+      const app = getApp();
       this.setData({
         step: 'pick',
         selectedMuscleOpen: false,
@@ -169,8 +170,8 @@ Component({
         vidPrefix: vidPrefix || '',
         muscleIcon: imgPrefix ? `${imgPrefix}/icons/all.png` : '',
         muscleLabel: 'Muscles',
-        favorExercises: [],
-        practicedExercises: [],
+        favorExercises: app.globalData.favorExercises || [],
+        practicedExercises: app.globalData.practicedExercises || [],
       });
     },
 
