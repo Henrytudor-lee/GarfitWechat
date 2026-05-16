@@ -334,16 +334,16 @@
 }
 
 .card-muscle-icon {
-  width: 40rpx;
-  height: 40rpx;
+  width: 28rpx;
+  height: 28rpx;
   flex-shrink: 0;
   background: rgba(255,255,255,0.05);
   border-radius: 8rpx;
 }
 
 .card-equip-icon {
-  width: 40rpx;
-  height: 40rpx;
+  width: 34rpx;
+  height: 34rpx;
   flex-shrink: 0;
   background: rgba(255,255,255,0.05);
   border-radius: 8rpx;

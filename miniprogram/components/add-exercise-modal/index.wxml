@@ -128,7 +128,9 @@
               <view class="card-footer">
                 <view class="card-name">{{item.name}}</view>
                 <view class="card-icons">
-                  <image wx:if="{{item.muscle_icon}}" class="card-muscle-icon" src="{{imgPrefix}}/body-icons/{{item.muscle_icon}}" mode="aspectFit" />
+                  <block wx:for="{{item.muscle_icons}}" wx:key="index">
+                    <image class="card-muscle-icon" src="{{imgPrefix}}/body-icons/{{item}}" mode="aspectFit" />
+                  </block>
                   <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
                 </view>
               </view>
