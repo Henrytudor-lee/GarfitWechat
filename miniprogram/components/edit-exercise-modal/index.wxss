@@ -227,8 +227,8 @@
 
 /* Delete button */
 .delete-btn {
-  width: 32rpx;
-  height: 32rpx;
+  width: 42rpx;
+  height: 42rpx;
   display: flex;
   align-items: center;
   justify-content: center;

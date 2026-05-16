@@ -75,8 +75,8 @@ Component({
       const last = this.data.sets[this.data.sets.length - 1];
       const newSet = {
         id: Date.now(),
-        weight: last?.weight || 20,
-        reps: last?.reps || 10,
+        weight: last?.weight || 0,
+        reps: last?.reps || 0,
         weight_unit: last?.weight_unit || 'kg',
         sequence: this.data.sets.length,
       };
@@ -122,7 +122,7 @@ Component({
 
     setUnit(e) {
       const index = e.currentTarget.dataset.index;
-      const u = e.currentTarget.dataset.weight_unit;
+      const u = e.currentTarget.dataset.weightUnit;
       this.updateSet(index, 'weight_unit', u);
     },
 
