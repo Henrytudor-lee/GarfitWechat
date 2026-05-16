@@ -382,6 +382,7 @@
 
 .sheet-btn {
   width: 100%;
+  height: 96rpx;
   background: #ccf200;
   color: #000;
   border-radius: 100rpx;
@@ -391,6 +392,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: none;
-  line-height: 2.6;
+  line-height: 96rpx;
+  white-space: nowrap;
 }
 .sheet-btn::after { border: none; }

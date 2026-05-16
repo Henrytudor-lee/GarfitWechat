@@ -551,6 +551,8 @@
   justify-content: center;
   border: none;
   letter-spacing: 2rpx;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .confirm-btn.disabled {

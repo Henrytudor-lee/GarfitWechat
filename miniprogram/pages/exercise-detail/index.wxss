@@ -156,6 +156,7 @@
 
 .btn-primary {
   flex: 1;
+  height: 96rpx;
   background: #ccf200;
   color: #000;
   border-radius: 100rpx;
@@ -165,6 +166,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: none;
-  line-height: 2.4;
+  line-height: 96rpx;
+  white-space: nowrap;
 }
 .btn-primary::after { border: none; }
