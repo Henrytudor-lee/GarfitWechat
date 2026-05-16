@@ -9,7 +9,7 @@ App({
     userId: null,
     openid: null,
   },
-  onLaunch: function () {
+  onLaunch: async function () {
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力');
     } else {
@@ -26,31 +26,33 @@ App({
     if (openid) this.globalData.openid = openid;
 
     if (!openid) {
-      this.doSilentLogin();
+      await this.doSilentLogin();
     }
   },
 
   doSilentLogin: function () {
-    wx.login({
-      success: (loginRes) => {
-        if (!loginRes.code) return;
-        wx.cloud.callFunction({
-          name: 'loginByWx',
-          data: { code: loginRes.code },
-          success: (res) => {
-            if (res.result && res.result.openid) {
-              const { openid, userId } = res.result;
-              this.globalData.openid = openid;
-              this.globalData.userId = userId;
-              wx.setStorageSync('openid', openid);
-              wx.setStorageSync('userId', userId);
-            }
-          },
-          fail: () => {
-            // 静默失败，不弹窗
-          },
-        });
-      },
+    return new Promise((resolve) => {
+      wx.login({
+        success: (loginRes) => {
+          if (!loginRes.code) { resolve(); return; }
+          wx.cloud.callFunction({
+            name: 'loginByWx',
+            data: { code: loginRes.code },
+            success: (res) => {
+              if (res.result && res.result.openid) {
+                const { openid, userId } = res.result;
+                this.globalData.openid = openid;
+                this.globalData.userId = userId;
+                wx.setStorageSync('openid', openid);
+                wx.setStorageSync('userId', userId);
+              }
+              resolve();
+            },
+            fail: () => { resolve(); },
+          });
+        },
+        fail: () => { resolve(); },
+      });
     });
   },
 });
