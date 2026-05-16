@@ -260,7 +260,7 @@ Component({
           ...item,
           equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
           equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-          muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
+          muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
           muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
         }));
 
