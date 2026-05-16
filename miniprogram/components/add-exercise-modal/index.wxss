@@ -502,6 +502,8 @@
   display: flex;
   gap: 16rpx;
   padding: 0 32rpx 20rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .unit-btn {

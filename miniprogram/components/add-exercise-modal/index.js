@@ -354,7 +354,7 @@ Component({
     },
 
     setUnit(e) {
-      const u = e.currentTarget.dataset.weight_unit;
+      const u = e.currentTarget.dataset.weightUnit;
       this.setData({ weight_unit: u });
     },
 

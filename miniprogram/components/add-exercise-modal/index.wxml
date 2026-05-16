@@ -187,7 +187,7 @@
         <!-- Weight Input -->
         <view class="input-section">
           <view class="input-label-row">
-            <view class="input-label">WEIGHT ({{weight_unit}})</view>
+            <view class="input-label">SET WEIGHT & REPS</view>
             <view class="quick-chips-row">
               <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
             </view>
