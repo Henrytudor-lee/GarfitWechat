@@ -208,13 +208,15 @@ Component({
         muscleIcon: id === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
         muscleLabel: id === 0 ? 'Muscles' : (muscleItem ? muscleItem.name : ''),
       });
+      this._listLoaded = false;
       this.loadList(true);
     },
 
     selectEquipment(e) {
-      const id = e.currentTarget.dataset.id;
+      const id = Number(e.currentTarget.dataset.id);
       if (id === this.data.selectedEquipment) return;
       this.setData({ selectedEquipment: id, page: 1, list: [] });
+      this._listLoaded = false;
       this.loadList(true);
     },
 
@@ -242,8 +244,8 @@ Component({
         data: {
           action: 'list',
           keyword,
-          equipmentId: selectedEquipment || '',
-          bodyPart: selectedMuscle || '',
+          equipmentId: selectedEquipment ? selectedEquipment : '',
+          bodyPart: selectedMuscle ? selectedMuscle : '',
           page,
           pageSize: this.data.pageSize,
         },
