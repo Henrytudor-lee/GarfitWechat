@@ -79,21 +79,21 @@ exports.main = async (event, context) => {
       if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
       if (!openid) return { success: false, error: '缺少 openid' };
 
-      // Fetch current favor_exercises
+      // VARCHAR存的是 '1,2,12,99,22' 逗号分隔字符串
       const [users] = await getPool().query('SELECT favor_exercises FROM users WHERE _openid = ?', [openid]);
-      const raw = users.length > 0 ? users[0].favor_exercises : null;
-      const current = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+      const raw = users.length > 0 ? (users[0].favor_exercises || '') : '';
+      const current = raw ? raw.split(',').filter(Boolean).map(Number) : [];
 
       let updated;
-      if (Array.isArray(current) && current.includes(exercise_id)) {
-        updated = current.filter(id => id !== exercise_id);
+      if (current.includes(Number(exercise_id))) {
+        updated = current.filter(id => id !== Number(exercise_id));
       } else {
-        updated = Array.isArray(current) ? [...current, exercise_id] : [exercise_id];
+        updated = [...current, Number(exercise_id)];
       }
 
       await getPool().query(
         'UPDATE users SET favor_exercises = ? WHERE _openid = ?',
-        [JSON.stringify(updated), openid]
+        [updated.join(','), openid]
       );
       return { success: true, favor_exercises: updated };
 
@@ -102,15 +102,16 @@ exports.main = async (event, context) => {
       const { exercise_id } = event;
       if (!exercise_id || !openid) return { success: false };
       try {
+        // VARCHAR存 '1,2,12,99,22' 逗号分隔字符串
         const [users] = await getPool().query('SELECT practiced_exercises FROM users WHERE _openid = ?', [openid]);
-        const raw = users.length > 0 ? users[0].practiced_exercises : null;
-        const current = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+        const raw = users.length > 0 ? (users[0].practiced_exercises || '') : '';
+        const current = raw ? raw.split(',').filter(Boolean).map(Number) : [];
         const arr = Array.isArray(current) ? current : [];
-        if (!arr.includes(exercise_id)) {
-          arr.push(exercise_id);
+        if (!arr.includes(Number(exercise_id))) {
+          arr.push(Number(exercise_id));
           await getPool().query(
             'UPDATE users SET practiced_exercises = ? WHERE _openid = ?',
-            [JSON.stringify(arr), openid]
+            [arr.join(','), openid]
           );
         }
       } catch (err) {
@@ -120,14 +121,15 @@ exports.main = async (event, context) => {
 
     } else if (action === 'getUserExercises') {
       // Returns user's favor_exercises and practiced_exercises arrays
+      // VARCHAR存 '1,2,12,99,22' 逗号分隔字符串
       if (!openid) return { success: false, error: '缺少 openid' };
       const [users] = await getPool().query('SELECT favor_exercises, practiced_exercises FROM users WHERE _openid = ?', [openid]);
       if (users.length === 0) return { success: true, favor_exercises: [], practiced_exercises: [] };
-      const favorRaw = users[0].favor_exercises;
-      const practicedRaw = users[0].practiced_exercises;
-      const favor = favorRaw ? (typeof favorRaw === 'string' ? JSON.parse(favorRaw) : favorRaw) : [];
-      const practiced = practicedRaw ? (typeof practicedRaw === 'string' ? JSON.parse(practicedRaw) : practicedRaw) : [];
-      return { success: true, favor_exercises: Array.isArray(favor) ? favor : [], practiced_exercises: Array.isArray(practiced) ? practiced : [] };
+      const favorRaw = users[0].favor_exercises || '';
+      const practicedRaw = users[0].practiced_exercises || '';
+      const favor = favorRaw ? favorRaw.split(',').filter(Boolean).map(Number) : [];
+      const practiced = practicedRaw ? practicedRaw.split(',').filter(Boolean).map(Number) : [];
+      return { success: true, favor_exercises: favor, practiced_exercises: practiced };
 
     } else {
       return { success: false, error: '未知 action' };
