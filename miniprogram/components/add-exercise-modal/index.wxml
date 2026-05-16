@@ -163,12 +163,10 @@
               <text class="tag tag-neutral">{{selectedItem.muscle_name || ''}}</text>
             </view>
           </view>
-        </view>
-
-        <!-- Last Time -->
-        <view wx:if="{{historyMax}}" class="history-bar">
-          <text class="history-label">Last time:</text>
-          <view class="history-val" bindtap="applyHistory">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</view>
+          <view wx:if="{{historyMax}}" class="history-badge" bindtap="applyHistory">
+            <text class="history-badge-label">Last</text>
+            <text class="history-badge-val">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</text>
+          </view>
         </view>
 
         <!-- Video -->
@@ -183,17 +181,14 @@
           ></video>
         </view>
 
-        <!-- Quick Weight Chips -->
-        <view class="quick-chips">
-          <view class="quick-chips-label">QUICK</view>
-          <view class="chips-row">
-            <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
-          </view>
-        </view>
-
         <!-- Weight Input -->
         <view class="input-section">
-          <view class="input-label">WEIGHT ({{weight_unit}})</view>
+          <view class="input-label-row">
+            <view class="input-label">WEIGHT ({{weight_unit}})</view>
+            <view class="quick-chips-row">
+              <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
+            </view>
+          </view>
           <view class="input-row">
             <view class="input-btn" bindtap="decWeight">−</view>
             <input
@@ -221,17 +216,14 @@
           >LB</view>
         </view>
 
-        <!-- Quick Reps Chips -->
-        <view class="quick-chips">
-          <view class="quick-chips-label">QUICK</view>
-          <view class="chips-row">
-            <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
-          </view>
-        </view>
-
         <!-- Reps Input -->
         <view class="input-section">
-          <view class="input-label">REPS</view>
+          <view class="input-label-row">
+            <view class="input-label">REPS</view>
+            <view class="quick-chips-row">
+              <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
+            </view>
+          </view>
           <view class="input-row">
             <view class="input-btn" bindtap="decReps">−</view>
             <input
