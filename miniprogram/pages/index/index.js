@@ -450,6 +450,7 @@ Page({
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
     if (sessionId) {
       this._loadExerciseGroups(sessionId);
+      this._resetRestTimer();  // reset rest timer after editing/saving sets
     }
   },
 
