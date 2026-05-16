@@ -69,6 +69,20 @@ Page({
       yesterdayDay: String(yesterday.getDate()),
       yesterdayMonth: MONTH_NAMES_EN[yesterday.getMonth()],
     });
+
+    // openid ready → load immediately; otherwise poll
+    if (app.globalData.openid) {
+      this._loadData();
+    } else {
+      const tryLoad = () => {
+        if (app.globalData.openid) {
+          this._loadData();
+        } else {
+          setTimeout(tryLoad, 100);
+        }
+      };
+      tryLoad();
+    }
   },
 
   onShow() {
@@ -79,11 +93,10 @@ Page({
       return;
     }
 
-    // Guard: onLoad already called _loadData, don't call again
+    // onLoad already loaded data, skip
     if (this.data._dataLoaded) return;
 
-    // openid not ready yet (async onLaunch not yet finished on first launch).
-    // Poll until ready, then load.
+    // openid not ready yet — poll until ready
     const tryLoad = () => {
       if (app.globalData.openid) {
         this._loadData();
