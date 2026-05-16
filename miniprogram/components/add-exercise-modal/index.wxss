@@ -386,9 +386,7 @@
   font-weight: 700;
   color: #fff;
   margin-bottom: 8rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .selected-tags {
