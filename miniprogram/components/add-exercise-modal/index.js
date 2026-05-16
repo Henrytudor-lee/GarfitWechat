@@ -123,12 +123,17 @@ Component({
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
         this._reset(imgPrefix, vidPrefix);
-        this.loadList(true);
+        if (!this._listLoaded) {
+          this._listLoaded = true;
+          this.loadList(true);
+        }
 
         // If preselected, go directly to set step
         if (this.data.preselectedExercise) {
           this._selectExercise(this.data.preselectedExercise);
         }
+      } else {
+        this._listLoaded = false;
       }
     },
     'preselectedExercise': function(ex) {
@@ -160,7 +165,7 @@ Component({
         imgPrefix: imgPrefix || '',
         vidPrefix: vidPrefix || '',
         muscleIcon: imgPrefix ? `${imgPrefix}/icons/all.png` : '',
-        muscleLabel: 'All Muscles',
+        muscleLabel: 'Muscles',
       });
     },
 
@@ -203,7 +208,7 @@ Component({
         page: 1,
         list: [],
         muscleIcon: id === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
-        muscleLabel: id === 0 ? 'All Muscles' : (muscleItem ? muscleItem.name : ''),
+        muscleLabel: id === 0 ? 'Muscles' : (muscleItem ? muscleItem.name : ''),
       });
       this.loadList(true);
     },
