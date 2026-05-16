@@ -121,6 +121,8 @@ Component({
     weight_unit: 'kg',
     historyMax: null,
     submitting: false,
+    weightChips: [10, 20, 30, 40, 50],
+    repsChips: [4, 8, 10, 12, 15, 20],
   },
 
   observers: {
@@ -341,6 +343,14 @@ Component({
 
     decReps() {
       this.setData({ reps: Math.max(0, this.data.reps - 1) });
+    },
+
+    setWeight(e) {
+      this.setData({ weight: Number(e.currentTarget.dataset.val) });
+    },
+
+    setReps(e) {
+      this.setData({ reps: Number(e.currentTarget.dataset.val) });
     },
 
     setUnit(e) {

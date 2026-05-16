@@ -169,6 +169,26 @@
           <view class="history-val" bindtap="applyHistory">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</view>
         </view>
 
+        <!-- Video -->
+        <view wx:if="{{selectedItem.video_name}}" class="video-wrap">
+          <video
+            class="step2-video"
+            src="{{vidPrefix}}/{{selectedItem.video_name}}"
+            mode="aspectFill"
+            show-center-play-btn
+            show-play-btn
+            enable-progress-gesture
+          ></video>
+        </view>
+
+        <!-- Quick Weight Chips -->
+        <view class="quick-chips">
+          <view class="quick-chips-label">QUICK</view>
+          <view class="chips-row">
+            <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
+          </view>
+        </view>
+
         <!-- Weight Input -->
         <view class="input-section">
           <view class="input-label">WEIGHT ({{weight_unit}})</view>
@@ -197,6 +217,14 @@
             bindtap="setUnit"
             data-weight-unit="lb"
           >LB</view>
+        </view>
+
+        <!-- Quick Reps Chips -->
+        <view class="quick-chips">
+          <view class="quick-chips-label">QUICK</view>
+          <view class="chips-row">
+            <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
+          </view>
         </view>
 
         <!-- Reps Input -->
