@@ -126,7 +126,7 @@
                 <!-- Top-left: DONE badge if practiced -->
                 <view wx:if="{{item.is_practiced}}" class="done-badge">DONE</view>
                 <!-- Bottom-left: heart/favorite icon (catchtap stops event bubbling) -->
-                <view class="fav-icon-wrap {{item.is_favorite ? 'active' : ''}}" catchtap="onFavoriteTap" data-id="{{item.id}}">
+                <view class="fav-icon-wrap" catchtap="onFavoriteTap" data-id="{{item.id}}">
                   <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
                   <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
                 </view>
