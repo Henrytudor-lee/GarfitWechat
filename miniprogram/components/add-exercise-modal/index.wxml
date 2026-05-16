@@ -180,6 +180,9 @@
             enable-progress-gesture
           ></video>
         </view>
+        <view wx:elif="{{selectedItem.image_name}}" class="video-placeholder">
+          <text class="video-placeholder-text">该动作暂无演示视频</text>
+        </view>
 
         <!-- Weight Input -->
         <view class="input-section">

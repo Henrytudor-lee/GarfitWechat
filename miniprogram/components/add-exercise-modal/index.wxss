@@ -587,6 +587,22 @@
   display: block;
 }
 
+.video-placeholder {
+  margin: 0 32rpx 24rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  height: 320rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-placeholder-text {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 /* Quick chips */
 .quick-chips {
   padding: 0 32rpx 12rpx;
