@@ -18,6 +18,7 @@ Page({
     restTimer: null,
     sessionStartMs: 0,
     restStartMs: 0,
+    _dataLoaded: false,   // guard: prevent duplicate _loadData from onLoad + onShow
 
     // History / Bento
     historyDate: '',        // ISO date string YYYY-MM-DD
@@ -51,7 +52,7 @@ Page({
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix });
+    this.setData({ imgPrefix: app.globalData.imagePrefix, _dataLoaded: true });
     const today = new Date();
     const iso = today.toISOString().split('T')[0];
     this.setData({
@@ -77,7 +78,20 @@ Page({
       this.addExerciseToSession(chosen);
       return;
     }
-    this._loadData();
+
+    // Guard: onLoad already called _loadData, don't call again
+    if (this.data._dataLoaded) return;
+
+    // openid not ready yet (async onLaunch not yet finished on first launch).
+    // Poll until ready, then load.
+    const tryLoad = () => {
+      if (app.globalData.openid) {
+        this._loadData();
+      } else {
+        setTimeout(tryLoad, 100);
+      }
+    };
+    tryLoad();
   },
 
   onUnload() {
