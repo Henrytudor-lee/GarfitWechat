@@ -95,7 +95,7 @@
                 data-id="{{item.id}}"
               >
                 <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
-                <text>{{item.name.toUpperCase()}}</text>
+                <text class="equip-name">{{item.name.toUpperCase()}}</text>
               </view>
             </view>
           </scroll-view>
@@ -127,7 +127,10 @@
               </view>
               <view class="card-footer">
                 <view class="card-name">{{item.name}}</view>
-                <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
+                <view class="card-icons">
+                  <image wx:if="{{item.muscle_icon}}" class="card-muscle-icon" src="{{imgPrefix}}/body-icons/{{item.muscle_icon}}" mode="aspectFit" />
+                  <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
+                </view>
               </view>
             </view>
           </view>

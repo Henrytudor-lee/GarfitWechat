@@ -56,6 +56,12 @@ const BODY_PART_MAP = {
   '9': 'Neck', '10': 'Cardio', '12': 'Waist',
   '17': 'Biceps', '18': 'Triceps', '19': 'Quadriceps', '20': 'Hamstrings',
 };
+const MUSCLE_ICON_MAP = {
+  '1': 'quadriceps.png', '2': 'chest.png', '3': 'hips.png', '4': 'back.png',
+  '5': 'shoulders.png', '6': 'shoulders.png', '7': 'forearms.png', '8': 'calves.png',
+  '9': 'neck.png', '10': 'cardio.png', '12': 'waist.png',
+  '17': 'biceps.png', '18': 'triceps.png', '19': 'quadriceps.png', '20': 'hamstrings.png',
+};
 const EQUIP_MAP = {
   '1': 'Barbell', '2': 'Body weight', '3': 'Cable', '4': 'Dumbbell',
   '5': 'EZ Barbell', '6': 'Leverage machine', '7': 'Sled machine',
@@ -259,6 +265,7 @@ Component({
           equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
           equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
           muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
+          muscle_icon: MUSCLE_ICON_MAP[String(item.body_part_id)] || '',
         }));
 
         this.setData({

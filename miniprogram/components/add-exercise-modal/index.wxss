@@ -207,6 +207,16 @@
   border-color: #ccf200;
 }
 
+.filter-chip .equip-name {
+  display: none;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.filter-chip.active .equip-name {
+  display: inline;
+}
+
 .filter-chip .equip-icon {
   width: 60rpx;
   height: 60rpx;
@@ -302,20 +312,38 @@
 
 .card-footer {
   padding: 12rpx;
+  padding-bottom: 64rpx;
+  position: relative;
+  min-height: 64rpx;
 }
 
 .card-name {
   font-size: 22rpx;
   font-weight: 600;
   color: #fff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
+}
+
+.card-icons {
+  position: absolute;
+  bottom: 12rpx;
+  right: 12rpx;
+  display: flex;
+  gap: 6rpx;
+  align-items: center;
+}
+
+.card-muscle-icon {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8rpx;
 }
 
 .card-equip-icon {
-  width: 48rpx;
-  height: 48rpx;
+  width: 40rpx;
+  height: 40rpx;
   flex-shrink: 0;
   background: rgba(255,255,255,0.05);
   border-radius: 8rpx;
