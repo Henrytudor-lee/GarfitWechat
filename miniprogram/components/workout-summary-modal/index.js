@@ -36,8 +36,9 @@ Component({
         this._computeStats();
       }
     },
-    'session': function() { this._computeStats(); },
-    'exerciseList': function() { this._computeStats(); },
+    'session, exerciseList': function() {
+      if (this.data.isOpen) this._computeStats();
+    },
   },
 
   methods: {
@@ -66,12 +67,6 @@ Component({
     closeModal() {
       this.triggerEvent('close');
     },
-
-    getExerciseCount() { 
-      this.data._stats.exerciseCount;
-      return this.data._stats.exerciseCount; },
-    getDurationStr() { return this.data._stats.durationStr; },
-    getTotalVolume() { return this.data._stats.totalVolume; },
 
     getDateStr() {
       const s = this.data.session;
