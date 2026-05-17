@@ -67,7 +67,9 @@ Component({
       this.triggerEvent('close');
     },
 
-    getExerciseCount() { return this.data._stats.exerciseCount; },
+    getExerciseCount() { 
+      this.data._stats.exerciseCount;
+      return this.data._stats.exerciseCount; },
     getDurationStr() { return this.data._stats.durationStr; },
     getTotalVolume() { return this.data._stats.totalVolume; },
 

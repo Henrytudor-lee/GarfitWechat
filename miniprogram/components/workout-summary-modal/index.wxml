@@ -19,17 +19,17 @@
     <!-- Stats Row -->
     <view class="stats-row">
       <view class="stat-item">
-        <view class="stat-val">{{getExerciseCount()}}</view>
+        <view class="stat-val">{{_stats.exerciseCount}}</view>
         <view class="stat-lbl">Exercises</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
-        <view class="stat-val">{{getDurationStr()}}</view>
+        <view class="stat-val">{{_stats.durationStr}}</view>
         <view class="stat-lbl">Duration</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
-        <view class="stat-val">{{getTotalVolume()}} kg</view>
+        <view class="stat-val">{{_stats.totalVolume}} kg</view>
         <view class="stat-lbl">Volume</view>
       </view>
     </view>
