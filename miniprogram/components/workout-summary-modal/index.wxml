@@ -63,7 +63,7 @@
           <view class="sets-grid">
             <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
               <text class="set-num">{{index + 1}}</text>
-              <text class="set-val">{{s.weight > 0 ? s.weight : '—'}} {{s.weight_unit || 'kg'}}</text>
+              <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
               <text class="set-sep">×</text>
               <text class="set-reps">{{s.reps}} reps</text>
             </view>
