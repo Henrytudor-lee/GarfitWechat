@@ -26,24 +26,37 @@ Component({
 
   data: {
     imgPrefix: '',
+    _stats: { exerciseCount: 0, durationStr: '--', totalVolume: 0 },
   },
 
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen) {
         this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
-        console.log('[workout-summary] open, session:', JSON.stringify(this.data.session), 'exerciseList length:', this.data.exerciseList.length);
+        this._computeStats();
       }
     },
-    'session': function(session) {
-      console.log('[workout-summary] session changed:', JSON.stringify(session));
-    },
-    'exerciseList': function(list) {
-      console.log('[workout-summary] exerciseList changed, length:', list.length);
-    },
+    'session': function() { this._computeStats(); },
+    'exerciseList': function() { this._computeStats(); },
   },
 
   methods: {
+    _computeStats() {
+      const list = this.data.exerciseList || [];
+      const s = this.data.session;
+      const exerciseCount = list.reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
+      const durationStr = s ? formatDuration(s.duration || s.elapsedSeconds || 0) : '--';
+      let totalVolume = 0;
+      for (const ex of list) {
+        if (ex.sets) {
+          for (const st of ex.sets) {
+            totalVolume += (st.weight || 0) * (st.reps || 0);
+          }
+        }
+      }
+      this.setData({ _stats: { exerciseCount, durationStr, totalVolume } });
+    },
+
     onMaskTap(e) {
       if (e.target === e.currentTarget) {
         this.closeModal();
@@ -54,46 +67,9 @@ Component({
       this.triggerEvent('close');
     },
 
-    getTotalSets() {
-      return this.data.exerciseList.reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
-    },
-
-    getTotalReps() {
-      let total = 0;
-      for (const ex of this.data.exerciseList) {
-        if (ex.sets) {
-          for (const s of ex.sets) {
-            total += s.reps || 0;
-          }
-        }
-      }
-      return total;
-    },
-
-    getExerciseCount() {
-      console.log('[workout-summary] getExerciseCount, exerciseList:', JSON.stringify(this.data.exerciseList));
-      return this.data.exerciseList.reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
-    },
-
-    getTotalVolume() {
-      console.log('[workout-summary] getTotalVolume, exerciseList:', JSON.stringify(this.data.exerciseList));
-      let total = 0;
-      for (const ex of this.data.exerciseList) {
-        if (ex.sets) {
-          for (const s of ex.sets) {
-            total += (s.weight || 0) * (s.reps || 0);
-          }
-        }
-      }
-      return total.toFixed(0);
-    },
-
-    getDurationStr() {
-      const s = this.data.session;
-      if (!s) return '--';
-      const duration = s.duration || s.elapsedSeconds || 0;
-      return formatDuration(duration);
-    },
+    getExerciseCount() { return this.data._stats.exerciseCount; },
+    getDurationStr() { return this.data._stats.durationStr; },
+    getTotalVolume() { return this.data._stats.totalVolume; },
 
     getDateStr() {
       const s = this.data.session;
