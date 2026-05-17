@@ -258,23 +258,22 @@
   color: rgba(204, 242, 0, 0.6);
 }
 
-/* Sets Grid - 2 columns */
+/* Sets Grid - 2 columns using grid */
 .sets-grid {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8rpx;
   padding: 0 16rpx 16rpx;
 }
 
 .set-chip {
-  width: calc(50% - 4rpx);
   display: flex;
   align-items: center;
   gap: 8rpx;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8rpx;
   padding: 12rpx;
+  min-width: 0;
 }
 
 .set-num {
