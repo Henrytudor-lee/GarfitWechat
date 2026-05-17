@@ -66,6 +66,39 @@
   font-size: 22rpx;
 }
 
+.filter-icons-wrap {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.filter-icon-btn {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10rpx;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.15s;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.filter-icon-btn-text {
+  font-size: 32rpx;
+}
+
+.filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.2);
+  color: #ccf200;
+}
+
+.tap-active {
+  opacity: 0.7;
+}
+
 /* Filter Sections */
 .filter-section {
   margin-bottom: 20rpx;

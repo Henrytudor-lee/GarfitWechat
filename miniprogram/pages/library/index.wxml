@@ -21,6 +21,18 @@
       bindinput="onSearchInput"
       bindconfirm="onSearch"
     />
+    <view class="filter-icons-wrap">
+      <text
+        class="filter-icon-btn {{filterFavor ? 'active' : ''}}"
+        bindtap="onFavorFilterTap"
+        hover-class="tap-active"
+      >♥</text>
+      <text
+        class="filter-icon-btn filter-icon-btn-text {{filterPracticed ? 'active' : ''}}"
+        bindtap="onPracticedFilterTap"
+        hover-class="tap-active"
+      >☑</text>
+    </view>
   </view>
 
   <!-- Equipment Filters -->

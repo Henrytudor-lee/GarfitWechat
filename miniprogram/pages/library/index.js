@@ -96,6 +96,8 @@ Page({
     isSelectMode: false,
     favorExercises: [],
     practicedExercises: [],
+    filterFavor: false,
+    filterPracticed: false,
   },
 
   onLoad(opts) {
@@ -131,7 +133,7 @@ Page({
     this.setData({ loading: true });
 
     const page = reset ? 1 : this.data.page;
-    const { keyword, selectedEquipment, selectedMuscle } = this.data;
+    const { keyword, selectedEquipment, selectedMuscle, filterFavor, filterPracticed, favorExercises, practicedExercises } = this.data;
 
     const res = await wx.cloud.callFunction({
       name: 'exerciseLibrary',
@@ -142,6 +144,10 @@ Page({
         bodyPart: selectedMuscle || '',
         page,
         pageSize: this.data.pageSize,
+        isFavor: filterFavor,
+        isPracticed: filterPracticed,
+        favorExerIds: favorExercises,
+        practicedExerIds: practicedExercises,
       },
     });
 
@@ -196,6 +202,18 @@ Page({
     const id = e.currentTarget.dataset.id;
     if (id === this.data.selectedMuscle) return;
     this.setData({ selectedMuscle: id, page: 1, list: [] });
+    this.loadList(true);
+  },
+
+  onFavorFilterTap() {
+    const newVal = !this.data.filterFavor;
+    this.setData({ filterFavor: newVal, page: 1, list: [] });
+    this.loadList(true);
+  },
+
+  onPracticedFilterTap() {
+    const newVal = !this.data.filterPracticed;
+    this.setData({ filterPracticed: newVal, page: 1, list: [] });
     this.loadList(true);
   },
 

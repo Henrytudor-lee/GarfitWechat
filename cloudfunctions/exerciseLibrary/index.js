@@ -22,7 +22,7 @@ function getPool() {
 }
 
 exports.main = async (event, context) => {
-  const { action, keyword, bodyPart, equipmentId, id, exerciseId, page = 1, pageSize = 20 } = event;
+  const { action, keyword, bodyPart, equipmentId, id, exerciseId, page = 1, pageSize = 20, isFavor, isPracticed, favorExerIds, practicedExerIds } = event;
 
   try {
     if (action === 'list') {
@@ -40,6 +40,37 @@ exports.main = async (event, context) => {
       if (equipmentId != null && equipmentId !== '') {
         sql += ' AND (equipment_id = ? OR equipment_id LIKE ? OR equipment_id LIKE ? OR equipment_id LIKE ?)';
         params.push(equipmentId, `${equipmentId},%`, `%,${equipmentId},%`, `%,${equipmentId}`);
+      }
+
+      // 筛选 favor/practiced：两者都勾选时取交集
+      if (isFavor && isPracticed) {
+        // AND 交集
+        if (favorExerIds && favorExerIds.length > 0 && practicedExerIds && practicedExerIds.length > 0) {
+          const intersection = favorExerIds.filter(id => practicedExerIds.includes(id));
+          if (intersection.length > 0) {
+            sql += ` AND id IN (${intersection.map(() => '?').join(',')})`;
+            params.push(...intersection);
+          } else {
+            // 无交集，返回空
+            sql += ' AND 1=0';
+          }
+        } else {
+          sql += ' AND 1=0';
+        }
+      } else if (isFavor) {
+        if (favorExerIds && favorExerIds.length > 0) {
+          sql += ` AND id IN (${favorExerIds.map(() => '?').join(',')})`;
+          params.push(...favorExerIds);
+        } else {
+          sql += ' AND 1=0';
+        }
+      } else if (isPracticed) {
+        if (practicedExerIds && practicedExerIds.length > 0) {
+          sql += ` AND id IN (${practicedExerIds.map(() => '?').join(',')})`;
+          params.push(...practicedExerIds);
+        } else {
+          sql += ' AND 1=0';
+        }
       }
 
       sql += ' ORDER BY name_zh ASC LIMIT ? OFFSET ?';
