@@ -125,6 +125,8 @@ Component({
     repsChips: [4, 8, 10, 12, 15, 20],
     favorExercises: [],   // array of exercise_ids
     practicedExercises: [], // array of exercise_ids
+    filterFavor: false,
+    filterPracticed: false,
   },
 
   observers: {
@@ -255,6 +257,18 @@ Component({
       this.loadList(true);
     },
 
+    onFavorFilterTap() {
+      const newVal = !this.data.filterFavor;
+      this.setData({ filterFavor: newVal, page: 1, list: [] });
+      this.loadList(true);
+    },
+
+    onPracticedFilterTap() {
+      const newVal = !this.data.filterPracticed;
+      this.setData({ filterPracticed: newVal, page: 1, list: [] });
+      this.loadList(true);
+    },
+
     async loadList(reset = false) {
       if (this.data.loading || this.data.loadingMore) return;
 
@@ -263,7 +277,7 @@ Component({
 
       this.setData({ loading: reset, loadingMore: !reset });
 
-      const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises } = this.data;
+      const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises, filterFavor, filterPracticed } = this.data;
 
       const res = await wx.cloud.callFunction({
         name: 'exerciseLibrary',
@@ -274,6 +288,10 @@ Component({
           bodyPart: selectedMuscle ? selectedMuscle : '',
           page,
           pageSize: this.data.pageSize,
+          isFavor: filterFavor,
+          isPracticed: filterPracticed,
+          favorExerIds: favorExercises,
+          practicedExerIds: practicedExercises,
         },
       });
 

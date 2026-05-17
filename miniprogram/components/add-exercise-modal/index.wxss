@@ -171,6 +171,27 @@
   color: #555;
 }
 
+.filter-icons-wrap {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 12rpx;
+}
+
+.filter-icon-btn {
+  font-size: 28rpx;
+  line-height: 1;
+  padding: 8rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.15s;
+}
+
+.filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.2);
+}
+
 /* Filter Section */
 .filter-section {
   padding: 0 32rpx 16rpx;

@@ -76,6 +76,10 @@
             bindinput="onSearchInput"
             bindconfirm="onSearch"
           />
+          <view class="filter-icons-wrap">
+            <text class="filter-icon-btn {{filterFavor ? 'active' : ''}}" bindtap="onFavorFilterTap">♥</text>
+            <text class="filter-icon-btn {{filterPracticed ? 'active' : ''}}" bindtap="onPracticedFilterTap">☑</text>
+          </view>
         </view>
 
         <!-- Equipment Filters -->
