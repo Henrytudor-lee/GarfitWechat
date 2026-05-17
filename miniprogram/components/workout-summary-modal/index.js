@@ -70,7 +70,13 @@ Component({
       return total;
     },
 
+    getExerciseCount() {
+      console.log('[workout-summary] getExerciseCount, exerciseList:', JSON.stringify(this.data.exerciseList));
+      return this.data.exerciseList.reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
+    },
+
     getTotalVolume() {
+      console.log('[workout-summary] getTotalVolume, exerciseList:', JSON.stringify(this.data.exerciseList));
       let total = 0;
       for (const ex of this.data.exerciseList) {
         if (ex.sets) {
@@ -80,10 +86,6 @@ Component({
         }
       }
       return total.toFixed(0);
-    },
-
-    getExerciseCount() {
-      return this.data.exerciseList.length;
     },
 
     getDurationStr() {
