@@ -32,7 +32,14 @@ Component({
     'isOpen': function(isOpen) {
       if (isOpen) {
         this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
+        console.log('[workout-summary] open, session:', JSON.stringify(this.data.session), 'exerciseList length:', this.data.exerciseList.length);
       }
+    },
+    'session': function(session) {
+      console.log('[workout-summary] session changed:', JSON.stringify(session));
+    },
+    'exerciseList': function(list) {
+      console.log('[workout-summary] exerciseList changed, length:', list.length);
     },
   },
 
