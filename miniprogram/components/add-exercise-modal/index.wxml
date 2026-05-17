@@ -86,7 +86,7 @@
                 class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}"
                 bindtap="selectEquipment"
                 data-id="0"
-              >ALL <text wx:if="{{selectedEquipment === 0}}" class="equip-name">Muscles</text></view>
+              >ALL <text wx:if="{{selectedEquipment === 0}}" class="equip-name">Equips</text></view>
               <view
                 wx:for="{{equipmentList}}"
                 wx:key="id"
