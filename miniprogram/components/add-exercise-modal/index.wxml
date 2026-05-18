@@ -1,6 +1,6 @@
 <!--components/add-exercise-modal/index.wxml-->
 <view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
-  <view class="modal-sheet" catchtap="">
+  <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Drag Handle -->
     <view class="drag-handle"></view>

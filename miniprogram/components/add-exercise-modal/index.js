@@ -237,6 +237,10 @@ Component({
       this.closeModal();
     },
 
+    onSheetTap() {
+      // Empty — catchtap on modal-sheet stops event bubbling so child taps don't reach mask
+    },
+
     goBack() {
       this.setData({
         step: 'pick',
