@@ -83,6 +83,8 @@ const EQUIP_ICON_MAP = {
   '25': 'suspension.png', '26': 'trap_bar.png', '27': 'VP.png', '28': 'wheel_roller.png',
 };
 
+const STORAGE_KEY = 'add_exercise_modal_filters';
+
 Component({
   properties: {
     isOpen: {
@@ -135,6 +137,7 @@ Component({
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
         this._reset(imgPrefix, vidPrefix);
+        this._loadSavedFilters();
         this._loadUserExercises();  // load user's favor/practiced lists
         this.loadList(true);
       } else {
@@ -177,6 +180,36 @@ Component({
       });
     },
 
+    _loadSavedFilters() {
+      try {
+        const saved = wx.getStorageSync(STORAGE_KEY);
+        if (saved) {
+          this.setData({
+            selectedMuscle: saved.selectedMuscle || 0,
+            selectedEquipment: saved.selectedEquipment || 0,
+            filterFavor: saved.filterFavor || false,
+            filterPracticed: saved.filterPracticed || false,
+          });
+        }
+      } catch (err) {
+        console.error('_loadSavedFilters failed', err);
+      }
+    },
+
+    _saveFilters() {
+      const { selectedMuscle, selectedEquipment, filterFavor, filterPracticed } = this.data;
+      try {
+        wx.setStorageSync(STORAGE_KEY, {
+          selectedMuscle,
+          selectedEquipment,
+          filterFavor,
+          filterPracticed,
+        });
+      } catch (err) {
+        console.error('_saveFilters failed', err);
+      }
+    },
+
     async _loadUserExercises() {
       if (!app.globalData.openid) return;
       try {
@@ -200,10 +233,8 @@ Component({
       this.triggerEvent('close');
     },
 
-    onMaskTap(e) {
-      if (e.target === e.currentTarget) {
-        this.closeModal();
-      }
+    onMaskTap() {
+      this.closeModal();
     },
 
     goBack() {
@@ -238,6 +269,7 @@ Component({
       });
       this._listLoaded = false;
       this.loadList(true);
+      this._saveFilters();
     },
 
     selectEquipment(e) {
@@ -246,6 +278,7 @@ Component({
       this.setData({ selectedEquipment: id, page: 1, list: [] });
       this._listLoaded = false;
       this.loadList(true);
+      this._saveFilters();
     },
 
     onSearchInput(e) {
@@ -261,12 +294,14 @@ Component({
       const newVal = !this.data.filterFavor;
       this.setData({ filterFavor: newVal, page: 1, list: [] });
       this.loadList(true);
+      this._saveFilters();
     },
 
     onPracticedFilterTap() {
       const newVal = !this.data.filterPracticed;
       this.setData({ filterPracticed: newVal, page: 1, list: [] });
       this.loadList(true);
+      this._saveFilters();
     },
 
     async loadList(reset = false) {
