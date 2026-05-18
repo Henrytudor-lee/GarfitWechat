@@ -184,11 +184,16 @@ Component({
       try {
         const saved = wx.getStorageSync(STORAGE_KEY);
         if (saved) {
+          const muscleId = saved.selectedMuscle || 0;
+          const muscleItem = MUSCLE_LIST.find(m => m.id === muscleId);
+          const imgPrefix = this.data.imgPrefix || '';
           this.setData({
-            selectedMuscle: saved.selectedMuscle || 0,
+            selectedMuscle: muscleId,
             selectedEquipment: saved.selectedEquipment || 0,
             filterFavor: saved.filterFavor || false,
             filterPracticed: saved.filterPracticed || false,
+            muscleIcon: muscleId === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
+            muscleLabel: muscleId === 0 ? 'Muscles' : (muscleItem ? muscleItem.name : ''),
           });
         }
       } catch (err) {
