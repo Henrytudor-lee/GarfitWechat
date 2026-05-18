@@ -1,0 +1,252 @@
+/* components/session-detail-modal/index.wxss */
+
+/* Mask */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+}
+
+/* Sheet — slides up from bottom */
+.modal-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+}
+
+/* Handle bar */
+.modal-sheet::before {
+  content: '';
+  display: block;
+  width: 80rpx;
+  height: 8rpx;
+  background: #444;
+  border-radius: 4rpx;
+  margin: 20rpx auto 0;
+  flex-shrink: 0;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.header-left,
+.header-right {
+  width: 120rpx;
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.header-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Session Info */
+.session-info {
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.session-date {
+  font-size: 22rpx;
+  color: #888;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+
+.session-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stat-val {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Exercise List */
+.exercise-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24rpx 32rpx;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  color: #666;
+  font-size: 24rpx;
+  padding: 80rpx 0;
+}
+
+.exercise-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.group-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.group-img {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.group-img-placeholder {
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.group-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.group-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.group-sets-count {
+  font-size: 20rpx;
+  color: #888;
+  font-weight: 500;
+}
+
+/* Sets Table */
+.sets-table {
+  padding: 0 20rpx 20rpx;
+}
+
+.sets-header-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.sets-header-row .col-set,
+.sets-header-row .col-weight,
+.sets-header-row .col-reps {
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sets-data-row {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.03);
+}
+
+.sets-data-row:last-child {
+  border-bottom: none;
+}
+
+.col-set {
+  width: 56rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #ccf200;
+  text-align: center;
+}
+
+.col-weight {
+  flex: 1;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+
+.col-reps {
+  width: 100rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}

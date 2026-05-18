@@ -1,0 +1,390 @@
+/* pages/stats/index.wxss — garcia-fitness-new style */
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 100rpx 24rpx 200rpx;
+}
+
+.page-header {
+  margin-bottom: 32rpx;
+}
+
+.page-title-text {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-subtitle-text {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 4rpx;
+}
+
+/* Summary Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.stat-card-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.stat-card-value {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-card-value-small {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4rpx;
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+/* Section */
+.section-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4rpx;
+}
+
+.section-subtitle {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16rpx;
+}
+
+/* Bar Chart */
+.bar-chart {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.bar-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.bar-label {
+  font-size: 22rpx;
+  color: #a1a1aa;
+  font-weight: 600;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #ccf200;
+  border-radius: 8rpx;
+  transition: width 0.5s ease;
+}
+
+.bar-value {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+  width: 80rpx;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Muscle Distribution */
+.muscle-chart-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-top: 8rpx;
+}
+
+.pie-chart-canvas {
+  width: 160rpx;
+  height: 160rpx;
+  flex-shrink: 0;
+}
+
+.muscle-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.muscle-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.muscle-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.muscle-legend-name {
+  font-size: 24rpx;
+  color: #d4d4d8;
+  font-weight: 600;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.muscle-legend-val {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 600;
+}
+
+/* Most Trained */
+.freq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+
+.freq-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 16rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12rpx;
+}
+
+.freq-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+
+.freq-count {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 600;
+}
+
+/* Exercise Selector */
+.select-wrap {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.select-header {
+  margin-bottom: 8rpx;
+}
+
+.select-label {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.select-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0 4rpx;
+}
+
+.select-text-placeholder {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #52525b;
+}
+
+.select-text-active {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+.select-arrow {
+  font-size: 36rpx;
+  color: #ccf200;
+  font-weight: 700;
+}
+
+/* Max Record Grid */
+.max-record-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.max-record-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20rpx;
+  padding: 24rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.max-record-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-bottom: 4rpx;
+}
+
+.max-record-num {
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: #ccf200;
+  line-height: 1;
+}
+
+.max-record-unit {
+  font-size: 18rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4rpx;
+}
+
+/* Weight Chart Canvas */
+.weight-chart-canvas {
+  width: 100%;
+  height: 280rpx;
+  margin-top: 8rpx;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-bottom: 8rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #52525b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.empty-subtext {
+  font-size: 22rpx;
+  color: #3f3f46;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 40rpx;
+}
+
+.loading-text {
+  font-size: 24rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

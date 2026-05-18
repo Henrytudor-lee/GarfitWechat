@@ -1,0 +1,266 @@
+/* components/edit-exercise-modal/index.wxss */
+
+/* Mask */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+}
+
+/* Sheet — slides up from bottom */
+.modal-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+}
+
+/* Handle bar */
+.modal-sheet::before {
+  content: '';
+  display: block;
+  width: 80rpx;
+  height: 8rpx;
+  background: #444;
+  border-radius: 4rpx;
+  margin: 20rpx auto 0;
+  flex-shrink: 0;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.header-img {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.header-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.header-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.header-sets {
+  font-size: 24rpx;
+  color: #888;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.action-btn-add {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #000;
+  font-size: 36rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn-close {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sets list — scrollable */
+.sets-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18rpx 12rpx;
+}
+
+/* Each set row */
+.set-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  box-sizing: border-box;
+}
+
+.set-item.deleted {
+  display: none;
+}
+
+/* Set number circle */
+.set-num {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #000;
+  font-size: 20rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Field label */
+.field-label {
+  font-size: 18rpx;
+  color: #666;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8rpx;
+}
+
+/* Each field (weight / reps) */
+.set-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.set-field-unit {
+  flex: 0 0 auto;
+}
+
+/* +/- buttons + input row */
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.field-btn {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 12rpx;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field-input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #fff;
+  background: transparent;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  border-radius: 12rpx;
+  padding: 8rpx 4rpx;
+}
+
+/* Unit toggle */
+.unit-toggle {
+  display: flex;
+  border-radius: 12rpx;
+  overflow: hidden;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.unit-btn {
+  padding: 8rpx 16rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #666;
+  transition: all 0.15s;
+}
+
+.unit-btn.active {
+  background: #ccf200;
+  color: #000;
+}
+
+/* Delete button */
+.delete-btn {
+  width: 42rpx;
+  height: 42rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  flex-shrink: 0;
+  color: #666;
+}
+
+/* Footer — save button always visible */
+.modal-footer {
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+}
+
+.save-btn {
+  width: 100%;
+  height: 96rpx;
+  background: #ccf200;
+  color: #000;
+  font-size: 28rpx;
+  font-weight: 700;
+  border-radius: 50rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.05em;
+}
+
+.save-btn.disabled {
+  opacity: 0.5;
+}
+
+.save-btn::after { border: none; }

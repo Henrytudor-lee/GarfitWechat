@@ -1,0 +1,79 @@
+<!--components/session-detail-modal/index.wxml-->
+<view class="modal-mask" wx:if="{{isOpen && session}}" bindtap="onMaskTap">
+  <view class="modal-sheet" catchtap="">
+
+    <!-- Header -->
+    <view class="modal-header">
+      <view class="header-left">
+        <view class="header-btn" bindtap="closeModal">✕</view>
+      </view>
+      <view class="header-title">SESSION DETAIL</view>
+      <view class="header-right"></view>
+    </view>
+
+    <!-- Session Info -->
+    <view class="session-info">
+      <view class="session-date">{{session.dateStr || session.start_time}}</view>
+      <view class="session-stats">
+        <view class="stat-item">
+          <view class="stat-val">{{session.duration_formatted || '--:--'}}</view>
+          <view class="stat-label">DURATION</view>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-val">{{exerciseList.length}}</view>
+          <view class="stat-label">EXERCISES</view>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-val">{{getTotalSets(exerciseList)}}</view>
+          <view class="stat-label">SETS</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Exercises List -->
+    <scroll-view class="exercise-list" scroll-y>
+      <view wx:if="{{loading}}" class="loading-state">LOADING...</view>
+      <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">NO EXERCISES RECORDED</view>
+
+      <view wx:else class="exercise-groups">
+        <view class="group-card" wx:for="{{exerciseList}}" wx:key="id">
+          <view class="group-header">
+            <image
+              wx:if="{{item.image_name}}"
+              class="group-img"
+              src="{{imgPrefix}}/{{item.image_name}}"
+              mode="aspectFill"
+            />
+            <view wx:else class="group-img group-img-placeholder">🏋️</view>
+            <view class="group-info">
+              <view class="group-name">{{item.name_zh || item.name}}</view>
+              <view class="group-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? 'SET' : 'SETS'}}</view>
+            </view>
+          </view>
+
+          <!-- Sets Table -->
+          <view class="sets-table">
+            <view class="sets-header-row">
+              <view class="col-set">SET</view>
+              <view class="col-weight">WEIGHT</view>
+              <view class="col-reps">REPS</view>
+            </view>
+            <view
+              wx:for="{{item.sets}}"
+              wx:for-item="s"
+              wx:key="id"
+              class="sets-data-row"
+            >
+              <view class="col-set">{{index + 1}}</view>
+              <view class="col-weight">{{s.weight}} {{s.weight_unit || 'kg'}}</view>
+              <view class="col-reps">{{s.reps}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+  </view>
+</view>

@@ -1,0 +1,311 @@
+/* pages/workout/index.wxss */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #F6F6F6;
+}
+
+.item-volume-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  background: #ccf200;
+  color: #1A1A2E;
+  border-radius: 20rpx;
+  padding: 4rpx 14rpx;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.item-actions {
+  display: flex;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.workout-header {
+  background: linear-gradient(135deg, #1A1A2E, #16213E);
+  padding: 40rpx 32rpx;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workout-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-dot {
+  width: 10rpx;
+  height: 10rpx;
+  background: #E94560;
+  border-radius: 50%;
+  margin-right: 12rpx;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.status-text {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.elapsed-time {
+  font-size: 40rpx;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.idle-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+}
+
+.idle-icon {
+  font-size: 120rpx;
+  margin-bottom: 32rpx;
+}
+
+.idle-text {
+  font-size: 32rpx;
+  color: #999;
+  margin-bottom: 60rpx;
+}
+
+.exercise-list {
+  flex: 1;
+  padding: 24rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1A1A2E;
+  margin-bottom: 20rpx;
+}
+
+.item-image-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+  background: #f0f0f0;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+}
+
+.item-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  font-size: 48rpx;
+}
+
+.exercise-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1A1A2E;
+  margin-bottom: 4rpx;
+}
+
+.item-sub {
+  font-size: 22rpx;
+  color: #888;
+  margin-bottom: 6rpx;
+}
+
+.item-sets {
+  display: flex;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.set-tag {
+  display: inline-block;
+  padding: 4rpx 14rpx;
+  background: #FFF0F3;
+  color: #E94560;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+
+.set-empty {
+  font-size: 22rpx;
+  color: #BBB;
+}
+
+.action-btn {
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  border: none;
+}
+
+.add-set {
+  background: #E94560;
+  color: #fff;
+}
+
+.edit-btn {
+  background: #F6F6F6;
+  color: #666;
+}
+
+.empty-exercises {
+  text-align: center;
+  color: #BBB;
+  font-size: 26rpx;
+  padding: 80rpx 0;
+}
+
+.bottom-bar {
+  display: flex;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.btn-add-exercise {
+  flex: 1;
+  background: #F6F6F6;
+  color: #1A1A2E;
+  border-radius: 50rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 2.4;
+}
+
+.btn-finish {
+  flex: 1;
+  background: linear-gradient(135deg, #E94560, #FF6B6B);
+  color: #fff;
+  border-radius: 50rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 2.4;
+}
+
+.btn-finish::after, .btn-add-exercise::after { border: none; }
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  width: 600rpx;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A2E;
+  text-align: center;
+  margin-bottom: 8rpx;
+}
+
+.modal-exercise-name {
+  font-size: 26rpx;
+  color: #999;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-row {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.modal-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 2rpx solid #EEEEEE;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  height: 88rpx;
+}
+
+.modal-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #1A1A2E;
+  height: 100%;
+}
+
+.unit-label {
+  font-size: 26rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.btn-modal-cancel, .btn-modal-confirm {
+  flex: 1;
+  border-radius: 50rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 2.4;
+  border: none;
+}
+
+.btn-modal-cancel {
+  background: #F6F6F6;
+  color: #666;
+}
+
+.btn-modal-confirm {
+  background: #E94560;
+  color: #fff;
+}
+
+.btn-modal-cancel::after, .btn-modal-confirm::after { border: none; }

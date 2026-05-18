@@ -1,0 +1,69 @@
+<!--components/edit-exercise-modal/index.wxml-->
+<view class="modal-mask" wx:if="{{isOpen && group}}" bindtap="onMaskTap">
+  <view class="modal-sheet" catchtap="">
+
+    <!-- Header -->
+    <view class="modal-header">
+      <view class="header-left">
+        <image wx:if="{{group.image_name}}" class="header-img" src="{{imgPrefix}}/{{group.image_name}}" mode="aspectFill" />
+        <view wx:else class="header-img header-img-placeholder">🏋️</view>
+        <view class="header-text">
+          <view class="header-name">{{group.name_zh || group.name}}</view>
+          <view class="header-sets">{{activeSetsCount}} {{activeSetsCount === 1 ? 'set' : 'sets'}}</view>
+        </view>
+      </view>
+      <view class="header-actions">
+        <view class="action-btn-add" bindtap="addSet">+</view>
+        <view class="action-btn-close" bindtap="closeModal">✕</view>
+      </view>
+    </view>
+
+    <!-- Sets List -->
+    <scroll-view class="sets-list" scroll-y>
+      <view wx:for="{{sets}}" wx:key="id" class="set-item {{item.deleted ? 'deleted' : ''}}" data-index="{{index}}">
+
+        <!-- Set Number -->
+        <view class="set-num">{{index + 1}}</view>
+
+        <!-- Weight -->
+        <view class="set-field">
+          <view class="field-label">WEIGHT</view>
+          <view class="field-row">
+            <view class="field-btn" bindtap="decWeight" data-index="{{index}}">−</view>
+            <input class="field-input" type="digit" value="{{item.weight}}" bindinput="onWeightInput" data-index="{{index}}" />
+            <view class="field-btn" bindtap="incWeight" data-index="{{index}}">+</view>
+          </view>
+        </view>
+
+        <!-- Unit -->
+        <view class="set-field set-field-unit">
+          <view class="field-label">UNIT</view>
+          <view class="unit-toggle">
+            <view class="unit-btn {{item.weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="kg">KG</view>
+            <view class="unit-btn {{item.weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="lb">LB</view>
+          </view>
+        </view>
+
+        <!-- Reps -->
+        <view class="set-field">
+          <view class="field-label">REPS</view>
+          <view class="field-row">
+            <view class="field-btn" bindtap="decReps" data-index="{{index}}">−</view>
+            <input class="field-input" type="number" value="{{item.reps}}" bindinput="onRepsInput" data-index="{{index}}" />
+            <view class="field-btn" bindtap="incReps" data-index="{{index}}">+</view>
+          </view>
+        </view>
+
+        <!-- Delete -->
+        <image class="delete-btn" src="/images/icons/delete.png" bindtap="deleteSet" data-index="{{index}}"></image>
+
+      </view>
+    </scroll-view>
+
+    <!-- Save Button -->
+    <view class="modal-footer">
+      <button class="save-btn {{saving ? 'disabled' : ''}}" bindtap="saveAll" disabled="{{saving}}">{{saving ? 'SAVING...' : 'SAVE CHANGES'}}</button>
+    </view>
+
+  </view>
+</view>

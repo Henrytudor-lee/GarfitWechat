@@ -1,0 +1,85 @@
+<!--components/workout-summary-modal/index.wxml-->
+<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+  <view class="modal-card" catchtap="">
+
+    <!-- Background decoration -->
+    <view class="card-bg"></view>
+    <view class="bg-blob blob-1"></view>
+    <view class="bg-blob blob-2"></view>
+
+    <!-- Header -->
+    <view class="card-header">
+      <view class="brand">GFIT</view>
+      <view class="check-circle">
+        <text class="check-icon">✓</text>
+      </view>
+      <view class="complete-label">Workout Complete</view>
+    </view>
+
+    <!-- Stats Row -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <view class="stat-val">{{_stats.exerciseCount}}</view>
+        <view class="stat-lbl">Exercises</view>
+      </view>
+      <view class="stat-sep"></view>
+      <view class="stat-item">
+        <view class="stat-val">{{_stats.durationStr}}</view>
+        <view class="stat-lbl">Duration</view>
+      </view>
+      <view class="stat-sep"></view>
+      <view class="stat-item">
+        <view class="stat-val">{{_stats.totalVolume}} kg</view>
+        <view class="stat-lbl">Volume</view>
+      </view>
+    </view>
+
+    <!-- Divider -->
+    <view class="divider"></view>
+
+    <!-- Exercise Breakdown -->
+    <view class="breakdown-title">Exercise Summary</view>
+    <scroll-view class="breakdown-scroll" scroll-y>
+      <view class="breakdown-list">
+        <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="id">
+          <view class="item-row">
+            <image
+              wx:if="{{item.image_name}}"
+              class="item-img"
+              src="{{imgPrefix}}/{{item.image_name}}"
+              mode="aspectFill"
+            />
+            <view wx:else class="item-img item-img-placeholder">🏋️</view>
+            <view class="item-info">
+              <view class="item-name">{{item.name_zh || item.name}}</view>
+              <view class="item-sets">{{item.sets.length}} sets</view>
+            </view>
+            <view class="item-vol">
+              <text class="vol-num">{{getGroupVolume(item)}}</text>
+              <text class="vol-unit">kg</text>
+            </view>
+          </view>
+          <!-- Sets grid: 2 columns -->
+          <view class="sets-grid">
+            <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
+              <text class="set-num">{{index + 1}}</text>
+              <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+              <text class="set-sep">×</text>
+              <text class="set-reps">{{s.reps}} reps</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Date Footer -->
+    <view class="date-footer">{{getDateStr()}}</view>
+
+    <!-- Action Buttons -->
+    <view class="card-footer">
+      <button class="btn-secondary" bindtap="closeModal">VIEW HISTORY</button>
+      <button class="btn-primary" bindtap="closeModal">DONE</button>
+    </view>
+
+  </view>
+</view>

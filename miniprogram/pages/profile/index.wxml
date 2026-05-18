@@ -1,0 +1,123 @@
+<!--pages/profile/index.wxml—garcia-fitness-new style-->
+<view class="page">
+
+  <!-- Profile Hero with Avatar -->
+  <view class="profile-hero" wx:if="{{isLoggedIn}}">
+    <!-- Avatar + Camera Button -->
+    <view class="avatar-container">
+      <view class="avatar-glow"></view>
+      <image class="avatar-img" src="{{userInfo.avatarUrl || '/images/avatar.png'}}" mode="aspectFill"/>
+      <button class="camera-btn" bindtap="changeAvatar">
+        <text class="camera-icon">✦</text>
+      </button>
+    </view>
+    <!-- Nickname -->
+    <view class="profile-name">{{userInfo.nickname || 'FITNESS USER'}}</view>
+  </view>
+
+  <!-- Not Logged In State -->
+  <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
+    <view class="not-logged-icon">✦</view>
+    <view class="not-logged-title">{{locale === 'en' ? 'NOT LOGGED IN' : '未登录'}}</view>
+    <view class="not-logged-hint">{{locale === 'en' ? 'Sign in to track your fitness journey' : '登录以开始健身之旅'}}</view>
+    <button class="login-btn" bindtap="goToLogin">{{locale === 'en' ? 'LOGIN / REGISTER' : '登录 / 注册'}}</button>
+  </view>
+
+  <!-- Logged In Content -->
+  <block wx:if="{{isLoggedIn}}">
+    <!-- Streak + Level Cards -->
+    <view class="stats-grid">
+      <!-- Streak Card -->
+      <view class="stat-card">
+        <text class="stat-icon {{flameColor}}">🜂</text>
+        <view class="stat-label">{{locale === 'en' ? 'ACTIVE STREAK' : '连续训练'}}</view>
+        <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{locale === 'en' ? ' days' : ' 天'}}</text></view>
+      </view>
+      <!-- Level Card -->
+      <view class="stat-card">
+        <text class="stat-icon {{trophyColor}}">🏆</text>
+        <view class="stat-label">{{locale === 'en' ? 'LEVEL' : '等级'}}</view>
+        <view class="stat-value-lg">{{levelInfo.label || 'ROOKIE'}}</view>
+        <view class="stat-sub">{{levelInfo.lv || 1}}</view>
+      </view>
+    </view>
+
+    <!-- Settings List -->
+    <view class="settings-list">
+      <!-- Language Toggle -->
+      <view class="settings-item" bindtap="toggleLanguage">
+        <view class="settings-left">
+          <view class="settings-icon-wrap lang-icon">
+            <text class="settings-icon-text">EN/CN</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title">{{locale === 'en' ? 'LANGUAGE' : '语言'}}</text>
+            <text class="settings-subtitle">{{locale === 'en' ? 'English (US)' : '中文'}}</text>
+          </view>
+        </view>
+        <view class="toggle-pills">
+          <text class="pill {{locale === 'en' ? 'pill-active' : ''}}">EN</text>
+          <text class="pill {{locale === 'zh' ? 'pill-active zh' : ''}}">CN</text>
+        </view>
+      </view>
+
+      <!-- Theme Toggle -->
+      <view class="settings-item" bindtap="toggleTheme">
+        <view class="settings-left">
+          <view class="settings-icon-wrap theme-icon">
+            <text class="settings-icon-text">{{theme === 'dark' ? '◐' : '◑'}}</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title">{{locale === 'en' ? 'THEME' : '主题'}}</text>
+            <text class="settings-subtitle">{{theme === 'dark' ? (locale === 'en' ? 'Dark' : '深色') : (locale === 'en' ? 'Light' : '浅色')}}</text>
+          </view>
+        </view>
+        <view class="toggle-pills">
+          <text class="pill {{theme === 'dark' ? 'pill-active dark' : ''}}">{{locale === 'en' ? 'Dark' : '深色'}}</text>
+          <text class="pill {{theme === 'light' ? 'pill-active light' : ''}}">{{locale === 'en' ? 'Light' : '浅色'}}</text>
+        </view>
+      </view>
+
+      <!-- AI Coach (locked) -->
+      <view class="settings-item locked">
+        <view class="settings-left">
+          <view class="settings-icon-wrap lock-icon">
+            <text class="settings-icon-text">⚙</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title locked-text">{{locale === 'en' ? 'AI COACH' : 'AI 教练'}}</text>
+            <text class="settings-subtitle locked-text">{{locale === 'en' ? 'COMING SOON' : '即将推出'}}</text>
+          </view>
+        </view>
+        <text class="lock-icon-right">🔒</text>
+      </view>
+
+      <!-- Settings (placeholder) -->
+      <view class="settings-item">
+        <view class="settings-left">
+          <view class="settings-icon-wrap">
+            <text class="settings-icon-text">⚙</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title">{{locale === 'en' ? 'SETTINGS' : '设置'}}</text>
+            <text class="settings-subtitle">{{locale === 'en' ? 'APP PREFERENCES' : '应用偏好'}}</text>
+          </view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+
+    <!-- Logout Button -->
+    <button class="logout-btn" bindtap="handleLogout">
+      <text class="logout-icon">↩</text>
+      <text class="logout-text">{{locale === 'en' ? 'LOG OUT' : '退出登录'}}</text>
+    </button>
+
+    <!-- Version -->
+    <view class="version-text">{{locale === 'en' ? 'GARCIAL FITNESS V1.0.2 - STABLE' : 'GARCIAL FITNESS V1.0.2 - 稳定版'}}</view>
+  </block>
+
+  <!-- Custom Tab Bar -->
+  <custom-tabbar active="profile" />
+
+</view>

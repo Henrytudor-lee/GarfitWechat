@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "PROFILE",
+  "navigationBarBackgroundColor": "#000000",
+  "navigationBarTextStyle": "white",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "appbar": "/components/appbar/index",
+    "custom-tabbar": "/components/custom-tabbar/index"
+  }
+}

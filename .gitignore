@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+miniprogram/node_modules/
+miniprogram/package-lock.json
+._*
+.DS_Store
+.hermes-project-memory

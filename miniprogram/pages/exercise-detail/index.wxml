@@ -1,0 +1,55 @@
+<!--pages/exercise-detail/index.wxml—garcia-fitness-new style-->
+<view class="page">
+
+  <!-- Media -->
+  <view class="media-wrap">
+    <video
+      wx:if="{{exercise.video_file}}"
+      class="media"
+      src="{{vidPrefix}}/{{exercise.video_file}}"
+      controls
+      show-center-play-btn
+      autoplay
+    />
+    <image
+      wx:else
+      class="media"
+      src="{{imgPrefix}}/{{exercise.image_name}}"
+      mode="aspectFill"
+    />
+    <view class="media-overlay"></view>
+    <!-- Back -->
+    <view class="back-btn" bindtap="goBack">←</view>
+  </view>
+
+  <!-- Content -->
+  <view class="content">
+    <view class="exercise-name">{{exercise.name_zh || exercise.name}}</view>
+    <view class="exercise-en">{{exercise.name}}</view>
+    <view class="tags-row">
+      <text class="tag tag-neutral">{{exercise.equipment_name || 'OTHER'}}</text>
+      <text class="tag">{{exercise.exercise_type || 'STRENGTH'}}</text>
+    </view>
+
+    <!-- Description -->
+    <view wx:if="{{exercise.description}}" class="desc">
+      {{exercise.description}}
+    </view>
+
+    <!-- Instructions -->
+    <view wx:if="{{exercise.instructions}}" class="instructions">
+      <view class="section-title">INSTRUCTIONS</view>
+      <text class="instruction-text">{{exercise.instructions}}</text>
+    </view>
+  </view>
+
+  <!-- Action Buttons -->
+  <view class="action-bar">
+    <view class="action-btn {{isFavorite ? 'fav-active' : ''}}" bindtap="toggleFavorite" data-id="{{exercise.id}}">
+      <text>{{isFavorite ? '♥' : '♡'}}</text>
+      <text class="action-label">FAVORITE</text>
+    </view>
+    <button class="btn-primary" bindtap="addToWorkout">ADD TO WORKOUT</button>
+  </view>
+
+</view>

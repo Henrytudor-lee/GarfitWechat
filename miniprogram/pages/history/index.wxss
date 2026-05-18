@@ -1,0 +1,157 @@
+/* pages/history/index.wxss — garcia-fitness-new style */
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 24rpx 24rpx 200rpx;
+}
+
+.page-header {
+  margin-bottom: 24rpx;
+}
+
+.page-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.page-subtitle {
+  font-size: 20rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 4rpx;
+}
+
+.select-wrap {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.select-label {
+  font-size: 18rpx;
+  color: #71717a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10rpx;
+}
+
+.select-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.select-arrow {
+  font-size: 28rpx;
+  color: #52525b;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #52525b;
+  letter-spacing: 0.1em;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+}
+.empty-icon {
+  font-size: 64rpx;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 16rpx;
+}
+.empty-hint {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #52525b;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.month-group {
+  margin-bottom: 32rpx;
+}
+
+.month-label {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 22rpx;
+  font-weight: 900;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 12rpx;
+  padding-left: 4rpx;
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.record-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16rpx;
+  padding: 20rpx 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.record-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.record-date {
+  font-size: 20rpx;
+  color: #52525b;
+  font-weight: 600;
+}
+
+.record-name {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.record-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.record-stat {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ccf200;
+}
+
+.record-arrow {
+  font-size: 24rpx;
+  color: #52525b;
+}
