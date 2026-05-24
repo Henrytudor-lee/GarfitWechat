@@ -95,8 +95,8 @@ Page({
   },
 
   onLoad() {
-    const locale = wx.getStorageSync('locale') || 'en';
-    const theme = wx.getStorageSync('theme') || 'dark';
+    const locale = wx.getStorageSync('language') || 'en';
+    const theme = wx.getStorageSync('theme') || 'night';
     this.setData({ imgPrefix: app.globalData.imagePrefix, locale, theme });
   },
 
@@ -112,8 +112,8 @@ Page({
       return;
     }
 
-    const locale = wx.getStorageSync('locale') || 'en';
-    const theme = wx.getStorageSync('theme') || 'dark';
+    const locale = wx.getStorageSync('language') || 'en';
+    const theme = wx.getStorageSync('theme') || 'night';
 
     const userInfo = {
       nickname: wx.getStorageSync('userName') || '',
@@ -188,21 +188,20 @@ Page({
     });
   },
 
-  // Toggle language EN <-> CN
+  // Toggle language EN <-> CN (using global app i18n system)
   toggleLanguage() {
-    const current = wx.getStorageSync('locale') || 'en';
+    const current = app.getLanguage() || 'en';
     const next = current === 'en' ? 'zh' : 'en';
-    wx.setStorageSync('locale', next);
+    app.setLanguage(next);
     this.setData({ locale: next });
     wx.showToast({ title: next === 'en' ? 'Language: EN' : '语言: 中文', icon: 'none' });
   },
 
-  // Toggle theme dark <-> light
+  // Toggle theme day <-> night
   toggleTheme() {
-    const current = wx.getStorageSync('theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    wx.setStorageSync('theme', next);
+    app.toggleTheme();
+    const next = app.getTheme();
     this.setData({ theme: next });
-    wx.showToast({ title: next === 'dark' ? 'Theme: Dark' : 'Theme: Light', icon: 'none' });
+    wx.showToast({ title: next === 'day' ? 'Theme: Day' : 'Theme: Night', icon: 'none' });
   }
 });

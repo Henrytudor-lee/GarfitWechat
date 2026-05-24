@@ -7,15 +7,29 @@ Page({
     isFavorite: false,
     imgPrefix: '',
     vidPrefix: '',
+    // i18n + theme
+    locale: 'en',
+    theme: 'night',
   },
 
   onLoad(opts) {
     this.setData({
       imgPrefix: app.globalData.imagePrefix,
       vidPrefix: app.globalData.videoPrefix,
+      locale: app.globalData.language || 'en',
+      theme: app.globalData.theme || 'night',
     });
     if (opts.id) {
       this._loadExercise(opts.id, opts.name);
+    }
+  },
+
+  onShow() {
+    // Refresh theme and locale from global app state
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'en';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
     }
   },
 

@@ -1,11 +1,34 @@
-/* pages/profile/index.wxss — matching index.wxml classes */
+/* pages/profile/index.wxss — garcia-fitness-new style
+   主题方案：使用 .theme-night / .theme-day 显式选择器，完全避免 CSS var() 继承问题
+   所有颜色均为硬编码值，不依赖任何 CSS 变量
+*/
+
+/* ========================
+   页面基础
+   ======================== */
 .page {
   min-height: 100vh;
   background: #131313;
   padding: 100rpx 24rpx 200rpx;
 }
 
-/* Profile Hero with Avatar */
+/* ========================
+   日间主题 — 显式选择器
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ========================
+   夜间主题 — 显式选择器
+   ======================== */
+.page.theme-night {
+  background: #131313;
+}
+
+/* ========================
+   通用样式（两个主题一致）
+   ======================== */
 .profile-hero {
   display: flex;
   flex-direction: column;
@@ -35,7 +58,15 @@
   border: 4rpx solid rgba(204, 242, 0, 0.4);
   position: relative;
   z-index: 1;
-  background: #1a1a1a;
+}
+
+/* 头像 — 日间 */
+.page.theme-day .avatar-img {
+  background: #ffffff;
+}
+/* 头像 — 夜间 */
+.page.theme-night .avatar-img {
+  background: #1c1c1c;
 }
 
 .camera-btn {
@@ -64,17 +95,19 @@
   font-weight: 900;
 }
 
+/* 用户名 */
 .profile-name {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 44rpx;
   font-weight: 900;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 8rpx;
 }
+.page.theme-day .profile-name { color: #1a1a1a; }
+.page.theme-night .profile-name { color: #ffffff; }
 
-/* Not Logged In State */
+/* 未登录状态 */
 .not-logged-in {
   display: flex;
   flex-direction: column;
@@ -94,17 +127,19 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 40rpx;
   font-weight: 900;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.page.theme-day .not-logged-title { color: #1a1a1a; }
+.page.theme-night .not-logged-title { color: #ffffff; }
 
 .not-logged-hint {
   font-size: 26rpx;
-  color: #71717a;
   text-align: center;
   line-height: 1.5;
 }
+.page.theme-day .not-logged-hint { color: #a1a1aa; }
+.page.theme-night .not-logged-hint { color: #71717a; }
 
 .login-btn {
   margin-top: 16rpx;
@@ -130,10 +165,9 @@
   margin-bottom: 32rpx;
 }
 
+/* 统计卡片 */
 .stat-card {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24rpx;
   padding: 28rpx 24rpx;
   display: flex;
@@ -141,6 +175,14 @@
   align-items: flex-start;
   position: relative;
   overflow: hidden;
+}
+.page.theme-day .stat-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+.page.theme-night .stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .stat-icon {
@@ -154,46 +196,51 @@
 .stat-label {
   font-size: 18rpx;
   font-weight: 800;
-  color: #71717a;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-top: 8rpx;
   margin-bottom: 12rpx;
 }
+.page.theme-day .stat-label { color: #a1a1aa; }
+.page.theme-night .stat-label { color: #71717a; }
 
 .stat-value {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 52rpx;
   font-weight: 900;
-  color: #fff;
   line-height: 1;
 }
+.page.theme-day .stat-value { color: #1a1a1a; }
+.page.theme-night .stat-value { color: #ffffff; }
 
 .stat-unit {
   font-size: 24rpx;
   font-weight: 700;
-  color: #71717a;
   margin-left: 4rpx;
 }
+.page.theme-day .stat-unit { color: #a1a1aa; }
+.page.theme-night .stat-unit { color: #71717a; }
 
 .stat-value-lg {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 36rpx;
   font-weight: 900;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   line-height: 1;
   margin-top: 8rpx;
 }
+.page.theme-day .stat-value-lg { color: #1a1a1a; }
+.page.theme-night .stat-value-lg { color: #ffffff; }
 
 .stat-sub {
   font-size: 20rpx;
   font-weight: 700;
-  color: #71717a;
   margin-top: 4rpx;
   letter-spacing: 0.05em;
 }
+.page.theme-day .stat-sub { color: #a1a1aa; }
+.page.theme-night .stat-sub { color: #71717a; }
 
 /* Settings List */
 .settings-list {
@@ -204,15 +251,22 @@
   padding: 0 4rpx;
 }
 
+/* 设置项 */
 .settings-item {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20rpx;
   padding: 28rpx 24rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
+}
+.page.theme-day .settings-item {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+.page.theme-night .settings-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .settings-item.locked {
@@ -226,100 +280,118 @@
   flex: 1;
 }
 
+/* 设置图标容器 */
 .settings-icon-wrap {
   width: 72rpx;
   height: 72rpx;
   border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
+.page.theme-day .settings-icon-wrap { background: rgba(0, 0, 0, 0.05); }
+.page.theme-night .settings-icon-wrap { background: rgba(255, 255, 255, 0.05); }
 
 .lang-icon {
   background: rgba(59, 130, 246, 0.15);
 }
 
-.theme-icon {
-  background: rgba(255, 255, 255, 0.05);
-}
+.theme-icon {}
+.lock-icon {}
 
-.lock-icon {
-  background: rgba(255, 255, 255, 0.05);
-}
-
+/* 设置图标文字 */
 .settings-icon-text {
   font-size: 22rpx;
   font-weight: 900;
-  color: #fff;
   letter-spacing: 0.02em;
 }
+.page.theme-day .settings-icon-text { color: #1a1a1a; }
+.page.theme-night .settings-icon-text { color: #ffffff; }
 
+/* 设置文本区 */
 .settings-texts {
   display: flex;
   flex-direction: column;
   gap: 4rpx;
 }
 
+/* 设置标题 */
 .settings-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #fff;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.page.theme-day .settings-title { color: #1a1a1a; }
+.page.theme-night .settings-title { color: #ffffff; }
 
 .settings-title.locked-text {
-  color: #71717a;
   text-decoration: line-through;
   text-decoration-style: dotted;
 }
+.page.theme-day .settings-title.locked-text { color: #a1a1aa; }
+.page.theme-night .settings-title.locked-text { color: #71717a; }
 
+/* 设置副标题 */
 .settings-subtitle {
   font-size: 20rpx;
   font-weight: 600;
-  color: #71717a;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.page.theme-day .settings-subtitle { color: #a1a1aa; }
+.page.theme-night .settings-subtitle { color: #71717a; }
 
-.settings-subtitle.locked-text {
-  color: #52525b;
-}
+.settings-subtitle.locked-text {}
+.page.theme-day .settings-subtitle.locked-text { color: #a1a1aa; }
+.page.theme-night .settings-subtitle.locked-text { color: #52525b; }
 
-/* Toggle Pills */
+/* Toggle Pills — 胶囊切换器 */
 .toggle-pills {
   display: flex;
-  background: rgba(0, 0, 0, 0.4);
   border-radius: 100rpx;
   padding: 6rpx;
-  border: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
+.page.theme-day .toggle-pills {
+  background: #e0e0e0;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+.page.theme-night .toggle-pills {
+  background: #262626;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
 
+/* 胶囊 — 默认未选中 */
 .pill {
   font-size: 20rpx;
   font-weight: 900;
   letter-spacing: 0.05em;
   padding: 10rpx 20rpx;
   border-radius: 100rpx;
-  color: #52525b;
   transition: all 0.2s ease;
 }
+.page.theme-day .pill { color: #a1a1aa; }
+.page.theme-night .pill { color: #52525b; }
 
+/* 胶囊 — 选中默认（基础亮色=日间主色） */
 .pill.pill-active {
   background: #ccf200;
   color: #000;
 }
 
+/* 胶囊 — Night/Dark 主题选中态：深灰背景+白色文字 */
+.pill.pill-active.night,
 .pill.pill-active.dark {
-  background: #3f3f46;
-  color: #fff;
+  background: #262626;
+  color: #ffffff;
 }
 
+/* 胶囊 — Day/Light 主题选中态：品牌黄 */
+.pill.pill-active.day,
 .pill.pill-active.light {
-  background: #facc15;
+  background: #ccf200;
   color: #000;
 }
 
@@ -327,32 +399,40 @@
   /* nothing extra */
 }
 
-/* Lock icon right */
+/* 锁图标右侧 */
 .lock-icon-right {
   font-size: 32rpx;
-  color: #3f3f46;
   flex-shrink: 0;
 }
+.page.theme-day .lock-icon-right { color: #a1a1aa; }
+.page.theme-night .lock-icon-right { color: #3f3f46; }
 
 /* Chevron */
 .chevron {
   font-size: 36rpx;
-  color: #3f3f46;
   flex-shrink: 0;
 }
+.page.theme-day .chevron { color: #a1a1aa; }
+.page.theme-night .chevron { color: #3f3f46; }
 
-/* Logout Button */
+/* 退出按钮 */
 .logout-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 20rpx;
   padding: 28rpx 24rpx;
   margin: 0 4rpx 32rpx;
   width: calc(100% - 8rpx);
+}
+.page.theme-day .logout-btn {
+  background: rgba(239, 68, 68, 0.10);
+  border: 1px solid rgba(239, 68, 68, 0.20);
+}
+.page.theme-night .logout-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.20);
 }
 
 .logout-btn::after { border: none; }
@@ -371,18 +451,19 @@
   text-transform: uppercase;
 }
 
-/* Version */
+/* 版本号 */
 .version-text {
   text-align: center;
   font-size: 18rpx;
   font-weight: 900;
-  color: #3f3f46;
   letter-spacing: 0.25em;
   text-transform: uppercase;
   padding-top: 16rpx;
 }
+.page.theme-day .version-text { color: #a1a1aa; }
+.page.theme-night .version-text { color: #3f3f46; }
 
-/* Fire/Trophy color tiers */
+/* 火焰/奖杯颜色分层 — 独立于主题 */
 .color-neutral-600 { color: #52525b; }
 .color-orange { color: #f97316; }
 .color-yellow { color: #facc15; }

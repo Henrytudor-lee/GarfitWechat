@@ -23,7 +23,7 @@
         </block>
         <block wx:else>
           <view class="header-btn back-btn" bindtap="goBack">
-            <image class="header-btn-icon" src="{{imgPrefix}}/icons/icon-back.svg" mode="aspectFit" />
+            <image class="header-btn-icon" src="{{imgPrefix}}/icons/icon-back.png" mode="aspectFit" />
             Back
           </view>
         </block>

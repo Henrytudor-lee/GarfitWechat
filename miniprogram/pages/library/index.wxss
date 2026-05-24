@@ -1,14 +1,61 @@
-/* pages/library/index.wxss — garcia-fitness-new style */
+/* pages/library/index.wxss — garcia-fitness-new explicit dual-theme selectors */
+/* ========================
+   Page Base — Night
+   ======================== */
 .page {
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: #131313;
   padding-top: 100rpx;
   padding-left: 24rpx;
   padding-right: 24rpx;
   padding-bottom: 200rpx;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* Page Header */
+/* ========================
+   Day Theme
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ========================
+   Night Theme
+   ======================== */
+.page.theme-night {}
+
+/* ========================
+   Page Header — Day
+   ======================== */
+.page.theme-day .page-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .page-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header — Night
+   ======================== */
+.page.theme-night .page-title {
+  color: #fff;
+}
+
+.page.theme-night .page-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header (shared)
+   ======================== */
 .page-header {
   padding: 24rpx 0 20rpx;
 }
@@ -17,7 +64,6 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 48rpx;
   font-weight: 900;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   line-height: 1;
@@ -26,16 +72,62 @@
 
 .page-subtitle {
   font-size: 22rpx;
-  color: #71717a;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
 
-/* Search */
+/* ========================
+   Search Bar — Day
+   ======================== */
+.page.theme-day .search-bar {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .search-input {
+  color: #1a1a1a;
+}
+
+.page.theme-day .search-placeholder {
+  color: #a1a1aa;
+}
+
+.page.theme-day .filter-icon-btn {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .filter-icon-btn-text {
+  color: #1a1a1a;
+}
+
+/* ========================
+   Search Bar — Night
+   ======================== */
+.page.theme-night .search-bar {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.page.theme-night .search-input {
+  color: #fff;
+}
+
+.page.theme-night .search-placeholder {
+  color: #3f3f46;
+}
+
+.page.theme-night .filter-icon-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .filter-icon-btn-text {
+  color: #fff;
+}
+
+/* ========================
+   Search Bar (shared)
+   ======================== */
 .search-bar {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
   border-radius: 20rpx;
   padding: 0 24rpx;
   height: 88rpx;
@@ -52,7 +144,6 @@
   flex: 1;
   font-size: 24rpx;
   font-weight: 700;
-  color: #fff;
   background: transparent;
   border: none;
   outline: none;
@@ -60,7 +151,6 @@
 }
 
 .search-placeholder {
-  color: #3f3f46;
   font-weight: 800;
   letter-spacing: 0.1em;
   font-size: 22rpx;
@@ -80,15 +170,12 @@
   align-items: center;
   justify-content: center;
   border-radius: 10rpx;
-  background: rgba(255, 255, 255, 0.08);
   transition: background 0.15s;
   font-size: 28rpx;
   line-height: 1;
 }
 
-.filter-icon-btn-text {
-  font-size: 32rpx;
-}
+.filter-icon-btn-text {}
 
 .filter-icon-btn.active {
   background: rgba(204, 242, 0, 0.2);
@@ -99,7 +186,61 @@
   opacity: 0.7;
 }
 
-/* Filter Sections */
+/* ========================
+   Filter Sections — Day
+   ======================== */
+.page.theme-day .filter-label {
+  color: #a1a1aa;
+}
+
+.page.theme-day .filter-chip {
+  background: rgba(0, 0, 0, 0.08);
+  color: #71717a;
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .filter-chip .equip-name {
+  color: #71717a;
+}
+
+.page.theme-day .muscle-item {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .muscle-name {
+  color: #71717a;
+}
+
+/* ========================
+   Filter Sections — Night
+   ======================== */
+.page.theme-night .filter-label {
+  color: #52525b;
+}
+
+.page.theme-night .filter-chip {
+  background: rgba(255, 255, 255, 0.2);
+  color: #888;
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .filter-chip .equip-name {
+  color: #888;
+}
+
+.page.theme-night .muscle-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.page.theme-night .muscle-name {
+  color: #71717a;
+}
+
+/* ========================
+   Filter Sections (shared)
+   ======================== */
 .filter-section {
   margin-bottom: 20rpx;
 }
@@ -107,7 +248,6 @@
 .filter-label {
   font-size: 18rpx;
   font-weight: 800;
-  color: #52525b;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   margin-bottom: 12rpx;
@@ -127,16 +267,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8rpx;
-  padding: 14rpx 28rpx;
-  border-radius: 100rpx;
-  font-size: 20rpx;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  background: rgba(255, 255, 255, 0.05);
-  color: #71717a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 4rpx 8rpx;
+  border-radius: 30rpx;
+  font-size: 22rpx;
+  font-weight: 700;
   flex-shrink: 0;
-  line-height: 1;
 }
 
 .filter-chip.active {
@@ -145,37 +280,124 @@
   border-color: #ccf200;
 }
 
-.filter-chip .equip-icon {
-  width: 26rpx;
-  height: 26rpx;
-  flex-shrink: 0;
-  border-radius: 6rpx;
+.filter-chip .equip-name {
+  font-size: 22rpx;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.muscle-row {
+.filter-chip.active .equip-name {
+  color: #000;
+}
+
+.filter-chip .equip-icon {
+  width: 60rpx;
+  height: 60rpx;
+  flex-shrink: 0;
+  border-radius: 8rpx;
+}
+
+.muscle-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
 }
 
-.muscle-chip {
-  padding: 10rpx 20rpx;
-  border-radius: 12rpx;
-  font-size: 20rpx;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  background: rgba(255, 255, 255, 0.05);
-  color: #71717a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.muscle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 16rpx;
+  min-width: 100rpx;
+  flex-shrink: 0;
 }
 
-.muscle-chip.active {
+.muscle-item.active {
   background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
   border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Exercise Grid — 2 columns using grid (card is not a direct child) */
+.muscle-icon {
+  width: 40rpx;
+  height: 40rpx;
+  flex-shrink: 0;
+}
+
+.muscle-item.active .muscle-icon {
+  opacity: 1;
+}
+
+.muscle-item .muscle-icon {
+  opacity: 0.6;
+}
+
+.muscle-item.active .muscle-name {
+  color: #60a5fa;
+}
+
+/* ========================
+   Exercise Grid — Day
+   ======================== */
+.page.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .card-img-wrap {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.page.theme-day .card-gradient {
+  background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%);
+}
+
+.page.theme-day .card-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .card-info-btn {
+  color: #a1a1aa;
+}
+
+.page.theme-day .chip-neutral {
+  background: rgba(0, 0, 0, 0.08);
+  color: #71717a;
+}
+
+/* ========================
+   Exercise Grid — Night
+   ======================== */
+.page.theme-night .exercise-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.page.theme-night .card-img-wrap {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.page.theme-night .card-gradient {
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+}
+
+.page.theme-night .card-name {
+  color: #fff;
+}
+
+.page.theme-night .card-info-btn {
+  color: #52525b;
+}
+
+.page.theme-night .chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #71717a;
+}
+
+/* ========================
+   Exercise Grid (shared)
+   ======================== */
 .exercise-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -186,8 +408,6 @@
 }
 
 .exercise-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24rpx;
   overflow: hidden;
   box-sizing: border-box;
@@ -198,7 +418,6 @@
   aspect-ratio: 16 / 10;
   position: relative;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
 }
 
 .card-img {
@@ -219,7 +438,6 @@
 .card-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
 }
 
 .fav-badge {
@@ -295,7 +513,6 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 22rpx;
   font-weight: 800;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   line-height: 1.2;
@@ -305,7 +522,6 @@
 
 .card-info-btn {
   font-size: 24rpx;
-  color: #52525b;
   flex-shrink: 0;
 }
 
@@ -327,25 +543,47 @@
   text-transform: uppercase;
 }
 
-.chip-neutral {
-  background: rgba(255, 255, 255, 0.08);
-  color: #71717a;
-}
-
 .chip-icon {
   width: 22rpx;
   height: 22rpx;
   flex-shrink: 0;
 }
 
-/* States */
+/* ========================
+   States — Day
+   ======================== */
+.page.theme-day .loading-state,
+.page.theme-day .empty-state {
+  color: #a1a1aa;
+}
+
+.page.theme-day .load-more,
+.page.theme-day .no-more {
+  color: #a1a1aa;
+}
+
+/* ========================
+   States — Night
+   ======================== */
+.page.theme-night .loading-state,
+.page.theme-night .empty-state {
+  color: #3f3f46;
+}
+
+.page.theme-night .load-more,
+.page.theme-night .no-more {
+  color: #52525b;
+}
+
+/* ========================
+   States (shared)
+   ======================== */
 .loading-state, .empty-state {
   text-align: center;
   padding: 80rpx 0;
   font-family: 'Lexend Deca', sans-serif;
   font-size: 22rpx;
   font-weight: 700;
-  color: #3f3f46;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
@@ -355,23 +593,106 @@
   padding: 30rpx 0;
   font-size: 20rpx;
   font-weight: 700;
-  color: #52525b;
   letter-spacing: 0.1em;
 }
 
-/* Bottom Sheet */
+/* ========================
+   Bottom Sheet — Day
+   ======================== */
+.page.theme-day .sheet-mask {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.page.theme-day .sheet {
+  background: #ffffff;
+}
+
+.page.theme-day .sheet-handle {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.page.theme-day .sheet-close {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+}
+
+.page.theme-day .sheet-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .sheet-media {
+  background: #f0f0f0;
+}
+
+.page.theme-day .sheet-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .sheet-en {
+  color: #71717a;
+}
+
+.page.theme-day .sheet-id {
+  color: #a1a1aa;
+}
+
+/* ========================
+   Bottom Sheet — Night
+   ======================== */
+.page.theme-night .sheet-mask {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.page.theme-night .sheet {
+  background: #1a1a1a;
+}
+
+.page.theme-night .sheet-handle {
+  background: rgba(255,255,255,0.15);
+}
+
+.page.theme-night .sheet-close {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.page.theme-night .sheet-title {
+  color: #fff;
+}
+
+.page.theme-night .sheet-media {
+  background: #000;
+}
+
+.page.theme-night .sheet-name {
+  color: #fff;
+}
+
+.page.theme-night .sheet-en {
+  color: #71717a;
+}
+
+.page.theme-night .sheet-id {
+  color: #52525b;
+}
+
+/* ========================
+   Bottom Sheet (shared)
+   ======================== */
 .sheet-mask {
+  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
   z-index: 200;
-  display: flex;
   flex-direction: column;
   justify-content: flex-end;
 }
 
+.sheet-mask.show {
+  display: flex;
+}
+
 .sheet {
-  background: #1a1a1a;
   border-radius: 32rpx 32rpx 0 0;
   max-height: 90vh;
   display: flex;
@@ -382,16 +703,43 @@
 .sheet-handle {
   width: 80rpx;
   height: 8rpx;
-  background: rgba(255,255,255,0.15);
   border-radius: 4rpx;
   margin: 20rpx auto;
   flex-shrink: 0;
 }
 
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx 24rpx;
+  flex-shrink: 0;
+}
+
+.sheet-close {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 34rpx;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
 .sheet-media {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #000;
   flex-shrink: 0;
 }
 
@@ -413,7 +761,6 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 36rpx;
   font-weight: 900;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-bottom: 6rpx;
@@ -421,7 +768,6 @@
 
 .sheet-en {
   font-size: 22rpx;
-  color: #71717a;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -437,7 +783,6 @@
 
 .sheet-id {
   font-size: 20rpx;
-  color: #52525b;
   font-weight: 700;
 }
 

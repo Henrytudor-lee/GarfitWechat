@@ -1,5 +1,5 @@
 <!--pages/profile/index.wxml—garcia-fitness-new style-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Profile Hero with Avatar -->
   <view class="profile-hero" wx:if="{{isLoggedIn}}">
@@ -65,16 +65,16 @@
       <view class="settings-item" bindtap="toggleTheme">
         <view class="settings-left">
           <view class="settings-icon-wrap theme-icon">
-            <text class="settings-icon-text">{{theme === 'dark' ? '◐' : '◑'}}</text>
+            <text class="settings-icon-text">{{theme === 'day' ? '◐' : '◑'}}</text>
           </view>
           <view class="settings-texts">
             <text class="settings-title">{{locale === 'en' ? 'THEME' : '主题'}}</text>
-            <text class="settings-subtitle">{{theme === 'dark' ? (locale === 'en' ? 'Dark' : '深色') : (locale === 'en' ? 'Light' : '浅色')}}</text>
+            <text class="settings-subtitle">{{theme === 'day' ? (locale === 'en' ? 'Day' : '日间') : (locale === 'en' ? 'Night' : '夜间')}}</text>
           </view>
         </view>
         <view class="toggle-pills">
-          <text class="pill {{theme === 'dark' ? 'pill-active dark' : ''}}">{{locale === 'en' ? 'Dark' : '深色'}}</text>
-          <text class="pill {{theme === 'light' ? 'pill-active light' : ''}}">{{locale === 'en' ? 'Light' : '浅色'}}</text>
+          <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{locale === 'en' ? 'Day' : '日间'}}</text>
+          <text class="pill {{theme === 'night' ? 'pill-active night' : ''}}">{{locale === 'en' ? 'Night' : '夜间'}}</text>
         </view>
       </view>
 
@@ -118,6 +118,6 @@
   </block>
 
   <!-- Custom Tab Bar -->
-  <custom-tabbar active="profile" />
+  <custom-tabbar active="profile" theme="{{theme}}" />
 
 </view>

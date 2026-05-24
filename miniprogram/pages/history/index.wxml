@@ -1,27 +1,27 @@
 <!--pages/history/index.wxml—garcia-fitness-new style-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <view class="page-header">
-    <view class="page-title">HISTORY</view>
-    <view class="page-subtitle">TRAINING RECORDS</view>
+    <view class="page-title">{{locale === 'zh' ? '历史' : 'HISTORY'}}</view>
+    <view class="page-subtitle">{{locale === 'zh' ? '你的训练记录' : 'YOUR TRAINING LOG'}}</view>
   </view>
 
   <!-- Filter by exercise -->
   <view class="select-wrap">
-    <view class="select-label">FILTER BY EXERCISE</view>
+    <view class="select-label">{{locale === 'zh' ? '按动作筛选' : 'FILTER BY EXERCISE'}}</view>
     <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
       <view class="select-display">
-        <text>{{selectedName || '— ALL EXERCISES —'}}</text>
+        <text>{{selectedName || (locale === 'zh' ? '— 全部动作 —' : '— ALL EXERCISES —')}}</text>
         <text class="select-arrow">›</text>
       </view>
     </picker>
   </view>
 
-  <view wx:if="{{loading}}" class="loading-state">LOADING...</view>
+  <view wx:if="{{loading}}" class="loading-state">{{locale === 'zh' ? '加载中...' : 'LOADING...'}}</view>
 
   <view wx:elif="{{list.length === 0}}" class="empty-state">
     <text class="empty-icon">☰</text>
-    <text class="empty-hint">NO RECORDS FOUND</text>
+    <text class="empty-hint">{{locale === 'zh' ? '暂无训练记录' : 'NO SESSIONS YET'}}</text>
   </view>
 
   <!-- Grouped by month -->
@@ -37,14 +37,28 @@
       >
         <view class="record-left">
           <view class="record-date">{{item.dateStr}}</view>
-          <view class="record-name">{{item.name}}</view>
+          <view class="record-name">
+            {{item.exercise_count || 0}} {{locale === 'zh' ? '个动作' : 'exercises'}}
+            · {{item.set_count || 0}} {{locale === 'zh' ? '组' : 'sets'}}
+          </view>
         </view>
         <view class="record-right">
-          <view class="record-stat">{{item.weight}}kg × {{item.reps}}</view>
+          <view class="record-stat">{{item.total_volume || 0}}kg</view>
+          <view class="record-dur">{{item.durationStr || '--'}}</view>
           <view class="record-arrow">›</view>
         </view>
       </view>
     </view>
   </view>
+
+  <!-- Session Detail Modal -->
+  <session-detail-modal
+    isOpen="{{showSessionDetail}}"
+    session="{{detailSession}}"
+    sessionId="{{detailSessionId}}"
+    exerciseList="{{detailExercises}}"
+    locale="{{locale}}"
+    bind:close="onDetailClose"
+  />
 
 </view>

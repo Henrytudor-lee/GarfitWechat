@@ -1,10 +1,50 @@
-/* pages/history/index.wxss — garcia-fitness-new style */
+/* pages/history/index.wxss — garcia-fitness-new explicit dual-theme selectors */
+/* ========================
+   Page Base — Night
+   ======================== */
 .page {
   min-height: 100vh;
   background: #131313;
   padding: 24rpx 24rpx 200rpx;
 }
 
+/* ========================
+   Day Theme
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ========================
+   Night Theme
+   ======================== */
+.page.theme-night {}
+
+/* ========================
+   Page Header — Day
+   ======================== */
+.page.theme-day .page-title {
+  color: #ccf200;
+}
+
+.page.theme-day .page-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header — Night
+   ======================== */
+.page.theme-night .page-title {
+  color: #ccf200;
+}
+
+.page.theme-night .page-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header (shared)
+   ======================== */
 .page-header {
   margin-bottom: 24rpx;
 }
@@ -20,16 +60,56 @@
 
 .page-subtitle {
   font-size: 20rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   margin-top: 4rpx;
 }
 
-.select-wrap {
+/* ========================
+   Select Wrap — Day
+   ======================== */
+.page.theme-day .select-wrap {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .select-label {
+  color: #71717a;
+}
+
+.page.theme-day .select-display {
+  color: #1a1a1a;
+}
+
+.page.theme-day .select-arrow {
+  color: #a1a1aa;
+}
+
+/* ========================
+   Select Wrap — Night
+   ======================== */
+.page.theme-night .select-wrap {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .select-label {
+  color: #71717a;
+}
+
+.page.theme-night .select-display {
+  color: #fff;
+}
+
+.page.theme-night .select-arrow {
+  color: #52525b;
+}
+
+/* ========================
+   Select Wrap (shared)
+   ======================== */
+.select-wrap {
   border-radius: 20rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 24rpx;
@@ -37,7 +117,6 @@
 
 .select-label {
   font-size: 18rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -50,24 +129,55 @@
   align-items: center;
   font-size: 26rpx;
   font-weight: 700;
-  color: #fff;
 }
 
 .select-arrow {
   font-size: 28rpx;
+}
+
+/* ========================
+   Loading State — Day
+   ======================== */
+.page.theme-day .loading-state {
+  color: #a1a1aa;
+}
+
+/* ========================
+   Loading State — Night
+   ======================== */
+.page.theme-night .loading-state {
   color: #52525b;
 }
 
+/* ========================
+   Loading State (shared)
+   ======================== */
 .loading-state {
   text-align: center;
   padding: 60rpx;
   font-family: 'Lexend Deca', sans-serif;
   font-size: 24rpx;
   font-weight: 700;
-  color: #52525b;
   letter-spacing: 0.1em;
 }
 
+/* ========================
+   Empty State — Day
+   ======================== */
+.page.theme-day .empty-hint {
+  color: #a1a1aa;
+}
+
+/* ========================
+   Empty State — Night
+   ======================== */
+.page.theme-night .empty-hint {
+  color: #52525b;
+}
+
+/* ========================
+   Empty State (shared)
+   ======================== */
 .empty-state {
   text-align: center;
   padding: 80rpx 40rpx;
@@ -82,11 +192,27 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 24rpx;
   font-weight: 700;
-  color: #52525b;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
+/* ========================
+   Month Group — Day
+   ======================== */
+.page.theme-day .month-label {
+  color: #71717a;
+}
+
+/* ========================
+   Month Group — Night
+   ======================== */
+.page.theme-night .month-label {
+  color: #71717a;
+}
+
+/* ========================
+   Month Group (shared)
+   ======================== */
 .month-group {
   margin-bottom: 32rpx;
 }
@@ -95,13 +221,63 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 22rpx;
   font-weight: 900;
-  color: #71717a;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   margin-bottom: 12rpx;
   padding-left: 4rpx;
 }
 
+/* ========================
+   Record Card — Day
+   ======================== */
+.page.theme-day .record-card {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1rpx solid rgba(0, 0, 0, 0.07);
+}
+
+.page.theme-day .record-date {
+  color: #71717a;
+}
+
+.page.theme-day .record-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .record-stat {
+  color: #ccf200;
+}
+
+.page.theme-day .record-arrow {
+  color: #a1a1aa;
+}
+
+/* ========================
+   Record Card — Night
+   ======================== */
+.page.theme-night .record-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid rgba(255, 255, 255, 0.07);
+}
+
+.page.theme-night .record-date {
+  color: #52525b;
+}
+
+.page.theme-night .record-name {
+  color: #fff;
+}
+
+.page.theme-night .record-stat {
+  color: #ccf200;
+}
+
+.page.theme-night .record-arrow {
+  color: #52525b;
+}
+
+/* ========================
+   Record Card (shared)
+   ======================== */
 .record-list {
   display: flex;
   flex-direction: column;
@@ -109,8 +285,6 @@
 }
 
 .record-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16rpx;
   padding: 20rpx 20rpx;
   display: flex;
@@ -126,7 +300,6 @@
 
 .record-date {
   font-size: 20rpx;
-  color: #52525b;
   font-weight: 600;
 }
 
@@ -134,7 +307,6 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 26rpx;
   font-weight: 800;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -148,10 +320,14 @@
 .record-stat {
   font-size: 24rpx;
   font-weight: 700;
-  color: #ccf200;
+}
+
+.record-dur {
+  font-size: 20rpx;
+  color: #71717a;
+  margin-top: 2rpx;
 }
 
 .record-arrow {
   font-size: 24rpx;
-  color: #52525b;
 }

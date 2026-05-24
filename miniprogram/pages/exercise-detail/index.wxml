@@ -1,5 +1,5 @@
 <!--pages/exercise-detail/index.wxml—garcia-fitness-new style-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Media -->
   <view class="media-wrap">
@@ -38,7 +38,7 @@
 
     <!-- Instructions -->
     <view wx:if="{{exercise.instructions}}" class="instructions">
-      <view class="section-title">INSTRUCTIONS</view>
+      <view class="section-title">{{locale === 'en' ? 'INSTRUCTIONS' : '动作说明'}}</view>
       <text class="instruction-text">{{exercise.instructions}}</text>
     </view>
   </view>
@@ -47,9 +47,9 @@
   <view class="action-bar">
     <view class="action-btn {{isFavorite ? 'fav-active' : ''}}" bindtap="toggleFavorite" data-id="{{exercise.id}}">
       <text>{{isFavorite ? '♥' : '♡'}}</text>
-      <text class="action-label">FAVORITE</text>
+      <text class="action-label">{{locale === 'en' ? 'FAVORITE' : '收藏'}}</text>
     </view>
-    <button class="btn-primary" bindtap="addToWorkout">ADD TO WORKOUT</button>
+    <button class="btn-primary" bindtap="addToWorkout">{{locale === 'en' ? 'ADD TO WORKOUT' : '添加到训练'}}</button>
   </view>
 
 </view>

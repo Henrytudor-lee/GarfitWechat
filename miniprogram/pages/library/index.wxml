@@ -1,13 +1,16 @@
 <!--pages/library/index.wxml—garcia-fitness-new style-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Top App Bar -->
-  <appbar />
+  <appbar theme="{{theme}}" />
+
+  <!-- Fixed Filters Section -->
+  <view class="filters-fixed">
 
   <!-- Page Header -->
   <view class="page-header">
-    <view class="page-title">EXERCISE LIBRARY</view>
-    <view class="page-subtitle">Access 7000+ professional movements</view>
+    <view class="page-title">{{locale === 'en' ? 'EXERCISE LIBRARY' : '动作库'}}</view>
+    <view class="page-subtitle">{{locale === 'en' ? 'Access 7000+ professional movements' : '访问 7000+ 专业动作'}}</view>
   </view>
 
   <!-- Search -->
@@ -15,7 +18,7 @@
     <text class="search-icon">🔍</text>
     <input
       class="search-input"
-      placeholder="SEARCH EXERCISES..."
+      placeholder="{{locale === 'en' ? 'SEARCH EXERCISES...' : '搜索动作...'}}"
       placeholder-class="search-placeholder"
       value="{{keyword}}"
       bindinput="onSearchInput"
@@ -37,14 +40,13 @@
 
   <!-- Equipment Filters -->
   <view class="filter-section">
-    <view class="filter-label">EQUIPMENT</view>
     <scroll-view class="filter-scroll" scroll-x>
       <view class="filter-row">
         <view
           class="filter-chip {{selectedEquipment === null ? 'active' : ''}}"
           bindtap="onEquipmentTap"
           data-id="{{null}}"
-        >ALL</view>
+        >{{locale === 'en' ? 'ALL' : '全部'}} <text wx:if="{{selectedEquipment === null}}" class="equip-name">{{locale === 'en' ? 'Equips' : '器材'}}</text></view>
         <view
           wx:for="{{equipmentList}}"
           wx:key="id"
@@ -53,7 +55,7 @@
           data-id="{{item.id}}"
         >
           <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
-          <text>{{item.name.toUpperCase()}}</text>
+          <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item.name}}</text>
         </view>
       </view>
     </scroll-view>
@@ -61,21 +63,34 @@
 
   <!-- Muscle Filters -->
   <view class="filter-section">
-    <view class="filter-label">MUSCLE FOCUS</view>
-    <view class="muscle-row">
-      <view
-        wx:for="{{muscleList}}"
-        wx:key="id"
-        class="muscle-chip {{selectedMuscle === item.id ? 'active' : ''}}"
-        bindtap="onMuscleTap"
-        data-id="{{item.id}}"
-      >{{item.name.toUpperCase()}}</view>
-    </view>
+    <scroll-view class="filter-scroll" scroll-x>
+      <view class="filter-row">
+        <view
+          class="filter-chip {{selectedMuscle === null ? 'active' : ''}}"
+          bindtap="onMuscleTap"
+          data-id="{{null}}"
+        >{{locale === 'en' ? 'ALL' : '全部'}} <text wx:if="{{selectedMuscle === null}}" class="equip-name">{{locale === 'en' ? 'Muscles' : '肌群'}}</text></view>
+        <view
+          wx:for="{{muscleList}}"
+          wx:key="id"
+          class="filter-chip {{selectedMuscle === item.id ? 'active' : ''}}"
+          bindtap="onMuscleTap"
+          data-id="{{item.id}}"
+        >
+          <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/body-icons/{{item.icon}}" mode="aspectFit" />
+          <text wx:if="{{selectedMuscle === item.id}}" class="equip-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
-  <!-- Exercise Grid -->
-  <view wx:if="{{loading && list.length === 0}}" class="loading-state">LOADING...</view>
-  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">NO EXERCISES FOUND</view>
+  </view>
+  <!-- /filters-fixed -->
+
+  <!-- Scrollable Content -->
+  <scroll-view class="content-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
+  <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{locale === 'en' ? 'LOADING...' : '加载中...'}}</view>
+  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{locale === 'en' ? 'NO EXERCISES FOUND' : '没有找到动作'}}</view>
 
   <view wx:else class="exercise-grid">
     <view
@@ -95,7 +110,7 @@
         />
         <view wx:else class="card-img-placeholder">🏋️</view>
         <view class="card-gradient"></view>
-        <view wx:if="{{item.is_practiced}}" class="done-badge">DONE</view>
+        <view wx:if="{{item.is_practiced}}" class="done-badge">{{locale === 'en' ? 'DONE' : '已完成'}}</view>
         <view class="fav-icon-wrap {{item.is_favorite ? 'active' : ''}}" catchtap="onFavoriteTap" data-id="{{item.id}}">
           <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
           <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
@@ -117,8 +132,11 @@
     </view>
   </view>
 
-  <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">LOAD MORE</view>
-  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
+  <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">{{locale === 'en' ? 'LOAD MORE' : '加载更多'}}</view>
+  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— {{locale === 'en' ? 'ALL' : '全部'}} —</view>
+
+  </scroll-view>
+  <!-- /content-scroll -->
 
   <!-- Exercise Detail Bottom Sheet -->
   <view class="sheet-mask {{selectedExercise ? 'show' : ''}}" catchtouchmove="noop">
@@ -170,12 +188,12 @@
           class="sheet-btn"
           bindtap="{{isSelectMode ? 'doSelect' : 'addToWorkout'}}"
           data-item="{{selectedExercise}}"
-        >{{isSelectMode ? 'SELECT EXERCISE' : 'ADD TO WORKOUT'}}</button>
+        >{{isSelectMode ? (locale === 'en' ? 'SELECT EXERCISE' : '选择动作') : (locale === 'en' ? 'ADD TO WORKOUT' : '添加到训练')}}</button>
       </view>
     </view>
   </view>
 
   <!-- Custom Tab Bar -->
-  <custom-tabbar active="library" />
+  <custom-tabbar active="library" theme="{{theme}}" />
 
 </view>

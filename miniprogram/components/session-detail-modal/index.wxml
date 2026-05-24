@@ -7,7 +7,7 @@
       <view class="header-left">
         <view class="header-btn" bindtap="closeModal">✕</view>
       </view>
-      <view class="header-title">SESSION DETAIL</view>
+      <view class="header-title">{{locale === 'zh' ? '训练详情' : 'SESSION DETAIL'}}</view>
       <view class="header-right"></view>
     </view>
 
@@ -16,26 +16,26 @@
       <view class="session-date">{{session.dateStr || session.start_time}}</view>
       <view class="session-stats">
         <view class="stat-item">
-          <view class="stat-val">{{session.duration_formatted || '--:--'}}</view>
-          <view class="stat-label">DURATION</view>
+          <view class="stat-val">{{_durationDisplay}}</view>
+          <view class="stat-label">{{locale === 'zh' ? '时长' : 'DURATION'}}</view>
         </view>
         <view class="stat-divider"></view>
         <view class="stat-item">
           <view class="stat-val">{{exerciseList.length}}</view>
-          <view class="stat-label">EXERCISES</view>
+          <view class="stat-label">{{locale === 'zh' ? '动作' : 'EXERCISES'}}</view>
         </view>
         <view class="stat-divider"></view>
         <view class="stat-item">
           <view class="stat-val">{{getTotalSets(exerciseList)}}</view>
-          <view class="stat-label">SETS</view>
+          <view class="stat-label">{{locale === 'zh' ? '组数' : 'SETS'}}</view>
         </view>
       </view>
     </view>
 
     <!-- Exercises List -->
     <scroll-view class="exercise-list" scroll-y>
-      <view wx:if="{{loading}}" class="loading-state">LOADING...</view>
-      <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">NO EXERCISES RECORDED</view>
+      <view wx:if="{{loading}}" class="loading-state">{{locale === 'zh' ? '加载中...' : 'LOADING...'}}</view>
+      <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">{{locale === 'zh' ? '暂无动作记录' : 'NO EXERCISES RECORDED'}}</view>
 
       <view wx:else class="exercise-groups">
         <view class="group-card" wx:for="{{exerciseList}}" wx:key="id">
@@ -49,26 +49,21 @@
             <view wx:else class="group-img group-img-placeholder">🏋️</view>
             <view class="group-info">
               <view class="group-name">{{item.name_zh || item.name}}</view>
-              <view class="group-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? 'SET' : 'SETS'}}</view>
+              <view class="group-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'SET') : (locale === 'zh' ? '组' : 'SETS')}}</view>
             </view>
           </view>
 
-          <!-- Sets Table -->
-          <view class="sets-table">
-            <view class="sets-header-row">
-              <view class="col-set">SET</view>
-              <view class="col-weight">WEIGHT</view>
-              <view class="col-reps">REPS</view>
-            </view>
+          <!-- Sets Grid (card chip style) -->
+          <view class="sets-grid">
             <view
               wx:for="{{item.sets}}"
               wx:for-item="s"
               wx:key="id"
-              class="sets-data-row"
+              class="set-chip"
             >
-              <view class="col-set">{{index + 1}}</view>
-              <view class="col-weight">{{s.weight}} {{s.weight_unit || 'kg'}}</view>
-              <view class="col-reps">{{s.reps}}</view>
+              <view class="set-chip-num">{{index + 1}}</view>
+              <view class="set-chip-val">{{s.weight}}×{{s.reps}}</view>
+              <view class="set-chip-unit">{{s.weight_unit || 'kg'}}/{{locale === 'zh' ? '次' : 'reps'}}</view>
             </view>
           </view>
         </view>

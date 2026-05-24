@@ -1,10 +1,52 @@
-/* pages/stats/index.wxss — garcia-fitness-new style */
+/* pages/stats/index.wxss — garcia-fitness-new explicit dual-theme selectors */
+/* ========================
+   Page Base — Night
+   ======================== */
 .page {
   min-height: 100vh;
   background: #131313;
   padding: 100rpx 24rpx 200rpx;
 }
 
+/* ========================
+   Day Theme
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ========================
+   Night Theme
+   ======================== */
+.page.theme-night {
+  background: #131313;
+}
+
+/* ========================
+   Page Header — Day
+   ======================== */
+.page.theme-day .page-title-text {
+  color: #ccf200;
+}
+
+.page.theme-day .page-subtitle-text {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header — Night
+   ======================== */
+.page.theme-night .page-title-text {
+  color: #ccf200;
+}
+
+.page.theme-night .page-subtitle-text {
+  color: #71717a;
+}
+
+/* ========================
+   Page Header (shared)
+   ======================== */
 .page-header {
   margin-bottom: 32rpx;
 }
@@ -20,14 +62,55 @@
 
 .page-subtitle-text {
   font-size: 22rpx;
-  color: #71717a;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   margin-top: 4rpx;
 }
 
-/* Summary Stats Grid */
+/* ========================
+   Summary Stats Grid — Day
+   ======================== */
+.page.theme-day .stat-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .stat-card-value {
+  color: #1a1a1a;
+}
+
+.page.theme-day .stat-card-value-small {
+  color: #1a1a1a;
+}
+
+.page.theme-day .stat-card-label {
+  color: #71717a;
+}
+
+/* ========================
+   Summary Stats Grid — Night
+   ======================== */
+.page.theme-night .stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .stat-card-value {
+  color: #fff;
+}
+
+.page.theme-night .stat-card-value-small {
+  color: #fff;
+}
+
+.page.theme-night .stat-card-label {
+  color: #71717a;
+}
+
+/* ========================
+   Summary Stats Grid (shared)
+   ======================== */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -36,8 +119,6 @@
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 20rpx;
   padding: 24rpx 20rpx;
   display: flex;
@@ -56,7 +137,6 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 44rpx;
   font-weight: 900;
-  color: #fff;
   line-height: 1;
 }
 
@@ -64,34 +144,71 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 32rpx;
   font-weight: 900;
-  color: #fff;
   line-height: 1;
 }
 
 .stat-card-label {
   font-size: 20rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-top: 4rpx;
 }
 
-/* Glass Card */
-.glass-card {
+/* ========================
+   Glass Card — Day
+   ======================== */
+.page.theme-day .glass-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+/* ========================
+   Glass Card — Night
+   ======================== */
+.page.theme-night .glass-card {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+/* ========================
+   Glass Card (shared)
+   ======================== */
+.glass-card {
   border-radius: 20rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
 }
 
-/* Section */
+/* ========================
+   Section — Day
+   ======================== */
+.page.theme-day .section-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .section-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Section — Night
+   ======================== */
+.page.theme-night .section-title {
+  color: #fff;
+}
+
+.page.theme-night .section-subtitle {
+  color: #71717a;
+}
+
+/* ========================
+   Section (shared)
+   ======================== */
 .section-title {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 26rpx;
   font-weight: 800;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 4rpx;
@@ -99,25 +216,72 @@
 
 .section-subtitle {
   font-size: 20rpx;
-  color: #71717a;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 16rpx;
 }
 
-/* Bar Chart */
-.bar-chart {
+/* ========================
+   Bar Chart — Day
+   ======================== */
+.page.theme-day .bar-chart {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .chart-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .bar-label {
+  color: #71717a;
+}
+
+.page.theme-day .bar-track {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bar-value {
+  color: #71717a;
+}
+
+/* ========================
+   Bar Chart — Night
+   ======================== */
+.page.theme-night .bar-chart {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .chart-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .bar-label {
+  color: #a1a1aa;
+}
+
+.page.theme-night .bar-track {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .bar-value {
+  color: #71717a;
+}
+
+/* ========================
+   Bar Chart (shared)
+   ======================== */
+.bar-chart {
   border-radius: 20rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
 }
 
 .chart-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 20rpx;
   padding: 24rpx;
   margin-bottom: 24rpx;
@@ -138,7 +302,6 @@
 
 .bar-label {
   font-size: 22rpx;
-  color: #a1a1aa;
   font-weight: 600;
   width: 100rpx;
   flex-shrink: 0;
@@ -147,7 +310,6 @@
 .bar-track {
   flex: 1;
   height: 16rpx;
-  background: rgba(255, 255, 255, 0.08);
   border-radius: 8rpx;
   overflow: hidden;
 }
@@ -161,29 +323,45 @@
 
 .bar-value {
   font-size: 22rpx;
-  color: #71717a;
   font-weight: 600;
   width: 80rpx;
   text-align: right;
   flex-shrink: 0;
 }
 
-/* Muscle Distribution */
+/* ========================
+   Muscle Distribution — Day
+   ======================== */
+.page.theme-day .muscle-legend-name {
+  color: #71717a;
+}
+
+/* ========================
+   Muscle Distribution — Night
+   ======================== */
+.page.theme-night .muscle-legend-name {
+  color: #d4d4d8;
+}
+
+/* ========================
+   Muscle Distribution (shared)
+   ======================== */
 .muscle-chart-wrap {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 16rpx;
   margin-top: 8rpx;
+  width: 100%;
 }
 
 .pie-chart-canvas {
-  width: 160rpx;
-  height: 160rpx;
-  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
 }
 
 .muscle-legend {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 10rpx;
@@ -204,7 +382,6 @@
 
 .muscle-legend-name {
   font-size: 24rpx;
-  color: #d4d4d8;
   font-weight: 600;
   flex: 1;
   text-transform: uppercase;
@@ -213,11 +390,43 @@
 
 .muscle-legend-val {
   font-size: 20rpx;
-  color: #71717a;
   font-weight: 600;
+  color: #71717a;
 }
 
-/* Most Trained */
+/* ========================
+   Most Trained — Day
+   ======================== */
+.page.theme-day .freq-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .freq-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .freq-count {
+  color: #71717a;
+}
+
+/* ========================
+   Most Trained — Night
+   ======================== */
+.page.theme-night .freq-item {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.page.theme-night .freq-name {
+  color: #fff;
+}
+
+.page.theme-night .freq-count {
+  color: #71717a;
+}
+
+/* ========================
+   Most Trained (shared)
+   ======================== */
 .freq-list {
   display: flex;
   flex-direction: column;
@@ -230,14 +439,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 14rpx 16rpx;
-  background: rgba(255, 255, 255, 0.04);
   border-radius: 12rpx;
 }
 
 .freq-name {
   font-size: 26rpx;
   font-weight: 700;
-  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   flex: 1;
@@ -245,14 +452,53 @@
 
 .freq-count {
   font-size: 22rpx;
-  color: #71717a;
   font-weight: 600;
 }
 
-/* Exercise Selector */
-.select-wrap {
+/* ========================
+   Exercise Selector — Day
+   ======================== */
+.page.theme-day .select-wrap {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .select-label {
+  color: #71717a;
+}
+
+.page.theme-day .select-text-placeholder {
+  color: #a1a1aa;
+}
+
+.page.theme-day .select-text-active {
+  color: #1a1a1a;
+}
+
+/* ========================
+   Exercise Selector — Night
+   ======================== */
+.page.theme-night .select-wrap {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .select-label {
+  color: #71717a;
+}
+
+.page.theme-night .select-text-placeholder {
+  color: #52525b;
+}
+
+.page.theme-night .select-text-active {
+  color: #fff;
+}
+
+/* ========================
+   Exercise Selector (shared)
+   ======================== */
+.select-wrap {
   border-radius: 20rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 24rpx;
@@ -264,7 +510,6 @@
 
 .select-label {
   font-size: 20rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -280,13 +525,11 @@
 .select-text-placeholder {
   font-size: 26rpx;
   font-weight: 600;
-  color: #52525b;
 }
 
 .select-text-active {
   font-size: 26rpx;
   font-weight: 600;
-  color: #fff;
 }
 
 .select-arrow {
@@ -295,7 +538,41 @@
   font-weight: 700;
 }
 
-/* Max Record Grid */
+/* ========================
+   Max Record Grid — Day
+   ======================== */
+.page.theme-day .max-record-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .max-record-num {
+  color: #ccf200;
+}
+
+.page.theme-day .max-record-unit {
+  color: #71717a;
+}
+
+/* ========================
+   Max Record Grid — Night
+   ======================== */
+.page.theme-night .max-record-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .max-record-num {
+  color: #ccf200;
+}
+
+.page.theme-night .max-record-unit {
+  color: #71717a;
+}
+
+/* ========================
+   Max Record Grid (shared)
+   ======================== */
 .max-record-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -304,8 +581,6 @@
 }
 
 .max-record-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 20rpx;
   padding: 24rpx 12rpx;
   display: flex;
@@ -324,27 +599,55 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 44rpx;
   font-weight: 900;
-  color: #ccf200;
   line-height: 1;
 }
 
 .max-record-unit {
   font-size: 18rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 4rpx;
 }
 
-/* Weight Chart Canvas */
+/* ========================
+   Weight Chart Canvas
+   ======================== */
 .weight-chart-canvas {
   width: 100%;
-  height: 280rpx;
+  height: 220px;
   margin-top: 8rpx;
 }
 
-/* Empty State */
+/* ========================
+   Empty State — Day
+   ======================== */
+.page.theme-day .empty-state {}
+
+.page.theme-day .empty-text {
+  color: #a1a1aa;
+}
+
+.page.theme-day .empty-subtext {
+  color: #71717a;
+}
+
+/* ========================
+   Empty State — Night
+   ======================== */
+.page.theme-night .empty-state {}
+
+.page.theme-night .empty-text {
+  color: #52525b;
+}
+
+.page.theme-night .empty-subtext {
+  color: #3f3f46;
+}
+
+/* ========================
+   Empty State (shared)
+   ======================== */
 .empty-state {
   text-align: center;
   padding: 80rpx 40rpx;
@@ -363,7 +666,6 @@
 
 .empty-text {
   font-size: 28rpx;
-  color: #52525b;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -371,10 +673,25 @@
 
 .empty-subtext {
   font-size: 22rpx;
-  color: #3f3f46;
 }
 
-/* Loading State */
+/* ========================
+   Loading State — Day
+   ======================== */
+.page.theme-day .loading-text {
+  color: #71717a;
+}
+
+/* ========================
+   Loading State — Night
+   ======================== */
+.page.theme-night .loading-text {
+  color: #71717a;
+}
+
+/* ========================
+   Loading State (shared)
+   ======================== */
 .loading-state {
   display: flex;
   justify-content: center;
@@ -383,7 +700,6 @@
 
 .loading-text {
   font-size: 24rpx;
-  color: #71717a;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;

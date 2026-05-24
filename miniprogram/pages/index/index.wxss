@@ -642,3 +642,234 @@
 .picker-today-btn:active {
   background: rgba(204, 242, 0, 0.20);
 }
+
+/* ========================
+   日间主题覆盖（day mode overrides）
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+.page.theme-day .today-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .timer-card {
+  background: rgba(0, 0, 0, 0.10);
+  border: 1rpx solid rgba(0, 0, 0, 0.12);
+}
+
+.page.theme-day .timer-label {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.page.theme-day .timer-display {
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+.page.theme-day .stat-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .stat-key {
+  color: rgba(0, 0, 0, 0.40);
+}
+
+.page.theme-day .stat-divider {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .section-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .section-badge {
+  color: #a1a1aa;
+}
+
+.page.theme-day .section-badge.active {
+  color: #ccf200;
+}
+
+.page.theme-day .section-link {
+  color: #1a1a1a;
+}
+
+.page.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .ec-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .ec-img-wrap {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-sets-count {
+  color: #71717a;
+}
+
+.page.theme-day .ec-vol-num {
+  color: #ccf200;
+}
+
+.page.theme-day .ec-vol-label {
+  color: #71717a;
+}
+
+.page.theme-day .ec-set-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-set-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-unit {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-sep {
+  color: #1a1a1a;
+}
+
+.page.theme-day .empty-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .empty-hint {
+  color: #a1a1aa;
+}
+
+.page.theme-day .recent-item {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.page.theme-day .recent-date {
+  color: #1a1a1a;
+}
+
+.page.theme-day .recent-stat {
+  color: #71717a;
+}
+
+.page.theme-day .history-session-item {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .history-session-time {
+  color: #ccf200;
+}
+
+.page.theme-day .history-session-stat {
+  color: #71717a;
+}
+
+.page.theme-day .bento-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-label {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.page.theme-day .bento-day {
+  color: #1a1a1a;
+}
+
+.page.theme-day .bento-month {
+  color: #71717a;
+}
+
+.page.theme-day .bento-month.text-primary {
+  color: #ccf200;
+}
+
+.page.theme-day .bento-month.text-muted {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.page.theme-day .bento-progress-bar {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-progress-fill {
+  background: #ccf200;
+}
+
+.page.theme-day .bento-progress-fill.muted {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-big-num {
+  color: #ccf200;
+}
+
+.page.theme-day .bento-hint {
+  color: rgba(0, 0, 0, 0.40);
+}
+
+.page.theme-day .date-picker-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.page.theme-day .picker-modal {
+  background: rgba(245, 245, 245, 0.98);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .picker-nav {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .picker-nav-arrow {
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-month-label {
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-day-h {
+  color: rgba(0, 0, 0, 0.30);
+}
+
+.page.theme-day .picker-day-cell {
+  color: rgba(0, 0, 0, 0.50);
+}
+
+.page.theme-day .picker-day-cell.today {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.page.theme-day .picker-day-cell.selected {
+  background: #ccf200;
+  color: #000;
+}
+
+.page.theme-day .picker-today-btn {
+  background: rgba(204, 242, 0, 0.10);
+  color: #ccf200;
+}
+
+.page.theme-day .picker-today-btn:active {
+  background: rgba(204, 242, 0, 0.20);
+}

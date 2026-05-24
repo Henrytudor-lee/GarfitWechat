@@ -15,12 +15,17 @@ Component({
       type: String,
       value: null,
     },
+    locale: {
+      type: String,
+      value: 'en',
+    },
   },
 
   data: {
     imgPrefix: '',
     exerciseList: [],
     loading: false,
+    _durationDisplay: '--:--',
   },
 
   observers: {
@@ -35,8 +40,11 @@ Component({
       }
     },
     'session': function(session) {
-      if (session && this.data.isOpen && session.exercises) {
-        this.setData({ exerciseList: session.exercises });
+      if (session && this.data.isOpen) {
+        if (session.exercises) {
+          this.setData({ exerciseList: session.exercises });
+        }
+        this._computeDuration(session);
       }
     },
   },
@@ -110,6 +118,44 @@ Component({
         }
       }
       return total.toFixed(0);
+    },
+
+    _computeDuration(session) {
+      // Use pre-formatted duration if available
+      if (session.duration_formatted) {
+        this.setData({ _durationDisplay: session.duration_formatted });
+        return;
+      }
+      // Compute from duration field (seconds) — most reliable, format H:MM or MM:SS
+      if (session.duration && session.duration > 0) {
+        const totalSeconds = Math.floor(session.duration);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const pad = (n) => String(n).padStart(2, '0');
+        const durationStr = hours > 0
+          ? `${pad(hours)}:${pad(minutes)}`
+          : `${pad(minutes)}:${pad(0)}`;
+        this.setData({ _durationDisplay: durationStr });
+        return;
+      }
+      // Fallback: compute from start_time and end_time, format H:MM or MM:SS
+      if (session.start_time && session.end_time) {
+        const start = new Date(session.start_time);
+        const end = new Date(session.end_time);
+        const diffMs = end - start;
+        if (diffMs > 0) {
+          const totalSeconds = Math.floor(diffMs / 1000);
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const pad = (n) => String(n).padStart(2, '0');
+          const durationStr = hours > 0
+            ? `${pad(hours)}:${pad(minutes)}`
+            : `${pad(minutes)}:${pad(0)}`;
+          this.setData({ _durationDisplay: durationStr });
+          return;
+        }
+      }
+      this.setData({ _durationDisplay: '--:--' });
     },
   },
 });

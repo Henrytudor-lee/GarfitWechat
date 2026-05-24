@@ -76,12 +76,12 @@ exports.main = async (event, context) => {
 
       // Exercise history: all exercises with records grouped by exercise_id
       const [histRows] = await getPool().query(
-        `SELECT e.exercise_id, e.name,
+        `SELECT e.exercise_id, e.name_zh,
                 JSON_ARRAYAGG(JSON_OBJECT('weight', e.weight, 'reps', e.reps, 'weight_unit', e.weight_unit, 'create_time', e.create_time)) as records
          FROM exercises e
          JOIN sessions s ON e.session_id = s.id
          WHERE s._openid = ? AND s.status = 'finished'
-         GROUP BY e.exercise_id, e.name
+         GROUP BY e.exercise_id, e.name_zh
          ORDER BY e.exercise_id`,
         [openid]);
 
@@ -93,7 +93,7 @@ exports.main = async (event, context) => {
         } catch (e) {}
         return {
           exercise_id: row.exercise_id,
-          name: row.name,
+          name: row.name_zh,
           records,
         };
       });
@@ -170,11 +170,11 @@ exports.main = async (event, context) => {
     // ── exerciseList: all exercise options for selector ──────────────
     if (action === 'exerciseList') {
       const [rows] = await getPool().query(
-        `SELECT DISTINCT e.exercise_id, e.name
+        `SELECT DISTINCT e.exercise_id, e.name_zh
          FROM exercises e
          JOIN sessions s ON e.session_id = s.id
          WHERE s._openid = ? AND s.status = 'finished'
-         ORDER BY e.name`,
+         ORDER BY e.name_zh`,
         [openid]);
       return { success: true, exercises: rows || [] };
     }

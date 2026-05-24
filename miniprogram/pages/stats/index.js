@@ -4,6 +4,8 @@ const app = getApp();
 Page({
   data: {
     imgPrefix: '',
+    locale: 'en',
+    theme: 'night',
     // Summary
     totalSessions: 0,
     currentStreak: 0,
@@ -27,15 +29,26 @@ Page({
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix });
+    const app = getApp();
+    this.setData({
+      imgPrefix: app.globalData.imagePrefix,
+      locale: app.globalData.language,
+      theme: app.globalData.theme,
+    });
   },
 
   async onShow() {
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'en';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
+    }
     await this._loadAll();
   },
 
   async _loadAll() {
-    wx.showLoading({ title: 'LOADING...', mask: true });
+    const loadingText = this.data.locale === 'en' ? 'LOADING...' : '加载中...';
+    wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
     const [statsRes] = await Promise.all([
@@ -95,6 +108,10 @@ Page({
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
+    // Assign colors to muscle groups
+    const MUSCLE_COLORS = ['#ccf200', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8'];
+    muscleDistribution.forEach((m, i) => { m.color = MUSCLE_COLORS[i % MUSCLE_COLORS.length]; });
+
     // Most trained exercises
     const mostTrained = historyExercises
       .map(ex => ({ name: ex.name, count: ex.records.length }))
@@ -120,6 +137,47 @@ Page({
       mostTrained,
       hasData,
     });
+
+    // Auto-select first exercise and load its max record
+    if (exerciseList.length > 0) {
+      const first = exerciseList[0];
+      this.setData({
+        selectedExerciseId: first.id,
+        selectedExerciseName: first.name,
+      });
+      this._loadExerciseData(first.id);
+    }
+
+    // Render muscle pie chart after data is set
+    if (muscleDistribution.length > 0) {
+      setTimeout(() => this._renderMuscleChart(), 300);
+    }
+  },
+
+  async _loadExerciseData(exerciseId) {
+    const loadingText = this.data.locale === 'en' ? 'LOADING...' : '加载中...';
+    wx.showLoading({ title: loadingText, mask: true });
+    const [recRes, recordsRes] = await Promise.all([
+      wx.cloud.callFunction({
+        name: 'stats',
+        data: { action: 'exerciseMax', exercise_id: exerciseId, openid: app.globalData.openid },
+      }),
+      wx.cloud.callFunction({
+        name: 'stats',
+        data: { action: 'exerciseRecords', exercise_id: exerciseId, openid: app.globalData.openid },
+      }),
+    ]);
+    wx.hideLoading();
+
+    if (recRes.result && recRes.result.success) {
+      this.setData({ maxRecord: recRes.result.maxRecord || null });
+    }
+
+    if (recordsRes.result && recordsRes.result.success) {
+      const records = recordsRes.result.records || [];
+      this.setData({ weightRecords: records });
+      setTimeout(() => this._renderWeightChart(records), 300);
+    }
   },
 
   async onExerciseChange(e) {
@@ -133,28 +191,7 @@ Page({
       selectedExerciseName: exercise.name,
     });
 
-    wx.showLoading({ title: 'LOADING...', mask: true });
-    const [recRes, recordsRes] = await Promise.all([
-      wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseMax', exercise_id: exercise.id, openid: app.globalData.openid },
-      }),
-      wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseRecords', exercise_id: exercise.id, openid: app.globalData.openid },
-      }),
-    ]);
-    wx.hideLoading();
-
-    if (recRes.result && recRes.result.success) {
-      this.setData({ maxRecord: recRes.result.maxRecord || null });
-    }
-
-    if (recordsRes.result && recordsRes.result.success) {
-      const records = recordsRes.result.records || [];
-      this.setData({ weightRecords: records });
-      this._renderWeightChart(records);
-    }
+    this._loadExerciseData(exercise.id);
   },
 
   _renderWeightChart(records) {
@@ -169,84 +206,177 @@ Page({
       reps: Number(r.reps) || 0,
     }));
 
-    // Use F2 canvas chart via wx-charts compatible approach
-    const query = wx.createSelectorQuery().in(this);
-    query.select('#weightChart').node((res) => {
-      const canvas = res.node;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      const dpr = wx.getSystemInfoSync().pixelRatio;
-      canvas.width = res.width * dpr;
-      canvas.height = res.height * dpr;
-      ctx.scale(dpr, dpr);
-
-      // Draw a simple bar chart manually on canvas
-      this._drawBarChart(ctx, chartData, res.width, res.height);
-    }).exec();
+    const theme = this.data.theme || 'night';
+    const page = this;
+    const drawChart = () => {
+      const query = wx.createSelectorQuery().in(page);
+      query.select('#weightChart').node((res) => {
+        if (!res || !res.node) return;
+        const canvas = res.node;
+        const ctx = canvas.getContext('2d');
+        const dpr = wx.getWindowInfo().pixelRatio || wx.getSystemInfoSync().pixelRatio;
+        const size = 200;
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        ctx.scale(dpr, dpr);
+        page._drawCurveChart(ctx, chartData, size, size, theme);
+      }).exec();
+    };
+    drawChart();
+    setTimeout(drawChart, 300);
   },
 
-  _drawBarChart(ctx, data, width, height) {
+  _drawCurveChart(ctx, data, width, height, theme) {
     if (!data || data.length === 0) return;
+    if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) return;
 
-    const padding = { top: 16, right: 16, bottom: 32, left: 40 };
-    const chartW = width - padding.left - padding.right;
-    const chartH = height - padding.top - padding.bottom;
+    const isDay = theme === 'day';
+    const pad = { t: 12, r: 4, b: 28, l: 20 };
+    const W = width - pad.l - pad.r;
+    const H = height - pad.t - pad.b;
+    if (W <= 0 || H <= 0) return;
 
-    const maxWeight = Math.max(...data.map(d => d.weight), 1);
+    const maxW = Math.max(...data.map(d => d.weight || 0), 1);
+    const lineColor = '#ccf200';
+    const dimColor = isDay ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)';
+    const labelColor = isDay ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
 
     // Background
-    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillStyle = isDay ? '#f5f5f5' : 'rgba(0,0,0,0)';
     ctx.fillRect(0, 0, width, height);
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    // Grid — horizontal lines only, subtle
+    ctx.strokeStyle = dimColor;
     ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    for (let i = 0; i <= 4; i++) {
-      const y = padding.top + (chartH / 4) * i;
+    for (let i = 0; i <= 3; i++) {
+      const y = pad.t + (H / 3) * i;
+      if (!isFinite(y)) continue;
       ctx.beginPath();
-      ctx.moveTo(padding.left, y);
-      ctx.lineTo(width - padding.right, y);
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(pad.l + W, y);
       ctx.stroke();
     }
-    ctx.setLineDash([]);
 
-    // Y axis labels
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.font = '9px sans-serif';
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= 4; i++) {
-      const val = Math.round(maxWeight * (1 - i / 4));
-      const y = padding.top + (chartH / 4) * i + 4;
-      ctx.fillText(`${val}kg`, padding.left - 4, y);
+    // Y axis — left side, weight values in kg
+    ctx.fillStyle = labelColor;
+    ctx.font = '8px sans-serif';
+    ctx.textAlign = 'left';
+    for (let i = 0; i <= 3; i++) {
+      const val = Math.round(maxW * (1 - i / 3));
+      const y = pad.t + (H / 3) * i + 4;
+      if (!isFinite(y)) continue;
+      ctx.fillText(`${val}kg`, 0, y);
     }
 
-    // X axis labels
+    // Compute points
+    const pts = data.map((d, i) => {
+      const x = pad.l + (W / Math.max(data.length - 1, 1)) * i;
+      const y = pad.t + H - (d.weight / maxW) * H;
+      return { x: isFinite(x) ? x : pad.l, y: isFinite(y) ? y : pad.t + H, weight: d.weight };
+    });
+
+    // Filled area under the curve
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + H);
+    pts.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else {
+        const prev = pts[i - 1];
+        const mx = (prev.x + p.x) / 2;
+        ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
+      }
+    });
+    ctx.lineTo(pts[pts.length - 1].x, pad.t + H);
+    ctx.lineTo(pad.l, pad.t + H);
+    ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + H);
+    grad.addColorStop(0, 'rgba(204,242,0,0.15)');
+    grad.addColorStop(1, 'rgba(204,242,0,0.02)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Stroke the line
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + H);
+    pts.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else {
+        const prev = pts[i - 1];
+        const mx = (prev.x + p.x) / 2;
+        ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
+      }
+    });
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // X axis labels — record indices (1, 2, 3...)
+    ctx.fillStyle = labelColor;
+    ctx.font = '8px sans-serif';
     ctx.textAlign = 'center';
-    const barWidth = Math.max(4, Math.min(20, chartW / data.length - 4));
-    data.forEach((d, i) => {
-      const x = padding.left + (chartW / data.length) * i + (chartW / data.length - barWidth) / 2;
-      const barH = (d.weight / maxWeight) * chartH;
-      const y = padding.top + chartH - barH;
-
-      // Bar gradient
-      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-      grad.addColorStop(0, '#ccf200');
-      grad.addColorStop(1, 'rgba(204,242,0,0.3)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barH, [3, 3, 0, 0]);
-      ctx.fill();
-
-      // Label
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = '8px sans-serif';
-      ctx.fillText(`#${d.index}`, x + barWidth / 2, height - padding.bottom + 12);
+    pts.forEach((p, i) => {
+      if (!isFinite(p.x)) return;
+      ctx.fillText(`${i + 1}`, p.x, pad.t + H + 14);
     });
   },
 
   _hideChart() {
     this.setData({ weightRecords: [] });
+  },
+
+  _renderMuscleChart() {
+    const muscleDistribution = this.data.muscleDistribution;
+    if (!muscleDistribution || muscleDistribution.length === 0) return;
+
+    const page = this;
+    const drawChart = () => {
+      const query = wx.createSelectorQuery().in(page);
+      query.select('#muscleChart').node((res) => {
+        if (!res || !res.node) return;
+        const canvas = res.node;
+        const ctx = canvas.getContext('2d');
+        const dpr = wx.getWindowInfo().pixelRatio || wx.getSystemInfoSync().pixelRatio;
+        const size = 120;
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        ctx.scale(dpr, dpr);
+        page._drawPieChart(ctx, muscleDistribution, size, size);
+      }).exec();
+    };
+    drawChart();
+    setTimeout(drawChart, 300);
+  },
+
+  _drawPieChart(ctx, data, width, height) {
+    if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) return;
+    const cx = width / 2;
+    const cy = height / 2;
+    const outerR = width / 2 - 2;
+    const innerR = outerR * 0.55; // donut hole
+
+    const total = data.reduce((s, d) => s + d.value, 0);
+    if (total === 0) return;
+
+    let startAngle = -Math.PI / 2; // start at top
+    data.forEach((d) => {
+      if (!isFinite(d.value) || d.value < 0) { startAngle = startAngle; return; }
+      const ratio = d.value / total;
+      const endAngle = startAngle + ratio * 2 * Math.PI;
+      if (!isFinite(startAngle) || !isFinite(endAngle)) return;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, startAngle, endAngle);
+      ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+      ctx.closePath();
+      ctx.fillStyle = d.color || '#ccf200';
+      ctx.fill();
+
+      startAngle = endAngle;
+    });
   },
 });

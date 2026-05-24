@@ -1,43 +1,43 @@
 <!--pages/stats/index.wxml—garcia-fitness-new style with charts-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Top App Bar -->
-  <appbar />
+  <appbar theme="{{theme}}" />
 
   <!-- Header -->
   <view class="page-header">
-    <view class="page-title-text">STATS</view>
-    <view class="page-subtitle-text">YOUR PERFORMANCE DATA</view>
+    <view class="page-title-text">{{locale === 'en' ? 'STATS' : '统计'}}</view>
+    <view class="page-subtitle-text">{{locale === 'en' ? 'YOUR PERFORMANCE DATA' : '你的运动表现数据'}}</view>
   </view>
 
   <!-- Summary Stats Row -->
   <view wx:if="{{hasData}}" class="stats-grid">
     <view class="stat-card">
-      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-calendar.svg" mode="aspectFit" />
+      <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-calendar.png" mode="aspectFit" />
       <view class="stat-card-value">{{totalSessions}}</view>
-      <view class="stat-card-label">SESSIONS</view>
+      <view class="stat-card-label">{{locale === 'en' ? 'SESSIONS' : '训练次数'}}</view>
     </view>
     <view class="stat-card">
-      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-flame.svg" mode="aspectFit" />
+      <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-flame.png" mode="aspectFit" />
       <view class="stat-card-value">{{currentStreak}}</view>
-      <view class="stat-card-label">STREAK</view>
+      <view class="stat-card-label">{{locale === 'en' ? 'STREAK' : '连续训练'}}</view>
     </view>
     <view class="stat-card">
-      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-activity.svg" mode="aspectFit" />
+      <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-activity.png" mode="aspectFit" />
       <view class="stat-card-value">{{weekWorkouts}}</view>
-      <view class="stat-card-label">THIS WEEK</view>
+      <view class="stat-card-label">{{locale === 'en' ? 'SESSIONS THIS WEEK' : '本周训练次数'}}</view>
     </view>
     <view class="stat-card">
-      <image class="stat-card-icon" src="{{imgPrefix}}/images/icons/icon-dumbbell.svg" mode="aspectFit" />
+      <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-dumbbell.png" mode="aspectFit" />
       <view class="stat-card-value stat-card-value-small">{{totalVolume}}kg</view>
-      <view class="stat-card-label">TOTAL VOLUME</view>
+      <view class="stat-card-label">{{locale === 'en' ? 'TOTAL VOLUME' : '总重量'}}</view>
     </view>
   </view>
 
   <!-- Weekly Volume Bar Chart — last 8 weeks -->
   <view wx:if="{{weeklyVolume.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">WEEKLY VOLUME</view>
-    <view class="section-subtitle">LAST 8 WEEKS</view>
+    <view class="section-title">{{locale === 'en' ? 'WEEKLY VOLUME' : '每周容量'}}</view>
+    <view class="section-subtitle">{{locale === 'en' ? 'LAST 8 WEEKS' : '最近8周'}}</view>
     <view class="bar-rows">
       <view class="bar-row" wx:for="{{weeklyVolume}}" wx:key="iso">
         <text class="bar-label">{{item.label}}</text>
@@ -51,9 +51,9 @@
 
   <!-- Muscle Distribution -->
   <view wx:if="{{muscleDistribution.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">MUSCLE DISTRIBUTION</view>
+    <view class="section-title">{{locale === 'en' ? 'MUSCLE DISTRIBUTION' : '肌群分布'}}</view>
     <view class="muscle-chart-wrap">
-      <canvas canvas-id="muscleChart" class="pie-chart-canvas" />
+      <canvas id="muscleChart" type="2d" class="pie-chart-canvas" />
       <view class="muscle-legend">
         <view class="muscle-legend-item" wx:for="{{muscleDistribution}}" wx:key="name">
           <view class="muscle-dot" style="background: {{item.color}}"></view>
@@ -66,11 +66,11 @@
 
   <!-- Most Trained Exercises -->
   <view wx:if="{{mostTrained.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">MOST TRAINED</view>
+    <view class="section-title">{{locale === 'en' ? 'MOST TRAINED' : '最常训练'}}</view>
     <view class="freq-list">
       <view class="freq-item" wx:for="{{mostTrained}}" wx:key="name">
         <text class="freq-name">{{item.name}}</text>
-        <text class="freq-count">{{item.count}} SETS</text>
+        <text class="freq-count">{{item.count}} {{locale === 'en' ? 'SETS' : '组'}}</text>
       </view>
     </view>
   </view>
@@ -78,12 +78,12 @@
   <!-- Exercise Selector -->
   <view class="glass-card select-wrap">
     <view class="select-header">
-      <text class="select-label">EXERCISE MAX RECORD</text>
+      <text class="select-label">{{locale === 'en' ? 'EXERCISE MAX RECORD' : '动作最大重量'}}</text>
     </view>
     <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
       <view class="select-display">
         <text class="{{selectedExerciseName ? 'select-text-active' : 'select-text-placeholder'}}">
-          {{selectedExerciseName || '— CHOOSE EXERCISE —'}}
+          {{selectedExerciseName || (locale === 'en' ? '— CHOOSE EXERCISE —' : '— 选择动作 —')}}
         </text>
         <text class="select-arrow">›</text>
       </view>
@@ -92,43 +92,43 @@
 
   <!-- No data state -->
   <view wx:if="{{!hasData && !loading}}" class="empty-state">
-    <image class="empty-icon" src="{{imgPrefix}}/images/icons/icon-chart.svg" mode="aspectFit" />
-    <text class="empty-text">NO TRAINING DATA YET</text>
-    <text class="empty-subtext">Start a workout to see your stats</text>
+    <image class="empty-icon" src="{{imgPrefix}}/icons/icon-chart.png" mode="aspectFit" />
+    <text class="empty-text">{{locale === 'en' ? 'NO TRAINING DATA YET' : '暂无训练数据'}}</text>
+    <text class="empty-subtext">{{locale === 'en' ? 'Start a workout to see your stats' : '开始训练来查看你的数据'}}</text>
   </view>
 
   <!-- Max Record Cards -->
   <view wx:if="{{maxRecord}}" class="max-record-grid">
     <view class="max-record-card">
-      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-target.svg" mode="aspectFit" />
+      <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-target.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.weight}}</view>
-      <view class="max-record-unit">KG</view>
+      <view class="max-record-unit">{{locale === 'en' ? 'KG' : '公斤'}}</view>
     </view>
     <view class="max-record-card">
-      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-chart.svg" mode="aspectFit" />
+      <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-chart.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.reps}}</view>
-      <view class="max-record-unit">REPS</view>
+      <view class="max-record-unit">{{locale === 'en' ? 'REPS' : '次数'}}</view>
     </view>
     <view class="max-record-card">
-      <image class="max-record-icon" src="{{imgPrefix}}/images/icons/icon-check.svg" mode="aspectFit" />
+      <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-check.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.totalSets}}</view>
-      <view class="max-record-unit">TOTAL SETS</view>
+      <view class="max-record-unit">{{locale === 'en' ? 'TOTAL SETS' : '总组数'}}</view>
     </view>
   </view>
 
   <!-- Weight Progress Chart -->
   <view wx:if="{{weightRecords.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">WEIGHT PROGRESS</view>
-    <view class="section-subtitle">{{weightRecords.length}} RECORDS</view>
-    <canvas canvas-id="weightChart" class="weight-chart-canvas" />
+    <view class="section-title">{{locale === 'en' ? 'WEIGHT PROGRESS' : '重量进步'}}</view>
+    <view class="section-subtitle">{{weightRecords.length}} {{locale === 'en' ? 'RECORDS' : '条记录'}}</view>
+    <canvas id="weightChart" type="2d" class="weight-chart-canvas" />
   </view>
 
   <!-- Loading -->
   <view wx:if="{{loading}}" class="loading-state">
-    <text class="loading-text">LOADING...</text>
+    <text class="loading-text">{{locale === 'en' ? 'LOADING...' : '加载中...'}}</text>
   </view>
 
   <!-- Custom Tab Bar -->
-  <custom-tabbar active="stats" />
+  <custom-tabbar active="stats" theme="{{theme}}" />
 
 </view>

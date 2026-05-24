@@ -1,4 +1,7 @@
 /* components/custom-tabbar/index.wxss — garcia-fitness-new bottom nav */
+/* ========================
+   Tabbar Wrap
+   ======================== */
 .tabbar-wrap {
   position: fixed;
   bottom: 0;
@@ -8,7 +11,9 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* FAB — bottom-right, above nav */
+/* ========================
+   FAB — bottom-right, above nav
+   ======================== */
 .fab {
   position: absolute;
   bottom: 140rpx;
@@ -37,14 +42,48 @@
   height: 56rpx;
 }
 
-/* Bottom Tab Bar */
-.tabbar {
-  width: 100%;
-  height: 120rpx;
+/* ========================
+   Bottom Tab Bar — Day Theme
+   ======================== */
+.tabbar-wrap.theme-day .tabbar {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border-top: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.tabbar-wrap.theme-day .tab-label {
+  color: #52525b;
+}
+
+.tabbar-wrap.theme-day .tab-item.active .tab-label {
+  color: #ccf200;
+}
+
+/* ========================
+   Bottom Tab Bar — Night Theme
+   ======================== */
+.tabbar-wrap.theme-night .tabbar {
   background: rgba(0, 0, 0, 0.80);
   backdrop-filter: blur(40rpx);
   -webkit-backdrop-filter: blur(40rpx);
   border-top: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.tabbar-wrap.theme-night .tab-label {
+  color: #71717a;
+}
+
+.tabbar-wrap.theme-night .tab-item.active .tab-label {
+  color: #ccf200;
+}
+
+/* ========================
+   Bottom Tab Bar — shared
+   ======================== */
+.tabbar {
+  width: 100%;
+  height: 120rpx;
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
@@ -83,11 +122,6 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #71717a;
   transition: color 0.2s ease;
   line-height: 1;
-}
-
-.tab-item.active .tab-label {
-  color: #ccf200;
 }

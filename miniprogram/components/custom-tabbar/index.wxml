@@ -1,5 +1,5 @@
 <!--components/custom-tabbar/index.wxml—garcia-fitness-new bottom nav-->
-<view class="tabbar-wrap">
+<view class="tabbar-wrap {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
   <!-- Bottom Nav -->
   <view class="tabbar">
     <view

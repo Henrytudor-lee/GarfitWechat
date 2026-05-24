@@ -20,6 +20,10 @@ Page({
     restStartMs: 0,
     _dataLoaded: false,   // guard: prevent duplicate _loadData from onLoad + onShow
 
+    // i18n + theme
+    locale: 'en',
+    theme: 'night',
+
     // History / Bento
     historyDate: '',        // ISO date string YYYY-MM-DD
     displayDate: '',         // formatted display string
@@ -32,6 +36,7 @@ Page({
     dayNames: DAY_NAMES_EN,
 
     // Bento data
+    todayTitle: '',
     todayDay: '',
     todayMonth: '',
     todayProgress: 0,
@@ -52,12 +57,18 @@ Page({
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix, _dataLoaded: true });
+    this.setData({
+      imgPrefix: app.globalData.imagePrefix,
+      _dataLoaded: true,
+      locale: app.globalData.language || 'en',
+      theme: app.globalData.theme || 'night',
+    });
     const today = new Date();
     const iso = today.toISOString().split('T')[0];
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
+      todayTitle: `今日训练 - ${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`,
       pickerYear: today.getFullYear(),
       pickerMonth: today.getMonth(),
       pickerYearLabel: this._getPickerYearLabel(today.getFullYear(), today.getMonth()),
@@ -86,6 +97,13 @@ Page({
   },
 
   onShow() {
+    // Refresh theme and locale from global app state
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'en';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
+    }
+
     const chosen = getApp().globalData.chosenExercise;
     if (chosen && this.data.runningSession) {
       getApp().globalData.chosenExercise = null;
@@ -382,13 +400,14 @@ Page({
 
   async stopWorkout() {
     const sessionId = this.data.currentSessionId || (this.data.runningSession ? (this.data.runningSession._id || this.data.runningSession.id) : null);
+    const locale = this.data.locale || 'en';
     wx.showModal({
-      title: 'END TRAINING',
-      content: 'Are you sure you want to end this training session?',
+      title: locale === 'zh' ? '结束训练' : 'END TRAINING',
+      content: locale === 'zh' ? '确定要结束本次训练吗？' : 'Are you sure you want to end this training session?',
       confirmColor: '#ccf200',
       success: async (res) => {
         if (!res.confirm) return;
-        wx.showLoading({ title: 'ENDING...', mask: true });
+        wx.showLoading({ title: locale === 'zh' ? '结束中...' : 'ENDING...', mask: true });
         // Gather summary data first
         let totalVolume = this.data.totalVolume;
         let exerciseCount = this.data.exerciseCount;
@@ -411,6 +430,7 @@ Page({
               duration: elapsedSeconds,
               totalVolume,
               exerciseCount,
+              exercises: this.data.exerciseGroups,
             },
             workoutSummaryExercises: this.data.exerciseGroups,
             runningSession: null,

@@ -1,32 +1,61 @@
-/* pages/workout/index.wxss */
+/* pages/workout/index.wxss — garcia-fitness-new explicit dual-theme selectors */
+/* ========================
+   Page Base — Night
+   ======================== */
 .page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #F6F6F6;
+  background: #131313;
 }
 
-.item-volume-badge {
-  font-size: 22rpx;
-  font-weight: 700;
-  background: #ccf200;
-  color: #1A1A2E;
-  border-radius: 20rpx;
-  padding: 4rpx 14rpx;
-  flex-shrink: 0;
-  margin-left: auto;
+/* ========================
+   Day Theme
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
 }
 
-.item-actions {
-  display: flex;
-  gap: 12rpx;
-  flex-shrink: 0;
+/* ========================
+   Night Theme
+   ======================== */
+.page.theme-night {}
+
+/* ========================
+   Workout Header — Day
+   ======================== */
+.page.theme-day .workout-header {
+  background: linear-gradient(135deg, #e8e8e8, #f0f0f0);
 }
 
-.workout-header {
+.page.theme-day .status-text {
+  color: #1a1a1a;
+}
+
+.page.theme-day .elapsed-time {
+  color: #1a1a1a;
+}
+
+/* ========================
+   Workout Header — Night
+   ======================== */
+.page.theme-night .workout-header {
   background: linear-gradient(135deg, #1A1A2E, #16213E);
-  padding: 40rpx 32rpx;
+}
+
+.page.theme-night .status-text {
   color: #fff;
+}
+
+.page.theme-night .elapsed-time {
+  color: #fff;
+}
+
+/* ========================
+   Workout Header (shared)
+   ======================== */
+.workout-header {
+  padding: 40rpx 32rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -62,6 +91,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ========================
+   Idle State — Day
+   ======================== */
+.page.theme-day .idle-text {
+  color: #71717a;
+}
+
+/* ========================
+   Idle State — Night
+   ======================== */
+.page.theme-night .idle-text {
+  color: #999;
+}
+
+/* ========================
+   Idle State (shared)
+   ======================== */
 .idle-state {
   flex: 1;
   display: flex;
@@ -78,10 +124,88 @@
 
 .idle-text {
   font-size: 32rpx;
-  color: #999;
   margin-bottom: 60rpx;
 }
 
+/* ========================
+   Exercise List — Day
+   ======================== */
+.page.theme-day .section-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .exercise-item {
+  background: #ffffff;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.page.theme-day .item-image-wrap {
+  background: #f0f0f0;
+}
+
+.page.theme-day .item-image-placeholder {
+  background: #f0f0f0;
+  color: #71717a;
+}
+
+.page.theme-day .item-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .item-sub {
+  color: #888;
+}
+
+.page.theme-day .set-tag {
+  background: #FFF0F3;
+  color: #E94560;
+}
+
+.page.theme-day .set-empty {
+  color: #BBB;
+}
+
+/* ========================
+   Exercise List — Night
+   ======================== */
+.page.theme-night .section-title {
+  color: #fff;
+}
+
+.page.theme-night .exercise-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .item-image-wrap {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.page.theme-night .item-image-placeholder {
+  background: rgba(255, 255, 255, 0.05);
+  color: #71717a;
+}
+
+.page.theme-night .item-name {
+  color: #fff;
+}
+
+.page.theme-night .item-sub {
+  color: #71717a;
+}
+
+.page.theme-night .set-tag {
+  background: rgba(233, 69, 96, 0.15);
+  color: #ef4444;
+}
+
+.page.theme-night .set-empty {
+  color: #52525b;
+}
+
+/* ========================
+   Exercise List (shared)
+   ======================== */
 .exercise-list {
   flex: 1;
   padding: 24rpx;
@@ -90,7 +214,6 @@
 .section-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1A1A2E;
   margin-bottom: 20rpx;
 }
 
@@ -101,7 +224,6 @@
   overflow: hidden;
   flex-shrink: 0;
   margin-right: 20rpx;
-  background: #f0f0f0;
 }
 
 .item-image {
@@ -115,12 +237,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f0f0;
   font-size: 48rpx;
 }
 
 .exercise-item {
-  background: #fff;
   border-radius: 16rpx;
   padding: 24rpx;
   margin-bottom: 16rpx;
@@ -136,13 +256,11 @@
 .item-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #1A1A2E;
   margin-bottom: 4rpx;
 }
 
 .item-sub {
   font-size: 22rpx;
-  color: #888;
   margin-bottom: 6rpx;
 }
 
@@ -155,15 +273,12 @@
 .set-tag {
   display: inline-block;
   padding: 4rpx 14rpx;
-  background: #FFF0F3;
-  color: #E94560;
   border-radius: 20rpx;
   font-size: 22rpx;
 }
 
 .set-empty {
   font-size: 22rpx;
-  color: #BBB;
 }
 
 .action-btn {
@@ -179,8 +294,8 @@
 }
 
 .edit-btn {
-  background: #F6F6F6;
-  color: #666;
+  background: rgba(255, 255, 255, 0.08);
+  color: #71717a;
 }
 
 .empty-exercises {
@@ -190,18 +305,73 @@
   padding: 80rpx 0;
 }
 
+/* ========================
+   Item Volume Badge (shared)
+   ======================== */
+.item-volume-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  background: #ccf200;
+  color: #1A1A2E;
+  border-radius: 20rpx;
+  padding: 4rpx 14rpx;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.item-actions {
+  display: flex;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+/* ========================
+   Bottom Bar — Day
+   ======================== */
+.page.theme-day .bottom-bar {
+  background: #ffffff;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .btn-add-exercise {
+  background: #f0f0f0;
+  color: #1A1A2E;
+}
+
+.page.theme-day .btn-finish {
+  background: linear-gradient(135deg, #E94560, #FF6B6B);
+  color: #fff;
+}
+
+/* ========================
+   Bottom Bar — Night
+   ======================== */
+.page.theme-night .bottom-bar {
+  background: #1c1c1c;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+.page.theme-night .btn-add-exercise {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.page.theme-night .btn-finish {
+  background: linear-gradient(135deg, #E94560, #FF6B6B);
+  color: #fff;
+}
+
+/* ========================
+   Bottom Bar (shared)
+   ======================== */
 .bottom-bar {
   display: flex;
   gap: 20rpx;
   padding: 24rpx;
-  background: #fff;
-  border-top: 1rpx solid #F0F0F0;
 }
 
 .btn-add-exercise {
   flex: 1;
-  background: #F6F6F6;
-  color: #1A1A2E;
   border-radius: 50rpx;
   font-size: 28rpx;
   font-weight: 600;
@@ -211,8 +381,6 @@
 
 .btn-finish {
   flex: 1;
-  background: linear-gradient(135deg, #E94560, #FF6B6B);
-  color: #fff;
   border-radius: 50rpx;
   font-size: 28rpx;
   font-weight: 600;
@@ -222,11 +390,94 @@
 
 .btn-finish::after, .btn-add-exercise::after { border: none; }
 
-/* 弹窗 */
+/* ========================
+   Modal — Day
+   ======================== */
+.page.theme-day .modal-mask {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.page.theme-day .modal-card {
+  background: #ffffff;
+}
+
+.page.theme-day .modal-title {
+  color: #1A1A2E;
+}
+
+.page.theme-day .modal-exercise-name {
+  color: #71717a;
+}
+
+.page.theme-day .modal-field {
+  border: 2rpx solid #EEEEEE;
+}
+
+.page.theme-day .modal-input {
+  color: #1A1A2E;
+}
+
+.page.theme-day .unit-label {
+  color: #888;
+}
+
+.page.theme-day .btn-modal-cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.page.theme-day .btn-modal-confirm {
+  background: #E94560;
+  color: #fff;
+}
+
+/* ========================
+   Modal — Night
+   ======================== */
+.page.theme-night .modal-mask {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.page.theme-night .modal-card {
+  background: #1c1c1c;
+}
+
+.page.theme-night .modal-title {
+  color: #fff;
+}
+
+.page.theme-night .modal-exercise-name {
+  color: #71717a;
+}
+
+.page.theme-night .modal-field {
+  border: 2rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.page.theme-night .modal-input {
+  color: #fff;
+}
+
+.page.theme-night .unit-label {
+  color: #71717a;
+}
+
+.page.theme-night .btn-modal-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: #a1a1aa;
+}
+
+.page.theme-night .btn-modal-confirm {
+  background: #E94560;
+  color: #fff;
+}
+
+/* ========================
+   Modal (shared)
+   ======================== */
 .modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,7 +485,6 @@
 }
 
 .modal-card {
-  background: #fff;
   border-radius: 24rpx;
   padding: 40rpx;
   width: 600rpx;
@@ -243,14 +493,12 @@
 .modal-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #1A1A2E;
   text-align: center;
   margin-bottom: 8rpx;
 }
 
 .modal-exercise-name {
   font-size: 26rpx;
-  color: #999;
   text-align: center;
   margin-bottom: 32rpx;
 }
@@ -265,7 +513,6 @@
   flex: 1;
   display: flex;
   align-items: center;
-  border: 2rpx solid #EEEEEE;
   border-radius: 16rpx;
   padding: 0 20rpx;
   height: 88rpx;
@@ -274,13 +521,11 @@
 .modal-input {
   flex: 1;
   font-size: 32rpx;
-  color: #1A1A2E;
   height: 100%;
 }
 
 .unit-label {
   font-size: 26rpx;
-  color: #999;
   margin-left: 8rpx;
 }
 
@@ -296,16 +541,6 @@
   font-weight: 600;
   line-height: 2.4;
   border: none;
-}
-
-.btn-modal-cancel {
-  background: #F6F6F6;
-  color: #666;
-}
-
-.btn-modal-confirm {
-  background: #E94560;
-  color: #fff;
 }
 
 .btn-modal-cancel::after, .btn-modal-confirm::after { border: none; }

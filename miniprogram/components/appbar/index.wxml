@@ -1,5 +1,5 @@
 <!--components/appbar/index.wxml—garcia-fitness-new top app bar-->
-<view class="appbar">
+<view class="appbar {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
   <view class="appbar-left">
     <image class="appbar-logo" src="/images/logo.png" mode="aspectFit" />
     <text class="appbar-title">GFIT</text>

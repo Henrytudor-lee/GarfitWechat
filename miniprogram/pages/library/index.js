@@ -33,21 +33,21 @@ const EQUIPMENT_LIST = [
 ];
 
 const MUSCLE_LIST = [
-  { id: 1, name: 'Thighs' },
-  { id: 2, name: 'Chest' },
-  { id: 3, name: 'Hips' },
-  { id: 4, name: 'Back' },
-  { id: 5, name: 'Upper Arms' },
-  { id: 6, name: 'Shoulders' },
-  { id: 7, name: 'Forearms' },
-  { id: 8, name: 'Calves' },
-  { id: 9, name: 'Neck' },
-  { id: 10, name: 'Cardio' },
-  { id: 12, name: 'Waist' },
-  { id: 17, name: 'Biceps' },
-  { id: 18, name: 'Triceps' },
-  { id: 19, name: 'Quadriceps' },
-  { id: 20, name: 'Hamstrings' },
+  { id: 1,  name: 'Thighs',      icon: 'quadriceps.png' },
+  { id: 2,  name: 'Chest',        icon: 'chest.png' },
+  { id: 3,  name: 'Hips',         icon: 'hips.png' },
+  { id: 4,  name: 'Back',         icon: 'back.png' },
+  { id: 5,  name: 'Upper Arms',   icon: 'shoulders.png' },
+  { id: 6,  name: 'Shoulders',    icon: 'shoulders.png' },
+  { id: 7,  name: 'Forearms',     icon: 'forearms.png' },
+  { id: 8,  name: 'Calves',       icon: 'calves.png' },
+  { id: 9,  name: 'Neck',          icon: 'neck.png' },
+  { id: 10, name: 'Cardio',       icon: 'cardio.png' },
+  { id: 12, name: 'Waist',        icon: 'waist.png' },
+  { id: 17, name: 'Biceps',       icon: 'biceps.png' },
+  { id: 18, name: 'Triceps',       icon: 'triceps.png' },
+  { id: 19, name: 'Quadriceps',    icon: 'quadriceps.png' },
+  { id: 20, name: 'Hamstrings',    icon: 'hamstrings.png' },
 ];
 
 // 部位ID到名称的映射（与原项目 constants.ts 一致）
@@ -98,6 +98,9 @@ Page({
     practicedExercises: [],
     filterFavor: false,
     filterPracticed: false,
+    // i18n + theme
+    locale: 'en',
+    theme: 'night',
   },
 
   onLoad(opts) {
@@ -105,9 +108,20 @@ Page({
       imgPrefix: app.globalData.imagePrefix,
       vidPrefix: app.globalData.videoPrefix,
       isSelectMode: opts.select === 'true',
+      locale: app.globalData.language || 'en',
+      theme: app.globalData.theme || 'night',
     });
     this._loadUserExercises();
     this.loadList(true);
+  },
+
+  onShow() {
+    // Refresh theme and locale from global app state
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'en';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
+    }
   },
 
   async _loadUserExercises() {
@@ -228,6 +242,7 @@ Page({
       const pages = getCurrentPages();
       const prev = pages[pages.length - 2];
       if (prev) prev.setData({ chosenExercise: item });
+      this.setData({ selectedExercise: null }); // 清理，防止 navigateBack 失败时 sheet 卡住
       wx.navigateBack();
     } else {
       // Open detail sheet

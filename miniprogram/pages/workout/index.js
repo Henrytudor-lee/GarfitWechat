@@ -15,14 +15,27 @@ Page({
     inputReps: '',
     weight_unit: 'kg',
     imgPrefix: '',
+    // i18n + theme
+    locale: 'en',
+    theme: 'night',
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
+    this.setData({
+      imgPrefix: app.globalData.imagePrefix || '',
+      locale: app.globalData.language || 'en',
+      theme: app.globalData.theme || 'night',
+    });
     this._checkSession();
   },
 
   onShow() {
+    // Refresh theme and locale from global app state
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'en';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
+    }
     // 从动作库选完动作返回时，带回了 chosenExercise
     const pages = getCurrentPages();
     const current = pages[pages.length - 1];
