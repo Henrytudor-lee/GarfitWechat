@@ -80,6 +80,25 @@
       <text class="empty-hint">{{locale === 'en' ? 'START TRAINING TO ADD EXERCISES' : '开始训练以添加动作'}}</text>
     </view>
   </view>
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">{{locale === 'en' ? 'Fitness Calendar' : '训练日历'}}</text>
+    </view>
+    <!-- Calendar Mini -->
+    <view class="calendar-card">
+      <view class="cal-header">
+        <text class="cal-nav" bindtap="_prevMonth">‹</text>
+        <text class="cal-month-label">{{locale === 'en' ? calMonthLabelEN : calMonthLabelZH}}</text>
+        <text class="cal-nav" bindtap="_nextMonth">›</text>
+      </view>
+      <view class="cal-weekdays">
+        <text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="cal-days">
+        <text wx:for="{{calendarDays}}" wx:key="dateStr" class="{{item.worked ? 'day-worked' : ''}} {{item.today ? 'day-today' : ''}}" bindtap="onDayTap" data-day="{{item}}">{{item.day}}</text>
+      </view>
+    </view>
+  </view>
 
   <!-- History Bento Section -->
   <view class="section">

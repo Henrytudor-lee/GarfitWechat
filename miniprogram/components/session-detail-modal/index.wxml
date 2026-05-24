@@ -15,19 +15,20 @@
     <view class="session-info">
       <view class="session-date">{{session.dateStr || session.start_time}}</view>
       <view class="session-stats">
-        <view class="stat-item">
+        <view class="stat-card">
           <view class="stat-val">{{_durationDisplay}}</view>
           <view class="stat-label">{{locale === 'zh' ? '时长' : 'DURATION'}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
+        <view class="stat-card">
           <view class="stat-val">{{exerciseList.length}}</view>
           <view class="stat-label">{{locale === 'zh' ? '动作' : 'EXERCISES'}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
+        <view class="stat-card">
           <view class="stat-val">{{getTotalSets(exerciseList)}}</view>
           <view class="stat-label">{{locale === 'zh' ? '组数' : 'SETS'}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
       </view>
     </view>
@@ -38,32 +39,29 @@
       <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">{{locale === 'zh' ? '暂无动作记录' : 'NO EXERCISES RECORDED'}}</view>
 
       <view wx:else class="exercise-groups">
-        <view class="group-card" wx:for="{{exerciseList}}" wx:key="id">
-          <view class="group-header">
-            <image
-              wx:if="{{item.image_name}}"
-              class="group-img"
-              src="{{imgPrefix}}/{{item.image_name}}"
-              mode="aspectFill"
-            />
-            <view wx:else class="group-img group-img-placeholder">🏋️</view>
-            <view class="group-info">
-              <view class="group-name">{{item.name_zh || item.name}}</view>
-              <view class="group-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'SET') : (locale === 'zh' ? '组' : 'SETS')}}</view>
+        <view class="ec-card" wx:for="{{exerciseList}}" wx:key="id">
+          <!-- ec-header: image + name + sets + volume -->
+          <view class="ec-header">
+            <view class="ec-img-wrap">
+              <image wx:if="{{item.image_name}}" class="ec-img" src="{{imgPrefix}}/{{item.image_name}}" mode="aspectFill" />
+              <view wx:else class="ec-img-placeholder">🏋️</view>
+            </view>
+            <view class="ec-info">
+              <view class="ec-name">{{item.name_zh || item.name}}</view>
+              <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'set') : (locale === 'zh' ? '组' : 'sets')}}</view>
+            </view>
+            <view class="ec-volume">
+              <view class="ec-vol-num">{{item.totalVolume || '—'}} {{item.sets[0] ? item.sets[0].weight_unit : 'kg'}}</view>
+              <view class="ec-vol-label">{{locale === 'zh' ? '总重量' : 'VOLUME'}}</view>
             </view>
           </view>
-
-          <!-- Sets Grid (card chip style) -->
-          <view class="sets-grid">
-            <view
-              wx:for="{{item.sets}}"
-              wx:for-item="s"
-              wx:key="id"
-              class="set-chip"
-            >
-              <view class="set-chip-num">{{index + 1}}</view>
-              <view class="set-chip-val">{{s.weight}}×{{s.reps}}</view>
-              <view class="set-chip-unit">{{s.weight_unit || 'kg'}}/{{locale === 'zh' ? '次' : 'reps'}}</view>
+          <!-- ec-sets-grid: 2 columns -->
+          <view class="ec-sets-grid">
+            <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
+              <view class="ec-set-num">{{index + 1}}</view>
+              <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
+              <view class="ec-set-sep">×</view>
+              <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{locale === 'zh' ? '次' : 'reps'}}</text></view>
             </view>
           </view>
         </view>

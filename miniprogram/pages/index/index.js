@@ -1,8 +1,10 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
 
-const DAY_NAMES_EN = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const MONTH_NAMES_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAY_NAMES_ZH = ['一', '二', '三', '四', '五', '六', '日'];
+const MONTH_NAMES_ZH = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
 Page({
   data: {
@@ -34,6 +36,14 @@ Page({
     pickerYearLabel: '',
     calendarDays: [],
     dayNames: DAY_NAMES_EN,
+
+    // Calendar mini
+    calendarYear: new Date().getFullYear(),
+    calendarMonth: new Date().getMonth(),  // 0-indexed
+    calendarWorkedDays: [],  // String[] like ['2026-05-03','2026-05-07']
+    calMonthLabelEN: '',
+    calMonthLabelZH: '',
+    weekdays: DAY_NAMES_EN,
 
     // Bento data
     todayDay: '',
@@ -72,7 +82,9 @@ Page({
       pickerYearLabel: this._getPickerYearLabel(today.getFullYear(), today.getMonth()),
       todayDay: String(today.getDate()),
       todayMonth: MONTH_NAMES_EN[today.getMonth()],
+      weekdays: this.data.locale === 'zh' ? DAY_NAMES_ZH : DAY_NAMES_EN,
     });
+    this._initCalendar();
     const yesterday = new Date(Date.now() - 86400000);
     this.setData({
       yesterdayDay: String(yesterday.getDate()),
@@ -82,10 +94,12 @@ Page({
     // openid ready → load immediately; otherwise poll
     if (app.globalData.openid) {
       this._loadData();
+      this._initCalendar();  // safe: openid is available
     } else {
       const tryLoad = () => {
         if (app.globalData.openid) {
           this._loadData();
+          this._initCalendar();  // safe: openid is now available
         } else {
           setTimeout(tryLoad, 100);
         }
@@ -358,6 +372,91 @@ Page({
     this._loadHistorySessions();
   },
 
+  _initCalendar() {
+    const { calendarYear, calendarMonth } = this.data;
+    const calMonthLabelEN = `${MONTH_NAMES_EN[calendarMonth]} ${calendarYear}`;
+    const calMonthLabelZH = `${calendarYear}年${MONTH_NAMES_ZH[calendarMonth]}`;
+    this.setData({ calMonthLabelEN, calMonthLabelZH });
+    this._loadCalendarMonth(calendarYear, calendarMonth);
+    this._buildCalendarDays();
+  },
+
+  async _loadCalendarMonth(year, month) {
+    const res = await wx.cloud.callFunction({
+      name: 'api',
+      data: { action: 'stats.monthDates', openid: app.globalData.openid, year, month: month + 1 },
+    });
+    if (res.result && res.result.dates && Array.isArray(res.result.dates)) {
+      this.setData({ calendarWorkedDays: res.result.dates });
+      this._buildCalendarDays();
+    }
+  },
+
+  _buildCalendarDays() {
+    const { calendarYear, calendarMonth, calendarWorkedDays } = this.data;
+    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const today = new Date();
+    const todayY = today.getFullYear();
+    const todayM = today.getMonth();
+    const todayD = today.getDate();
+    const days = [];
+    // Add empty cells for days before month starts (week starts Monday)
+    const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    for (let i = 0; i < startOffset; i++) days.push({ empty: true });
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      days.push({
+        day: i,
+        dateStr,
+        empty: false,
+        worked: calendarWorkedDays.includes(dateStr),
+        today: i === todayD && calendarMonth === todayM && calendarYear === todayY,
+      });
+    }
+    this.setData({ calendarDays: days });
+  },
+
+  _prevMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 0) { calendarMonth = 11; calendarYear -= 1; }
+    else calendarMonth -= 1;
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      calMonthLabelEN: `${MONTH_NAMES_EN[calendarMonth]} ${calendarYear}`,
+      calMonthLabelZH: `${calendarYear}年${MONTH_NAMES_ZH[calendarMonth]}`,
+    });
+    if (app.globalData.openid) this._loadCalendarMonth(calendarYear, calendarMonth);
+    this._buildCalendarDays();
+  },
+
+  _nextMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 11) { calendarMonth = 0; calendarYear += 1; }
+    else calendarMonth += 1;
+    this.setData({
+      calendarYear,
+      calendarMonth,
+      calMonthLabelEN: `${MONTH_NAMES_EN[calendarMonth]} ${calendarYear}`,
+      calMonthLabelZH: `${calendarYear}年${MONTH_NAMES_ZH[calendarMonth]}`,
+    });
+    if (app.globalData.openid) this._loadCalendarMonth(calendarYear, calendarMonth);
+    this._buildCalendarDays();
+  },
+
+  onDayTap(e) {
+    const dayObj = e.currentTarget.dataset.day;
+    if (!dayObj || dayObj.empty) return;
+    if (!dayObj.worked) return;
+    const iso = dayObj.dateStr;
+    this.setData({
+      historyDate: iso,
+      displayDate: this._formatDisplayDate(iso),
+    });
+    this._loadHistorySessions();
+  },
+
   async _loadHistorySessions() {
     const { historyDate } = this.data;
     if (!historyDate) return;
@@ -369,9 +468,10 @@ Page({
     if (res.result && res.result.sessions) {
       const sessions = res.result.sessions.map(s => {
         const d = new Date(s.start_time);
-        const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const timeStr = d.toLocaleTimeString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
         const mins = Math.floor((s.duration || 0) / 60);
-        return { ...s, timeStr, durationStr: `${mins} MIN` };
+        const durationStr = this.data.locale === 'zh' ? `${mins}分钟` : `${mins} MIN`;
+        return { ...s, timeStr, durationStr };
       });
       this.setData({ historySessions: sessions });
     } else {

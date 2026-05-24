@@ -194,50 +194,90 @@
   font-weight: 500;
 }
 
-/* Sets Grid (card chip style) — 2 columns */
-.sets-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  padding: 16rpx 20rpx 20rpx;
+/* ========================
+   Group Card — Glassmorphism
+   ======================== */
+.group-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: 24rpx;
+  overflow: hidden;
 }
 
-.set-chip {
+.group-header {
+  border-bottom: 0.5rpx solid rgba(255, 255, 255, 0.06);
+}
+
+/* ========================
+   Sets List — row style
+   ======================== */
+.sets-list {
+  padding: 8rpx 16rpx 16rpx;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12rpx;
-  padding: 12rpx 16rpx;
-  width: calc(50% - 8rpx);
-  gap: 4rpx;
+  gap: 8rpx;
 }
 
-.set-chip-num {
-  width: 36rpx;
-  height: 36rpx;
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12rpx;
+}
+
+.set-num-badge {
+  width: 48rpx;
+  height: 48rpx;
   border-radius: 50%;
   background: #ccf200;
-  color: #1a1a1a;
+  color: #000;
   font-size: 20rpx;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4rpx;
+  flex-shrink: 0;
 }
 
-.set-chip-val {
-  font-size: 24rpx;
+.set-main {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  flex: 1;
+}
+
+.set-weight {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #ccf200;
+}
+
+.set-unit-label {
+  font-size: 20rpx;
+  color: #888;
+  margin-left: 2rpx;
+}
+
+.set-sep {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 12rpx;
+}
+
+.set-reps {
+  font-size: 30rpx;
   font-weight: 700;
   color: #fff;
 }
 
-.set-chip-unit {
-  font-size: 16rpx;
+.set-reps-label {
+  font-size: 20rpx;
   color: #888;
-  font-weight: 500;
+  margin-left: 4rpx;
 }
 
 /* ========================
@@ -285,14 +325,6 @@
   color: #a1a1aa;
 }
 
-.page.theme-day .group-card {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.page.theme-day .group-header {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
 .page.theme-day .group-img-placeholder {
   background: rgba(0, 0, 0, 0.04);
 }
@@ -305,19 +337,308 @@
   color: #71717a;
 }
 
-.page.theme-day .set-chip {
-  background: rgba(0, 0, 0, 0.06);
+/* Day theme — group card glassmorphism */
+.page.theme-day .group-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(0, 0, 0, 0.06);
 }
 
-.page.theme-day .set-chip-num {
-  background: #ccf200;
+.page.theme-day .group-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.page.theme-day .set-row {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .set-weight {
+  color: #65bf30;
+}
+
+.page.theme-day .set-reps {
   color: #1a1a1a;
 }
 
-.page.theme-day .set-chip-val {
-  color: #1a1a1a;
+.page.theme-day .set-sep {
+  color: rgba(0, 0, 0, 0.3);
 }
 
-.page.theme-day .set-chip-unit {
+.page.theme-day .set-num-badge {
+  background: #65bf30;
+  color: #fff;
+}
+
+.page.theme-day .set-unit-label,
+.page.theme-day .set-reps-label {
   color: #71717a;
+}
+
+/* ========================
+   Session Info — stat-card redesign
+   ======================== */
+.session-info {
+  padding: 28rpx 32rpx 24rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.session-stats {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.stat-card {
+  flex: 1;
+  max-width: 200rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: 20rpx;
+  padding: 20rpx 12rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
+}
+
+.stat-val {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -1rpx;
+}
+
+.stat-label {
+  font-size: 16rpx;
+  font-weight: 600;
+  color: #666;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stat-accent-bar {
+  width: 40rpx;
+  height: 4rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(90deg, #ccf200, #a8d100);
+  margin-top: 4rpx;
+}
+
+/* ========================
+   Exercise Card — ec-card (matches Current Workout exercise-card)
+   ======================== */
+.ec-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: 24rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.ec-header {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  gap: 12rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.ec-img-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ec-img {
+  width: 100%;
+  height: 100%;
+}
+
+.ec-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.ec-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ec-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+}
+
+.ec-sets-count {
+  font-size: 22rpx;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.ec-volume {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.ec-vol-num {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #ccf200;
+}
+
+.ec-vol-label {
+  font-size: 18rpx;
+  color: #71717a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ec-sets-grid {
+  padding: 20rpx;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+}
+
+.ec-set-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14rpx;
+  padding: 14rpx 18rpx;
+  column-gap: 12rpx;
+}
+
+.ec-set-num {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #131313;
+  font-size: 18rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ec-set-val {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #fff;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ec-set-val.reps {
+  flex: .7;
+  text-align: end;
+}
+
+.ec-set-unit {
+  font-size: 18rpx;
+  color: #fff;
+  font-weight: 400;
+}
+
+.ec-set-sep {
+  font-size: 20rpx;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ========================
+   Day Theme Overrides — stat-card
+   ======================== */
+.page.theme-day .session-info {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .stat-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .stat-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .stat-label {
+  color: #71717a;
+}
+
+.page.theme-day .stat-accent-bar {
+  background: linear-gradient(90deg, #65bf30, #4da826);
+}
+
+/* Day theme — ec-card overrides */
+.page.theme-day .ec-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1rpx solid rgba(0, 0, 0, 0.06);
+}
+
+.page.theme-day .ec-header {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .ec-img-wrap {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-sets-count {
+  color: #71717a;
+}
+
+.page.theme-day .ec-vol-num {
+  color: #65bf30;
+}
+
+.page.theme-day .ec-vol-label {
+  color: #71717a;
+}
+
+.page.theme-day .ec-set-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-set-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-unit {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-sep {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-num {
+  background: #65bf30;
+  color: #fff;
 }

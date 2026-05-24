@@ -649,6 +649,27 @@ exports.main = async (event, context) => {
 
         return { success: true, records: rows || [] };
 
+      } else if (sub === 'monthDates') {
+        const { year, month } = event;
+        if (!year || !month) return { success: false, error: '缺少 year 或 month' };
+
+        const [rows] = await getPool().query(
+          `SELECT DATE(start_time) as day FROM sessions
+           WHERE _openid = ? AND status = 'finished'
+             AND YEAR(start_time) = ? AND MONTH(start_time) = ?
+           GROUP BY DATE(start_time)
+           ORDER BY day ASC`,
+          [openid, year, month]);
+
+        const dates = (rows || []).map(r => {
+          const d = r.day;
+          if (d instanceof Date) {
+            return d.toISOString().slice(0, 10);
+          }
+          return String(d).slice(0, 10);
+        });
+        return { success: true, dates };
+
       } else {
         return { success: false, error: '未知 action' };
       }
