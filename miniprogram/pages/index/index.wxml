@@ -4,9 +4,6 @@
   <!-- Top App Bar -->
   <appbar theme="{{theme}}" />
 
-  <!-- Today Title -->
-  <text class="today-title">{{todayTitle}}</text>
-
   <!-- Hero Timer Card -->
   <view class="timer-card">
     <view class="timer-label">{{locale === 'en' ? 'DURATION' : '时长'}}</view>

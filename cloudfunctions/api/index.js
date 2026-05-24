@@ -185,7 +185,7 @@ exports.main = async (event, context) => {
 
       if (sub === 'get') {
         const [[user]] = await getPool().query(
-          'SELECT name, avatar, phone, level, score, created_at FROM users WHERE _openid = ? LIMIT 1',
+          'SELECT name, avatar, phone, created_at FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
         return {
@@ -194,8 +194,6 @@ exports.main = async (event, context) => {
             name: user.name,
             avatar: user.avatar,
             phone: user.phone,
-            level: user.level,
-            score: user.score,
             created_at: user.created_at,
           },
         };
@@ -257,13 +255,13 @@ exports.main = async (event, context) => {
           "SELECT COUNT(*) as cnt FROM sessions WHERE _openid = ? AND status = 'finished'",
           [openid]);
         const cnt = row ? row.cnt : 0;
-        let lv = 1, label = 'ROOKIE', score = cnt;
-        if (cnt >= 361) { lv = 6; label = 'ELITE'; }
-        else if (cnt >= 121) { lv = 5; label = 'EXPERT'; }
-        else if (cnt >= 61) { lv = 4; label = 'ADVANCED'; }
-        else if (cnt >= 31) { lv = 3; label = 'INTERMEDIATE'; }
-        else if (cnt >= 8) { lv = 2; label = 'BEGINNER'; }
-        return { success: true, data: { lv, label, score } };
+        let lv = 1, label = 'ROOKIE', label_zh = '新手', score = cnt;
+        if (cnt >= 361) { lv = 6; label = 'ELITE'; label_zh = '精英'; }
+        else if (cnt >= 121) { lv = 5; label = 'EXPERT'; label_zh = '专家'; }
+        else if (cnt >= 61) { lv = 4; label = 'ADVANCED'; label_zh = '高级'; }
+        else if (cnt >= 31) { lv = 3; label = 'INTERMEDIATE'; label_zh = '进阶'; }
+        else if (cnt >= 8) { lv = 2; label = 'BEGINNER'; label_zh = '入门'; }
+        return { success: true, data: { lv, label, label_zh, score } };
 
       } else if (sub === 'updateAvatar') {
         const { avatarUrl } = event;

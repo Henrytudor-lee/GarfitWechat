@@ -191,6 +191,9 @@
   top: 16rpx;
   right: 16rpx;
   opacity: 0.6;
+
+  width: 32px;
+  height: 32px;
 }
 
 .stat-label {
@@ -290,6 +293,15 @@
   justify-content: center;
   flex-shrink: 0;
 }
+.settings-lang-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.settings-edit-icon {
+  width: 20px;
+  height: 20px;
+}
 .page.theme-day .settings-icon-wrap { background: rgba(0, 0, 0, 0.05); }
 .page.theme-night .settings-icon-wrap { background: rgba(255, 255, 255, 0.05); }
 
@@ -302,7 +314,7 @@
 
 /* 设置图标文字 */
 .settings-icon-text {
-  font-size: 22rpx;
+  font-size: 26px;
   font-weight: 900;
   letter-spacing: 0.02em;
 }
@@ -463,6 +475,8 @@
 .page.theme-day .version-text { color: #a1a1aa; }
 .page.theme-night .version-text { color: #3f3f46; }
 
+.settings-lock-icon { width: 24rpx; height: 24rpx;}
+
 /* 火焰/奖杯颜色分层 — 独立于主题 */
 .color-neutral-600 { color: #52525b; }
 .color-orange { color: #f97316; }
@@ -471,3 +485,109 @@
 .color-green { color: #4ade80; }
 .color-teal { color: #2dd4bf; }
 .color-blue { color: #60a5fa; }
+
+/* ========================
+   昵称编辑按钮
+   ======================== */
+.profile-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.edit-name-btn {
+  font-size: 36rpx;
+  color: #ccf200;
+  padding: 8rpx;
+  line-height: 1;
+}
+
+/* ========================
+   昵称编辑弹窗
+   ======================== */
+.edit-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-modal-box {
+  width: 600rpx;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx 32rpx;
+}
+.page.theme-day .edit-modal-box {
+  background: #ffffff;
+}
+.page.theme-night .edit-modal-box {
+  background: #262626;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.edit-modal-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 32rpx;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+.page.theme-day .edit-modal-title { color: #1a1a1a; }
+.page.theme-night .edit-modal-title { color: #ffffff; }
+
+.edit-modal-input {
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  margin-bottom: 32rpx;
+}
+.page.theme-day .edit-modal-input {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1a1a1a;
+}
+.page.theme-night .edit-modal-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.edit-modal-btns {
+  display: flex;
+  gap: 16rpx;
+}
+
+.edit-modal-cancel,
+.edit-modal-confirm {
+  flex: 1;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+}
+.edit-modal-cancel::after,
+.edit-modal-confirm::after { border: none; }
+
+.edit-modal-cancel {
+  background: rgba(255, 255, 255, 0.08);
+}
+.page.theme-day .edit-modal-cancel { color: #71717a; background: rgba(0, 0, 0, 0.06); }
+.page.theme-night .edit-modal-cancel { color: #a1a1aa; }
+
+.edit-modal-confirm {
+  background: #ccf200;
+  color: #000;
+}

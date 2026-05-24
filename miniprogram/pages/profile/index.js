@@ -92,6 +92,8 @@ Page({
     flameColor: 'color-neutral-600',
     trophyColor: 'color-neutral-600',
     version: 'V1.0.2 - STABLE',
+    showEditNameModal: false,
+    editNameValue: '',
   },
 
   onLoad() {
@@ -122,12 +124,21 @@ Page({
 
     this.setData({ isLoggedIn: true, locale, theme, userInfo });
 
-    const [streakRes, levelRes] = await Promise.all([
+    const [profileRes, streakRes, levelRes] = await Promise.all([
+      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.get', openid: app.globalData.openid } }),
       wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getStreak', openid: app.globalData.openid } }),
       wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getLevel', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
+
+    const profileData = profileRes.result && profileRes.result.profile;
+    if (profileData) {
+      wx.setStorageSync('userName', profileData.name);
+      wx.setStorageSync('avatarUrl', profileData.avatar);
+      app.globalData.userInfo = { nickname: profileData.name, avatarUrl: profileData.avatar };
+      this.setData({ userInfo: { nickname: profileData.name, avatarUrl: profileData.avatar } });
+    }
 
     const streak = (streakRes.result && streakRes.result.streak) || 0;
     const levelData = (levelRes.result && levelRes.result.data) || { label: 'ROOKIE', lv: 1, score: 0 };
@@ -184,6 +195,62 @@ Page({
           });
         }
         wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
+      },
+    });
+  },
+
+  // Edit nickname
+  onEditName() {
+    this.setData({
+      showEditNameModal: true,
+      editNameValue: this.data.userInfo.nickname || '',
+    });
+  },
+
+  onEditNameInput(e) {
+    this.setData({ editNameValue: e.detail.value });
+  },
+
+  noop() {},
+
+  cancelEditName() {
+    this.setData({ showEditNameModal: false, editNameValue: '' });
+  },
+
+  confirmEditName() {
+    const name = this.data.editNameValue.trim();
+    const regex = /^[一-龥a-zA-Z0-9_]{1,16}$/;
+    if (!regex.test(name)) {
+      wx.showToast({
+        title: this.data.locale === 'en' ? 'Invalid nickname' : '昵称格式不正确',
+        icon: 'none',
+      });
+      return;
+    }
+    wx.cloud.callFunction({
+      name: 'api',
+      data: { action: 'profile.update', openid: app.globalData.openid, name },
+      success: (res) => {
+        if (res.result && res.result.success === true) {
+          const userInfo = { ...this.data.userInfo, nickname: name };
+          this.setData({ userInfo, showEditNameModal: false });
+          wx.setStorageSync('userName', name);
+          wx.showToast({
+            title: this.data.locale === 'en' ? 'Nickname updated' : '昵称已更新',
+            icon: 'success',
+          });
+        } else {
+          wx.showToast({
+            title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
+            icon: 'none',
+          });
+        }
+      },
+      fail: () => {
+        wx.showToast({
+          title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
+          icon: 'none',
+        });
       },
     });
   },

@@ -36,7 +36,6 @@ Page({
     dayNames: DAY_NAMES_EN,
 
     // Bento data
-    todayTitle: '',
     todayDay: '',
     todayMonth: '',
     todayProgress: 0,
@@ -68,7 +67,6 @@ Page({
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
-      todayTitle: `今日训练 - ${today.getFullYear()}年${String(today.getMonth() + 1).padStart(2, '0')}月${String(today.getDate()).padStart(2, '0')}日`,
       pickerYear: today.getFullYear(),
       pickerMonth: today.getMonth(),
       pickerYearLabel: this._getPickerYearLabel(today.getFullYear(), today.getMonth()),

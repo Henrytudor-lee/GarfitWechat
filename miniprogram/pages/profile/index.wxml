@@ -12,7 +12,22 @@
       </button>
     </view>
     <!-- Nickname -->
-    <view class="profile-name">{{userInfo.nickname || 'FITNESS USER'}}</view>
+    <view class="profile-name-wrap">
+      <view class="profile-name">{{userInfo.nickname || '微信用户'}}</view>
+      <image class="settings-edit-icon" bindtap="onEditName" src="{{imgPrefix}}/icons/icon-edit.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <!-- Edit Nickname Modal -->
+  <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="cancelEditName">
+    <view class="edit-modal-box" catchtap="noop">
+      <view class="edit-modal-title">{{locale === 'en' ? 'EDIT NICKNAME' : '编辑昵称'}}</view>
+      <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{locale === 'en' ? 'Nickname' : '昵称'}}" maxlength="16" bindinput="onEditNameInput" />
+      <view class="edit-modal-btns">
+        <button class="edit-modal-cancel" bindtap="cancelEditName">{{locale === 'en' ? 'CANCEL' : '取消'}}</button>
+        <button class="edit-modal-confirm" bindtap="confirmEditName">{{locale === 'en' ? 'CONFIRM' : '确认'}}</button>
+      </view>
+    </view>
   </view>
 
   <!-- Not Logged In State -->
@@ -29,16 +44,15 @@
     <view class="stats-grid">
       <!-- Streak Card -->
       <view class="stat-card">
-        <text class="stat-icon {{flameColor}}">🜂</text>
+        <image class="stat-icon" src="{{imgPrefix}}/icons/icon-sign.png" mode="aspectFit" />
         <view class="stat-label">{{locale === 'en' ? 'ACTIVE STREAK' : '连续训练'}}</view>
         <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{locale === 'en' ? ' days' : ' 天'}}</text></view>
       </view>
       <!-- Level Card -->
       <view class="stat-card">
-        <text class="stat-icon {{trophyColor}}">🏆</text>
-        <view class="stat-label">{{locale === 'en' ? 'LEVEL' : '等级'}}</view>
-        <view class="stat-value-lg">{{levelInfo.label || 'ROOKIE'}}</view>
-        <view class="stat-sub">{{levelInfo.lv || 1}}</view>
+        <image class="stat-icon" src="{{imgPrefix}}/icons/icon-crawn.png" mode="aspectFit" />
+        <view class="stat-label">{{locale === 'en' ? 'LEVEL' : '等级'}}{{levelInfo.lv || 1}}</view>
+        <view class="stat-value-lg">{{locale === 'en' ? levelInfo.label : (levelInfo.label_zh || levelInfo.label)}}</view>
       </view>
     </view>
 
@@ -48,7 +62,7 @@
       <view class="settings-item" bindtap="toggleLanguage">
         <view class="settings-left">
           <view class="settings-icon-wrap lang-icon">
-            <text class="settings-icon-text">EN/CN</text>
+            <image class="settings-lang-icon" src="{{imgPrefix}}/icons/icon-lang.png" mode="aspectFit" />
           </view>
           <view class="settings-texts">
             <text class="settings-title">{{locale === 'en' ? 'LANGUAGE' : '语言'}}</text>
@@ -89,32 +103,13 @@
             <text class="settings-subtitle locked-text">{{locale === 'en' ? 'COMING SOON' : '即将推出'}}</text>
           </view>
         </view>
-        <text class="lock-icon-right">🔒</text>
-      </view>
-
-      <!-- Settings (placeholder) -->
-      <view class="settings-item">
-        <view class="settings-left">
-          <view class="settings-icon-wrap">
-            <text class="settings-icon-text">⚙</text>
-          </view>
-          <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'SETTINGS' : '设置'}}</text>
-            <text class="settings-subtitle">{{locale === 'en' ? 'APP PREFERENCES' : '应用偏好'}}</text>
-          </view>
-        </view>
-        <text class="chevron">›</text>
+        <image class="settings-lock-icon" src="{{imgPrefix}}/icons/icon-lock.png" mode="aspectFit" />
       </view>
     </view>
 
-    <!-- Logout Button -->
-    <button class="logout-btn" bindtap="handleLogout">
-      <text class="logout-icon">↩</text>
-      <text class="logout-text">{{locale === 'en' ? 'LOG OUT' : '退出登录'}}</text>
-    </button>
 
     <!-- Version -->
-    <view class="version-text">{{locale === 'en' ? 'GARCIAL FITNESS V1.0.2 - STABLE' : 'GARCIAL FITNESS V1.0.2 - 稳定版'}}</view>
+    <view class="version-text">{{locale === 'en' ? 'GARCIA FITNESS V1.0.6 - STABLE' : 'GARCIA FITNESS V1.0.6 - 稳定版'}}</view>
   </block>
 
   <!-- Custom Tab Bar -->
