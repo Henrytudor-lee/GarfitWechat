@@ -47,7 +47,7 @@
               <view wx:else class="ec-img-placeholder">🏋️</view>
             </view>
             <view class="ec-info">
-              <view class="ec-name">{{item.name_zh || item.name}}</view>
+              <view class="ec-name">{{locale === 'zh' ? item.name_zh : item.name}}</view>
               <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'set') : (locale === 'zh' ? '组' : 'sets')}}</view>
             </view>
             <view class="ec-volume">

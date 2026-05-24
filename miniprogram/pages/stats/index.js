@@ -108,26 +108,15 @@ Page({
 
     // Muscle distribution (derived from body_part_id, locale-aware)
     const muscleMap = {};
-    const BODY_PART_NAMES_EN = {
-      '1': 'Thighs', '2': 'Chest', '3': 'Hips', '4': 'Back',
-      '5': 'Upper Arms', '6': 'Shoulders', '7': 'Forearms', '8': 'Calves',
-      '9': 'Neck', '10': 'Cardio', '12': 'Waist',
-      '17': 'Biceps', '18': 'Triceps', '19': 'Quadriceps', '20': 'Hamstrings',
-    };
-    const BODY_PART_NAMES_ZH = {
-      '1': '大腿', '2': '胸部', '3': '臀部', '4': '背部',
-      '5': '上臂', '6': '肩部', '7': '前臂', '8': '小腿',
-      '9': '颈部', '10': '有氧', '12': '腰部',
-      '17': '肱二头肌', '18': '肱三头肌', '19': '股四头肌', '20': '腘绳肌',
-    };
+    const { BODY_PART_MAP, BODY_PART_MAP_ZH } = require('../../utils/maps.js');
     historyExercises.forEach(ex => {
       const total = ex.records.reduce((s, r) => s + (r.weight || 0) * (r.reps || 0), 0);
       if (total === 0) return;
       const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
       partIds.forEach(partId => {
         const name = (this.data.locale || 'en') === 'en'
-          ? (BODY_PART_NAMES_EN[partId] || 'Other')
-          : (BODY_PART_NAMES_ZH[partId] || '其他');
+          ? (BODY_PART_MAP[partId] || 'Other')
+          : (BODY_PART_MAP_ZH[partId] || '其他');
         muscleMap[name] = (muscleMap[name] || 0) + total;
       });
     });

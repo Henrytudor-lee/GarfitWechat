@@ -397,11 +397,11 @@ exports.main = async (event, context) => {
           sql += ' AND (name LIKE ? OR name_zh LIKE ?)';
           params.push(`%${keyword}%`, `%${keyword}%`);
         }
-        if (bodyPart != null && bodyPart !== '') {
+        if (bodyPart && Number(bodyPart) !== 0) {
           sql += ' AND (body_part_id = ? OR body_part_id LIKE ? OR body_part_id LIKE ? OR body_part_id LIKE ?)';
           params.push(bodyPart, `${bodyPart},%`, `%,${bodyPart},%`, `%,${bodyPart}`);
         }
-        if (equipmentId != null && equipmentId !== '') {
+        if (equipmentId && Number(equipmentId) !== 0) {
           sql += ' AND (equipment_id = ? OR equipment_id LIKE ? OR equipment_id LIKE ? OR equipment_id LIKE ?)';
           params.push(equipmentId, `${equipmentId},%`, `%,${equipmentId},%`, `%,${equipmentId}`);
         }

@@ -1,87 +1,55 @@
 // components/add-exercise-modal/index.js
 const app = getApp();
+const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
 
 const EQUIPMENT_LIST = [
-  { id: 1,  name: 'Barbell',         icon: 'barbell.png' },
-  { id: 2,  name: 'Body weight',     icon: 'bodyweight.png' },
-  { id: 3,  name: 'Cable',           icon: 'cable.png' },
-  { id: 4,  name: 'Dumbbell',        icon: 'dumbell.png' },
-  { id: 5,  name: 'EZ Barbell',      icon: 'ez_barbell.png' },
-  { id: 6,  name: 'Leverage machine',icon: 'leverage_machine.png' },
-  { id: 7,  name: 'Sled machine',    icon: 'sled_machine.png' },
-  { id: 8,  name: 'Smith machine',    icon: 'smith_machine.png' },
-  { id: 9,  name: 'Weighted',        icon: 'weighted.png' },
-  { id: 10, name: 'Assisted',        icon: 'A.png' },
-  { id: 11, name: 'Band',            icon: 'band.png' },
-  { id: 12, name: 'Battling Rope',   icon: 'battling_rope.png' },
-  { id: 13, name: 'Bosu ball',       icon: 'bosu_ball.png' },
-  { id: 14, name: 'Hammer',          icon: 'H.png' },
-  { id: 15, name: 'Kettlebell',      icon: 'kettlebell.png' },
-  { id: 16, name: 'Medicine Ball',   icon: 'medicine_ball.png' },
-  { id: 17, name: 'Olympic barbell', icon: 'barbell.png' },
-  { id: 18, name: 'Power Sled',     icon: 'power_sled.png' },
-  { id: 19, name: 'Resistance Band', icon: 'resistance_band.png' },
-  { id: 20, name: 'Roll',           icon: 'roll.png' },
-  { id: 21, name: 'Rollball',       icon: 'rollball.png' },
-  { id: 22, name: 'Rope',           icon: 'rope.png' },
-  { id: 23, name: 'Stability ball',  icon: 'stability_ball.png' },
-  { id: 24, name: 'Stick',          icon: 'ST.png' },
-  { id: 25, name: 'Suspension',     icon: 'suspension.png' },
-  { id: 26, name: 'Trap bar',       icon: 'trap_bar.png' },
-  { id: 27, name: 'Vibrate Plate',  icon: 'VP.png' },
-  { id: 28, name: 'Wheel roller',   icon: 'wheel_roller.png' },
+  { id: 1, icon: 'barbell.png' },
+  { id: 2, icon: 'bodyweight.png' },
+  { id: 3, icon: 'cable.png' },
+  { id: 4, icon: 'dumbell.png' },
+  { id: 5, icon: 'ez_barbell.png' },
+  { id: 6, icon: 'leverage_machine.png' },
+  { id: 7, icon: 'sled_machine.png' },
+  { id: 8, icon: 'smith_machine.png' },
+  { id: 9, icon: 'weighted.png' },
+  { id: 10, icon: 'A.png' },
+  { id: 11, icon: 'band.png' },
+  { id: 12, icon: 'battling_rope.png' },
+  { id: 13, icon: 'bosu_ball.png' },
+  { id: 14, icon: 'H.png' },
+  { id: 15, icon: 'kettlebell.png' },
+  { id: 16, icon: 'medicine_ball.png' },
+  { id: 17, icon: 'barbell.png' },
+  { id: 18, icon: 'power_sled.png' },
+  { id: 19, icon: 'resistance_band.png' },
+  { id: 20, icon: 'roll.png' },
+  { id: 21, icon: 'rollball.png' },
+  { id: 22, icon: 'rope.png' },
+  { id: 23, icon: 'stability_ball.png' },
+  { id: 24, icon: 'ST.png' },
+  { id: 25, icon: 'suspension.png' },
+  { id: 26, icon: 'trap_bar.png' },
+  { id: 27, icon: 'VP.png' },
+  { id: 28, icon: 'wheel_roller.png' },
 ];
 
 const MUSCLE_LIST = [
-  { id: 1,  name: 'Thighs',      icon: 'quadriceps.png' },
-  { id: 2,  name: 'Chest',        icon: 'chest.png' },
-  { id: 3,  name: 'Hips',         icon: 'hips.png' },
-  { id: 4,  name: 'Back',         icon: 'back.png' },
-  { id: 5,  name: 'Upper Arms',   icon: 'shoulders.png' },
-  { id: 6,  name: 'Shoulders',    icon: 'shoulders.png' },
-  { id: 7,  name: 'Forearms',     icon: 'forearms.png' },
-  { id: 8,  name: 'Calves',       icon: 'calves.png' },
-  { id: 9,  name: 'Neck',          icon: 'neck.png' },
-  { id: 10, name: 'Cardio',       icon: 'cardio.png' },
-  { id: 12, name: 'Waist',        icon: 'waist.png' },
-  { id: 17, name: 'Biceps',       icon: 'biceps.png' },
-  { id: 18, name: 'Triceps',       icon: 'triceps.png' },
-  { id: 19, name: 'Quadriceps',    icon: 'quadriceps.png' },
-  { id: 20, name: 'Hamstrings',    icon: 'hamstrings.png' },
+  { id: 1, icon: 'quadriceps.png' },
+  { id: 2, icon: 'chest.png' },
+  { id: 3, icon: 'hips.png' },
+  { id: 4, icon: 'back.png' },
+  { id: 5, icon: 'shoulders.png' },
+  { id: 6, icon: 'shoulders.png' },
+  { id: 7, icon: 'forearms.png' },
+  { id: 8, icon: 'calves.png' },
+  { id: 9, icon: 'neck.png' },
+  { id: 10, icon: 'cardio.png' },
+  { id: 12, icon: 'waist.png' },
+  { id: 17, icon: 'biceps.png' },
+  { id: 18, icon: 'triceps.png' },
+  { id: 19, icon: 'quadriceps.png' },
+  { id: 20, icon: 'hamstrings.png' },
 ];
-
-const BODY_PART_MAP = {
-  '1': 'Thighs', '2': 'Chest', '3': 'Hips', '4': 'Back',
-  '5': 'Upper Arms', '6': 'Shoulders', '7': 'Forearms', '8': 'Calves',
-  '9': 'Neck', '10': 'Cardio', '12': 'Waist',
-  '17': 'Biceps', '18': 'Triceps', '19': 'Quadriceps', '20': 'Hamstrings',
-};
-const MUSCLE_ICON_MAP = {
-  '1': 'quadriceps.png', '2': 'chest.png', '3': 'hips.png', '4': 'back.png',
-  '5': 'shoulders.png', '6': 'shoulders.png', '7': 'forearms.png', '8': 'calves.png',
-  '9': 'neck.png', '10': 'cardio.png', '12': 'waist.png',
-  '17': 'biceps.png', '18': 'triceps.png', '19': 'quadriceps.png', '20': 'hamstrings.png',
-};
-const EQUIP_MAP = {
-  '1': 'Barbell', '2': 'Body weight', '3': 'Cable', '4': 'Dumbbell',
-  '5': 'EZ Barbell', '6': 'Leverage machine', '7': 'Sled machine',
-  '8': 'Smith machine', '9': 'Weighted', '10': 'Assisted',
-  '11': 'Band', '12': 'Battling Rope', '13': 'Bosu ball', '14': 'Hammer',
-  '15': 'Kettlebell', '16': 'Medicine Ball', '17': 'Olympic barbell',
-  '18': 'Power Sled', '19': 'Resistance Band', '20': 'Roll',
-  '21': 'Rollball', '22': 'Rope', '23': 'Stability ball', '24': 'Stick',
-  '25': 'Suspension', '26': 'Trap bar', '27': 'Vibrate Plate', '28': 'Wheel roller',
-};
-const EQUIP_ICON_MAP = {
-  '1': 'barbell.png', '2': 'bodyweight.png', '3': 'cable.png', '4': 'dumbell.png',
-  '5': 'ez_barbell.png', '6': 'leverage_machine.png', '7': 'sled_machine.png',
-  '8': 'smith_machine.png', '9': 'weighted.png', '10': 'A.png',
-  '11': 'band.png', '12': 'battling_rope.png', '13': 'bosu_ball.png', '14': 'H.png',
-  '15': 'kettlebell.png', '16': 'medicine_ball.png', '17': 'barbell.png',
-  '18': 'power_sled.png', '19': 'resistance_band.png', '20': 'roll.png',
-  '21': 'rollball.png', '22': 'rope.png', '23': 'stability_ball.png', '24': 'ST.png',
-  '25': 'suspension.png', '26': 'trap_bar.png', '27': 'VP.png', '28': 'wheel_roller.png',
-};
 
 const STORAGE_KEY = 'add_exercise_modal_filters';
 
@@ -117,6 +85,8 @@ Component({
     vidPrefix: '',
     equipmentList: EQUIPMENT_LIST,
     muscleList: MUSCLE_LIST,
+    equipmentListWithName: [],
+    muscleListWithName: [],
     selectedItem: null,
     weight: 0,
     reps: 0,
@@ -129,10 +99,11 @@ Component({
     practicedExercises: [], // array of exercise_ids
     filterFavor: false,
     filterPracticed: false,
+    locale: 'en',
   },
 
   observers: {
-    'isOpen': function(isOpen) {
+    'isOpen': function (isOpen) {
       if (isOpen) {
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
@@ -144,7 +115,7 @@ Component({
         this._listLoaded = false;
       }
     },
-    'preselectedExercise': function(ex) {
+    'preselectedExercise': function (ex) {
       if (ex && this.data.isOpen) {
         this._selectExercise(ex);
       }
@@ -154,6 +125,15 @@ Component({
   methods: {
     _reset(imgPrefix, vidPrefix) {
       const app = getApp();
+      const locale = app.globalData.language || 'en';
+      const equipmentListWithName = EQUIPMENT_LIST.map(item => ({
+        ...item,
+        _name: locale === 'zh' ? EQUIP_MAP_ZH[String(item.id)] : EQUIP_MAP[String(item.id)],
+      }));
+      const muscleListWithName = MUSCLE_LIST.map(item => ({
+        ...item,
+        _name: locale === 'zh' ? BODY_PART_MAP_ZH[String(item.id)] : BODY_PART_MAP[String(item.id)],
+      }));
       this.setData({
         step: 'pick',
         selectedMuscleOpen: false,
@@ -177,6 +157,9 @@ Component({
         muscleLabel: 'Muscles',
         favorExercises: app.globalData.favorExercises || [],
         practicedExercises: app.globalData.practicedExercises || [],
+        locale,
+        equipmentListWithName,
+        muscleListWithName,
       });
     },
 
@@ -187,13 +170,14 @@ Component({
           const muscleId = saved.selectedMuscle || 0;
           const muscleItem = MUSCLE_LIST.find(m => m.id === muscleId);
           const imgPrefix = this.data.imgPrefix || '';
+          const locale = this.data.locale || 'en';
           this.setData({
             selectedMuscle: muscleId,
             selectedEquipment: saved.selectedEquipment || 0,
             filterFavor: saved.filterFavor || false,
             filterPracticed: saved.filterPracticed || false,
-            muscleIcon: muscleId === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
-            muscleLabel: muscleId === 0 ? 'Muscles' : (muscleItem ? muscleItem.name : ''),
+            muscleIcon: muscleId == 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
+            muscleLabel: muscleId == 0 ? (locale === 'zh' ? '肌群' : 'Muscles') : (muscleItem ? (locale === 'zh' ? BODY_PART_MAP_ZH[String(muscleId)] : BODY_PART_MAP[String(muscleId)]) : ''),
           });
         }
       } catch (err) {
@@ -273,8 +257,8 @@ Component({
         selectedMuscleOpen: false,
         page: 1,
         list: [],
-        muscleIcon: id === 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
-        muscleLabel: id === 0 ? 'Muscles' : (muscleItem ? muscleItem.name : ''),
+        muscleIcon: id == 0 ? `${imgPrefix}/icons/all.png` : (muscleItem ? `${imgPrefix}/body-icons/${muscleItem.icon}` : ''),
+        muscleLabel: id == 0 ? (this.data.locale === 'zh' ? '肌群' : 'Muscles') : (muscleItem ? (this.data.locale === 'zh' ? BODY_PART_MAP_ZH[String(id)] : BODY_PART_MAP[String(id)]) : ''),
       });
       this._listLoaded = false;
       this.loadList(true);
@@ -350,6 +334,7 @@ Component({
             equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
             muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
             muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
+            muscle_name_zh: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP_ZH[id.trim()] || '').filter(Boolean).join(', '),
             is_favorite: favorExercises.includes(id),
             is_practiced: practicedExercises.includes(id),
           };

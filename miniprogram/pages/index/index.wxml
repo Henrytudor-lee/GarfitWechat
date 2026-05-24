@@ -175,13 +175,13 @@
   <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
 
   <!-- Edit Exercise Modal -->
-  <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
+  <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" locale="{{locale}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
 
   <!-- Session Detail Modal -->
   <session-detail-modal isOpen="{{showSessionDetailModal}}" session="{{viewingSession}}" sessionId="{{viewingSessionId}}" locale="{{locale}}" bind:close="onSessionDetailClose" />
 
   <!-- Workout Summary Modal -->
-  <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" exerciseList="{{workoutSummaryExercises}}" bind:close="onWorkoutSummaryClose" />
+  <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" exerciseList="{{workoutSummaryExercises}}" locale="{{locale}}" bind:close="onWorkoutSummaryClose" />
 
   <!-- Custom Tab Bar -->
   <custom-tabbar active="training" theme="{{theme}}" />

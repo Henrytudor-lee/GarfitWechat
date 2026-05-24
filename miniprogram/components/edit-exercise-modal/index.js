@@ -15,6 +15,10 @@ Component({
       type: String,
       value: null,
     },
+    locale: {
+      type: String,
+      value: 'en',
+    },
   },
 
   data: {

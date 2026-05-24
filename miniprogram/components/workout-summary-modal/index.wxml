@@ -51,7 +51,7 @@
             />
             <view wx:else class="item-img item-img-placeholder">🏋️</view>
             <view class="item-info">
-              <view class="item-name">{{item.name_zh || item.name}}</view>
+              <view class="item-name">{{locale === 'zh' ? item.name_zh : item.name}}</view>
               <view class="item-sets">{{item.sets.length}} sets</view>
             </view>
             <view class="item-vol">
