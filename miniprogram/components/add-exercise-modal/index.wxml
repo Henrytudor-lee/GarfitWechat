@@ -180,7 +180,7 @@
 
     <!-- Bottom Confirm Button (Step 2 only) -->
     <view wx:if="{{step === 'set'}}" class="modal-footer">
-      <button class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}" bindtap="confirmAdd" disabled="{{weight < 0 || reps <= 0 || submitting}}">{{submitting ? 'ADDING...' : 'ADD TO WORKOUT'}}</button>
+      <button class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}" bindtap="confirmAdd" disabled="{{weight < 0 || reps <= 0 || submitting}}">{{submitting ? (locale === 'zh' ? '添加中' :'ADDING...' ): (locale === 'zh' ? '添加训练' :'ADD TO WORKOUT')}}</button>
     </view>
 
   </view>
