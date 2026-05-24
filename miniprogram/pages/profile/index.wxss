@@ -382,10 +382,10 @@
 }
 
 /* 胶囊 — Night/Dark 主题选中态：深灰背景+白色文字 */
-.pill.pill-active.night,
-.pill.pill-active.dark {
+.page.theme-night .pill.pill-active.night,
+.page.theme-night .pill.pill-active.dark {
   background: #262626;
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 /* 胶囊 — Day/Light 主题选中态：品牌黄 */

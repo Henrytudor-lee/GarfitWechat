@@ -74,7 +74,7 @@
         </view>
         <view class="toggle-pills">
           <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{locale === 'en' ? 'Day' : '日间'}}</text>
-          <text class="pill {{theme === 'night' ? 'pill-active night' : ''}}">{{locale === 'en' ? 'Night' : '夜间'}}</text>
+          <text class="pill {{theme === 'night' ? 'pill-active' : ''}}">{{locale === 'en' ? 'Night' : '夜间'}}</text>
         </view>
       </view>
 
