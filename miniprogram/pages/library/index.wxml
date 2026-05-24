@@ -55,7 +55,7 @@
           data-id="{{item.id}}"
         >
           <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
-          <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item.name}}</text>
+          <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{locale === 'en' ? item.name : item.name_zh}}</text>
         </view>
       </view>
     </scroll-view>
@@ -78,7 +78,7 @@
           data-id="{{item.id}}"
         >
           <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/body-icons/{{item.icon}}" mode="aspectFit" />
-          <text wx:if="{{selectedMuscle === item.id}}" class="equip-name">{{item.name}}</text>
+          <text wx:if="{{selectedMuscle === item.id}}" class="equip-name">{{locale === 'en' ? item.name : item.name_zh}}</text>
         </view>
       </view>
     </scroll-view>
@@ -120,13 +120,13 @@
       <!-- Card Footer -->
       <view class="card-footer">
         <view class="card-top">
-          <view class="card-name">{{item.name}}</view>
+          <view class="card-name">{{locale === 'en' ? item.name : (item.name_zh || item.name)}}</view>
           <view class="card-info-btn" catchtap="openDetail" data-item="{{item}}">ⓘ</view>
         </view>
         <view class="card-tags">
           <image wx:if="{{item.equipment_icon}}" class="chip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
-          <text class="chip chip-neutral">{{item.equipment_name || 'OTHER'}}</text>
-          <text wx:if="{{item.muscle_name}}" class="chip">{{item.muscle_name}}</text>
+          <text class="chip chip-neutral">{{locale === 'en' ? item.equipment_name : (item.equipment_name_zh || item.equipment_name)}}</text>
+          <text wx:if="{{item.muscle_name}}" class="chip">{{locale === 'en' ? item.muscle_name : (item.muscle_name_zh || item.muscle_name)}}</text>
         </view>
       </view>
     </view>
@@ -175,8 +175,8 @@
         <view class="sheet-content">
           <view class="sheet-en">{{selectedExercise.name}}</view>
           <view class="sheet-tags">
-            <text class="chip chip-neutral">{{selectedExercise.equipment_name || 'OTHER'}}</text>
-            <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{selectedExercise.muscle_name}}</text>
+            <text class="chip chip-neutral">{{locale === 'en' ? selectedExercise.equipment_name : (selectedExercise.equipment_name_zh || selectedExercise.equipment_name)}}</text>
+            <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{locale === 'en' ? selectedExercise.muscle_name : (selectedExercise.muscle_name_zh || selectedExercise.muscle_name)}}</text>
             <text class="chip chip-neutral">{{selectedExercise.exercise_type || 'STRENGTH'}}</text>
           </view>
         </view>

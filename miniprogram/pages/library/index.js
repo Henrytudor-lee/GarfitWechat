@@ -2,52 +2,52 @@
 const app = getApp();
 
 const EQUIPMENT_LIST = [
-  { id: 1,  name: 'Barbell',         icon: 'barbell.png' },
-  { id: 2,  name: 'Body weight',     icon: 'bodyweight.png' },
-  { id: 3,  name: 'Cable',           icon: 'cable.png' },
-  { id: 4,  name: 'Dumbbell',        icon: 'dumbell.png' },
-  { id: 5,  name: 'EZ Barbell',      icon: 'ez_barbell.png' },
-  { id: 6,  name: 'Leverage machine',icon: 'leverage_machine.png' },
-  { id: 7,  name: 'Sled machine',    icon: 'sled_machine.png' },
-  { id: 8,  name: 'Smith machine',    icon: 'smith_machine.png' },
-  { id: 9,  name: 'Weighted',        icon: 'weighted.png' },
-  { id: 10, name: 'Assisted',        icon: 'A.png' },
-  { id: 11, name: 'Band',            icon: 'band.png' },
-  { id: 12, name: 'Battling Rope',   icon: 'battling_rope.png' },
-  { id: 13, name: 'Bosu ball',       icon: 'bosu_ball.png' },
-  { id: 14, name: 'Hammer',          icon: 'H.png' },
-  { id: 15, name: 'Kettlebell',      icon: 'kettlebell.png' },
-  { id: 16, name: 'Medicine Ball',   icon: 'medicine_ball.png' },
-  { id: 17, name: 'Olympic barbell', icon: 'barbell.png' },
-  { id: 18, name: 'Power Sled',     icon: 'power_sled.png' },
-  { id: 19, name: 'Resistance Band', icon: 'resistance_band.png' },
-  { id: 20, name: 'Roll',           icon: 'roll.png' },
-  { id: 21, name: 'Rollball',       icon: 'rollball.png' },
-  { id: 22, name: 'Rope',           icon: 'rope.png' },
-  { id: 23, name: 'Stability ball',  icon: 'stability_ball.png' },
-  { id: 24, name: 'Stick',          icon: 'ST.png' },
-  { id: 25, name: 'Suspension',     icon: 'suspension.png' },
-  { id: 26, name: 'Trap bar',       icon: 'trap_bar.png' },
-  { id: 27, name: 'Vibrate Plate',  icon: 'VP.png' },
-  { id: 28, name: 'Wheel roller',   icon: 'wheel_roller.png' },
+  { id: 1,  name: 'Barbell',         name_zh: '杠铃',        icon: 'barbell.png' },
+  { id: 2,  name: 'Body weight',     name_zh: '自重',        icon: 'bodyweight.png' },
+  { id: 3,  name: 'Cable',           name_zh: '钢索',        icon: 'cable.png' },
+  { id: 4,  name: 'Dumbbell',        name_zh: '哑铃',        icon: 'dumbell.png' },
+  { id: 5,  name: 'EZ Barbell',      name_zh: 'EZ杠铃',     icon: 'ez_barbell.png' },
+  { id: 6,  name: 'Leverage machine',name_zh: '器械',        icon: 'leverage_machine.png' },
+  { id: 7,  name: 'Sled machine',    name_zh: '雪橇机',      icon: 'sled_machine.png' },
+  { id: 8,  name: 'Smith machine',   name_zh: '史密斯机',   icon: 'smith_machine.png' },
+  { id: 9,  name: 'Weighted',        name_zh: '负重',        icon: 'weighted.png' },
+  { id: 10, name: 'Assisted',        name_zh: '辅助',         icon: 'A.png' },
+  { id: 11, name: 'Band',            name_zh: '弹力带',       icon: 'band.png' },
+  { id: 12, name: 'Battling Rope',   name_zh: '战绳',        icon: 'battling_rope.png' },
+  { id: 13, name: 'Bosu ball',       name_zh: 'Bosu球',      icon: 'bosu_ball.png' },
+  { id: 14, name: 'Hammer',          name_zh: '锤式',         icon: 'H.png' },
+  { id: 15, name: 'Kettlebell',      name_zh: '壶铃',         icon: 'kettlebell.png' },
+  { id: 16, name: 'Medicine Ball',   name_zh: '药球',         icon: 'medicine_ball.png' },
+  { id: 17, name: 'Olympic barbell', name_zh: '奥林匹克杠铃',icon: 'barbell.png' },
+  { id: 18, name: 'Power Sled',      name_zh: '动力雪橇',    icon: 'power_sled.png' },
+  { id: 19, name: 'Resistance Band',name_zh: '阻力带',      icon: 'resistance_band.png' },
+  { id: 20, name: 'Roll',            name_zh: '滚轮',         icon: 'roll.png' },
+  { id: 21, name: 'Rollball',        name_zh: '滚球',         icon: 'rollball.png' },
+  { id: 22, name: 'Rope',            name_zh: '绳索',         icon: 'rope.png' },
+  { id: 23, name: 'Stability ball',  name_zh: '稳定球',      icon: 'stability_ball.png' },
+  { id: 24, name: 'Stick',           name_zh: '短棍',         icon: 'ST.png' },
+  { id: 25, name: 'Suspension',      name_zh: '悬吊',         icon: 'suspension.png' },
+  { id: 26, name: 'Trap bar',        name_zh: 'Trap bar',     icon: 'trap_bar.png' },
+  { id: 27, name: 'Vibrate Plate',   name_zh: '震动板',      icon: 'VP.png' },
+  { id: 28, name: 'Wheel roller',    name_zh: '轮滑滚筒',    icon: 'wheel_roller.png' },
 ];
 
 const MUSCLE_LIST = [
-  { id: 1,  name: 'Thighs',      icon: 'quadriceps.png' },
-  { id: 2,  name: 'Chest',        icon: 'chest.png' },
-  { id: 3,  name: 'Hips',         icon: 'hips.png' },
-  { id: 4,  name: 'Back',         icon: 'back.png' },
-  { id: 5,  name: 'Upper Arms',   icon: 'shoulders.png' },
-  { id: 6,  name: 'Shoulders',    icon: 'shoulders.png' },
-  { id: 7,  name: 'Forearms',     icon: 'forearms.png' },
-  { id: 8,  name: 'Calves',       icon: 'calves.png' },
-  { id: 9,  name: 'Neck',          icon: 'neck.png' },
-  { id: 10, name: 'Cardio',       icon: 'cardio.png' },
-  { id: 12, name: 'Waist',        icon: 'waist.png' },
-  { id: 17, name: 'Biceps',       icon: 'biceps.png' },
-  { id: 18, name: 'Triceps',       icon: 'triceps.png' },
-  { id: 19, name: 'Quadriceps',    icon: 'quadriceps.png' },
-  { id: 20, name: 'Hamstrings',    icon: 'hamstrings.png' },
+  { id: 1,  name: 'Thighs',      name_zh: '大腿',        icon: 'quadriceps.png' },
+  { id: 2,  name: 'Chest',       name_zh: '胸部',        icon: 'chest.png' },
+  { id: 3,  name: 'Hips',        name_zh: '髋部',         icon: 'hips.png' },
+  { id: 4,  name: 'Back',        name_zh: '背部',         icon: 'back.png' },
+  { id: 5,  name: 'Upper Arms',  name_zh: '上臂',         icon: 'shoulders.png' },
+  { id: 6,  name: 'Shoulders',   name_zh: '肩膀',         icon: 'shoulders.png' },
+  { id: 7,  name: 'Forearms',    name_zh: '前臂',         icon: 'forearms.png' },
+  { id: 8,  name: 'Calves',      name_zh: '小腿',         icon: 'calves.png' },
+  { id: 9,  name: 'Neck',        name_zh: '颈部',          icon: 'neck.png' },
+  { id: 10, name: 'Cardio',      name_zh: '有氧',          icon: 'cardio.png' },
+  { id: 12, name: 'Waist',       name_zh: '腰部',         icon: 'waist.png' },
+  { id: 17, name: 'Biceps',      name_zh: '肱二头肌',     icon: 'biceps.png' },
+  { id: 18, name: 'Triceps',     name_zh: '肱三头肌',     icon: 'triceps.png' },
+  { id: 19, name: 'Quadriceps',   name_zh: '股四头肌',     icon: 'quadriceps.png' },
+  { id: 20, name: 'Hamstrings',  name_zh: '腘绳肌',       icon: 'hamstrings.png' },
 ];
 
 // 部位ID到名称的映射（与原项目 constants.ts 一致）
@@ -60,6 +60,16 @@ const EQUIP_MAP = {
   '18': 'Power Sled', '19': 'Resistance Band', '20': 'Roll',
   '21': 'Rollball', '22': 'Rope', '23': 'Stability ball', '24': 'Stick',
   '25': 'Suspension', '26': 'Trap bar', '27': 'Vibrate Plate', '28': 'Wheel roller',
+};
+const EQUIP_MAP_ZH = {
+  '1': '杠铃', '2': '自重', '3': '钢索', '4': '哑铃',
+  '5': 'EZ杠铃', '6': '器械', '7': '雪橇机',
+  '8': '史密斯机', '9': '负重', '10': '辅助',
+  '11': '弹力带', '12': '战绳', '13': 'Bosu球', '14': '锤式',
+  '15': '壶铃', '16': '药球', '17': '奥林匹克杠铃',
+  '18': '动力雪橇', '19': '阻力带', '20': '滚轮',
+  '21': '滚球', '22': '绳索', '23': '稳定球', '24': '短棍',
+  '25': '悬吊', '26': 'Trap bar', '27': '震动板', '28': '轮滑滚筒',
 };
 const EQUIP_ICON_MAP = {
   '1': 'barbell.png', '2': 'bodyweight.png', '3': 'cable.png', '4': 'dumbell.png',
@@ -76,6 +86,12 @@ const BODY_PART_MAP = {
   '5': 'Upper Arms', '6': 'Shoulders', '7': 'Forearms', '8': 'Calves',
   '9': 'Neck', '10': 'Cardio', '12': 'Waist',
   '17': 'Biceps', '18': 'Triceps', '19': 'Quadriceps', '20': 'Hamstrings',
+};
+const BODY_PART_MAP_ZH = {
+  '1': '大腿', '2': '胸部', '3': '髋部', '4': '背部',
+  '5': '上臂', '6': '肩膀', '7': '前臂', '8': '小腿',
+  '9': '颈部', '10': '有氧', '12': '腰部',
+  '17': '肱二头肌', '18': '肱三头肌', '19': '股四头肌', '20': '腘绳肌',
 };
 
 Page({
@@ -169,13 +185,22 @@ Page({
 
     if (res.result && res.result.success) {
       const { favorExercises, practicedExercises } = this.data;
+      const locale = this.data.locale;
+      const equipMap = locale === 'zh' ? EQUIP_MAP_ZH : EQUIP_MAP;
+      const bodyPartMap = locale === 'zh' ? BODY_PART_MAP_ZH : BODY_PART_MAP;
       let items = (res.result.list || []).map(item => {
         const id = item.id;
+        // Handle multi-muscle (comma-separated body_part_id)
+        const bpIds = String(item.body_part_id).split(',');
+        const muscleName = bpIds.map(bid => bodyPartMap[bid.trim()] || '').filter(Boolean).join(' / ');
+        const muscleNameZh = bpIds.map(bid => BODY_PART_MAP_ZH[bid.trim()] || '').filter(Boolean).join(' / ');
         return {
           ...item,
-          equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
+          equipment_name: equipMap[String(item.equipment_id)] || 'Other',
+          equipment_name_zh: EQUIP_MAP_ZH[String(item.equipment_id)] || '',
           equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-          muscle_name: BODY_PART_MAP[String(item.body_part_id)] || '',
+          muscle_name: muscleName,
+          muscle_name_zh: muscleNameZh,
           is_favorite: favorExercises.includes(id),
           is_practiced: practicedExercises.includes(id),
         };

@@ -808,3 +808,36 @@
   white-space: nowrap;
 }
 .sheet-btn::after { border: none; }
+
+/* ========================
+   Appended — Library Fixes
+   ======================== */
+
+/* 1. filter-chip active state — green tint background + primary text */
+.filter-chip.active {
+  background: rgba(204, 242, 0, 0.15) !important;
+  color: #ccf200 !important;
+  border-color: #ccf200 !important;
+}
+
+.filter-chip.active .equip-name {
+  color: #ccf200 !important;
+}
+
+/* 2. content-scroll — fill remaining viewport height */
+.content-scroll {
+  flex: 1;
+  height: 0;          /* flex-grow fills remaining space; 0 min-width prevents blow-out */
+  min-height: 300rpx;
+}
+
+/* 3. page layout — make page a proper flex column so content-scroll fills the gap */
+.page {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ensure filters-fixed does not shrink */
+.filters-fixed {
+  flex-shrink: 0;
+}
