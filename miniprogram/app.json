@@ -3,10 +3,7 @@
     "pages/index/index",
     "pages/library/index",
     "pages/stats/index",
-    "pages/profile/index",
-    "pages/exercise-detail/index",
-    "pages/history/index",
-    "pages/workout/index"
+    "pages/profile/index"
   ],
   "window": {
     "backgroundColor": "#131313",
