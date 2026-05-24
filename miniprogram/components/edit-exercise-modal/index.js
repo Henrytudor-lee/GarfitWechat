@@ -142,9 +142,9 @@ Component({
 
           if (original && (original.weight !== s.weight || original.reps !== s.reps || original.weight_unit !== s.weight_unit)) {
             await wx.cloud.callFunction({
-              name: 'exercise',
+              name: 'api',
               data: {
-                action: 'update',
+                action: 'exercise.update',
                 id: s.id,
                 session_id: this.data.sessionId,
                 openid: app.globalData.openid,
@@ -157,9 +157,9 @@ Component({
 
           if (!original && s.id > Date.now() - 100000) {
             await wx.cloud.callFunction({
-              name: 'exercise',
+              name: 'api',
               data: {
-                action: 'add',
+                action: 'exercise.add',
                 session_id: this.data.sessionId,
                 openid: app.globalData.openid,
                 exercise_id: group.exercise_id,
@@ -184,9 +184,9 @@ Component({
         });
         for (const s of toDelete) {
           await wx.cloud.callFunction({
-            name: 'exercise',
+            name: 'api',
             data: {
-              action: 'delete',
+              action: 'exercise.delete',
               id: s.id,
               session_id: this.data.sessionId,
               openid: app.globalData.openid,

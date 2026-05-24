@@ -56,8 +56,8 @@ Page({
   async _checkSession() {
     wx.showLoading({ title: '加载中...' });
     const res = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'getRunning', openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.getRunning', openid: app.globalData.openid },
     });
     wx.hideLoading();
 
@@ -97,9 +97,9 @@ Page({
   async _loadExercises() {
     if (!this.data.session) return;
     const res = await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'list',
+        action: 'exercise.list',
         session_id: this.data.session._id,
         openid: app.globalData.openid,
       },
@@ -140,8 +140,8 @@ Page({
   async startWorkout() {
     wx.showLoading({ title: '创建训练...' });
     const res = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'create', openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.create', openid: app.globalData.openid },
     });
     wx.hideLoading();
 
@@ -217,9 +217,9 @@ Page({
 
     // 写入数据库
     const res = await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'add',
+        action: 'exercise.add',
         session_id: this.data.session._id,
         openid: app.globalData.openid,
         exercise_id: selectedExercise.exercise_id,
@@ -256,8 +256,8 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '结束训练...' });
           const r = await wx.cloud.callFunction({
-            name: 'session',
-            data: { action: 'finish', session_id: this.data.session._id, openid: app.globalData.openid },
+            name: 'api',
+            data: { action: 'session.finish', session_id: this.data.session._id, openid: app.globalData.openid },
           });
           wx.hideLoading();
           if (r.result && r.result.success) {

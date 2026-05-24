@@ -144,8 +144,8 @@ Page({
     if (!app.globalData.openid) return;
     try {
       const res = await wx.cloud.callFunction({
-        name: 'exercise',
-        data: { action: 'getUserExercises', openid: app.globalData.openid },
+        name: 'api',
+        data: { action: 'exercise.getUserExercises', openid: app.globalData.openid },
       });
       if (res.result && res.result.success) {
         this.setData({
@@ -166,9 +166,9 @@ Page({
     const { keyword, selectedEquipment, selectedMuscle, filterFavor, filterPracticed, favorExercises, practicedExercises } = this.data;
 
     const res = await wx.cloud.callFunction({
-      name: 'exerciseLibrary',
+      name: 'api',
       data: {
-        action: 'list',
+        action: 'library.list',
         keyword,
         equipmentId: selectedEquipment || '',
         bodyPart: selectedMuscle || '',
@@ -302,9 +302,9 @@ Page({
     this.setData({ list });
 
     wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'toggleFavorite',
+        action: 'exercise.toggleFavorite',
         exercise_id: id,
         openid: app.globalData.openid,
       },
@@ -326,16 +326,16 @@ Page({
     if (!userId) return;
 
     const runRes = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'getRunning', openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.getRunning', openid: app.globalData.openid },
     });
 
     let sessionId;
     if (!runRes.result || !runRes.result.session) {
       // Start session first
       const createRes = await wx.cloud.callFunction({
-        name: 'session',
-        data: { action: 'create', openid: app.globalData.openid },
+        name: 'api',
+        data: { action: 'session.create', openid: app.globalData.openid },
       });
       if (!createRes.result || !createRes.result.success) return;
       sessionId = (createRes.result && (createRes.result.sessionId || (createRes.result.session && createRes.result.session._id)));
@@ -345,9 +345,9 @@ Page({
 
     // Save exercise to session
     await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'add',
+        action: 'exercise.add',
         session_id: sessionId,
         openid: app.globalData.openid,
         exercise_id: item.id,

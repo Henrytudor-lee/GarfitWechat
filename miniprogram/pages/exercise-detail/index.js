@@ -37,8 +37,8 @@ Page({
     wx.showLoading({ title: 'LOADING...', mask: true });
 
     const res = await wx.cloud.callFunction({
-      name: 'exerciseLibrary',
-      data: { action: 'detail', id: parseInt(id) },
+      name: 'api',
+      data: { action: 'library.detail', id: parseInt(id) },
     });
 
     wx.hideLoading();
@@ -60,15 +60,15 @@ Page({
 
     // Get or create running session
     const runRes = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'getRunning', openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.getRunning', openid: app.globalData.openid },
     });
 
     let sessionId;
     if (!runRes.result || !runRes.result.session) {
       const createRes = await wx.cloud.callFunction({
-        name: 'session',
-        data: { action: 'create', openid: app.globalData.openid },
+        name: 'api',
+        data: { action: 'session.create', openid: app.globalData.openid },
       });
       if (!createRes.result || !createRes.result.success) return;
       sessionId = createRes.result.sessionId || (createRes.result.session && createRes.result.session.id);
@@ -77,9 +77,9 @@ Page({
     }
 
     await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'add',
+        action: 'exercise.add',
         session_id: sessionId,
         openid: app.globalData.openid,
         exercise_id: exercise.id,

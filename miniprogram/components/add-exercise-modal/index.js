@@ -219,8 +219,8 @@ Component({
       if (!app.globalData.openid) return;
       try {
         const res = await wx.cloud.callFunction({
-          name: 'exercise',
-          data: { action: 'getUserExercises', openid: app.globalData.openid },
+          name: 'api',
+          data: { action: 'exercise.getUserExercises', openid: app.globalData.openid },
         });
         if (res.result && res.result.success) {
           this.setData({
@@ -324,9 +324,9 @@ Component({
       const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises, filterFavor, filterPracticed } = this.data;
 
       const res = await wx.cloud.callFunction({
-        name: 'exerciseLibrary',
+        name: 'api',
         data: {
-          action: 'list',
+          action: 'library.list',
           keyword,
           equipmentId: selectedEquipment ? selectedEquipment : '',
           bodyPart: selectedMuscle ? selectedMuscle : '',
@@ -390,13 +390,13 @@ Component({
 
       try {
         const res = await wx.cloud.callFunction({
-        name: 'exercise',
-        data: {
-          action: 'getMaxWeight',
-          exerciseId: item.id,
-          openid: app.globalData.openid,
-        },
-      });
+          name: 'api',
+          data: {
+            action: 'exercise.getMaxWeight',
+            exerciseId: item.id,
+            openid: app.globalData.openid,
+          },
+        });
 
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
@@ -469,18 +469,18 @@ Component({
 
         // Fire markPracticed asynchronously — non-blocking
         wx.cloud.callFunction({
-          name: 'exercise',
+          name: 'api',
           data: {
-            action: 'markPracticed',
+            action: 'exercise.markPracticed',
             exercise_id: exId,
             openid: app.globalData.openid,
           },
         });
 
         const res = await wx.cloud.callFunction({
-          name: 'exercise',
+          name: 'api',
           data: {
-            action: 'add',
+            action: 'exercise.add',
             session_id: sessionId,
             openid: app.globalData.openid,
             exercise_id: exId,
@@ -527,9 +527,9 @@ Component({
 
       // Call cloud function
       wx.cloud.callFunction({
-        name: 'exercise',
+        name: 'api',
         data: {
-          action: 'toggleFavorite',
+          action: 'exercise.toggleFavorite',
           exercise_id: id,
           openid: app.globalData.openid,
         },

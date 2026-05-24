@@ -67,9 +67,9 @@ Component({
       this.setData({ loading: true });
 
       const res = await wx.cloud.callFunction({
-        name: 'exercise',
+        name: 'api',
         data: {
-          action: 'list',
+          action: 'exercise.list',
           session_id: this.data.sessionId,
           openid: app.globalData.openid,
         },

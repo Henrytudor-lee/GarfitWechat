@@ -95,8 +95,8 @@ App({
         success: (loginRes) => {
           if (!loginRes.code) { resolve(); return; }
           wx.cloud.callFunction({
-            name: 'loginByWx',
-            data: { code: loginRes.code },
+            name: 'api',
+            data: { action: 'login.code', code: loginRes.code },
             success: (res) => {
               if (res.result && res.result.openid) {
                 const { openid, userId, favor_exercises, practiced_exercises } = res.result;

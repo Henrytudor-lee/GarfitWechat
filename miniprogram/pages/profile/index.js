@@ -123,8 +123,8 @@ Page({
     this.setData({ isLoggedIn: true, locale, theme, userInfo });
 
     const [streakRes, levelRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'profile', data: { action: 'getStreak', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'profile', data: { action: 'getLevel', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getStreak', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getLevel', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -176,8 +176,8 @@ Page({
             success: (uploadRes) => {
               const avatarUrl = uploadRes.fileID;
               wx.cloud.callFunction({
-                name: 'profile',
-                data: { action: 'updateAvatar', openid: app.globalData.openid, avatarUrl },
+                name: 'api',
+                data: { action: 'profile.updateAvatar', openid: app.globalData.openid, avatarUrl },
               });
               wx.setStorageSync('avatarUrl', avatarUrl);
             },

@@ -134,8 +134,8 @@ Page({
     wx.showLoading({ title: 'LOADING...', mask: true });
 
     const [runRes, recentRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'session', data: { action: 'getRunning', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'session', data: { action: 'list', page: 1, pageSize: 5, openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'session.getRunning', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'session.list', page: 1, pageSize: 5, openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -168,8 +168,8 @@ Page({
 
   async _loadExerciseGroups(sessionId) {
     const res = await wx.cloud.callFunction({
-      name: 'exercise',
-      data: { action: 'list', session_id: sessionId, openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'exercise.list', session_id: sessionId, openid: app.globalData.openid },
     });
     if (res.result && res.result.success) {
       const map = {};
@@ -365,8 +365,8 @@ Page({
     if (!historyDate) return;
     // Fetch sessions for the given date
     const res = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'list', date: historyDate, openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.list', date: historyDate, openid: app.globalData.openid },
     });
     if (res.result && res.result.sessions) {
       const sessions = res.result.sessions.map(s => {
@@ -385,8 +385,8 @@ Page({
   async startWorkout() {
     wx.showLoading({ title: 'STARTING...', mask: true });
     const res = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'create', openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.create', openid: app.globalData.openid },
     });
     wx.hideLoading();
     if (res.result && res.result.success) {
@@ -416,8 +416,8 @@ Page({
           elapsedSeconds = Math.floor((Date.now() - new Date(this.data.runningSession.start_time).getTime()) / 1000);
         }
         const r = await wx.cloud.callFunction({
-          name: 'session',
-          data: { action: 'finish', session_id: sessionId, openid: app.globalData.openid },
+          name: 'api',
+          data: { action: 'session.finish', session_id: sessionId, openid: app.globalData.openid },
         });
         wx.hideLoading();
         if (r.result && r.result.success) {
@@ -515,9 +515,9 @@ Page({
     const sessionId = this.data.currentSessionId || this.data.runningSession.id || this.data.runningSession._id;
     wx.showLoading({ title: 'ADDING...', mask: true });
     const res = await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'add',
+        action: 'exercise.add',
         session_id: sessionId,
         openid: app.globalData.openid,
         exercise_id: item._id || item.id,

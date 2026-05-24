@@ -68,7 +68,7 @@ Page({
     this.setData({ loading: true });
 
     const [statsRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'stats', data: { action: 'summary', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'stats.summary', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -190,12 +190,12 @@ Page({
     wx.showLoading({ title: loadingText, mask: true });
     const [recRes, recordsRes] = await Promise.all([
       wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseMax', exercise_id: exerciseId, openid: app.globalData.openid },
+        name: 'api',
+        data: { action: 'stats.exerciseMax', exercise_id: exerciseId, openid: app.globalData.openid },
       }),
       wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseRecords', exercise_id: exerciseId, openid: app.globalData.openid },
+        name: 'api',
+        data: { action: 'stats.exerciseRecords', exercise_id: exerciseId, openid: app.globalData.openid },
       }),
     ]);
     wx.hideLoading();

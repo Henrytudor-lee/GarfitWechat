@@ -32,8 +32,8 @@ Page({
     this.setData({ loading: true });
 
     const res = await wx.cloud.callFunction({
-      name: 'session',
-      data: { action: 'list', page: 1, pageSize: 100, openid: app.globalData.openid },
+      name: 'api',
+      data: { action: 'session.list', page: 1, pageSize: 100, openid: app.globalData.openid },
     });
 
     this.setData({ loading: false });
@@ -88,9 +88,9 @@ Page({
   async _loadSessionExercises(sessionId) {
     if (!sessionId) return;
     const res = await wx.cloud.callFunction({
-      name: 'exercise',
+      name: 'api',
       data: {
-        action: 'list',
+        action: 'exercise.list',
         session_id: sessionId,
         openid: app.globalData.openid,
       },
