@@ -1,6 +1,22 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
 
+// Compute ISO yrweek key e.g. 202621 for 2026-W21
+function toYrweek(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const dayNum = d.getDay();
+  const MonToSun = dayNum === 0 ? 6 : dayNum - 1;
+  d.setDate(d.getDate() - MonToSun);
+  const thu = new Date(d);
+  thu.setDate(d.getDate() + 4);
+  const isoYear = thu.getFullYear();
+  const jan1 = new Date(isoYear, 0, 1);
+  const days = Math.floor((thu - jan1) / 86400000);
+  const week = Math.ceil((days + 1) / 7);
+  return String(isoYear) + String(week).padStart(2, '0');
+}
+
 Page({
   data: {
     imgPrefix: '',
@@ -47,7 +63,7 @@ Page({
   },
 
   async _loadAll() {
-    const loadingText = this.data.locale === 'en' ? 'LOADING...' : '加载中...';
+    const loadingText = (this.data.locale || 'en') === 'en' ? 'LOADING...' : '加载中...';
     wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
@@ -79,29 +95,41 @@ Page({
     for (let i = 7; i >= 0; i--) {
       const wd = new Date(now);
       wd.setDate(now.getDate() - i * 7);
-      const iso = wd.toISOString().slice(0, 10);
-      const label = wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      weeklyVolume.push({ label, volume: weekMap[iso] || 0, iso });
+      const yrweek = toYrweek(wd);
+      const label = (this.data.locale || 'en') === 'en'
+        ? wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        : wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      weeklyVolume.push({ label, volume: weekMap[yrweek] || 0, yrweek });
     }
 
     // Percent relative to max
     const maxVol = Math.max(...weeklyVolume.map(w => w.volume), 1);
     weeklyVolume.forEach(w => { w.percent = Math.round((w.volume / maxVol) * 100); });
 
-    // Muscle distribution (derived from exercise names)
+    // Muscle distribution (derived from body_part_id, locale-aware)
     const muscleMap = {};
+    const BODY_PART_NAMES_EN = {
+      '1': 'Thighs', '2': 'Chest', '3': 'Hips', '4': 'Back',
+      '5': 'Upper Arms', '6': 'Shoulders', '7': 'Forearms', '8': 'Calves',
+      '9': 'Neck', '10': 'Cardio', '12': 'Waist',
+      '17': 'Biceps', '18': 'Triceps', '19': 'Quadriceps', '20': 'Hamstrings',
+    };
+    const BODY_PART_NAMES_ZH = {
+      '1': '大腿', '2': '胸部', '3': '臀部', '4': '背部',
+      '5': '上臂', '6': '肩部', '7': '前臂', '8': '小腿',
+      '9': '颈部', '10': '有氧', '12': '腰部',
+      '17': '肱二头肌', '18': '肱三头肌', '19': '股四头肌', '20': '腘绳肌',
+    };
     historyExercises.forEach(ex => {
       const total = ex.records.reduce((s, r) => s + (r.weight || 0) * (r.reps || 0), 0);
       if (total === 0) return;
-      const name = (ex.name || '').toLowerCase();
-      let muscle = 'Other';
-      if (name.includes('chest') || name.includes('bench') || name.includes('fly')) muscle = 'Chest';
-      else if (name.includes('back') || name.includes('row') || name.includes('lat')) muscle = 'Back';
-      else if (name.includes('squat') || name.includes('leg') || name.includes('quad') || name.includes('ham') || name.includes('calf')) muscle = 'Legs';
-      else if (name.includes('shoulder') || name.includes('press') || name.includes('lateral')) muscle = 'Shoulders';
-      else if (name.includes('bicep') || name.includes('curl') || name.includes('tricep')) muscle = 'Arms';
-      else if (name.includes('core') || name.includes('plank') || name.includes('ab')) muscle = 'Core';
-      muscleMap[muscle] = (muscleMap[muscle] || 0) + total;
+      const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
+      partIds.forEach(partId => {
+        const name = (this.data.locale || 'en') === 'en'
+          ? (BODY_PART_NAMES_EN[partId] || 'Other')
+          : (BODY_PART_NAMES_ZH[partId] || '其他');
+        muscleMap[name] = (muscleMap[name] || 0) + total;
+      });
     });
     const muscleDistribution = Object.entries(muscleMap)
       .map(([name, value]) => ({ name, value }))
@@ -112,16 +140,19 @@ Page({
     const MUSCLE_COLORS = ['#ccf200', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8'];
     muscleDistribution.forEach((m, i) => { m.color = MUSCLE_COLORS[i % MUSCLE_COLORS.length]; });
 
-    // Most trained exercises
+    // Most trained exercises — use locale-aware name
     const mostTrained = historyExercises
-      .map(ex => ({ name: ex.name, count: ex.records.length }))
+      .map(ex => ({
+        name: (this.data.locale || 'en') === 'en' ? (ex.name_en || ex.name) : (ex.name_zh || ex.name),
+        count: ex.records.length,
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    // Exercise list for selector
+    // Exercise list for selector — use locale-aware name
     const exerciseList = historyExercises.map(ex => ({
       id: ex.exercise_id,
-      name: ex.name,
+      name: (this.data.locale || 'en') === 'en' ? (ex.name_en || ex.name) : (ex.name_zh || ex.name),
     }));
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
@@ -155,7 +186,7 @@ Page({
   },
 
   async _loadExerciseData(exerciseId) {
-    const loadingText = this.data.locale === 'en' ? 'LOADING...' : '加载中...';
+    const loadingText = (this.data.locale || 'en') === 'en' ? 'LOADING...' : '加载中...';
     wx.showLoading({ title: loadingText, mask: true });
     const [recRes, recordsRes] = await Promise.all([
       wx.cloud.callFunction({

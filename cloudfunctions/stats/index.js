@@ -76,12 +76,14 @@ exports.main = async (event, context) => {
 
       // Exercise history: all exercises with records grouped by exercise_id
       const [histRows] = await getPool().query(
-        `SELECT e.exercise_id, e.name_zh,
+        `SELECT e.exercise_id, el.name_zh, el.name as name_en,
+                el.body_part_id as body_part_ids,
                 JSON_ARRAYAGG(JSON_OBJECT('weight', e.weight, 'reps', e.reps, 'weight_unit', e.weight_unit, 'create_time', e.create_time)) as records
          FROM exercises e
          JOIN sessions s ON e.session_id = s.id
+         JOIN exercises_library el ON e.exercise_id = el.id
          WHERE s._openid = ? AND s.status = 'finished'
-         GROUP BY e.exercise_id, e.name_zh
+         GROUP BY e.exercise_id, el.name_zh, el.name, el.body_part_id
          ORDER BY e.exercise_id`,
         [openid]);
 
@@ -93,7 +95,9 @@ exports.main = async (event, context) => {
         } catch (e) {}
         return {
           exercise_id: row.exercise_id,
-          name: row.name_zh,
+          name_zh: row.name_zh,
+          name_en: row.name_en,
+          body_part_ids: row.body_part_ids,
           records,
         };
       });
