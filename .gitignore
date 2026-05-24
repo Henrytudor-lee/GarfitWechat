@@ -5,3 +5,6 @@ miniprogram/package-lock.json
 ._*
 .DS_Store
 .hermes-project-memory
+scripts/**
+result_backend.json
+result_frontend.json
