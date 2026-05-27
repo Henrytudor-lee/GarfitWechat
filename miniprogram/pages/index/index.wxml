@@ -183,6 +183,9 @@
   <!-- Workout Summary Modal -->
   <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" exerciseList="{{workoutSummaryExercises}}" locale="{{locale}}" bind:close="onWorkoutSummaryClose" />
 
+  <!-- Welcome Modal -->
+  <welcome-modal isOpen="{{showWelcome}}" bind:close="onWelcomeClose" />
+
   <!-- Custom Tab Bar -->
   <custom-tabbar active="training" theme="{{theme}}" />
 

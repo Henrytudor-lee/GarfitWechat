@@ -71,8 +71,12 @@ exports.main = async (event, context) => {
 
       const openid = wxRes.openid;
       const [[existingUser]] = await getPool().query(
-        'SELECT id, favor_exercises, practiced_exercises FROM users WHERE _openid = ? LIMIT 1',
+        'SELECT id, name, avatar, favor_exercises, practiced_exercises FROM users WHERE _openid = ? LIMIT 1',
         [openid]);
+
+      // const is_new = !existingUser || !existingUser.name || !existingUser.avatar;
+
+      const is_new = true; // 测试
 
       if (existingUser) {
         const favor = existingUser.favor_exercises
@@ -81,13 +85,13 @@ exports.main = async (event, context) => {
         const practiced = existingUser.practiced_exercises
           ? existingUser.practiced_exercises.split(',').filter(Boolean).map(Number)
           : [];
-        return { success: true, userId: existingUser.id, openid, favor_exercises: favor, practiced_exercises: practiced };
+        return { success: true, userId: existingUser.id, openid, is_new, favor_exercises: favor, practiced_exercises: practiced };
       }
 
       const [result] = await getPool().query(
         "INSERT INTO users (_openid, role, status) VALUES (?, 'user', 1)",
         [openid]);
-      return { success: true, userId: result.insertId, openid, favor_exercises: [], practiced_exercises: [] };
+      return { success: true, userId: result.insertId, openid, is_new: true, favor_exercises: [], practiced_exercises: [] };
     }
 
     // ══════════════════════════════════════════════════════════
@@ -200,7 +204,7 @@ exports.main = async (event, context) => {
 
       } else if (sub === 'update') {
         const [[user]] = await getPool().query(
-          'SELECT id FROM users WHERE _openid = ? LIMIT 1',
+          'SELECT id, avatar FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
 
@@ -213,6 +217,11 @@ exports.main = async (event, context) => {
           vals.push(name);
         }
         if (avatar !== undefined && avatar !== '') {
+          if (user.avatar && user.avatar !== avatar) {
+            cloud.deleteFile({ fileList: [user.avatar] }).catch(err => {
+              console.error('删除旧头像失败:', err);
+            });
+          }
           fields.push('avatar = ?');
           vals.push(avatar);
         }
@@ -267,6 +276,62 @@ exports.main = async (event, context) => {
         const { avatarUrl } = event;
         if (!avatarUrl) return { success: false, error: '缺少 avatarUrl' };
         await getPool().query('UPDATE users SET avatar = ? WHERE _openid = ?', [avatarUrl, openid]);
+        return { success: true };
+
+      } else if (sub === 'updateFull') {
+        const [[user]] = await getPool().query(
+          'SELECT id, avatar FROM users WHERE _openid = ? LIMIT 1',
+          [openid]);
+        if (!user) return { success: false, error: '用户不存在' };
+
+        const { name, birthday, gender, purpose, avatar } = event;
+        const fields = [];
+        const vals = [];
+
+        if (name !== undefined && name !== '') {
+          fields.push('name = ?');
+          vals.push(name);
+        }
+        if (birthday !== undefined && birthday !== '') {
+          fields.push('birthday = ?');
+          vals.push(birthday);
+        }
+        if (gender !== undefined && gender !== '') {
+          fields.push('gender = ?');
+          vals.push(gender);
+        }
+        if (purpose !== undefined && purpose !== '') {
+          const p = parseInt(purpose);
+          if (p < 1 || p > 3) return { success: false, error: 'purpose 必须是 1(塑形)/2(减肥)/3(养生)' };
+          fields.push('purpose = ?');
+          vals.push(p);
+        }
+        if (avatar !== undefined && avatar !== '') {
+          fields.push('avatar = ?');
+          vals.push(avatar);
+          // 删除云端旧头像文件
+          const oldAvatar = user.avatar;
+          if (oldAvatar && oldAvatar !== avatar) {
+            cloud.deleteFile({
+              fileList: [oldAvatar],
+            }).then(res => {
+              if (res.fileList && res.fileList[0] && res.fileList[0].status === 0) {
+                console.log('旧头像文件已删除:', oldAvatar);
+              } else {
+                console.log('删除旧头像文件失败:', res.errMsg || JSON.stringify(res));
+              }
+            }).catch(err => {
+              console.error('删除旧头像文件异常:', err.message || JSON.stringify(err));
+            });
+          }
+        }
+
+        if (fields.length > 0) {
+          vals.push(openid);
+          await getPool().query(
+            `UPDATE users SET ${fields.join(', ')} WHERE _openid = ?`,
+            vals);
+        }
         return { success: true };
 
       } else {

@@ -19,6 +19,10 @@ App({
     // ---- 日夜间主题 ----
     theme: 'night',
     themeVars: {},
+
+    // ---- 新用户欢迎弹框 ----
+    isNewUser: false,
+    showWelcome: false,
   },
 
   onLaunch: async function () {
@@ -52,9 +56,7 @@ App({
     this.globalData.favorExercises = wx.getStorageSync('favorExercises') || [];
     this.globalData.practicedExercises = wx.getStorageSync('practicedExercises') || [];
 
-    if (!openid) {
-      await this.doSilentLogin();
-    }
+    this.globalData.loginPromise = this.doSilentLogin();
   },
 
   // ---- 国际化切换 API ----
@@ -89,6 +91,11 @@ App({
     return this.globalData.themeVars;
   },
 
+  // ---- 欢迎弹框控制 ----
+  closeWelcomeModal() {
+    this.globalData.showWelcome = false;
+  },
+
   doSilentLogin: function () {
     return new Promise((resolve) => {
       wx.login({
@@ -99,11 +106,21 @@ App({
             data: { action: 'login.code', code: loginRes.code },
             success: (res) => {
               if (res.result && res.result.openid) {
-                const { openid, userId, favor_exercises, practiced_exercises } = res.result;
+                const { openid, userId, favor_exercises, practiced_exercises, is_new } = res.result;
                 this.globalData.openid = openid;
                 this.globalData.userId = userId;
                 this.globalData.favorExercises = favor_exercises || [];
                 this.globalData.practicedExercises = practiced_exercises || [];
+                this.globalData.isNewUser = is_new === true;
+                this.globalData.showWelcome = is_new === true;
+                // Notify index page to check showWelcome
+                const pages = getCurrentPages();
+                if (pages.length > 0) {
+                  const indexPage = pages[pages.length - 1];
+                  if (indexPage.onWelcomeLoginReady) {
+                    indexPage.onWelcomeLoginReady();
+                  }
+                }
                 wx.setStorageSync('openid', openid);
                 wx.setStorageSync('userId', userId);
                 wx.setStorageSync('favorExercises', favor_exercises || []);

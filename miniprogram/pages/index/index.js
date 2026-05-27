@@ -63,9 +63,10 @@ Page({
     workoutSummaryExercises: [],
     currentSessionId: null,
     showAddModal: false,
+    showWelcome: false,
   },
 
-  onLoad() {
+  onLoad: async function() {
     this.setData({
       imgPrefix: app.globalData.imagePrefix,
       _dataLoaded: true,
@@ -109,6 +110,12 @@ Page({
   },
 
   onShow() {
+    // Show welcome modal for new users — ALWAYS check first (before _dataLoaded guard)
+    if (app.globalData.showWelcome && !this.data.showWelcome) {
+      this.setData({ showWelcome: true });
+      // Don't return — still allow chosenExercise and other logic below
+    }
+
     // Refresh theme and locale from global app state
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
     const locale = app.globalData.language || 'en';
@@ -123,7 +130,7 @@ Page({
       return;
     }
 
-    // onLoad already loaded data, skip
+    // onLoad already loaded data, skip — showWelcome check ran above
     if (this.data._dataLoaded) return;
 
     // openid not ready yet — poll until ready
@@ -605,6 +612,20 @@ Page({
     if (sessionId) {
       this._loadExerciseGroups(sessionId);
       this._resetRestTimer();  // reset rest timer on exercise add
+    }
+  },
+
+  onWelcomeClose() {
+    this.setData({ showWelcome: false });
+    if (app.closeWelcomeModal) {
+      app.closeWelcomeModal();
+    }
+  },
+
+  // Called by app.doSilentLogin when login completes — check showWelcome
+  onWelcomeLoginReady() {
+    if (app.globalData.showWelcome && !this.data.showWelcome) {
+      this.setData({ showWelcome: true });
     }
   },
 

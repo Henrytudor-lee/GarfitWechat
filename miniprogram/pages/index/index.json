@@ -6,8 +6,10 @@
   "usingComponents": {
     "appbar": "/components/appbar/index",
     "custom-tabbar": "/components/custom-tabbar/index",
+    "add-exercise-modal": "/components/add-exercise-modal/index",
     "edit-exercise-modal": "/components/edit-exercise-modal/index",
     "session-detail-modal": "/components/session-detail-modal/index",
-    "workout-summary-modal": "/components/workout-summary-modal/index"
+    "workout-summary-modal": "/components/workout-summary-modal/index",
+    "welcome-modal": "/components/welcome-modal/index"
   }
 }

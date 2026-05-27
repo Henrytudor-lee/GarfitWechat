@@ -24,7 +24,7 @@ module.exports = {
   "edit_exercise": "EDIT EXERCISE",
   "save": "SAVE",
   "cancel": "CANCEL",
-  "delete": "DELETE",
+  "confirm": "CONFIRM",
   "confirm_delete": "Delete this exercise?",
   "loading": "LOADING...",
   "starting": "STARTING...",
