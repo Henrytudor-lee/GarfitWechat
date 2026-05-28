@@ -1,0 +1,87 @@
+<!-- components/welcome-modal/index.wxml -->
+<view class="modal-mask" bindtap="onMaskTap" hidden="{{!isOpen}}">
+  <view class="modal-sheet" catchtap="noop">
+
+    <!-- Header: Logo + Welcome -->
+    <view class="modal-header">
+      <view class="header-top">
+        <view class="lang-btn" bindtap="switchLanguage">
+          <text class="{{currentLang === 'zh' ?'active lang-current':'lang-current'}}">中文</text>
+          <text class="lang-current">/</text>
+          <text class="{{currentLang !== 'zh' ?'active lang-current':'lang-current'}}">EN</text>
+        </view>
+      </view>
+      <view class="header-brand">
+        <text class="brand-title">{{welcomeText}}</text>
+        <text class="brand-subtitle">{{welcomeSubText}}</text>
+      </view>
+    </view>
+
+    <!-- Form Content -->
+    <view class="form-content">
+
+      <!-- Avatar Upload -->
+      <view class="avatar-section" bindtap="onChooseAvatar">
+        <view class="avatar-container">
+          <image class="avatar-image" src="{{avatarPath || '/images/avatar.png'}}" mode="aspectFill" />
+          <view class="avatar-camera">
+            <text class="camera-icon">✦</text>
+          </view>
+        </view>
+        <text class="avatar-hint">{{uploadAvatarText}}</text>
+      </view>
+
+      <!-- Name Input -->
+      <view class="form-item">
+        <input class="name-input" type="text" placeholder="{{namePlaceholder}}" value="{{name}}" bindinput="onNameInput" />
+      </view>
+
+      <!-- Gender Selection -->
+      <view class="form-item">
+        <text class="field-label">{{genderLabel}}</text>
+        <view class="gender-row">
+          <view class="gender-btn {{gender === 'male' ? 'active' : ''}}" data-value="male" bindtap="onGenderChange">
+            <text class="gender-text">{{currentLang === 'zh' ? '男' : 'Male'}}</text>
+          </view>
+          <view class="gender-btn {{gender === 'female' ? 'active' : ''}}" data-value="female" bindtap="onGenderChange">
+            <text class="gender-text">{{currentLang === 'zh' ? '女' : 'Female'}}</text>
+          </view>
+          <view class="gender-btn {{gender === 'other' ? 'active' : ''}}" data-value="other" bindtap="onGenderChange">
+            <text class="gender-text">{{currentLang === 'zh' ? '其他' : 'Other'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Birthday Picker -->
+      <view class="form-item">
+        <picker mode="date" start="1900-01-01" end="2099-12-31" bindchange="onBirthdayChange">
+          <view class="picker-row">
+            <text class="picker-label">{{birthdayPlaceholder}}</text>
+            <text class="picker-value {{birthday ? '' : 'placeholder'}}">{{birthday || birthdayPlaceholder}}</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- Purpose Selection -->
+      <view class="form-item">
+        <text class="field-label">{{purposeLabel}}</text>
+        <view class="purpose-grid">
+          <block wx:for="{{purposeOptions}}" wx:key="key">
+            <view class="purpose-card {{purpose === item.key ? 'selected' : ''}}" data-key="{{item.key}}" bindtap="onPurposeSelect">
+              <text class="purpose-icon">{{item.icon}}</text>
+              <text class="purpose-label">{{currentLang === 'zh' ? item.text : item.textEn}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- Footer Buttons -->
+    <view class="modal-footer">
+      <button class="btn-cancel" bindtap="onCancel">{{cancelText}}</button>
+      <button class="btn-confirm" bindtap="onConfirm">{{confirmText}}</button>
+    </view>
+
+  </view>
+</view>
