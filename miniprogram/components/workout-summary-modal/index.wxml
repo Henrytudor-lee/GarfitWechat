@@ -1,6 +1,9 @@
 <!--components/workout-summary-modal/index.wxml-->
-<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+<view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
   <view class="modal-card" catchtap="">
+
+    <!-- Hidden canvas for download — position absolute + offscreen, no layout impact -->
+    <canvas canvas-id="stats-canvas" style="width:600px;height:800px;position:absolute;left:-9999px;" class="stats-canvas-el" type="2d"></canvas>
 
     <!-- Background decoration -->
     <view class="card-bg"></view>
@@ -13,24 +16,24 @@
       <view class="check-circle">
         <text class="check-icon">✓</text>
       </view>
-      <view class="complete-label">Workout Complete</view>
+      <view class="complete-label">{{_locale === 'zh' ? '训练完成' : 'Workout Complete'}}</view>
     </view>
 
     <!-- Stats Row -->
     <view class="stats-row">
       <view class="stat-item">
         <view class="stat-val">{{_stats.exerciseCount}}</view>
-        <view class="stat-lbl">Exercises</view>
+        <view class="stat-lbl">{{_locale === 'zh' ? '动作数' : 'Exercises'}}</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
         <view class="stat-val">{{_stats.durationStr}}</view>
-        <view class="stat-lbl">Duration</view>
+        <view class="stat-lbl">{{_locale === 'zh' ? '时长' : 'Duration'}}</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
         <view class="stat-val">{{_stats.totalVolume}} kg</view>
-        <view class="stat-lbl">Volume</view>
+        <view class="stat-lbl">{{_locale === 'zh' ? '总量' : 'Volume'}}</view>
       </view>
     </view>
 
@@ -38,7 +41,7 @@
     <view class="divider"></view>
 
     <!-- Exercise Breakdown -->
-    <view class="breakdown-title">Exercise Summary</view>
+    <view class="breakdown-title">{{_locale === 'zh' ? '动作明细' : 'Exercise Summary'}}</view>
     <scroll-view class="breakdown-scroll" scroll-y>
       <view class="breakdown-list">
         <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="id">
@@ -51,8 +54,8 @@
             />
             <view wx:else class="item-img item-img-placeholder">🏋️</view>
             <view class="item-info">
-              <view class="item-name">{{locale === 'zh' ? item.name_zh : item.name}}</view>
-              <view class="item-sets">{{item.sets.length}} sets</view>
+              <view class="item-name">{{_locale === 'zh' ? (item.name_zh || item.name) : (item.name || item.name_zh)}}</view>
+              <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? (_locale === 'zh' ? '组' : 'set') : (_locale === 'zh' ? '组' : 'sets')}}</view>
             </view>
             <view class="item-vol">
               <text class="vol-num">{{getGroupVolume(item)}}</text>
@@ -75,10 +78,11 @@
     <!-- Date Footer -->
     <view class="date-footer">{{getDateStr()}}</view>
 
-    <!-- Action Buttons -->
+    <!-- Action Buttons: DONE + DOWNLOAD + SHARE -->
     <view class="card-footer">
-      <button class="btn-secondary" bindtap="closeModal">VIEW HISTORY</button>
-      <button class="btn-primary" bindtap="closeModal">DONE</button>
+      <button class="btn-secondary" bindtap="closeModal">{{_locale === 'zh' ? '完成' : 'DONE'}}</button>
+      <button class="btn-download" bindtap="downloadStats">{{_locale === 'zh' ? '下载' : 'DOWNLOAD'}}</button>
+      <button class="btn-share" open-type="share">{{_locale === 'zh' ? '分享' : 'SHARE'}}</button>
     </view>
 
   </view>

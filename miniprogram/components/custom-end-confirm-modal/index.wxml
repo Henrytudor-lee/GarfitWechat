@@ -1,0 +1,29 @@
+<!--components/custom-end-confirm-modal/index.wxml-->
+<view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
+  <view class="modal-card" catchtap="">
+
+    <!-- Background decoration -->
+    <view class="card-bg"></view>
+    <view class="bg-blob blob-1"></view>
+    <view class="bg-blob blob-2"></view>
+
+    <!-- Header -->
+    <view class="card-header">
+      <view class="brand">GFIT</view>
+      <view class="confirm-icon">?</view>
+      <view class="confirm-label">{{_locale === 'zh' ? '确认结束训练' : 'END TRAINING'}}</view>
+    </view>
+
+    <!-- Content -->
+    <view class="content-body">
+      <view class="content-text">{{_locale === 'zh' ? '确定要结束本次训练吗？' : 'Are you sure you want to end this training session?'}}</view>
+    </view>
+
+    <!-- Action Buttons -->
+    <view class="card-footer">
+      <button class="btn-secondary" bindtap="cancelConfirm">{{_locale === 'zh' ? '取消' : 'CANCEL'}}</button>
+      <button class="btn-primary" bindtap="confirmEnd">{{_locale === 'zh' ? '确认' : 'CONFIRM'}}</button>
+    </view>
+
+  </view>
+</view>

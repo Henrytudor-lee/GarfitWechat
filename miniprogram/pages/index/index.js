@@ -64,6 +64,9 @@ Page({
     currentSessionId: null,
     showAddModal: false,
     showWelcome: false,
+
+    // End confirm modal
+    showEndConfirm: false,
   },
 
   onLoad: async function() {
@@ -503,52 +506,53 @@ Page({
     }
   },
 
+  async requestStopWorkout() {
+    this.setData({ showEndConfirm: true });
+  },
+
+  onEndConfirmCancel() {
+    this.setData({ showEndConfirm: false });
+  },
+
   async stopWorkout() {
+    this.setData({ showEndConfirm: false });
     const sessionId = this.data.currentSessionId || (this.data.runningSession ? (this.data.runningSession._id || this.data.runningSession.id) : null);
-    const locale = this.data.locale || 'en';
-    wx.showModal({
-      title: locale === 'zh' ? '结束训练' : 'END TRAINING',
-      content: locale === 'zh' ? '确定要结束本次训练吗？' : 'Are you sure you want to end this training session?',
-      confirmColor: '#ccf200',
-      success: async (res) => {
-        if (!res.confirm) return;
-        wx.showLoading({ title: locale === 'zh' ? '结束中...' : 'ENDING...', mask: true });
-        // Gather summary data first
-        let totalVolume = this.data.totalVolume;
-        let exerciseCount = this.data.exerciseCount;
-        let elapsedSeconds = 0;
-        if (this.data.runningSession && this.data.runningSession.start_time) {
-          elapsedSeconds = Math.floor((Date.now() - new Date(this.data.runningSession.start_time).getTime()) / 1000);
-        }
-        const r = await wx.cloud.callFunction({
-          name: 'api',
-          data: { action: 'session.finish', session_id: sessionId, openid: app.globalData.openid },
-        });
-        wx.hideLoading();
-        if (r.result && r.result.success) {
-          this._stopTimers();
-          // Show workout summary modal
-          this.setData({
-            showWorkoutSummary: true,
-            workoutSummarySession: {
-              ...this.data.runningSession,
-              duration: elapsedSeconds,
-              totalVolume,
-              exerciseCount,
-              exercises: this.data.exerciseGroups,
-            },
-            workoutSummaryExercises: this.data.exerciseGroups,
-            runningSession: null,
-            currentSessionId: null,
-            exerciseGroups: [],
-            exerciseCount: 0,
-            totalVolume: 0,
-            elapsedTime: '00:00:00',
-            restTime: '--:--',
-          });
-        }
-      },
+    const locale = app.globalData.language || 'en';
+    wx.showLoading({ title: locale === 'zh' ? '结束中...' : 'ENDING...', mask: true });
+    // Gather summary data first
+    let totalVolume = this.data.totalVolume;
+    let exerciseCount = this.data.exerciseCount;
+    let elapsedMs = 0;
+    if (this.data.runningSession && this.data.runningSession.start_time) {
+      elapsedMs = Date.now() - new Date(this.data.runningSession.start_time).getTime();
+    }
+    const r = await wx.cloud.callFunction({
+      name: 'api',
+      data: { action: 'session.finish', session_id: sessionId, openid: app.globalData.openid },
     });
+    wx.hideLoading();
+    if (r.result && r.result.success) {
+      this._stopTimers();
+      // Show workout summary modal — duration in ms for _computeStats
+      this.setData({
+        showWorkoutSummary: true,
+        workoutSummarySession: {
+          ...this.data.runningSession,
+          duration: elapsedMs,
+          totalVolume,
+          exerciseCount,
+          exercises: this.data.exerciseGroups,
+        },
+        workoutSummaryExercises: this.data.exerciseGroups,
+        runningSession: null,
+        currentSessionId: null,
+        exerciseGroups: [],
+        exerciseCount: 0,
+        totalVolume: 0,
+        elapsedTime: '00:00:00',
+        restTime: '--:--',
+      });
+    }
   },
 
   goToLibrary() {
