@@ -9,8 +9,10 @@
 
     <!-- Header -->
     <view class="card-header">
-      <view class="brand">GFIT</view>
-      <view class="confirm-icon">?</view>
+      <view class="brand-row">
+        <image class="brand-logo" src="/images/logo.png" mode="aspectFit" />
+        <view class="brand">GFIT</view>
+      </view>
       <view class="confirm-label">{{_locale === 'zh' ? '确认结束训练' : 'END TRAINING'}}</view>
     </view>
 

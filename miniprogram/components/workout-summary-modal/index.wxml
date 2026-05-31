@@ -2,9 +2,6 @@
 <view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
   <view class="modal-card" catchtap="">
 
-    <!-- Hidden canvas for download — position absolute + offscreen, no layout impact -->
-    <canvas canvas-id="stats-canvas" style="width:600px;height:800px;position:absolute;left:-9999px;" class="stats-canvas-el" type="2d"></canvas>
-
     <!-- Background decoration -->
     <view class="card-bg"></view>
     <view class="bg-blob blob-1"></view>
@@ -12,11 +9,14 @@
 
     <!-- Header -->
     <view class="card-header">
-      <view class="brand">GFIT</view>
+      <view class="brand-row">
+        <image class="brand-logo" src="/images/logo.png" mode="aspectFit" />
+        <view class="brand">GFIT</view>
+      </view>
       <view class="check-circle">
         <text class="check-icon">✓</text>
       </view>
-      <view class="complete-label">{{_locale === 'zh' ? '训练完成' : 'Workout Complete'}}</view>
+      <view class="complete-label {{_theme === 'day' ? 'theme-day' : ''}}">{{_locale === 'zh' ? '训练完成' : 'Workout Complete'}}</view>
     </view>
 
     <!-- Stats Row -->
@@ -78,10 +78,9 @@
     <!-- Date Footer -->
     <view class="date-footer">{{getDateStr()}}</view>
 
-    <!-- Action Buttons: DONE + DOWNLOAD + SHARE -->
+    <!-- Action Buttons -->
     <view class="card-footer">
       <button class="btn-secondary" bindtap="closeModal">{{_locale === 'zh' ? '完成' : 'DONE'}}</button>
-      <button class="btn-download" bindtap="downloadStats">{{_locale === 'zh' ? '下载' : 'DOWNLOAD'}}</button>
       <button class="btn-share" open-type="share">{{_locale === 'zh' ? '分享' : 'SHARE'}}</button>
     </view>
 

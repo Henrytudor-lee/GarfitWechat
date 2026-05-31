@@ -18,9 +18,32 @@ function getPool() {
       waitForConnections: true,
       connectionLimit: 5,
       queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10000,
+      connectTimeout: 10000,
     });
   }
   return pool;
+}
+
+// ── Execute query with one automatic retry on stale connection ──────
+async function query(sql, params) {
+  const tryOnce = async () => {
+    const p = getPool();
+    return p.query(sql, params);
+  };
+  try {
+    return await tryOnce();
+  } catch (err) {
+    const isStale = err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST'
+      || err.message && err.message.includes('Malformed communication packet');
+    if (isStale) {
+      // Destroy current pool so next call recreates it
+      if (pool) { pool.end().catch(() => {}); pool = null; }
+      return tryOnce();
+    }
+    throw err;
+  }
 }
 
 // ── Helper: ISO timestamp ─────────────────────────────────────────────
@@ -70,7 +93,7 @@ exports.main = async (event, context) => {
       if (wxRes.errcode) return { success: false, error: wxRes.errmsg || '微信登录失败' };
 
       const openid = wxRes.openid;
-      const [[existingUser]] = await getPool().query(
+      const [[existingUser]] = await query(
         'SELECT id, name, avatar, favor_exercises, practiced_exercises FROM users WHERE _openid = ? LIMIT 1',
         [openid]);
 
@@ -87,7 +110,7 @@ exports.main = async (event, context) => {
         return { success: true, userId: existingUser.id, openid, is_new, favor_exercises: favor, practiced_exercises: practiced };
       }
 
-      const [result] = await getPool().query(
+      const [result] = await query(
         "INSERT INTO users (_openid, role, status) VALUES (?, 'user', 1)",
         [openid]);
       return { success: true, userId: result.insertId, openid, is_new: true, favor_exercises: [], practiced_exercises: [] };
@@ -101,7 +124,7 @@ exports.main = async (event, context) => {
       if (!openid) return { success: false, error: '未登录' };
 
       if (sub === 'create') {
-        const [running] = await getPool().query(
+        const [running] = await query(
           "SELECT * FROM sessions WHERE _openid = ? AND status = 'active' LIMIT 1",
           [openid]);
         if (running.length > 0) {
@@ -109,17 +132,17 @@ exports.main = async (event, context) => {
           return { success: true, session: { ...r, start_time: isoTime(r.start_time) }, resumed: true };
         }
 
-        const [[user]] = await getPool().query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
+        const [[user]] = await query('SELECT id FROM users WHERE _openid = ? LIMIT 1', [openid]);
         const userId = user ? user.id : null;
 
-        const [result] = await getPool().query(
+        const [result] = await query(
           "INSERT INTO sessions (_openid, user_id, start_time, status) VALUES (?, ?, UTC_TIMESTAMP(), 'active')",
           [openid, userId]);
-        const [newSess] = await getPool().query('SELECT * FROM sessions WHERE id = ?', [result.insertId]);
+        const [newSess] = await query('SELECT * FROM sessions WHERE id = ?', [result.insertId]);
         return { success: true, sessionId: result.insertId, session: { ...newSess[0], start_time: isoTime(newSess[0].start_time) }, resumed: false };
 
       } else if (sub === 'getRunning') {
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           "SELECT * FROM sessions WHERE _openid = ? AND status = 'active' LIMIT 1",
           [openid]);
         const session = rows[0] ? { ...rows[0], start_time: isoTime(rows[0].start_time) } : null;
@@ -130,12 +153,12 @@ exports.main = async (event, context) => {
         const id = sessionId || session_id;
         if (!id) return { success: false, error: '缺少 sessionId 或 session_id' };
 
-        const [sessions] = await getPool().query(
+        const [sessions] = await query(
           'SELECT * FROM sessions WHERE id = ? AND _openid = ? LIMIT 1',
           [id, openid]);
         if (sessions.length === 0) return { success: false, error: '会话不存在' };
 
-        await getPool().query(
+        await query(
           "UPDATE sessions SET status = 'finished', end_time = NOW(), duration = TIMESTAMPDIFF(SECOND, start_time, NOW()) WHERE id = ? AND _openid = ?",
           [id, openid]);
         return { success: true };
@@ -155,14 +178,14 @@ exports.main = async (event, context) => {
         sql += ' ORDER BY start_time DESC LIMIT ? OFFSET ?';
         params.push(pageSize, offset);
 
-        const [rows] = await getPool().query(sql, params);
+        const [rows] = await query(sql, params);
         const sessions = rows.map(s => ({ ...s, start_time: isoTime(s.start_time) }));
         return { success: true, sessions, page, pageSize };
 
       } else if (sub === 'getById') {
         const { id } = event;
         if (!id) return { success: false, error: '缺少 id' };
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           'SELECT * FROM sessions WHERE id = ? AND _openid = ? LIMIT 1',
           [id, openid]);
         const session = rows[0] ? { ...rows[0], start_time: isoTime(rows[0].start_time) } : null;
@@ -171,7 +194,7 @@ exports.main = async (event, context) => {
       } else if (sub === 'delete') {
         const { id } = event;
         if (!id) return { success: false, error: '缺少 id' };
-        await getPool().query('DELETE FROM sessions WHERE id = ? AND _openid = ?', [id, openid]);
+        await query('DELETE FROM sessions WHERE id = ? AND _openid = ?', [id, openid]);
         return { success: true };
 
       } else {
@@ -187,7 +210,7 @@ exports.main = async (event, context) => {
       if (!openid) return { success: false, error: '未登录' };
 
       if (sub === 'get') {
-        const [[user]] = await getPool().query(
+        const [[user]] = await query(
           'SELECT name, avatar, phone, created_at FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
@@ -202,7 +225,7 @@ exports.main = async (event, context) => {
         };
 
       } else if (sub === 'update') {
-        const [[user]] = await getPool().query(
+        const [[user]] = await query(
           'SELECT id, avatar FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
@@ -227,14 +250,14 @@ exports.main = async (event, context) => {
 
         if (fields.length > 0) {
           vals.push(openid);
-          await getPool().query(
+          await query(
             `UPDATE users SET ${fields.join(', ')} WHERE _openid = ?`,
             vals);
         }
         return { success: true };
 
       } else if (sub === 'getStreak') {
-        const [streakDays] = await getPool().query(
+        const [streakDays] = await query(
           "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
           [openid]);
         let streak = 0;
@@ -259,7 +282,7 @@ exports.main = async (event, context) => {
         return { success: true, streak };
 
       } else if (sub === 'getLevel') {
-        const [[row]] = await getPool().query(
+        const [[row]] = await query(
           "SELECT COUNT(*) as cnt FROM sessions WHERE _openid = ? AND status = 'finished'",
           [openid]);
         const cnt = row ? row.cnt : 0;
@@ -274,11 +297,11 @@ exports.main = async (event, context) => {
       } else if (sub === 'updateAvatar') {
         const { avatarUrl } = event;
         if (!avatarUrl) return { success: false, error: '缺少 avatarUrl' };
-        await getPool().query('UPDATE users SET avatar = ? WHERE _openid = ?', [avatarUrl, openid]);
+        await query('UPDATE users SET avatar = ? WHERE _openid = ?', [avatarUrl, openid]);
         return { success: true };
 
       } else if (sub === 'updateFull') {
-        const [[user]] = await getPool().query(
+        const [[user]] = await query(
           'SELECT id, avatar FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
@@ -327,7 +350,7 @@ exports.main = async (event, context) => {
 
         if (fields.length > 0) {
           vals.push(openid);
-          await getPool().query(
+          await query(
             `UPDATE users SET ${fields.join(', ')} WHERE _openid = ?`,
             vals);
         }
@@ -347,11 +370,11 @@ exports.main = async (event, context) => {
       if (sub === 'add') {
         const { session_id, exercise_id, name_zh, name_en, image_name, video_name, weight, reps, weight_unit } = event;
         if (!session_id || !exercise_id || !name_zh) return { success: false, error: '缺少必填字段' };
-        const [sessions] = await getPool().query('SELECT _openid, user_id FROM sessions WHERE id = ?', [session_id]);
+        const [sessions] = await query('SELECT _openid, user_id FROM sessions WHERE id = ?', [session_id]);
         const _openid = sessions.length > 0 ? sessions[0]._openid : null;
         const userId = sessions.length > 0 ? sessions[0].user_id : null;
 
-        const [result] = await getPool().query(
+        const [result] = await query(
           'INSERT INTO exercises (session_id, _openid, user_id, exercise_id, name_zh, name_en, image_name, video_name, weight, reps, weight_unit, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
           [session_id, _openid, userId, exercise_id, name_zh, name_en || null, image_name || null, video_name || null, parseFloat(weight) || 0, parseInt(reps) || 0, (weight_unit || 'kg')]);
         return { success: true, exerciseId: result.insertId };
@@ -359,7 +382,7 @@ exports.main = async (event, context) => {
       } else if (sub === 'list') {
         const { session_id } = event;
         if (!session_id) return { success: false, error: '缺少 session_id' };
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           'SELECT * FROM exercises WHERE session_id = ? ORDER BY create_time ASC',
           [session_id]);
         return { success: true, exercises: rows };
@@ -367,7 +390,7 @@ exports.main = async (event, context) => {
       } else if (sub === 'getMaxWeight') {
         const exercise_id = event.exercise_id || event.exerciseId;
         if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           `SELECT weight, reps, weight_unit, create_time
            FROM exercises
            WHERE _openid = ? AND exercise_id = ?
@@ -379,7 +402,7 @@ exports.main = async (event, context) => {
       } else if (sub === 'update') {
         const { id, session_id, weight, reps, openid: callerOpenid, weight_unit } = event;
         if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
-        await getPool().query(
+        await query(
           'UPDATE exercises SET weight = ?, reps = ?, weight_unit = ? WHERE id = ? AND session_id = ? AND _openid = ?',
           [parseFloat(weight) || 0, parseInt(reps) || 0, (weight_unit || 'kg'), id, session_id, callerOpenid]);
         return { success: true };
@@ -387,7 +410,7 @@ exports.main = async (event, context) => {
       } else if (sub === 'delete') {
         const { id, session_id, openid: callerOpenid } = event;
         if (!id || !session_id) return { success: false, error: '缺少 id 或 session_id' };
-        await getPool().query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
+        await query('DELETE FROM exercises WHERE id = ? AND session_id = ? AND _openid = ?', [id, session_id, callerOpenid]);
         return { success: true };
 
       } else if (sub === 'toggleFavorite') {
@@ -395,7 +418,7 @@ exports.main = async (event, context) => {
         if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
         if (!openid) return { success: false, error: '缺少 openid' };
 
-        const [users] = await getPool().query('SELECT favor_exercises FROM users WHERE _openid = ?', [openid]);
+        const [users] = await query('SELECT favor_exercises FROM users WHERE _openid = ?', [openid]);
         const raw = users.length > 0 ? (users[0].favor_exercises || '') : '';
         const current = raw ? raw.split(',').filter(Boolean).map(Number) : [];
 
@@ -406,7 +429,7 @@ exports.main = async (event, context) => {
           updated = [...current, Number(exercise_id)];
         }
 
-        await getPool().query(
+        await query(
           'UPDATE users SET favor_exercises = ? WHERE _openid = ?',
           [updated.join(','), openid]
         );
@@ -416,13 +439,13 @@ exports.main = async (event, context) => {
         const { exercise_id } = event;
         if (!exercise_id || !openid) return { success: false };
         try {
-          const [users] = await getPool().query('SELECT practiced_exercises FROM users WHERE _openid = ?', [openid]);
+          const [users] = await query('SELECT practiced_exercises FROM users WHERE _openid = ?', [openid]);
           const raw = users.length > 0 ? (users[0].practiced_exercises || '') : '';
           const current = raw ? raw.split(',').filter(Boolean).map(Number) : [];
           const arr = Array.isArray(current) ? current : [];
           if (!arr.includes(Number(exercise_id))) {
             arr.push(Number(exercise_id));
-            await getPool().query(
+            await query(
               'UPDATE users SET practiced_exercises = ? WHERE _openid = ?',
               [arr.join(','), openid]
             );
@@ -434,7 +457,7 @@ exports.main = async (event, context) => {
 
       } else if (sub === 'getUserExercises') {
         if (!openid) return { success: false, error: '缺少 openid' };
-        const [users] = await getPool().query('SELECT favor_exercises, practiced_exercises FROM users WHERE _openid = ?', [openid]);
+        const [users] = await query('SELECT favor_exercises, practiced_exercises FROM users WHERE _openid = ?', [openid]);
         if (users.length === 0) return { success: true, favor_exercises: [], practiced_exercises: [] };
         const favorRaw = users[0].favor_exercises || '';
         const practicedRaw = users[0].practiced_exercises || '';
@@ -501,40 +524,40 @@ exports.main = async (event, context) => {
         sql += ' ORDER BY name_zh ASC LIMIT ? OFFSET ?';
         params.push(pageSize, (page - 1) * pageSize);
 
-        const [rows] = await getPool().query(sql, params);
+        const [rows] = await query(sql, params);
         return { success: true, list: rows, page, pageSize };
 
       } else if (sub === 'detail') {
         if (!id) return { success: false, error: '缺少 id' };
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           'SELECT * FROM exercises_library WHERE id = ? LIMIT 1',
           [id]
         );
         return { success: true, item: rows[0] || null };
 
       } else if (sub === 'favorites') {
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           'SELECT id,name,name_zh,image_name,video_name,equipment_id,body_part_id,exercise_type,is_favorite FROM exercises_library WHERE is_favorite = 1 ORDER BY name_zh ASC'
         );
         return { success: true, list: rows };
 
       } else if (sub === 'toggleLibraryFavorite') {
         if (!exerciseId) return { success: false, error: '缺少 exerciseId' };
-        const [existing] = await getPool().query(
+        const [existing] = await query(
           'SELECT is_favorite FROM exercises_library WHERE id = ? LIMIT 1',
           [exerciseId]
         );
         if (!existing || existing.length === 0) return { success: false, error: '动作不存在' };
 
         const newVal = existing[0].is_favorite === 1 ? 0 : 1;
-        await getPool().query(
+        await query(
           'UPDATE exercises_library SET is_favorite = ? WHERE id = ?',
           [newVal, exerciseId]
         );
         return { success: true, is_favorite: newVal };
 
       } else if (sub === 'count') {
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           'SELECT COUNT(*) as total FROM exercises_library'
         );
         return { success: true, total: rows[0].total };
@@ -553,25 +576,25 @@ exports.main = async (event, context) => {
 
       if (sub === 'summary' || !sub) {
         // Total finished sessions
-        const [[totalRow]] = await getPool().query(
+        const [[totalRow]] = await query(
           "SELECT COUNT(*) as n FROM sessions WHERE _openid = ? AND status = 'finished'",
           [openid]);
         const totalSessions = totalRow ? totalRow.n : 0;
 
         // Total volume
-        const [[volumeRow]] = await getPool().query(
+        const [[volumeRow]] = await query(
           "SELECT COALESCE(SUM(e.weight * e.reps), 0) as total FROM exercises e JOIN sessions s ON e.session_id = s.id WHERE s._openid = ? AND s.status = 'finished'",
           [openid]);
         const totalVolume = Number(volumeRow ? volumeRow.total : 0);
 
         // Week workouts
-        const [[weekRow]] = await getPool().query(
+        const [[weekRow]] = await query(
           "SELECT COUNT(*) as n FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
           [openid]);
         const weekWorkouts = weekRow ? weekRow.n : 0;
 
         // Current streak
-        const [streakDays] = await getPool().query(
+        const [streakDays] = await query(
           "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
           [openid]);
         let currentStreak = 0;
@@ -597,7 +620,7 @@ exports.main = async (event, context) => {
         }
 
         // Exercise history
-        const [histRows] = await getPool().query(
+        const [histRows] = await query(
           `SELECT e.exercise_id, el.name_zh, el.name as name_en,
                   el.body_part_id as body_part_ids,
                   JSON_ARRAYAGG(JSON_OBJECT('weight', e.weight, 'reps', e.reps, 'weight_unit', e.weight_unit, 'create_time', e.create_time)) as records
@@ -624,7 +647,7 @@ exports.main = async (event, context) => {
         });
 
         // Weekly volume
-        const [weeklyVolume] = await getPool().query(
+        const [weeklyVolume] = await query(
           `SELECT
              YEARWEEK(s.start_time, 1) as yrweek,
              DATE_FORMAT(s.start_time, '%Y-%m-%d') as day,
@@ -638,7 +661,7 @@ exports.main = async (event, context) => {
           [openid]);
 
         // Recent sessions
-        const [recentSessions] = await getPool().query(
+        const [recentSessions] = await query(
           "SELECT * FROM sessions WHERE _openid = ? ORDER BY start_time DESC LIMIT 30",
           [openid]);
 
@@ -659,7 +682,7 @@ exports.main = async (event, context) => {
         const { exercise_id } = event;
         if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
 
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           `SELECT e.weight, e.reps, e.weight_unit, e.create_time
            FROM exercises e
            JOIN sessions s ON e.session_id = s.id
@@ -673,7 +696,7 @@ exports.main = async (event, context) => {
         }
 
         const max = rows[0];
-        const [[countRow]] = await getPool().query(
+        const [[countRow]] = await query(
           `SELECT COUNT(*) as totalSets FROM exercises e
            JOIN sessions s ON e.session_id = s.id
            WHERE s._openid = ? AND e.exercise_id = ? AND s.status = 'finished'`,
@@ -690,7 +713,7 @@ exports.main = async (event, context) => {
         };
 
       } else if (sub === 'exerciseList') {
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           `SELECT DISTINCT e.exercise_id, e.name_zh
            FROM exercises e
            JOIN sessions s ON e.session_id = s.id
@@ -703,7 +726,7 @@ exports.main = async (event, context) => {
         const { exercise_id } = event;
         if (!exercise_id) return { success: false, error: '缺少 exercise_id' };
 
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           `SELECT e.weight, e.reps, e.weight_unit, e.create_time
            FROM exercises e
            JOIN sessions s ON e.session_id = s.id
@@ -717,7 +740,7 @@ exports.main = async (event, context) => {
         const { year, month } = event;
         if (!year || !month) return { success: false, error: '缺少 year 或 month' };
 
-        const [rows] = await getPool().query(
+        const [rows] = await query(
           `SELECT DATE(start_time) as day FROM sessions
            WHERE _openid = ? AND status = 'finished'
              AND YEAR(start_time) = ? AND MONTH(start_time) = ?
