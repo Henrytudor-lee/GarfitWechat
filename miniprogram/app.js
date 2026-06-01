@@ -46,7 +46,6 @@ App({
     const currentTheme = theme.initTheme();
     this.globalData.theme = currentTheme;
     this.globalData.themeVars = theme.getThemeVars();
-    // 应用主题到 window 背景色（initTheme 内部已调用 applyTheme，此处不再重复调用）
 
     // 静默自动登录：优先从 storage 恢复，若无则调 wx.login + loginByWx 云函数
     const userId = wx.getStorageSync('userId');
@@ -57,6 +56,16 @@ App({
     this.globalData.practicedExercises = wx.getStorageSync('practicedExercises') || [];
 
     this.globalData.loginPromise = this.doSilentLogin();
+  },
+
+  onShow: function () {
+    // 每次小程序从后台回到前台，重新初始化云环境，确保 cloud:// URL 能正常访问
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: this.globalData.env,
+        traceUser: false,
+      });
+    }
   },
 
   // ---- 国际化切换 API ----
