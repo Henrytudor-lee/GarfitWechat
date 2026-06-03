@@ -26,6 +26,7 @@ Component({
     imgPrefix: '',
     exerciseList: [],
     _locale: 'en',
+    _dateStr: '',
     _stats: {
       exerciseCount: 0,
       durationStr: '0 min',
@@ -42,6 +43,7 @@ Component({
           imgPrefix: app.globalData.imagePrefix || '',
           _locale: locale,
           _theme: theme,
+          _dateStr: this._computeDateStr(),
         });
       }
     },
@@ -88,34 +90,31 @@ Component({
         : (locale === 'zh' ? `${mins}分钟` : `${mins} min`);
 
       let totalVolume = 0;
-      for (const ex of exerciseList) {
+      // 为每个动作预计算 totalVolume (WXML 不支持方法调用, 必须在 data 字段里)
+      const groups = exerciseList.map((ex) => {
+        let vol = 0;
         if (ex.sets) {
           for (const s of ex.sets) {
-            totalVolume += toKg(s.weight, s.weight_unit) * (Number(s.reps) || 0);
+            vol += toKg(s.weight, s.weight_unit) * (Number(s.reps) || 0);
           }
         }
+        return { ...ex, totalVolume: Math.round(vol) };
+      });
+      for (const ex of groups) {
+        totalVolume += ex.totalVolume;
       }
 
       this.setData({
-        exerciseList,
+        exerciseList: groups,
         _stats: {
-          exerciseCount: exerciseList.length,
+          exerciseCount: groups.length,
           durationStr,
           totalVolume: Math.round(totalVolume),
         },
       });
     },
 
-    getGroupVolume(item) {
-      if (!item || !item.sets) return 0;
-      let vol = 0;
-      for (const s of item.sets) {
-        vol += toKg(s.weight, s.weight_unit) * (Number(s.reps) || 0);
-      }
-      return Math.round(vol);
-    },
-
-    getDateStr() {
+    _computeDateStr() {
       const now = new Date();
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const dd = String(now.getDate()).padStart(2, '0');

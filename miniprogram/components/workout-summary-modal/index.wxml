@@ -58,7 +58,7 @@
               <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? (_locale === 'zh' ? '组' : 'set') : (_locale === 'zh' ? '组' : 'sets')}}</view>
             </view>
             <view class="item-vol">
-              <text class="vol-num">{{getGroupVolume(item)}}</text>
+              <text class="vol-num">{{item.totalVolume}}</text>
               <text class="vol-unit">kg</text>
             </view>
           </view>
@@ -76,7 +76,7 @@
     </scroll-view>
 
     <!-- Date Footer -->
-    <view class="date-footer">{{getDateStr()}}</view>
+    <view class="date-footer">{{_dateStr}}</view>
 
     <!-- Action Buttons -->
     <view class="card-footer">
