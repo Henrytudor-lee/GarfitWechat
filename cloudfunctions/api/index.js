@@ -5,6 +5,11 @@ const https = require('https');
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
+// ── 重量单位换算 (与前端 utils/unit.js 保持一致) ─────────────────────
+const KG_PER_LB = 0.4536;
+// SQL 片段: lb → kg 换算，保持与前端 toKg() 一致
+const WEIGHT_KG_SQL = `CASE e.weight_unit WHEN 'lb' THEN e.weight * ${KG_PER_LB} ELSE e.weight END`;
+
 // ── Shared pool (singleton) ──────────────────────────────────────────
 let pool = null;
 function getPool() {
@@ -583,7 +588,7 @@ exports.main = async (event, context) => {
 
         // Total volume
         const [[volumeRow]] = await query(
-          "SELECT COALESCE(SUM(e.weight * e.reps), 0) as total FROM exercises e JOIN sessions s ON e.session_id = s.id WHERE s._openid = ? AND s.status = 'finished'",
+          `SELECT COALESCE(SUM(${WEIGHT_KG_SQL} * e.reps), 0) as total FROM exercises e JOIN sessions s ON e.session_id = s.id WHERE s._openid = ? AND s.status = 'finished'`,
           [openid]);
         const totalVolume = Number(volumeRow ? volumeRow.total : 0);
 
@@ -651,7 +656,7 @@ exports.main = async (event, context) => {
           `SELECT
              YEARWEEK(s.start_time, 1) as yrweek,
              DATE_FORMAT(s.start_time, '%Y-%m-%d') as day,
-             COALESCE(SUM(e.weight * e.reps), 0) as volume
+             COALESCE(SUM(${WEIGHT_KG_SQL} * e.reps), 0) as volume
            FROM exercises e
            JOIN sessions s ON e.session_id = s.id
            WHERE s._openid = ? AND s.status = 'finished'

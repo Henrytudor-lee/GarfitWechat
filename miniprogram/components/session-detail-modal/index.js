@@ -1,5 +1,6 @@
 // components/session-detail-modal/index.js
 const app = getApp();
+const { toKg } = require('../../utils/unit.js');
 
 Component({
   properties: {
@@ -108,7 +109,7 @@ Component({
               reps: ex.reps,
               weight_unit: ex.weight_unit || 'kg',
             });
-            map[ex.exercise_id].totalVolume += (Number(ex.weight) || 0) * (Number(ex.reps) || 0);
+            map[ex.exercise_id].totalVolume += toKg(ex.weight, ex.weight_unit) * (Number(ex.reps) || 0);
           }
         }
         this.setData({ exerciseList: Object.values(map) });

@@ -1,5 +1,6 @@
 // components/workout-summary-modal/index.js
 const app = getApp();
+const { toKg } = require('../../utils/unit.js');
 
 Component({
   properties: {
@@ -90,7 +91,7 @@ Component({
       for (const ex of exerciseList) {
         if (ex.sets) {
           for (const s of ex.sets) {
-            totalVolume += (s.weight || 0) * (s.reps || 0);
+            totalVolume += toKg(s.weight, s.weight_unit) * (Number(s.reps) || 0);
           }
         }
       }
@@ -109,7 +110,7 @@ Component({
       if (!item || !item.sets) return 0;
       let vol = 0;
       for (const s of item.sets) {
-        vol += (s.weight || 0) * (s.reps || 0);
+        vol += toKg(s.weight, s.weight_unit) * (Number(s.reps) || 0);
       }
       return Math.round(vol);
     },

@@ -52,7 +52,7 @@
                 <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'set') : (locale === 'zh' ? '组' : 'sets')}}</view>
               </view>
               <view class="ec-volume">
-                <view class="ec-vol-num">{{item.totalVolume || '—'}} {{item.sets[0] ? item.sets[0].weight_unit : 'kg'}}</view>
+                <view class="ec-vol-num">{{item.totalVolume || '—'}} kg</view>
                 <view class="ec-vol-label">{{locale === 'zh' ? '总重量' : 'VOLUME'}}</view>
               </view>
             </view>

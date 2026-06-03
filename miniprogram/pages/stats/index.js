@@ -1,5 +1,6 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
+const { toKg } = require('../../utils/unit.js');
 
 // Compute ISO yrweek key e.g. 202621 for 2026-W21
 function toYrweek(date) {
@@ -110,7 +111,7 @@ Page({
     const muscleMap = {};
     const { BODY_PART_MAP, BODY_PART_MAP_ZH } = require('../../utils/maps.js');
     historyExercises.forEach(ex => {
-      const total = ex.records.reduce((s, r) => s + (r.weight || 0) * (r.reps || 0), 0);
+      const total = ex.records.reduce((s, r) => s + toKg(r.weight, r.weight_unit) * (Number(r.reps) || 0), 0);
       if (total === 0) return;
       const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
       partIds.forEach(partId => {
