@@ -26,6 +26,8 @@ Component({
     exerciseList: [],
     loading: false,
     _durationDisplay: '--:--',
+    _dateDisplay: '',
+    totalSets: 0,
   },
 
   observers: {
@@ -44,8 +46,16 @@ Component({
         if (session.exercises) {
           this.setData({ exerciseList: session.exercises });
         }
+        this._computeDate(session);
         this._computeDuration(session);
       }
+    },
+    'exerciseList': function(list) {
+      const total = (list || []).reduce(
+        (acc, ex) => acc + (ex.sets ? ex.sets.length : 0),
+        0
+      );
+      this.setData({ totalSets: total });
     },
   },
 
@@ -83,11 +93,12 @@ Component({
           if (!map[ex.exercise_id]) {
             map[ex.exercise_id] = {
               _id: ex._id,
-              name: ex.name,
-              name_zh: ex.name_zh || ex.name,
+              name_en: ex.name_en,
+              name_zh: ex.name_zh || ex.name_en,
               image_name: ex.image_name,
               exercise_id: ex.exercise_id,
               sets: [],
+              totalVolume: 0,
             };
           }
           if (ex.weight > 0 || ex.reps > 0) {
@@ -97,27 +108,39 @@ Component({
               reps: ex.reps,
               weight_unit: ex.weight_unit || 'kg',
             });
+            map[ex.exercise_id].totalVolume += (Number(ex.weight) || 0) * (Number(ex.reps) || 0);
           }
         }
-        const list = Object.values(map);
-        this.setData({ exerciseList: list });
+        this.setData({ exerciseList: Object.values(map) });
       }
     },
 
-    getTotalSets(list) {
-      return list.reduce((acc, ex) => acc + (ex.sets ? ex.sets.length : 0), 0);
-    },
-
-    getTotalWeight(list) {
-      let total = 0;
-      for (const ex of list) {
-        if (ex.sets) {
-          for (const s of ex.sets) {
-            total += (s.weight || 0) * (s.reps || 0);
-          }
-        }
+    _computeDate(session) {
+      // Prefer a pre-formatted dateStr if backend provides one
+      if (session.dateStr) {
+        this.setData({ _dateDisplay: session.dateStr });
+        return;
       }
-      return total.toFixed(0);
+      const raw = session.start_time;
+      if (!raw) {
+        this.setData({ _dateDisplay: '' });
+        return;
+      }
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) {
+        this.setData({ _dateDisplay: String(raw) });
+        return;
+      }
+      const locale = this.data.locale || 'en';
+      const formatted = d.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      this.setData({ _dateDisplay: formatted });
     },
 
     _computeDuration(session) {
@@ -131,10 +154,11 @@ Component({
         const totalSeconds = Math.floor(session.duration);
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
         const pad = (n) => String(n).padStart(2, '0');
         const durationStr = hours > 0
           ? `${pad(hours)}:${pad(minutes)}`
-          : `${pad(minutes)}:${pad(0)}`;
+          : `${pad(minutes)}:${pad(seconds)}`;
         this.setData({ _durationDisplay: durationStr });
         return;
       }
@@ -147,10 +171,11 @@ Component({
           const totalSeconds = Math.floor(diffMs / 1000);
           const hours = Math.floor(totalSeconds / 3600);
           const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
           const pad = (n) => String(n).padStart(2, '0');
           const durationStr = hours > 0
             ? `${pad(hours)}:${pad(minutes)}`
-            : `${pad(minutes)}:${pad(0)}`;
+            : `${pad(minutes)}:${pad(seconds)}`;
           this.setData({ _durationDisplay: durationStr });
           return;
         }

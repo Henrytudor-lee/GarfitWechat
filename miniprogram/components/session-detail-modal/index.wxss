@@ -127,7 +127,15 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.exercise-list-inner {
   padding: 24rpx 32rpx;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .loading-state,
@@ -439,6 +447,9 @@
   border-radius: 24rpx;
   overflow: hidden;
   margin-bottom: 20rpx;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .ec-header {
@@ -515,7 +526,7 @@
 .ec-sets-grid {
   padding: 20rpx;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12rpx;
 }
 
@@ -526,6 +537,7 @@
   border-radius: 14rpx;
   padding: 14rpx 18rpx;
   column-gap: 12rpx;
+  min-width: 0;
 }
 
 .ec-set-num {
