@@ -1,6 +1,6 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
-const { toKg } = require('../../utils/unit.js');
+const { setVolume } = require('../../utils/unit.js');
 
 // 体积数值格式化: 整数保持整数, 有小数保留 1 位, 浮点精度噪声截断
 // 大数自动用 k / M 缩写: 12345 -> "12.3k", 1234567 -> "1.2M"
@@ -144,7 +144,7 @@ Page({
     const muscleMap = {};
     const { BODY_PART_MAP, BODY_PART_MAP_ZH } = require('../../utils/maps.js');
     historyExercises.forEach(ex => {
-      const total = ex.records.reduce((s, r) => s + toKg(r.weight, r.weight_unit) * (Number(r.reps) || 0), 0);
+      const total = ex.records.reduce((s, r) => s + setVolume(r), 0);
       if (total === 0) return;
       const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
       partIds.forEach(partId => {

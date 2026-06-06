@@ -56,6 +56,31 @@ function isoTime(val) {
   return val ? new Date(val).toISOString() : null;
 }
 
+// ── Helper: 连续训练天数 (current streak) ─────────────────────────────
+async function computeCurrentStreak(openid) {
+  const [streakDays] = await query(
+    "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
+    [openid]);
+  if (streakDays.length === 0) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const lastDate = new Date(streakDays[0].day);
+  const daysSinceLast = (new Date(today) - lastDate) / 86400000;
+  if (daysSinceLast > 1) return 0;  // 中断
+  let streak = 0;
+  let prevDate = null;
+  for (const row of streakDays) {
+    const d = new Date(row.day);
+    if (!prevDate) { streak = 1; }
+    else {
+      const diff = (prevDate - d) / 86400000;
+      if (diff === 1) { streak++; }
+      else { break; }
+    }
+    prevDate = d;
+  }
+  return streak;
+}
+
 // ── Entry point ──────────────────────────────────────────────────────
 exports.main = async (event, context) => {
   const { action } = event;
@@ -262,28 +287,7 @@ exports.main = async (event, context) => {
         return { success: true };
 
       } else if (sub === 'getStreak') {
-        const [streakDays] = await query(
-          "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
-          [openid]);
-        let streak = 0;
-        if (streakDays.length > 0) {
-          const today = new Date().toISOString().slice(0, 10);
-          const lastDate = new Date(streakDays[0].day);
-          const daysSinceLast = (new Date(today) - lastDate) / 86400000;
-          if (daysSinceLast <= 1) {
-            let prevDate = null;
-            for (const row of streakDays) {
-              const d = new Date(row.day);
-              if (!prevDate) { streak = 1; }
-              else {
-                const diff = (prevDate - d) / 86400000;
-                if (diff === 1) { streak++; }
-                else { break; }
-              }
-              prevDate = d;
-            }
-          }
-        }
+        const streak = await computeCurrentStreak(openid);
         return { success: true, streak };
 
       } else if (sub === 'getLevel') {
@@ -599,30 +603,7 @@ exports.main = async (event, context) => {
         const weekWorkouts = weekRow ? weekRow.n : 0;
 
         // Current streak
-        const [streakDays] = await query(
-          "SELECT DATE(start_time) as day FROM sessions WHERE _openid = ? AND status = 'finished' AND start_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(start_time) ORDER BY day DESC",
-          [openid]);
-        let currentStreak = 0;
-        if (streakDays.length > 0) {
-          const today = new Date().toISOString().slice(0, 10);
-          const lastDate = new Date(streakDays[0].day);
-          const daysSinceLast = (new Date(today) - lastDate) / 86400000;
-          if (daysSinceLast <= 1) {
-            let streak = 0;
-            let prevDate = null;
-            for (const row of streakDays) {
-              const d = new Date(row.day);
-              if (!prevDate) { streak = 1; }
-              else {
-                const diff = (prevDate - d) / 86400000;
-                if (diff === 1) { streak++; }
-                else { break; }
-              }
-              prevDate = d;
-            }
-            currentStreak = streak;
-          }
-        }
+        const currentStreak = await computeCurrentStreak(openid);
 
         // Exercise history
         const [histRows] = await query(

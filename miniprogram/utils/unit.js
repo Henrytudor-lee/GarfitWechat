@@ -20,4 +20,14 @@ function toKg(weight, unit) {
 module.exports = {
   KG_PER_LB,
   toKg,
+  /**
+   * 计算一个 set 的体积 (weight * reps), 自动处理 lb→kg 单位转换与脏数据。
+   * @param {{weight?: number|string, weight_unit?: string, reps?: number|string}} set
+   * @returns {number} 该组换算成 kg 后的体积; 无效输入返回 0
+   */
+  setVolume(set) {
+    if (!set) return 0;
+    const reps = Number(set.reps) || 0;
+    return toKg(set.weight, set.weight_unit) * reps;
+  },
 };

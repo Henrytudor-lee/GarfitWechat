@@ -1,6 +1,6 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
-const { toKg } = require('../../utils/unit.js');
+const { setVolume } = require('../../utils/unit.js');
 
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const MONTH_NAMES_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -201,7 +201,7 @@ Page({
           map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0 };
         }
         if (ex.weight > 0 || ex.reps > 0) {
-          const vol = toKg(ex.weight, ex.weight_unit) * (Number(ex.reps) || 0);
+          const vol = setVolume(ex);
           map[ex.exercise_id].sets.push({
             id: ex.id,
             weight: ex.weight,
@@ -215,12 +215,12 @@ Page({
         ...g,
         totalVolume: Math.round(g.totalVolume),
       }));
-      const volume = groups.reduce((sum, g) =>
-        sum + g.sets.reduce((s, set) => s + toKg(set.weight, set.weight_unit) * (Number(set.reps) || 0), 0), 0);
+      // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
+      const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
       this.setData({
         exerciseGroups: groups,
         exerciseCount: groups.length,
-        totalVolume: Math.round(volume),
+        totalVolume: volume,
       });
     }
   },
