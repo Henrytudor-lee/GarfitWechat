@@ -325,7 +325,6 @@ Page({
     this.setData({ showDatePicker: false });
   },
 
-  noop() {},
 
   prevMonth() {
     let { pickerYear, pickerMonth } = this.data;

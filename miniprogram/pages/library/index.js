@@ -284,8 +284,6 @@ Page({
     this.setData({ selectedExercise: null });
   },
 
-  noop() {},
-
   onFavoriteTap(e) {
     const id = e.currentTarget.dataset.id;
     const { favorExercises } = this.data;

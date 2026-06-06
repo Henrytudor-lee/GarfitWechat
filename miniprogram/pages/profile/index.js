@@ -1,65 +1,6 @@
 // pages/profile/index.js — garcia-fitness-new style
 const app = getApp();
 
-const I18N = {
-  en: {
-    profile: {
-      title: 'PROFILE',
-      login_required: 'NOT LOGGED IN',
-      login_hint: 'Sign in to track your fitness journey',
-      login_btn: 'LOGIN / REGISTER',
-      active_streak: 'ACTIVE STREAK',
-      days: 'days',
-      level: 'LEVEL',
-      lv: 'LV.',
-      language: 'LANGUAGE',
-      theme: 'THEME',
-      dark: 'Dark',
-      light: 'Light',
-      ai_coach: 'AI COACH',
-      soon: 'COMING SOON',
-      ai_subtitle: 'PERSONALIZED GUIDANCE',
-      settings: 'SETTINGS',
-      settings_sub: 'APP PREFERENCES',
-      logout: 'LOG OUT',
-      logout_sub: 'SIGN OUT OF YOUR ACCOUNT',
-      version: 'GARCIAL FITNESS V1.0.2 - STABLE',
-    }
-  },
-  zh: {
-    profile: {
-      title: '个人资料',
-      login_required: '未登录',
-      login_hint: '登录以开始健身之旅',
-      login_btn: '登录 / 注册',
-      active_streak: '连续训练',
-      days: '天',
-      level: '等级',
-      lv: 'LV.',
-      language: '语言',
-      theme: '主题',
-      dark: '深色',
-      light: '浅色',
-      ai_coach: 'AI 教练',
-      soon: '即将推出',
-      ai_subtitle: '个性化指导',
-      settings: '设置',
-      settings_sub: '应用偏好',
-      logout: '退出登录',
-      logout_sub: '退出当前账户',
-      version: 'GARCIAL FITNESS V1.0.2 - 稳定版',
-    }
-  }
-};
-
-function t(key, locale) {
-  const dict = I18N[locale] || I18N.en;
-  const keys = key.split('.');
-  let val = dict;
-  for (const k of keys) val = val[k];
-  return val || key;
-}
-
 // Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
 function getFlameColor(streak) {
   if (streak === 0) return 'color-neutral-600';
@@ -210,8 +151,6 @@ Page({
   onEditNameInput(e) {
     this.setData({ editNameValue: e.detail.value });
   },
-
-  noop() {},
 
   cancelEditName() {
     this.setData({ showEditNameModal: false, editNameValue: '' });
