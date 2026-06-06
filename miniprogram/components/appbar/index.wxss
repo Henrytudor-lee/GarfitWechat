@@ -10,7 +10,7 @@
 }
 
 .appbar.theme-day .appbar-title {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .appbar.theme-day .appbar-lang {

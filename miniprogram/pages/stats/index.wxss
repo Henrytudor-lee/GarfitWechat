@@ -26,7 +26,7 @@
    Page Header — Day
    ======================== */
 .page.theme-day .page-title-text {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .page-subtitle-text {
@@ -547,7 +547,7 @@
 }
 
 .page.theme-day .max-record-num {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .max-record-unit {

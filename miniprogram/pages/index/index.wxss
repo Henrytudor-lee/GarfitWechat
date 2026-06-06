@@ -689,7 +689,7 @@
 }
 
 .page.theme-day .section-badge.active {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .section-link {
@@ -718,7 +718,7 @@
 }
 
 .page.theme-day .ec-vol-num {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .ec-vol-label {
@@ -793,7 +793,7 @@
 }
 
 .page.theme-day .bento-month.text-primary {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .bento-month.text-muted {
@@ -813,7 +813,7 @@
 }
 
 .page.theme-day .bento-big-num {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .bento-hint {

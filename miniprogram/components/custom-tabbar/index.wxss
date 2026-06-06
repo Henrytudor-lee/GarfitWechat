@@ -58,7 +58,7 @@
 }
 
 .tabbar-wrap.theme-day .tab-item.active .tab-label {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 /* ========================

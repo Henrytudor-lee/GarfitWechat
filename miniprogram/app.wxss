@@ -12,6 +12,8 @@ page {
   --card-border: rgba(255, 255, 255, 0.10);
   --primary: #ccf200;
   --primary-dim: #b3d400;
+  /* 文字/边框场景用：day 主题下 lime 看不清，换深橄榄绿 */
+  --primary-text: #ccf200;
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
@@ -36,6 +38,8 @@ page.theme-day {
   --card-border: rgba(0, 0, 0, 0.10);
   --primary: #ccf200;
   --primary-dim: #b3d400;
+  /* lime #ccf200 在白底上对比度差，文字/边框场景用深橄榄绿保可读 */
+  --primary-text: #7a8c00;
   --text-primary: #1a1a1a;
   --text-secondary: #52525b;
   --text-muted: #a1a1aa;
@@ -60,8 +64,8 @@ page.theme-day .btn-ghost {
   border-color: rgba(0, 0, 0, 0.10);
 }
 page.theme-day .tag {
-  background: rgba(204, 242, 0, 0.15);
-  color: #ccf200;
+  background: rgba(122, 140, 0, 0.15);
+  color: var(--primary-text);
 }
 page.theme-day .tag-neutral {
   background: rgba(0, 0, 0, 0.08);
@@ -77,12 +81,12 @@ page.theme-day .input {
   color: #1a1a1a;
 }
 page.theme-day .input:focus {
-  border-color: #ccf200;
+  border-color: var(--primary-text);
 }
 page.theme-day .input-placeholder {
   color: #a1a1aa;
 }
-page.theme-day .text-primary { color: #ccf200; }
+page.theme-day .text-primary { color: var(--primary-text); }
 page.theme-day .text-secondary { color: #52525b; }
 page.theme-day .text-muted { color: #a1a1aa; }
 
@@ -99,6 +103,7 @@ page.theme-night {
   --card-border: rgba(255, 255, 255, 0.10);
   --primary: #ccf200;
   --primary-dim: #b3d400;
+  --primary-text: #ccf200;
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
@@ -124,7 +129,7 @@ page.theme-night .btn-ghost {
 }
 page.theme-night .tag {
   background: rgba(204, 242, 0, 0.15);
-  color: #ccf200;
+  color: var(--primary);
 }
 page.theme-night .tag-neutral {
   background: rgba(255, 255, 255, 0.08);
@@ -140,12 +145,12 @@ page.theme-night .input {
   color: #ffffff;
 }
 page.theme-night .input:focus {
-  border-color: #ccf200;
+  border-color: var(--primary);
 }
 page.theme-night .input-placeholder {
   color: #71717a;
 }
-page.theme-night .text-primary { color: #ccf200; }
+page.theme-night .text-primary { color: var(--primary); }
 page.theme-night .text-secondary { color: #a1a1aa; }
 page.theme-night .text-muted { color: #71717a; }
 
