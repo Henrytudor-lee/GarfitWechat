@@ -37,7 +37,7 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen) {
-        const locale = app.globalData.language || 'en';
+        const locale = app.globalData.language || 'zh';
         const theme = app.globalData.theme || 'night';
         this.setData({
           imgPrefix: app.globalData.imagePrefix || '',
@@ -84,7 +84,7 @@ Component({
       const totalMinutes = Math.round(durationMs / 60000);
       const hours = Math.floor(totalMinutes / 60);
       const mins = totalMinutes % 60;
-      const locale = app.globalData.language || 'en';
+      const locale = app.globalData.language || 'zh';
       const durationStr = hours > 0
         ? (locale === 'zh' ? `${hours}小时${mins}分钟` : `${hours}h ${mins}m`)
         : (locale === 'zh' ? `${mins}分钟` : `${mins} min`);

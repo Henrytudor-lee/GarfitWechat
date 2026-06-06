@@ -125,7 +125,7 @@ Component({
   methods: {
     _reset(imgPrefix, vidPrefix) {
       const app = getApp();
-      const locale = app.globalData.language || 'en';
+      const locale = app.globalData.language || 'zh';
       const equipmentListWithName = EQUIPMENT_LIST.map(item => ({
         ...item,
         _name: locale === 'zh' ? EQUIP_MAP_ZH[String(item.id)] : EQUIP_MAP[String(item.id)],
@@ -170,7 +170,7 @@ Component({
           const muscleId = saved.selectedMuscle || 0;
           const muscleItem = MUSCLE_LIST.find(m => m.id === muscleId);
           const imgPrefix = this.data.imgPrefix || '';
-          const locale = this.data.locale || 'en';
+          const locale = this.data.locale || 'zh';
           this.setData({
             selectedMuscle: muscleId,
             selectedEquipment: saved.selectedEquipment || 0,

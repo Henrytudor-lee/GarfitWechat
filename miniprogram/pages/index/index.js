@@ -74,7 +74,7 @@ Page({
     this.setData({
       imgPrefix: app.globalData.imagePrefix,
       _dataLoaded: true,
-      locale: app.globalData.language || 'en',
+      locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
     });
     const today = new Date();
@@ -122,7 +122,7 @@ Page({
 
     // Refresh theme and locale from global app state
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
-    const locale = app.globalData.language || 'en';
+    const locale = app.globalData.language || 'zh';
     if (this.data.theme !== theme || this.data.locale !== locale) {
       this.setData({ theme, locale });
     }
@@ -518,7 +518,7 @@ Page({
   async stopWorkout() {
     this.setData({ showEndConfirm: false });
     const sessionId = this.data.currentSessionId || (this.data.runningSession ? (this.data.runningSession._id || this.data.runningSession.id) : null);
-    const locale = app.globalData.language || 'en';
+    const locale = app.globalData.language || 'zh';
     wx.showLoading({ title: locale === 'zh' ? '结束中...' : 'ENDING...', mask: true });
     // Gather summary data first
     let totalVolume = this.data.totalVolume;

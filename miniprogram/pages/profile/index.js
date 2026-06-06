@@ -97,7 +97,7 @@ Page({
   },
 
   onLoad() {
-    const locale = wx.getStorageSync('language') || 'en';
+    const locale = wx.getStorageSync('language') || 'zh';
     const theme = wx.getStorageSync('theme') || 'night';
     this.setData({ imgPrefix: app.globalData.imagePrefix, locale, theme });
   },
@@ -114,7 +114,7 @@ Page({
       return;
     }
 
-    const locale = wx.getStorageSync('language') || 'en';
+    const locale = wx.getStorageSync('language') || 'zh';
     const theme = wx.getStorageSync('theme') || 'night';
 
     const userInfo = {
@@ -257,7 +257,7 @@ Page({
 
   // Toggle language EN <-> CN (using global app i18n system)
   toggleLanguage() {
-    const current = app.getLanguage() || 'en';
+    const current = app.getLanguage() || 'zh';
     const next = current === 'en' ? 'zh' : 'en';
     app.setLanguage(next);
     this.setData({ locale: next });

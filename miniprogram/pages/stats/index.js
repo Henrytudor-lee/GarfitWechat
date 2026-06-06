@@ -56,7 +56,7 @@ Page({
 
   async onShow() {
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
-    const locale = app.globalData.language || 'en';
+    const locale = app.globalData.language || 'zh';
     if (this.data.theme !== theme || this.data.locale !== locale) {
       this.setData({ theme, locale });
     }
@@ -64,7 +64,7 @@ Page({
   },
 
   async _loadAll() {
-    const loadingText = (this.data.locale || 'en') === 'en' ? 'LOADING...' : '加载中...';
+    const loadingText = (this.data.locale || 'zh') === 'zh' ? '加载中...' : 'LOADING...';
     wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
@@ -97,9 +97,9 @@ Page({
       const wd = new Date(now);
       wd.setDate(now.getDate() - i * 7);
       const yrweek = toYrweek(wd);
-      const label = (this.data.locale || 'en') === 'en'
-        ? wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-        : wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      const label = (this.data.locale || 'zh') === 'zh'
+        ? wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+        : wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       weeklyVolume.push({ label, volume: weekMap[yrweek] || 0, yrweek });
     }
 
@@ -115,9 +115,9 @@ Page({
       if (total === 0) return;
       const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
       partIds.forEach(partId => {
-        const name = (this.data.locale || 'en') === 'en'
-          ? (BODY_PART_MAP[partId] || 'Other')
-          : (BODY_PART_MAP_ZH[partId] || '其他');
+        const name = (this.data.locale || 'zh') === 'zh'
+          ? (BODY_PART_MAP_ZH[partId] || '其他')
+          : (BODY_PART_MAP[partId] || 'Other');
         muscleMap[name] = (muscleMap[name] || 0) + total;
       });
     });
@@ -133,7 +133,7 @@ Page({
     // Most trained exercises — use locale-aware name
     const mostTrained = historyExercises
       .map(ex => ({
-        name: (this.data.locale || 'en') === 'en' ? (ex.name_en || ex.name) : (ex.name_zh || ex.name),
+        name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
         count: ex.records.length,
       }))
       .sort((a, b) => b.count - a.count)
@@ -142,7 +142,7 @@ Page({
     // Exercise list for selector — use locale-aware name
     const exerciseList = historyExercises.map(ex => ({
       id: ex.exercise_id,
-      name: (this.data.locale || 'en') === 'en' ? (ex.name_en || ex.name) : (ex.name_zh || ex.name),
+      name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
     }));
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
@@ -176,7 +176,7 @@ Page({
   },
 
   async _loadExerciseData(exerciseId) {
-    const loadingText = (this.data.locale || 'en') === 'en' ? 'LOADING...' : '加载中...';
+    const loadingText = (this.data.locale || 'zh') === 'zh' ? '加载中...' : 'LOADING...';
     wx.showLoading({ title: loadingText, mask: true });
     const [recRes, recordsRes] = await Promise.all([
       wx.cloud.callFunction({

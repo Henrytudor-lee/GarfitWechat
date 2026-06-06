@@ -7,14 +7,14 @@ const LOCALES = {
 };
 
 // 默认语言
-let currentLang = 'en';
+let currentLang = 'zh';
 
 /**
  * 初始化语言，从 storage 恢复
  */
 function initLang() {
   const saved = wx.getStorageSync('language');
-  currentLang = saved === 'zh' || saved === 'en' ? saved : 'en';
+  currentLang = saved === 'zh' || saved === 'en' ? saved : 'zh';
   return currentLang;
 }
 

@@ -132,7 +132,7 @@ Component({
         this.setData({ _dateDisplay: String(raw) });
         return;
       }
-      const locale = this.data.locale || 'en';
+      const locale = this.data.locale || 'zh';
       const formatted = d.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US', {
         year: 'numeric',
         month: '2-digit',

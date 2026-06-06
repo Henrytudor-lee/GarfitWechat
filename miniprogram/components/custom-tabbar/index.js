@@ -23,7 +23,7 @@ Component({
 
   attached() {
     const app = getApp();
-    const locale = app.globalData.language || 'en';
+    const locale = app.globalData.language || 'zh';
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
     this.setData({ locale, theme });
     this._updateTabLabels(locale);

@@ -124,7 +124,7 @@ Page({
       imgPrefix: app.globalData.imagePrefix,
       vidPrefix: app.globalData.videoPrefix,
       isSelectMode: opts.select === 'true',
-      locale: app.globalData.language || 'en',
+      locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
     });
     this._loadUserExercises();
@@ -134,7 +134,7 @@ Page({
   onShow() {
     // Refresh theme and locale from global app state
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
-    const locale = app.globalData.language || 'en';
+    const locale = app.globalData.language || 'zh';
     if (this.data.theme !== theme || this.data.locale !== locale) {
       this.setData({ theme, locale });
     }

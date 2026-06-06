@@ -25,7 +25,7 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen) {
-        const locale = app.globalData.language || 'en';
+        const locale = app.globalData.language || 'zh';
         const theme = app.globalData.theme || 'night';
         this.setData({ _locale: locale, _theme: theme });
       }

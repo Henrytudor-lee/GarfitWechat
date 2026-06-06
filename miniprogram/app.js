@@ -13,7 +13,7 @@ App({
     openid: null,
 
     // ---- 国际化 ----
-    language: 'en',
+    language: 'zh',
     t: {},
 
     // ---- 日夜间主题 ----
