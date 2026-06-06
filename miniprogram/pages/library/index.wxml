@@ -115,7 +115,7 @@
           <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
           <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
         </view>
-        <view wx:if="{{item.video_file}}" class="play-overlay">▶</view>
+        <view wx:if="{{item.video_name}}" class="play-overlay">▶</view>
       </view>
       <!-- Card Footer -->
       <view class="card-footer">
@@ -154,9 +154,9 @@
       <!-- Media -->
       <view class="sheet-media">
         <video
-          wx:if="{{selectedExercise.video_file}}"
+          wx:if="{{selectedExercise.video_name}}"
           class="sheet-video"
-          src="{{vidPrefix}}/{{selectedExercise.video_file}}"
+          src="{{vidPrefix}}/{{selectedExercise.video_name}}"
           controls
           show-center-play-btn
           enable-play-gesture
