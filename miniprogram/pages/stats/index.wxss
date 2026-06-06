@@ -294,6 +294,30 @@
   margin-top: 8rpx;
 }
 
+.bar-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 4rpx;
+}
+.bar-header-label {
+  width: 100rpx;
+  flex-shrink: 0;
+}
+.bar-header-track {
+  flex: 1;
+}
+.bar-header-unit {
+  width: 80rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .bar-row {
   display: flex;
   align-items: center;
