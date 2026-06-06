@@ -37,7 +37,7 @@
    Page Header — Night
    ======================== */
 .page.theme-night .page-title-text {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-night .page-subtitle-text {
@@ -55,7 +55,7 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 40rpx;
   font-weight: 900;
-  color: #ccf200;
+  color: var(--primary-text);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -316,7 +316,7 @@
 
 .bar-fill {
   height: 100%;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 8rpx;
   transition: width 0.5s ease;
 }
@@ -534,7 +534,7 @@
 
 .select-arrow {
   font-size: 36rpx;
-  color: #ccf200;
+  color: var(--primary-text);
   font-weight: 700;
 }
 
@@ -563,7 +563,7 @@
 }
 
 .page.theme-night .max-record-num {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-night .max-record-unit {

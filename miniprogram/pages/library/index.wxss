@@ -179,7 +179,7 @@
 
 .filter-icon-btn.active {
   background: rgba(204, 242, 0, 0.2);
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .tap-active {
@@ -275,9 +275,9 @@
 }
 
 .filter-chip.active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
-  border-color: #ccf200;
+  border-color: var(--primary);
 }
 
 .filter-chip .equip-name {
@@ -444,7 +444,7 @@
   position: absolute;
   top: 12rpx;
   right: 12rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 16rpx;
   font-weight: 900;
@@ -457,7 +457,7 @@
   position: absolute;
   top: 8rpx;
   left: 8rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 16rpx;
   font-weight: 900;
@@ -535,7 +535,7 @@
   display: inline-block;
   padding: 3rpx 10rpx;
   background: rgba(204, 242, 0, 0.15);
-  color: #ccf200;
+  color: var(--primary-text);
   border-radius: 6rpx;
   font-size: 16rpx;
   font-weight: 800;
@@ -846,7 +846,7 @@
   height: 96rpx;
   line-height: 96rpx;
   white-space: nowrap;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   border-radius: 100rpx;
   font-family: 'Lexend Deca', sans-serif;
@@ -867,12 +867,12 @@
 /* 1. filter-chip active state — green tint background + primary text */
 .filter-chip.active {
   background: rgba(204, 242, 0, 0.15) !important;
-  color: #ccf200 !important;
-  border-color: #ccf200 !important;
+  color: var(--primary-text) !important;
+  border-color: var(--primary) !important;
 }
 
 .filter-chip.active .equip-name {
-  color: #ccf200 !important;
+  color: var(--primary-text) !important;
 }
 
 /* 2. content-scroll — fill remaining viewport height */

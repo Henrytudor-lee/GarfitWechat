@@ -28,7 +28,7 @@
 }
 
 .appbar.theme-night .appbar-title {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .appbar.theme-night .appbar-lang {

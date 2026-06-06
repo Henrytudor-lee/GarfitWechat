@@ -75,7 +75,7 @@
   right: 0rpx;
   width: 52rpx;
   height: 52rpx;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -119,7 +119,7 @@
 
 .not-logged-icon {
   font-size: 80rpx;
-  color: #ccf200;
+  color: var(--primary-text);
   margin-bottom: 16rpx;
 }
 
@@ -143,7 +143,7 @@
 
 .login-btn {
   margin-top: 16rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   border-radius: 100rpx;
   font-family: 'Lexend Deca', sans-serif;
@@ -389,7 +389,7 @@
 
 /* 胶囊 — 选中默认（基础亮色=日间主色） */
 .pill.pill-active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 
@@ -403,7 +403,7 @@
 /* 胶囊 — Day/Light 主题选中态：品牌黄 */
 .pill.pill-active.day,
 .pill.pill-active.light {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 
@@ -498,7 +498,7 @@
 
 .edit-name-btn {
   font-size: 36rpx;
-  color: #ccf200;
+  color: var(--primary-text);
   padding: 8rpx;
   line-height: 1;
 }
@@ -588,6 +588,6 @@
 .page.theme-night .edit-modal-cancel { color: #a1a1aa; }
 
 .edit-modal-confirm {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }

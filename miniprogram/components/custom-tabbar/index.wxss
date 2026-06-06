@@ -21,7 +21,7 @@
   right: 32rpx;
   width: 112rpx;
   height: 112rpx;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -76,7 +76,7 @@
 }
 
 .tabbar-wrap.theme-night .tab-item.active .tab-label {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 /* ========================

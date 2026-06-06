@@ -56,7 +56,7 @@
 }
 
 .stat-val.text-primary {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .stat-key {
@@ -91,7 +91,7 @@
 }
 .start-btn::after { border: none; }
 .start-btn.start {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   box-shadow: 0 0 40rpx rgba(204, 242, 0, 0.35);
 }
@@ -108,7 +108,7 @@
   right: 32rpx;
   width: 112rpx;
   height: 112rpx;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -153,14 +153,14 @@
   text-transform: uppercase;
 }
 .section-badge.active {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .section-link {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 22rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -239,7 +239,7 @@
 .ec-vol-num {
   font-size: 24rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .ec-vol-label {
@@ -270,7 +270,7 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #131313;
   font-size: 20rpx;
   font-weight: 700;
@@ -380,7 +380,7 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 24rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .history-session-info {
@@ -439,7 +439,7 @@
   text-transform: uppercase;
 }
 
-.bento-month.text-primary { color: #ccf200; }
+.bento-month.text-primary { color: var(--primary-text); }
 .bento-month.text-muted { color: rgba(255, 255, 255, 0.25); }
 
 .bento-progress-bar {
@@ -453,7 +453,7 @@
 
 .bento-progress-fill {
   height: 100%;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 100rpx;
 }
 
@@ -471,7 +471,7 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 72rpx;
   font-weight: 900;
-  color: #ccf200;
+  color: var(--primary-text);
   line-height: 1;
   margin: 8rpx 0 4rpx;
 }
@@ -492,7 +492,7 @@
   opacity: 0.05;
 }
 
-.text-primary { color: #ccf200; }
+.text-primary { color: var(--primary-text); }
 
 /* Date Picker Button */
 .date-picker-btn {
@@ -620,7 +620,7 @@
 }
 
 .picker-day-cell.selected {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-weight: 800;
 }
@@ -633,7 +633,7 @@
   border-radius: 16rpx;
   font-size: 22rpx;
   font-weight: 800;
-  color: #ccf200;
+  color: var(--primary-text);
   text-align: center;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -805,7 +805,7 @@
 }
 
 .page.theme-day .bento-progress-fill {
-  background: #ccf200;
+  background: var(--primary);
 }
 
 .page.theme-day .bento-progress-fill.muted {
@@ -861,13 +861,13 @@
 }
 
 .page.theme-day .picker-day-cell.selected {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 
 .page.theme-day .picker-today-btn {
   background: rgba(204, 242, 0, 0.10);
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .page.theme-day .picker-today-btn:active {
@@ -950,7 +950,7 @@
   background: transparent;
   color: inherit;
   font-weight: 600;
-  border: 3rpx solid #ccf200;
+  border: 3rpx solid var(--primary);
 }
 
 .day-today {
@@ -993,9 +993,9 @@
 
 .page.theme-day .day-worked {
   border-color: #9cb02c;
-  background-color: #ccf200;
+  background-color: var(--primary);
 }
 
 .page.theme-night .day-worked {
-  border-color: #ccf200;
+  border-color: var(--primary);
 }

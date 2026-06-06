@@ -241,7 +241,7 @@
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 20rpx;
   font-weight: 800;
@@ -261,7 +261,7 @@
 .set-weight {
   font-size: 34rpx;
   font-weight: 800;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .set-unit-label {
@@ -432,7 +432,7 @@
   width: 40rpx;
   height: 4rpx;
   border-radius: 4rpx;
-  background: linear-gradient(90deg, #ccf200, #a8d100);
+  background: linear-gradient(90deg, var(--primary), #a8d100);
   margin-top: 4rpx;
 }
 
@@ -512,7 +512,7 @@
 .ec-vol-num {
   font-size: 22rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .ec-vol-label {
@@ -544,7 +544,7 @@
   width: 32rpx;
   height: 32rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #131313;
   font-size: 18rpx;
   font-weight: 700;

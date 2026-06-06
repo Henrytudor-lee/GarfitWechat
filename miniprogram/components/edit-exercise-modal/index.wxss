@@ -92,7 +92,7 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 36rpx;
   font-weight: 700;
@@ -142,7 +142,7 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 20rpx;
   font-weight: 700;
@@ -221,7 +221,7 @@
 }
 
 .unit-btn.active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 
@@ -247,7 +247,7 @@
 .save-btn {
   width: 100%;
   height: 96rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 28rpx;
   font-weight: 700;

@@ -202,8 +202,8 @@
 
 .gender-option.selected {
   background: rgba(204, 242, 0, 0.15);
-  border-color: #ccf200;
-  color: #ccf200;
+  border-color: var(--primary);
+  color: var(--primary-text);
 }
 
 .gender-option radio {
@@ -238,7 +238,7 @@
 
 .purpose-option.selected {
   background: rgba(204, 242, 0, 0.12);
-  border-color: #ccf200;
+  border-color: var(--primary);
 }
 
 .purpose-icon {
@@ -252,7 +252,7 @@
 }
 
 .purpose-option.selected .purpose-text {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 /* Footer Buttons */
@@ -283,7 +283,7 @@
 }
 
 .btn-confirm {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 

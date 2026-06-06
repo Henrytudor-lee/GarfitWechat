@@ -14,6 +14,8 @@ page {
   --primary-dim: #b3d400;
   /* 文字/边框场景用：day 主题下 lime 看不清，换深橄榄绿 */
   --primary-text: #ccf200;
+  /* lime 软背景（如标签底色），day 主题下用深橄榄绿保持低饱和度可读 */
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
@@ -40,6 +42,7 @@ page.theme-day {
   --primary-dim: #b3d400;
   /* lime #ccf200 在白底上对比度差，文字/边框场景用深橄榄绿保可读 */
   --primary-text: #7a8c00;
+  --primary-bg-soft: rgba(122, 140, 0, 0.15);
   --text-primary: #1a1a1a;
   --text-secondary: #52525b;
   --text-muted: #a1a1aa;
@@ -64,7 +67,7 @@ page.theme-day .btn-ghost {
   border-color: rgba(0, 0, 0, 0.10);
 }
 page.theme-day .tag {
-  background: rgba(122, 140, 0, 0.15);
+  background: var(--primary-bg-soft);
   color: var(--primary-text);
 }
 page.theme-day .tag-neutral {
@@ -104,6 +107,7 @@ page.theme-night {
   --primary: #ccf200;
   --primary-dim: #b3d400;
   --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
   --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
@@ -128,7 +132,7 @@ page.theme-night .btn-ghost {
   border-color: rgba(255, 255, 255, 0.10);
 }
 page.theme-night .tag {
-  background: rgba(204, 242, 0, 0.15);
+  background: var(--primary-bg-soft);
   color: var(--primary);
 }
 page.theme-night .tag-neutral {
@@ -263,6 +267,11 @@ page.theme-night .text-muted { color: #71717a; }
 .text-primary { color: var(--primary); }
 .text-secondary { color: var(--text-secondary); }
 .text-muted { color: var(--text-muted); }
+/* 强调色: 文字/边框场景用, day 主题下自动用深橄榄绿 */
+.text-accent { color: var(--primary-text); }
+.bg-accent { background: var(--primary); color: #000; }
+.bg-accent-soft { background: var(--primary-bg-soft); color: var(--primary-text); }
+.border-accent { border-color: var(--primary-text); }
 
 .font-lexend { font-family: 'Lexend Deca', 'Lexend', sans-serif; }
 .font-bold { font-weight: 700; }
@@ -276,4 +285,12 @@ page.theme-night .text-muted { color: #71717a; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 通用 glass-card (替代 .card 别名) */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 24rpx;
+  overflow: hidden;
 }
