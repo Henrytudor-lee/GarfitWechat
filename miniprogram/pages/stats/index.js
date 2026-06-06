@@ -2,10 +2,25 @@
 const app = getApp();
 const { toKg } = require('../../utils/unit.js');
 
-// 体积数值格式化: 整数保持整数, 有小数保留 1 位, 浮点精度噪声截断, 加千分位
+// 体积数值格式化: 整数保持整数, 有小数保留 1 位, 浮点精度噪声截断
+// 大数自动用 k / M 缩写: 12345 -> "12.3k", 1234567 -> "1.2M"
 function formatVolume(value) {
   const n = Number(value) || 0;
-  // 浮点容差: 与整数差 < 0.05 视为整数
+  const abs = Math.abs(n);
+
+  // 大数走 k / M 缩写 (无小数时去掉 .0)
+  if (abs >= 1000000) {
+    const v = n / 1000000;
+    const r = Math.round(v * 10) / 10;
+    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'M';
+  }
+  if (abs >= 10000) {
+    const v = n / 1000;
+    const r = Math.round(v * 10) / 10;
+    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'k';
+  }
+
+  // 普通范围: 浮点容差 0.05, 整数保持整数
   const rounded = Math.round(n * 10) / 10;
   let str;
   if (Math.abs(rounded - Math.round(rounded)) < 0.05) {
@@ -13,7 +28,7 @@ function formatVolume(value) {
   } else {
     str = rounded.toFixed(1);
   }
-  // 加千分位 (zh 优先用半角逗号; 同时 EN 也用半角逗号)
+  // 加千分位
   const [intPart, decPart] = str.split('.');
   const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return decPart ? `${withSep}.${decPart}` : withSep;
