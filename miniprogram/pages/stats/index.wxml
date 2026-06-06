@@ -29,7 +29,7 @@
     </view>
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-dumbbell.png" mode="aspectFit" />
-      <view class="stat-card-value stat-card-value-small">{{totalVolumeDisplay}} kg</view>
+      <view class="stat-card-value stat-card-value-small">{{totalVolumeDisplay}} <text class="unit">kg</text></view>
       <view class="stat-card-label">{{locale === 'en' ? 'TOTAL VOLUME' : '总重量'}}</view>
     </view>
   </view>
@@ -63,7 +63,7 @@
         <view class="muscle-legend-item" wx:for="{{muscleDistribution}}" wx:key="name">
           <view class="muscle-dot" style="background: {{item.color}}"></view>
           <text class="muscle-legend-name">{{item.name}}</text>
-          <text class="muscle-legend-val">{{item.valueDisplay}}kg</text>
+          <text class="muscle-legend-val">{{item.valueDisplay}} <text class="unit">kg</text></text>
         </view>
       </view>
     </view>

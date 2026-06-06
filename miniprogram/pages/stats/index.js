@@ -8,7 +8,7 @@ function formatVolume(value) {
   const n = Number(value) || 0;
   const abs = Math.abs(n);
 
-  // 大数走 k / M 缩写 (无小数时去掉 .0)
+  // 大数走 K / M 缩写 (大写 K 是国际 kilo 惯例, 与 kg 区分)
   if (abs >= 1000000) {
     const v = n / 1000000;
     const r = Math.round(v * 10) / 10;
@@ -17,7 +17,7 @@ function formatVolume(value) {
   if (abs >= 10000) {
     const v = n / 1000;
     const r = Math.round(v * 10) / 10;
-    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'k';
+    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'K';
   }
 
   // 普通范围: 浮点容差 0.05, 整数保持整数

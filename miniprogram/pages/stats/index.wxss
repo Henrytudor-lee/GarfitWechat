@@ -140,6 +140,21 @@
   line-height: 1;
 }
 
+/* 单位 (kg) 视觉降级: 与数字 K 区分 */
+.unit {
+  font-size: 60%;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 0.15em;
+  letter-spacing: 0.05em;
+}
+
+/* 肌群图例数字小, 单位用绝对值避免过小 */
+.muscle-legend-val .unit {
+  font-size: 16rpx;
+  margin-left: 0.2em;
+}
+
 .stat-card-value-small {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 32rpx;
