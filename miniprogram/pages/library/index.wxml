@@ -163,11 +163,20 @@
           bindtap="onVideoTap"
         />
         <image
-          wx:else
+          wx:elif="{{selectedExercise.image_name}}"
           class="sheet-img"
           src="{{imgPrefix}}/{{selectedExercise.image_name}}"
           mode="aspectFill"
         />
+        <view wx:else class="sheet-img sheet-img-placeholder">
+          <text class="placeholder-icon">🏋️</text>
+        </view>
+        <!-- 视频缺失提示: 有图无视频时叠在图片上, 无图时叠在占位符上 -->
+        <view wx:if="{{!selectedExercise.video_name}}" class="sheet-media-tip">
+          <text class="tip-icon">🎬</text>
+          <text class="tip-text">{{locale === 'en' ? 'No demo video for this exercise yet' : '该动作演示视频待补充'}}</text>
+          <text wx:if="{{selectedExercise.image_name}}" class="tip-sub">{{locale === 'en' ? 'Showing preview image only' : '当前显示预览图'}}</text>
+        </view>
       </view>
 
       <!-- Scrollable Content -->
