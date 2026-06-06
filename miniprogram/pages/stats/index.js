@@ -2,6 +2,23 @@
 const app = getApp();
 const { toKg } = require('../../utils/unit.js');
 
+// 体积数值格式化: 整数保持整数, 有小数保留 1 位, 浮点精度噪声截断, 加千分位
+function formatVolume(value) {
+  const n = Number(value) || 0;
+  // 浮点容差: 与整数差 < 0.05 视为整数
+  const rounded = Math.round(n * 10) / 10;
+  let str;
+  if (Math.abs(rounded - Math.round(rounded)) < 0.05) {
+    str = String(Math.round(rounded));
+  } else {
+    str = rounded.toFixed(1);
+  }
+  // 加千分位 (zh 优先用半角逗号; 同时 EN 也用半角逗号)
+  const [intPart, decPart] = str.split('.');
+  const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decPart ? `${withSep}.${decPart}` : withSep;
+}
+
 // Compute ISO yrweek key e.g. 202621 for 2026-W21
 function toYrweek(date) {
   const d = new Date(date);
@@ -100,7 +117,8 @@ Page({
       const label = (this.data.locale || 'zh') === 'zh'
         ? wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
         : wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      weeklyVolume.push({ label, volume: weekMap[yrweek] || 0, yrweek });
+      const vol = weekMap[yrweek] || 0;
+      weeklyVolume.push({ label, volume: vol, volumeDisplay: formatVolume(vol), yrweek });
     }
 
     // Percent relative to max
@@ -122,7 +140,7 @@ Page({
       });
     });
     const muscleDistribution = Object.entries(muscleMap)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name, value, valueDisplay: formatVolume(value) }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
@@ -152,6 +170,7 @@ Page({
       currentStreak: d.currentStreak || 0,
       weekWorkouts: d.weekWorkouts || 0,
       totalVolume: d.totalVolume || 0,
+      totalVolumeDisplay: formatVolume(d.totalVolume || 0),
       exerciseList,
       weeklyVolume,
       muscleDistribution,
