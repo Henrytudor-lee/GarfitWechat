@@ -109,7 +109,7 @@ Component({
 
     onTap() {
       if (this.data._wasDragging) return;
-      this.triggerEvent('tap', { hasSession: this.data.hasSession });
+      this.triggerEvent('orb-tap', { hasSession: this.data.hasSession });
     },
 
     onTouchStart(e) {

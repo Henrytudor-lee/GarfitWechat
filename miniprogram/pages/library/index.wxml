@@ -215,6 +215,6 @@
   <custom-tabbar active="library" theme="{{theme}}" />
 
   <!-- Session Orb (悬浮圆球) -->
-  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:tap="onOrbTap" />
+  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 
 </view>

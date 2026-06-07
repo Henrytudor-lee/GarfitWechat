@@ -190,7 +190,7 @@
   <welcome-modal isOpen="{{showWelcome}}" bind:close="onWelcomeClose" />
 
   <!-- Session Orb (悬浮圆球, 显示 running session 状态) -->
-  <session-orb session="{{runningSession}}" theme="{{theme}}" bind:tap="onOrbTap" />
+  <session-orb session="{{runningSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 
   <!-- Custom Tab Bar -->
   <custom-tabbar active="training" theme="{{theme}}" />

@@ -137,6 +137,6 @@
   <custom-tabbar active="stats" theme="{{theme}}" />
 
   <!-- Session Orb -->
-  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:tap="onOrbTap" />
+  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 
 </view>
