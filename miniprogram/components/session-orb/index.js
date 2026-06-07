@@ -109,12 +109,13 @@ Component({
 
     onTap() {
       if (this.data._wasDragging) return;
-      this.setData({ _wasDragging: false }); // 复位, 避免后续被卡
-      if (!this.data.hasSession) {
-        // 无 session: 标记需要快速开始, 然后跳到训练页
-        getApp().globalData._quickStartFromOrb = true;
+      this.triggerEvent('orb-tap', { hasSession: this.data.hasSession });
+      // fallback: 如果事件没穿透, 直接调页面方法
+      const pages = getCurrentPages();
+      const page = pages[pages.length - 1];
+      if (page && typeof page.onOrbTap === 'function') {
+        page.onOrbTap({ hasSession: this.data.hasSession });
       }
-      wx.switchTab({ url: '/pages/index/index' });
     },
 
     onTouchStart(e) {
