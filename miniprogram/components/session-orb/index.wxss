@@ -40,12 +40,11 @@
   filter: invert(1);
 }
 
-/* === active: 深色圆 + logo + duration + 呼吸缩放 === */
+/* === active: 深色圆 + logo + duration (圆球本身不缩放, 仅 logo) === */
 .session-orb.active {
   background: var(--surface-high);
   border: 2rpx solid var(--primary);
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
-  animation: orb-breath 1.6s ease-in-out infinite;
 }
 
 .orb-content {
@@ -62,6 +61,12 @@
   width: 50rpx;
   height: 50rpx;
   margin-bottom: 2rpx;
+}
+
+/* 仅 active 态的 logo 呼吸缩放 (圆球本身不缩放) */
+.session-orb.active .orb-logo {
+  animation: orb-breath 1.6s ease-in-out infinite;
+  transform-origin: center center;
 }
 
 .orb-time {
@@ -115,8 +120,7 @@
 }
 
 .orb-tap {
-  /* 按下时关闭呼吸 (避免与 transform 冲突) */
-  animation: none !important;
+  /* 按下时圆球自身缩小, 不影响内部 logo 的呼吸动画 */
   transform: scale(0.92) !important;
 }
 
