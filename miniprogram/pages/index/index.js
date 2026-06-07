@@ -635,11 +635,6 @@ Page({
     if (app.closeWelcomeModal) {
       app.closeWelcomeModal();
     }
-    // 新用户完成欢迎引导后, 跳转到新手引导页
-    if (app.globalData.needsGuide) {
-      app.globalData.needsGuide = false;
-      wx.navigateTo({ url: '/pages/guide/index' });
-    }
   },
 
   // Called by app.doSilentLogin when login completes — check showWelcome

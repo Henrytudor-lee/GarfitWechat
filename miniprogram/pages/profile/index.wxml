@@ -107,6 +107,20 @@
       </view>
     </view>
 
+    <!-- Help Guide -->
+    <view class="settings-item" bindtap="onHelpTap" hover-class="item-hover">
+      <view class="settings-left">
+        <view class="settings-icon-wrap">
+          <text class="settings-icon-text">📖</text>
+        </view>
+        <view class="settings-texts">
+          <text class="settings-title">{{t.HELP_GUIDE}}</text>
+          <text class="settings-subtitle">{{t.HELP_GUIDE_SUB}}</text>
+        </view>
+      </view>
+      <text class="settings-arrow">›</text>
+    </view>
+
 
     <!-- Version -->
     <view class="version-text">{{t.GARCIA_FITNESS_V106_STABLE}}</view>

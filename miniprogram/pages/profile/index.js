@@ -223,5 +223,9 @@ Page({
     const next = app.getTheme();
     this.setData({ theme: next });
     wx.showToast({ title: next === 'day' ? 'Theme: Day' : 'Theme: Night', icon: 'none' });
-  }
+  },
+
+  onHelpTap() {
+    wx.navigateTo({ url: '/pages/guide/index' });
+  },
 });

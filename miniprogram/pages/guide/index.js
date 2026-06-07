@@ -138,7 +138,6 @@ Page({
 
   goToTraining() {
     // 标记引导完成
-    wx.setStorageSync('guide_done', true);
     app.globalData.showingGuide = false;
     // 切换到 training 页 (tab)
     wx.switchTab({ url: '/pages/index/index' });

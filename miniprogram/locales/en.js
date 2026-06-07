@@ -34,6 +34,8 @@ module.exports = {
   "FITNESS_GOAL": "Fitness Goal",
   "GARCIA_FITNESS_V106_STABLE": "GARCIA FITNESS V1.0.6 - STABLE",
   "GENDER": "Gender",
+  "HELP_GUIDE": "Help Guide",
+  "HELP_GUIDE_SUB": "Learn how to use the app",
   "HISTORY": "HISTORY",
   "INVALID_NICKNAME": "Invalid nickname",
   "IN_PROGRESS": "IN PROGRESS",

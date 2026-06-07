@@ -476,6 +476,15 @@
 .page.theme-night .version-text { color: #3f3f46; }
 
 .settings-lock-icon { width: 24rpx; height: 24rpx;}
+.settings-arrow {
+  font-size: 36rpx;
+  color: var(--text-muted, #62666d);
+  font-weight: 300;
+  line-height: 1;
+}
+.item-hover {
+  opacity: 0.7;
+}
 
 /* 火焰/奖杯颜色分层 — 独立于主题 */
 .color-neutral-600 { color: #52525b; }

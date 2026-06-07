@@ -34,6 +34,8 @@ module.exports = {
   "FITNESS_GOAL": "运动目的",
   "GARCIA_FITNESS_V106_STABLE": "GARCIA FITNESS V1.0.6 - 稳定版",
   "GENDER": "性别",
+  "HELP_GUIDE": "帮助文档",
+  "HELP_GUIDE_SUB": "了解如何使用",
   "HISTORY": "历史记录",
   "INVALID_NICKNAME": "昵称格式不正确",
   "IN_PROGRESS": "进行中",
