@@ -75,6 +75,7 @@ Page({
     // UI state
     loading: false,
     hasData: false,
+    orbSession: null,
   },
 
   onLoad() {
@@ -94,6 +95,9 @@ Page({
       this.setData({ theme, locale });
     }
     await this._loadAll();
+    // Refresh session orb
+    const orbSession = await app.loadRunningSession();
+    this.setData({ orbSession });
   },
 
   async _loadAll() {
@@ -234,6 +238,11 @@ Page({
       this.setData({ weightRecords: records });
       setTimeout(() => this._renderWeightChart(records), 300);
     }
+  },
+
+  onOrbTap() {
+    // 跳到 training 页 (running session 在那里)
+    wx.switchTab({ url: '/pages/index/index' });
   },
 
   async onExerciseChange(e) {

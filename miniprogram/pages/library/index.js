@@ -119,6 +119,8 @@ Page({
     currentSessionId: null,
     preselectedExercise: null,
     addingToWorkout: false,
+    // Session orb (floating running-session indicator)
+    orbSession: null,
     // i18n + theme
     locale: 'en',
     theme: 'night',
@@ -143,6 +145,23 @@ Page({
     const locale = app.globalData.language || 'zh';
     if (this.data.theme !== theme || this.data.locale !== locale) {
       this.setData({ theme, locale });
+    }
+    // Refresh session orb (running session indicator)
+    this._loadOrbSession();
+  },
+
+  async _loadOrbSession() {
+    const session = await app.loadRunningSession();
+    this.setData({ orbSession: session });
+  },
+
+  onOrbTap() {
+    // 有 session: 跳回 training 页 (index)
+    if (this.data.orbSession) {
+      wx.switchTab({ url: '/pages/index/index' });
+    } else {
+      // 无 session: 跳到 training 页并启动
+      wx.switchTab({ url: '/pages/index/index' });
     }
   },
 

@@ -96,10 +96,32 @@ App({
     return this.globalData.theme;
   },
 
+
   getThemeVars() {
     return this.globalData.themeVars;
   },
 
+  // ---- 全局 running session ----
+  // 4 个页面 (index/library/stats/profile) 通过 loadRunningSession 共享状态
+  async loadRunningSession() {
+    if (!this.globalData.openid) return null;
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'api',
+        data: { action: 'session.getRunning', openid: this.globalData.openid },
+      });
+      const session = (res && res.result && res.result.session) || null;
+      this.globalData.runningSession = session;
+      return session;
+    } catch (e) {
+      console.error('loadRunningSession failed:', e);
+      return null;
+    }
+  },
+
+  setRunningSession(session) {
+    this.globalData.runningSession = session;
+  },
   // ---- 欢迎弹框控制 ----
   closeWelcomeModal() {
     this.globalData.showWelcome = false;

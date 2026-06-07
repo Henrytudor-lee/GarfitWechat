@@ -33,6 +33,7 @@ Page({
     flameColor: 'color-neutral-600',
     trophyColor: 'color-neutral-600',
     version: 'V1.0.2 - STABLE',
+    orbSession: null,
     showEditNameModal: false,
     editNameValue: '',
   },
@@ -50,6 +51,9 @@ Page({
 
   async onShow() {
     await this.loadData();
+    // Refresh session orb
+    const orbSession = await app.loadRunningSession();
+    this.setData({ orbSession });
   },
 
   async loadData() {
@@ -143,6 +147,11 @@ Page({
         wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
       },
     });
+  },
+
+  onOrbTap() {
+    // 跳到 training 页
+    wx.switchTab({ url: '/pages/index/index' });
   },
 
   // Edit nickname

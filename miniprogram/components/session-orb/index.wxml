@@ -1,0 +1,19 @@
+<!--components/session-orb/index.wxml-->
+<view class="session-orb {{hasSession ? 'active' : 'idle'}}" bindtap="onTap" hover-class="orb-tap">
+  <!-- 旋转光圈 (loading 效果, 仅 running 时显示) -->
+  <view wx:if="{{hasSession}}" class="orb-aura"></view>
+  <view wx:if="{{hasSession}}" class="orb-aura orb-aura-2"></view>
+
+  <!-- 内容 -->
+  <block wx:if="{{hasSession}}">
+    <view class="orb-content">
+      <text class="orb-icon">🏋️</text>
+      <text class="orb-time">{{durationDisplay}}</text>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="orb-content">
+      <text class="orb-icon-start">▶</text>
+    </view>
+  </block>
+</view>

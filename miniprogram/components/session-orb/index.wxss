@@ -1,0 +1,125 @@
+/* components/session-orb/index.wxss */
+.session-orb {
+  position: fixed;
+  bottom: 200rpx;
+  right: 32rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lexend Deca', 'Lexend', sans-serif;
+  transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === idle: 显示启动图标 === */
+.session-orb.idle {
+  background: var(--primary);
+  box-shadow:
+    0 8rpx 24rpx rgba(0, 0, 0, 0.25),
+    inset 0 -4rpx 0 rgba(0, 0, 0, 0.1);
+  animation: orb-pulse-idle 2s ease-in-out infinite;
+}
+
+.session-orb.idle .orb-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb-icon-start {
+  font-size: 40rpx;
+  color: #000;
+  font-weight: 900;
+  line-height: 1;
+  margin-left: 6rpx;  /* 视觉居中 ▶ 三角形 */
+}
+
+/* === active: 显示 duration + 旋转光圈 === */
+.session-orb.active {
+  background: var(--surface-high);
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
+  overflow: visible;
+}
+
+.orb-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
+  pointer-events: none;
+}
+
+.orb-icon {
+  font-size: 28rpx;
+  line-height: 1;
+  margin-bottom: 2rpx;
+}
+
+.orb-time {
+  font-size: 18rpx;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === 旋转光圈 (loading 轨迹) === */
+.orb-aura {
+  position: absolute;
+  top: -6rpx;
+  left: -6rpx;
+  right: -6rpx;
+  bottom: -6rpx;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 270deg,
+    var(--primary) 320deg,
+    var(--primary) 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
+  mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
+  animation: orb-rotate 1.5s linear infinite;
+  opacity: 0.95;
+}
+
+.orb-aura-2 {
+  animation-duration: 2.5s;
+  animation-direction: reverse;
+  opacity: 0.5;
+  -webkit-mask: radial-gradient(circle, transparent 54rpx, #000 60rpx);
+  mask: radial-gradient(circle, transparent 54rpx, #000 60rpx);
+}
+
+@keyframes orb-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orb-pulse-idle {
+  0%, 100% { box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25), inset 0 -4rpx 0 rgba(0, 0, 0, 0.1); }
+  50% { box-shadow: 0 8rpx 28rpx rgba(204, 242, 0, 0.4), inset 0 -4rpx 0 rgba(0, 0, 0, 0.1); }
+}
+
+.orb-tap {
+  transform: scale(0.92);
+}
+
+/* === day 主题微调 === */
+.page.theme-day .session-orb.idle {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15), inset 0 -2rpx 0 rgba(0, 0, 0, 0.05);
+}
+.page.theme-day .session-orb.active {
+  background: #ffffff;
+  border-color: var(--primary);
+}

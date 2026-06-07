@@ -620,6 +620,16 @@ Page({
     }
   },
 
+  onOrbTap() {
+    // 若有 running session, 滚到顶部 (timer card 在顶部)
+    if (this.data.runningSession) {
+      wx.pageScrollTo({ scrollTop: 0, duration: 200 });
+    } else {
+      // 无 session, 启动
+      this.startWorkout();
+    }
+  },
+
   onWelcomeClose() {
     this.setData({ showWelcome: false });
     if (app.closeWelcomeModal) {

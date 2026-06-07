@@ -11,6 +11,7 @@
     "session-detail-modal": "/components/session-detail-modal/index",
     "workout-summary-modal": "/components/workout-summary-modal/index",
     "custom-end-confirm-modal": "/components/custom-end-confirm-modal/index",
-    "welcome-modal": "/components/welcome-modal/index"
+    "welcome-modal": "/components/welcome-modal/index",
+    "session-orb": "/components/session-orb/index"
   }
 }
