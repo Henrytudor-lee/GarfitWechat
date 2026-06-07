@@ -128,6 +128,19 @@ Page({
       this.setData({ theme, locale });
     }
 
+    // If coming from orb idle tap, auto-start workout
+    if (app.globalData._quickStartFromOrb) {
+      app.globalData._quickStartFromOrb = false;
+      // 如果还没开始工作, 等 _dataLoaded 后再开始
+      if (this.data._dataLoaded) {
+        this.startWorkout();
+      } else {
+        // 存到队列里, onLoad 的 _loadData 结束后会检查
+        setTimeout(() => this.startWorkout(), 500);
+      }
+      return;
+    }
+
     const chosen = getApp().globalData.chosenExercise;
     if (chosen && this.data.runningSession) {
       getApp().globalData.chosenExercise = null;

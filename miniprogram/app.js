@@ -23,6 +23,7 @@ App({
     // ---- 新用户欢迎弹框 ----
     isNewUser: false,
     showWelcome: false,
+    _quickStartFromOrb: false,
   },
 
   onLaunch: async function () {
