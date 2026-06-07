@@ -10,11 +10,13 @@ const sysInfo = wx.getSystemInfoSync();
 const SCREEN_WIDTH_RPX = 750;  // 设计稿基准
 const SCREEN_HEIGHT_RPX = sysInfo.windowHeight * (750 / sysInfo.windowWidth);
 
-// 默认位置: 屏幕右边缘, fab 在它下面约 120rpx
-// (fab 在 bottom: 200rpx, ORB_SIZE 112rpx, 间距 8rpx, 算 orb 中心要在 fab 中心上方 120rpx)
+// 默认位置
 const DEFAULT_X = SCREEN_WIDTH_RPX - ORB_SIZE_RPX - MARGIN_RPX;
-// bottom = 320rpx => top = screenHeight - 320 - 112 = screenHeight - 432
-const DEFAULT_Y = SCREEN_HEIGHT_RPX - 320 - ORB_SIZE_RPX;
+
+// idle：右下角 (距底边 30rpx)
+const IDLE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 30;
+// active：fab 上方 (fab bottom=200rpx, fab 高=112, 间距 40rpx => orb bottom=200+112+40=352)
+const ACTIVE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 352;
 
 // px -> rpx 转换系数
 const PX2RPX = 750 / sysInfo.windowWidth;
@@ -57,7 +59,7 @@ Component({
       // 从 storage 读取位置 (单位 rpx)
       let pos = wx.getStorageSync(STORAGE_KEY);
       if (!pos || typeof pos.x !== 'number') {
-        pos = { x: DEFAULT_X, y: DEFAULT_Y };
+        pos = { x: DEFAULT_X, y: IDLE_Y };
       }
       this.setData({ positionX: pos.x, positionY: pos.y });
       this._applySession(this.data.session);
@@ -74,9 +76,13 @@ Component({
       if (hasSession) {
         this._tick();
         this._startTick();
+        // active → 移到 fab 上方
+        this.setData({ positionX: DEFAULT_X, positionY: ACTIVE_Y });
       } else {
         this._stopTick();
         this.setData({ durationDisplay: '00:00' });
+        // idle → 回到右下角
+        this.setData({ positionX: DEFAULT_X, positionY: IDLE_Y });
       }
     },
 
