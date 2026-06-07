@@ -1,16 +1,23 @@
 // components/session-orb/index.js
 const app = getApp();
-const { toKg, setVolume } = require('../../utils/unit.js');
 
-const ORB_SIZE = 112;       // rpx
 const STORAGE_KEY = 'orb_position';
-// 默认位置: 右下角, 偏上 (fab 放在 orb 下面约 120rpx 处)
+const ORB_SIZE_RPX = 112;
+const MARGIN_RPX = 16;  // 靠右 (小边距)
+
+// 屏宽高 (rpx)
 const sysInfo = wx.getSystemInfoSync();
-const DEFAULT_X = sysInfo.windowWidth - ORB_SIZE - 32;
-// windowHeight 是 px, 1rpx = (750 / windowWidth) px
-// 想要 distance from bottom = 320rpx, 转换为 top = windowHeight - 320 * windowWidth / 750 - ORB_SIZE
-const _rpx2px = sysInfo.windowWidth / 750;
-const DEFAULT_Y = sysInfo.windowHeight - (320 * _rpx2px) - (ORB_SIZE * _rpx2px);
+const SCREEN_WIDTH_RPX = 750;  // 设计稿基准
+const SCREEN_HEIGHT_RPX = sysInfo.windowHeight * (750 / sysInfo.windowWidth);
+
+// 默认位置: 屏幕右边缘, fab 在它下面约 120rpx
+// (fab 在 bottom: 200rpx, ORB_SIZE 112rpx, 间距 8rpx, 算 orb 中心要在 fab 中心上方 120rpx)
+const DEFAULT_X = SCREEN_WIDTH_RPX - ORB_SIZE_RPX - MARGIN_RPX;
+// bottom = 320rpx => top = screenHeight - 320 - 112 = screenHeight - 432
+const DEFAULT_Y = SCREEN_HEIGHT_RPX - 320 - ORB_SIZE_RPX;
+
+// px -> rpx 转换系数
+const PX2RPX = 750 / sysInfo.windowWidth;
 
 Component({
   properties: {
@@ -30,12 +37,13 @@ Component({
     _tickHandle: null,
     positionX: 0,
     positionY: 0,
-    // drag state
+    // drag state (全部 rpx)
     dragging: false,
     _dragStartX: 0,
     _dragStartY: 0,
     _originX: 0,
     _originY: 0,
+    _wasDragging: false,
   },
 
   observers: {
@@ -46,7 +54,7 @@ Component({
 
   lifetimes: {
     attached() {
-      // 从 storage 读取位置
+      // 从 storage 读取位置 (单位 rpx)
       let pos = wx.getStorageSync(STORAGE_KEY);
       if (!pos || typeof pos.x !== 'number') {
         pos = { x: DEFAULT_X, y: DEFAULT_Y };
@@ -94,7 +102,6 @@ Component({
     },
 
     onTap() {
-      // 拖拽时不触发 tap
       if (this.data._wasDragging) return;
       this.triggerEvent('tap', { hasSession: this.data.hasSession });
     },
@@ -102,8 +109,8 @@ Component({
     onTouchStart(e) {
       const t = e.touches[0];
       this.setData({
-        _dragStartX: t.clientX,
-        _dragStartY: t.clientY,
+        _dragStartX: t.clientX * PX2RPX,
+        _dragStartY: t.clientY * PX2RPX,
         _originX: this.data.positionX,
         _originY: this.data.positionY,
         _wasDragging: false,
@@ -113,16 +120,19 @@ Component({
 
     onTouchMove(e) {
       const t = e.touches[0];
-      const dx = t.clientX - this.data._dragStartX;
-      const dy = t.clientY - this.data._dragStartY;
-      // 阈值 6rpx (约 3px): 超过才认为是 drag
-      if (!this.data._wasDragging && Math.hypot(dx, dy) < 6) return;
+      // 全部用 rpx 计算
+      const currentX = t.clientX * PX2RPX;
+      const currentY = t.clientY * PX2RPX;
+      const dx = currentX - this.data._dragStartX;
+      const dy = currentY - this.data._dragStartY;
+      // 阈值 8rpx (~4px) 才视为 drag
+      if (!this.data._wasDragging && Math.hypot(dx, dy) < 8) return;
       this.setData({ _wasDragging: true });
       const newX = this.data._originX + dx;
       const newY = this.data._originY + dy;
-      // 限制在屏幕内
-      const maxX = wx.getSystemInfoSync().windowWidth - ORB_SIZE;
-      const maxY = wx.getSystemInfoSync().windowHeight - ORB_SIZE - 100;  // 100 留给 tabbar
+      // 边界限制 (rpx)
+      const maxX = SCREEN_WIDTH_RPX - ORB_SIZE_RPX;
+      const maxY = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 100;  // 100 留给 tabbar
       this.setData({
         positionX: Math.max(0, Math.min(maxX, newX)),
         positionY: Math.max(0, Math.min(maxY, newY)),
@@ -132,13 +142,12 @@ Component({
     onTouchEnd() {
       this.setData({ dragging: false });
       if (this.data._wasDragging) {
-        // 持久化
+        // 持久化 (rpx)
         wx.setStorageSync(STORAGE_KEY, {
           x: this.data.positionX,
           y: this.data.positionY,
         });
-        // 重置 _wasDragging 标志, 避免 onTap 在下一帧误触
-        // (用 setTimeout 延后, 避免 touchend 后立刻 tap)
+        // 屏蔽 tap 50ms
         setTimeout(() => {
           this.setData({ _wasDragging: false });
         }, 50);
