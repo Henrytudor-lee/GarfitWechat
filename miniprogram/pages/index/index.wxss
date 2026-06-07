@@ -105,7 +105,7 @@
 .fab {
   position: fixed;
   bottom: 200rpx;
-  left: 32rpx;
+  right: 32rpx;
   width: 112rpx;
   height: 112rpx;
   background: var(--primary);

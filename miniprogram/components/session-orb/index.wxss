@@ -1,8 +1,7 @@
 /* components/session-orb/index.wxss */
 .session-orb {
   position: fixed;
-  bottom: 200rpx;
-  right: 32rpx;
+  /* left/top 由 inline style 控制 (支持拖拽) */
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
@@ -11,17 +10,21 @@
   align-items: center;
   justify-content: center;
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
-  transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.3s ease;
   -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+  /* transform-origin 用于呼吸缩放 */
+  transform-origin: center center;
+  /* GPU 加速 */
+  will-change: transform, left, top;
 }
 
-/* === idle: 显示启动图标 === */
+/* === idle: lime 圆 + logo (无动画) === */
 .session-orb.idle {
   background: var(--primary);
   box-shadow:
     0 8rpx 24rpx rgba(0, 0, 0, 0.25),
     inset 0 -4rpx 0 rgba(0, 0, 0, 0.1);
-  animation: orb-pulse-idle 2s ease-in-out infinite;
+  transition: box-shadow 0.3s ease;
 }
 
 .session-orb.idle .orb-content {
@@ -30,20 +33,19 @@
   justify-content: center;
 }
 
-.orb-icon-start {
-  font-size: 40rpx;
-  color: #000;
-  font-weight: 900;
-  line-height: 1;
-  margin-left: 6rpx;  /* 视觉居中 ▶ 三角形 */
+.orb-logo-idle {
+  width: 70rpx;
+  height: 70rpx;
+  /* 黑色 logo 在 lime 背景上: 反色以增加对比 */
+  filter: invert(1);
 }
 
-/* === active: 显示 duration + 旋转光圈 === */
+/* === active: 深色圆 + logo + duration + 呼吸缩放 === */
 .session-orb.active {
   background: var(--surface-high);
   border: 2rpx solid var(--primary);
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
-  overflow: visible;
+  animation: orb-breath 1.6s ease-in-out infinite;
 }
 
 .orb-content {
@@ -56,9 +58,9 @@
   pointer-events: none;
 }
 
-.orb-icon {
-  font-size: 28rpx;
-  line-height: 1;
+.orb-logo {
+  width: 50rpx;
+  height: 50rpx;
   margin-bottom: 2rpx;
 }
 
@@ -101,18 +103,28 @@
   mask: radial-gradient(circle, transparent 54rpx, #000 60rpx);
 }
 
+/* === 呼吸缩放 (active 态) === */
+@keyframes orb-breath {
+  0%, 100% { transform: scale(1.0); }
+  50% { transform: scale(1.08); }
+}
+
 @keyframes orb-rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes orb-pulse-idle {
-  0%, 100% { box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25), inset 0 -4rpx 0 rgba(0, 0, 0, 0.1); }
-  50% { box-shadow: 0 8rpx 28rpx rgba(204, 242, 0, 0.4), inset 0 -4rpx 0 rgba(0, 0, 0, 0.1); }
+.orb-tap {
+  /* 按下时关闭呼吸 (避免与 transform 冲突) */
+  animation: none !important;
+  transform: scale(0.92) !important;
 }
 
-.orb-tap {
-  transform: scale(0.92);
+/* === 拖拽时态 === */
+.session-orb.dragging {
+  transform: scale(1.05);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
+  transition: none;  /* 拖拽时不走 transition 避免拖尾 */
 }
 
 /* === day 主题微调 === */
@@ -122,4 +134,9 @@
 .page.theme-day .session-orb.active {
   background: #ffffff;
   border-color: var(--primary);
+}
+.page.theme-day .orb-logo-idle {
+  /* day 主题: 不反色 (logo 自身可能已经是黑色背景) */
+  filter: none;
+  background: transparent;
 }
