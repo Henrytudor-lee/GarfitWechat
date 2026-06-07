@@ -3,14 +3,10 @@
   <!-- Status bar placeholder -->
   <view class="status-bar-top"></view>
 
-  <!-- Header: progress dots + skip -->
+  <!-- Header: skip left -->
   <view class="guide-header">
-    <view class="progress-dots">
-      <block wx:for="{{cards}}" wx:key="index">
-        <view class="dot {{currentStep === index ? 'active' : ''}}"></view>
-      </block>
-    </view>
     <view class="skip-btn" bindtap="onSkip">{{skipText}}</view>
+    <view class="header-spacer"></view>
   </view>
 
   <!-- Cards container with swipe support -->
@@ -34,11 +30,19 @@
     </view>
   </view>
 
-  <!-- Bottom controls -->
-  <view class="guide-footer">
-    <button wx:if="{{currentStep > 0}}" class="btn-ghost" bindtap="onPrev">{{backText}}</button>
-    <button class="btn-primary" bindtap="onNext">
-      {{currentStep < cards.length - 1 ? nextText : doneText}}
-    </button>
+  <!-- Bottom: progress dots + controls -->
+  <view class="guide-bottom">
+    <view class="progress-dots">
+      <block wx:for="{{cards}}" wx:key="index">
+        <view class="dot {{currentStep === index ? 'active' : ''}}"></view>
+      </block>
+    </view>
+    <view class="guide-footer">
+      <button wx:if="{{currentStep > 0}}" class="btn-ghost" bindtap="onPrev">{{backText}}</button>
+      <view class="btn-ghost-spacer" wx:if="{{currentStep === 0}}"></view>
+      <button class="btn-primary" bindtap="onNext">
+        {{currentStep < cards.length - 1 ? nextText : doneText}}
+      </button>
+    </view>
   </view>
 </view>

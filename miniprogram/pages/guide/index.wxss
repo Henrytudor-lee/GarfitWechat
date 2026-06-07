@@ -19,40 +19,25 @@ page {
   height: 44px;
 }
 
-/* === Header === */
+/* === Header: skip left === */
 .guide-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 16rpx 32rpx 0;
   min-height: 48rpx;
 }
 
-.progress-dots {
-  display: flex;
-  gap: 8rpx;
-  align-items: center;
-}
-
-.dot {
-  width: 8rpx;
-  height: 8rpx;
-  border-radius: 50%;
-  background: var(--quaternary-text, #62666d);
-  transition: all 0.3s ease;
-}
-
-.dot.active {
-  width: 28rpx;
-  border-radius: 4rpx;
-  background: var(--primary, #ccf200);
+.header-spacer {
+  flex: 1;
 }
 
 .skip-btn {
   font-size: 26rpx;
   font-weight: 510;
   color: var(--text-muted, #8a8f98);
-  padding: 6rpx 12rpx;
+  padding: 12rpx 16rpx;
+  margin-left: -8rpx;  /* align left edge */
 }
 
 /* === Cards Container === */
@@ -76,7 +61,7 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60rpx 48rpx 40rpx;
+  padding: 40rpx 48rpx;
   text-align: center;
   flex-shrink: 0;
 }
@@ -90,7 +75,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 48rpx;
+  margin-bottom: 40rpx;
   position: relative;
   overflow: hidden;
 }
@@ -167,13 +152,45 @@ page {
   letter-spacing: -0.3rpx;
 }
 
-/* === Bottom Footer === */
+/* === Bottom: progress dots + controls === */
+.guide-bottom {
+  padding: 16rpx 32rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  align-items: center;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--quaternary-text, #62666d);
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  width: 28rpx;
+  border-radius: 4rpx;
+  background: var(--primary, #ccf200);
+}
+
 .guide-footer {
-  padding: 24rpx 32rpx 48rpx;
+  width: 100%;
   display: flex;
   gap: 16rpx;
   align-items: center;
-  background: linear-gradient(to top, var(--page-bg, #08090a) 60%, transparent);
+}
+
+.btn-ghost-spacer {
+  width: 160rpx;
+  flex-shrink: 0;
 }
 
 .btn-primary {
@@ -208,6 +225,7 @@ page {
   text-align: center;
   padding: 0;
   font-family: inherit;
+  flex-shrink: 0;
 }
 
 .btn-ghost::after {
