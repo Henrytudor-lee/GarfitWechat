@@ -20,12 +20,12 @@
 
   <!-- Edit Nickname Modal -->
   <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="cancelEditName">
-    <view class="edit-modal-box" catchtap="noop">
-      <view class="edit-modal-title">{{locale === 'en' ? 'EDIT NICKNAME' : '编辑昵称'}}</view>
-      <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{locale === 'en' ? 'Nickname' : '昵称'}}" maxlength="16" bindinput="onEditNameInput" />
+    <view class="edit-modal-box" catchtap="">
+      <view class="edit-modal-title">{{t.EDIT_NICKNAME}}</view>
+      <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{t.NICKNAME}}" maxlength="16" bindinput="onEditNameInput" />
       <view class="edit-modal-btns">
-        <button class="edit-modal-cancel" bindtap="cancelEditName">{{locale === 'en' ? 'CANCEL' : '取消'}}</button>
-        <button class="edit-modal-confirm" bindtap="confirmEditName">{{locale === 'en' ? 'CONFIRM' : '确认'}}</button>
+        <button class="edit-modal-cancel" bindtap="cancelEditName">{{t.CANCEL}}</button>
+        <button class="edit-modal-confirm" bindtap="confirmEditName">{{t.CONFIRM}}</button>
       </view>
     </view>
   </view>
@@ -33,9 +33,9 @@
   <!-- Not Logged In State -->
   <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
     <view class="not-logged-icon">✦</view>
-    <view class="not-logged-title">{{locale === 'en' ? 'NOT LOGGED IN' : '未登录'}}</view>
-    <view class="not-logged-hint">{{locale === 'en' ? 'Sign in to track your fitness journey' : '登录以开始健身之旅'}}</view>
-    <button class="login-btn" bindtap="goToLogin">{{locale === 'en' ? 'LOGIN / REGISTER' : '登录 / 注册'}}</button>
+    <view class="not-logged-title">{{t.NOT_LOGGED_IN}}</view>
+    <view class="not-logged-hint">{{t.SIGN_IN_TO_TRACK_YOUR_FITNESS_JOURNEY}}</view>
+    <button class="login-btn" bindtap="goToLogin">{{t.LOGIN_REGISTER}}</button>
   </view>
 
   <!-- Logged In Content -->
@@ -45,13 +45,13 @@
       <!-- Streak Card -->
       <view class="stat-card">
         <image class="stat-icon" src="{{imgPrefix}}/icons/icon-sign.png" mode="aspectFit" />
-        <view class="stat-label">{{locale === 'en' ? 'ACTIVE STREAK' : '连续训练'}}</view>
-        <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{locale === 'en' ? ' days' : ' 天'}}</text></view>
+        <view class="stat-label">{{t.ACTIVE_STREAK}}</view>
+        <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{t.DAYS}}</text></view>
       </view>
       <!-- Level Card -->
       <view class="stat-card">
         <image class="stat-icon" src="{{imgPrefix}}/icons/icon-crawn.png" mode="aspectFit" />
-        <view class="stat-label">{{locale === 'en' ? 'LEVEL' : '等级'}}{{levelInfo.lv || 1}}</view>
+        <view class="stat-label">{{t.LEVEL}}{{levelInfo.lv || 1}}</view>
         <view class="stat-value-lg">{{locale === 'en' ? levelInfo.label : (levelInfo.label_zh || levelInfo.label)}}</view>
       </view>
     </view>
@@ -65,8 +65,8 @@
             <image class="settings-lang-icon" src="{{imgPrefix}}/icons/icon-lang.png" mode="aspectFit" />
           </view>
           <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'LANGUAGE' : '语言'}}</text>
-            <text class="settings-subtitle">{{locale === 'en' ? 'English (US)' : '中文'}}</text>
+            <text class="settings-title">{{t.LANGUAGE}}</text>
+            <text class="settings-subtitle">{{t.ENGLISH_US}}</text>
           </view>
         </view>
         <view class="toggle-pills">
@@ -82,13 +82,13 @@
             <text class="settings-icon-text">{{theme === 'day' ? '◐' : '◑'}}</text>
           </view>
           <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'THEME' : '主题'}}</text>
-            <text class="settings-subtitle">{{theme === 'day' ? (locale === 'en' ? 'Day' : '日间') : (locale === 'en' ? 'Night' : '夜间')}}</text>
+            <text class="settings-title">{{t.THEME}}</text>
+            <text class="settings-subtitle">{{theme === 'day' ? t.DAY : t.NIGHT}}</text>
           </view>
         </view>
         <view class="toggle-pills">
-          <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{locale === 'en' ? 'Day' : '日间'}}</text>
-          <text class="pill {{theme === 'night' ? 'pill-active' : ''}}">{{locale === 'en' ? 'Night' : '夜间'}}</text>
+          <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{t.DAY}}</text>
+          <text class="pill {{theme === 'night' ? 'pill-active' : ''}}">{{t.NIGHT}}</text>
         </view>
       </view>
 
@@ -99,8 +99,8 @@
             <text class="settings-icon-text">⚙</text>
           </view>
           <view class="settings-texts">
-            <text class="settings-title locked-text">{{locale === 'en' ? 'AI COACH' : 'AI 教练'}}</text>
-            <text class="settings-subtitle locked-text">{{locale === 'en' ? 'COMING SOON' : '即将推出'}}</text>
+            <text class="settings-title locked-text">{{t.AI_COACH}}</text>
+            <text class="settings-subtitle locked-text">{{t.COMING_SOON}}</text>
           </view>
         </view>
         <image class="settings-lock-icon" src="{{imgPrefix}}/icons/icon-lock.png" mode="aspectFit" />
@@ -109,7 +109,7 @@
 
 
     <!-- Version -->
-    <view class="version-text">{{locale === 'en' ? 'GARCIA FITNESS V1.0.6 - STABLE' : 'GARCIA FITNESS V1.0.6 - 稳定版'}}</view>
+    <view class="version-text">{{t.GARCIA_FITNESS_V106_STABLE}}</view>
   </block>
 
   <!-- Custom Tab Bar -->

@@ -20,6 +20,14 @@ Component({
   data: {
     _locale: 'en',
     _theme: 'night',
+    t: app.globalData.t,  // 注入 i18n 字典
+  },
+
+  lifetimes: {
+    attached() {
+      // 组件挂载时同步最新 t (可能在语言切换后才挂载)
+      if (app.globalData.t) this.setData({ t: app.globalData.t });
+    },
   },
 
   observers: {

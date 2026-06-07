@@ -82,6 +82,7 @@ Component({
     loading: false,
     loadingMore: false,
     imgPrefix: '',
+    t: app.globalData.t,  // 注入 i18n 字典
     vidPrefix: '',
     equipmentList: EQUIPMENT_LIST,
     muscleList: MUSCLE_LIST,

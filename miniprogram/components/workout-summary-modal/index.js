@@ -27,6 +27,7 @@ Component({
     exerciseList: [],
     _locale: 'en',
     _dateStr: '',
+    t: app.globalData.t,  // 注入 i18n 字典
     _stats: {
       exerciseCount: 0,
       durationStr: '0 min',

@@ -1,6 +1,6 @@
 <!-- components/welcome-modal/index.wxml -->
 <view class="modal-mask" bindtap="onMaskTap" hidden="{{!isOpen}}">
-  <view class="modal-sheet" catchtap="noop">
+  <view class="modal-sheet" catchtap="">
 
     <!-- Header: Logo + Welcome -->
     <view class="modal-header">

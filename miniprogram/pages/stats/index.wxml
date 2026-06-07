@@ -6,8 +6,8 @@
 
   <!-- Header -->
   <view class="page-header">
-    <view class="page-title-text">{{locale === 'en' ? 'STATS' : '统计'}}</view>
-    <view class="page-subtitle-text">{{locale === 'en' ? 'YOUR PERFORMANCE DATA' : '你的运动表现数据'}}</view>
+    <view class="page-title-text">{{t.STATS}}</view>
+    <view class="page-subtitle-text">{{t.YOUR_PERFORMANCE_DATA}}</view>
   </view>
 
   <!-- Summary Stats Row -->
@@ -15,29 +15,29 @@
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-calendar.png" mode="aspectFit" />
       <view class="stat-card-value">{{totalSessions}}</view>
-      <view class="stat-card-label">{{locale === 'en' ? 'SESSIONS' : '训练次数'}}</view>
+      <view class="stat-card-label">{{t.SESSIONS}}</view>
     </view>
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-flame.png" mode="aspectFit" />
       <view class="stat-card-value">{{currentStreak}}</view>
-      <view class="stat-card-label">{{locale === 'en' ? 'STREAK' : '连续训练'}}</view>
+      <view class="stat-card-label">{{t.STREAK}}</view>
     </view>
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-activity.png" mode="aspectFit" />
       <view class="stat-card-value">{{weekWorkouts}}</view>
-      <view class="stat-card-label">{{locale === 'en' ? 'SESSIONS THIS WEEK' : '本周训练次数'}}</view>
+      <view class="stat-card-label">{{t.SESSIONS_THIS_WEEK}}</view>
     </view>
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-dumbbell.png" mode="aspectFit" />
       <view class="stat-card-value stat-card-value-small">{{totalVolumeDisplay}} <text class="unit">kg</text></view>
-      <view class="stat-card-label">{{locale === 'en' ? 'TOTAL VOLUME' : '总重量'}}</view>
+      <view class="stat-card-label">{{t.TOTAL_VOLUME}}</view>
     </view>
   </view>
 
   <!-- Weekly Volume Bar Chart — last 8 weeks -->
   <view wx:if="{{weeklyVolume.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">{{locale === 'en' ? 'WEEKLY TRAINING VOLUME' : '每周训练量'}}</view>
-    <view class="section-subtitle">{{locale === 'en' ? 'LAST 8 WEEKS' : '最近8周'}}</view>
+    <view class="section-title">{{t.WEEKLY_TRAINING_VOLUME}}</view>
+    <view class="section-subtitle">{{t.LAST_8_WEEKS}}</view>
     <view class="bar-header">
       <text class="bar-header-label"></text>
       <view class="bar-header-track"></view>
@@ -56,7 +56,7 @@
 
   <!-- Muscle Distribution -->
   <view wx:if="{{muscleDistribution.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">{{locale === 'en' ? 'MUSCLE DISTRIBUTION' : '肌群分布'}}</view>
+    <view class="section-title">{{t.MUSCLE_DISTRIBUTION}}</view>
     <view class="muscle-chart-wrap">
       <canvas id="muscleChart" type="2d" class="pie-chart-canvas" />
       <view class="muscle-legend">
@@ -71,11 +71,11 @@
 
   <!-- Most Trained Exercises -->
   <view wx:if="{{mostTrained.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">{{locale === 'en' ? 'MOST TRAINED' : '最常训练'}}</view>
+    <view class="section-title">{{t.MOST_TRAINED}}</view>
     <view class="freq-list">
       <view class="freq-item" wx:for="{{mostTrained}}" wx:key="name">
         <text class="freq-name">{{item.name}}</text>
-        <text class="freq-count">{{item.count}} {{locale === 'en' ? 'SETS' : '组'}}</text>
+        <text class="freq-count">{{item.count}} {{t.SETS}}</text>
       </view>
     </view>
   </view>
@@ -83,12 +83,12 @@
   <!-- Exercise Selector -->
   <view class="glass-card select-wrap">
     <view class="select-header">
-      <text class="select-label">{{locale === 'en' ? 'EXERCISE MAX RECORD' : '动作最大重量'}}</text>
+      <text class="select-label">{{t.EXERCISE_MAX_RECORD}}</text>
     </view>
     <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
       <view class="select-display">
         <text class="{{selectedExerciseName ? 'select-text-active' : 'select-text-placeholder'}}">
-          {{selectedExerciseName || (locale === 'en' ? '— CHOOSE EXERCISE —' : '— 选择动作 —')}}
+          {{selectedExerciseName || t.CHOOSE_EXERCISE}}
         </text>
         <text class="select-arrow">›</text>
       </view>
@@ -98,8 +98,8 @@
   <!-- No data state -->
   <view wx:if="{{!hasData && !loading}}" class="empty-state">
     <image class="empty-icon" src="{{imgPrefix}}/icons/icon-chart.png" mode="aspectFit" />
-    <text class="empty-text">{{locale === 'en' ? 'NO TRAINING DATA YET' : '暂无训练数据'}}</text>
-    <text class="empty-subtext">{{locale === 'en' ? 'Start a workout to see your stats' : '开始训练来查看你的数据'}}</text>
+    <text class="empty-text">{{t.NO_TRAINING_DATA_YET}}</text>
+    <text class="empty-subtext">{{t.START_A_WORKOUT_TO_SEE_YOUR_STATS}}</text>
   </view>
 
   <!-- Max Record Cards -->
@@ -107,30 +107,30 @@
     <view class="max-record-card">
       <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-target.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.weight}}</view>
-      <view class="max-record-unit">{{locale === 'en' ? 'KG' : '公斤'}}</view>
+      <view class="max-record-unit">{{t.KG}}</view>
     </view>
     <view class="max-record-card">
       <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-chart.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.reps}}</view>
-      <view class="max-record-unit">{{locale === 'en' ? 'REPS' : '次数'}}</view>
+      <view class="max-record-unit">{{t.REPS}}</view>
     </view>
     <view class="max-record-card">
       <image class="max-record-icon" src="{{imgPrefix}}/icons/icon-check.png" mode="aspectFit" />
       <view class="max-record-num">{{maxRecord.totalSets}}</view>
-      <view class="max-record-unit">{{locale === 'en' ? 'TOTAL SETS' : '总组数'}}</view>
+      <view class="max-record-unit">{{t.TOTAL_SETS}}</view>
     </view>
   </view>
 
   <!-- Weight Progress Chart -->
   <view wx:if="{{weightRecords.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">{{locale === 'en' ? 'WEIGHT PROGRESS' : '重量进步'}}</view>
-    <view class="section-subtitle">{{weightRecords.length}} {{locale === 'en' ? 'RECORDS' : '条记录'}}</view>
+    <view class="section-title">{{t.WEIGHT_PROGRESS}}</view>
+    <view class="section-subtitle">{{weightRecords.length}} {{t.RECORDS}}</view>
     <canvas id="weightChart" type="2d" class="weight-chart-canvas" />
   </view>
 
   <!-- Loading -->
   <view wx:if="{{loading}}" class="loading-state">
-    <text class="loading-text">{{locale === 'en' ? 'LOADING...' : '加载中...'}}</text>
+    <text class="loading-text">{{t.LOADING}}</text>
   </view>
 
   <!-- Custom Tab Bar -->

@@ -40,7 +40,12 @@ Page({
   onLoad() {
     const locale = wx.getStorageSync('language') || 'zh';
     const theme = wx.getStorageSync('theme') || 'night';
-    this.setData({ imgPrefix: app.globalData.imagePrefix, locale, theme });
+    this.setData({
+      imgPrefix: app.globalData.imagePrefix,
+      locale,
+      theme,
+      t: app.globalData.t,  // 注入 i18n 字典
+    });
   },
 
   async onShow() {

@@ -16,24 +16,24 @@
       <view class="check-circle">
         <text class="check-icon">✓</text>
       </view>
-      <view class="complete-label {{_theme === 'day' ? 'theme-day' : ''}}">{{_locale === 'zh' ? '训练完成' : 'Workout Complete'}}</view>
+      <view class="complete-label {{_theme === 'day' ? 'theme-day' : ''}}">{{t.WORKOUT_COMPLETE}}</view>
     </view>
 
     <!-- Stats Row -->
     <view class="stats-row">
       <view class="stat-item">
         <view class="stat-val">{{_stats.exerciseCount}}</view>
-        <view class="stat-lbl">{{_locale === 'zh' ? '动作数' : 'Exercises'}}</view>
+        <view class="stat-lbl">{{t.EXERCISES}}</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item stat-duration">
         <view class="stat-val">{{_stats.durationStr}}</view>
-        <view class="stat-lbl">{{_locale === 'zh' ? '时长' : 'Duration'}}</view>
+        <view class="stat-lbl">{{t.DURATION}}</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
         <view class="stat-val">{{_stats.totalVolume}} kg</view>
-        <view class="stat-lbl">{{_locale === 'zh' ? '总量' : 'Volume'}}</view>
+        <view class="stat-lbl">{{t.VOLUME}}</view>
       </view>
     </view>
 
@@ -41,7 +41,7 @@
     <view class="divider"></view>
 
     <!-- Exercise Breakdown -->
-    <view class="breakdown-title">{{_locale === 'zh' ? '动作明细' : 'Exercise Summary'}}</view>
+    <view class="breakdown-title">{{t.EXERCISE_SUMMARY}}</view>
     <scroll-view class="breakdown-scroll" scroll-y>
       <view class="breakdown-list">
         <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="id">
@@ -55,7 +55,7 @@
             <view wx:else class="item-img item-img-placeholder">🏋️</view>
             <view class="item-info">
               <view class="item-name">{{_locale === 'zh' ? (item.name_zh || item.name) : (item.name || item.name_zh)}}</view>
-              <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? (_locale === 'zh' ? '组' : 'set') : (_locale === 'zh' ? '组' : 'sets')}}</view>
+              <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
             </view>
             <view class="item-vol">
               <text class="vol-num">{{item.totalVolume}}</text>
@@ -80,8 +80,8 @@
 
     <!-- Action Buttons -->
     <view class="card-footer">
-      <button class="btn-secondary" bindtap="closeModal">{{_locale === 'zh' ? '完成' : 'DONE'}}</button>
-      <button class="btn-share" open-type="share">{{_locale === 'zh' ? '分享' : 'SHARE'}}</button>
+      <button class="btn-secondary" bindtap="closeModal">{{t.DONE}}</button>
+      <button class="btn-share" open-type="share">{{t.SHARE}}</button>
     </view>
 
   </view>

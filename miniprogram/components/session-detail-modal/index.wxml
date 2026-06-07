@@ -7,7 +7,7 @@
       <view class="header-left">
         <view class="header-btn" bindtap="closeModal">✕</view>
       </view>
-      <view class="header-title">{{locale === 'zh' ? '训练详情' : 'SESSION DETAIL'}}</view>
+      <view class="header-title">{{t.SESSION_DETAIL}}</view>
       <view class="header-right"></view>
     </view>
 
@@ -17,17 +17,17 @@
       <view class="session-stats">
         <view class="stat-card">
           <view class="stat-val">{{_durationDisplay}}</view>
-          <view class="stat-label">{{locale === 'zh' ? '时长' : 'DURATION'}}</view>
+          <view class="stat-label">{{t.DURATION}}</view>
           <view class="stat-accent-bar"></view>
         </view>
         <view class="stat-card">
           <view class="stat-val">{{exerciseList.length}}</view>
-          <view class="stat-label">{{locale === 'zh' ? '动作' : 'EXERCISES'}}</view>
+          <view class="stat-label">{{t.EXERCISES}}</view>
           <view class="stat-accent-bar"></view>
         </view>
         <view class="stat-card">
           <view class="stat-val">{{totalSets}}</view>
-          <view class="stat-label">{{locale === 'zh' ? '组数' : 'SETS'}}</view>
+          <view class="stat-label">{{t.SETS}}</view>
           <view class="stat-accent-bar"></view>
         </view>
       </view>
@@ -36,8 +36,8 @@
     <!-- Exercises List -->
     <scroll-view class="exercise-list" scroll-y>
       <view class="exercise-list-inner">
-        <view wx:if="{{loading}}" class="loading-state">{{locale === 'zh' ? '加载中...' : 'LOADING...'}}</view>
-        <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">{{locale === 'zh' ? '暂无动作记录' : 'NO EXERCISES RECORDED'}}</view>
+        <view wx:if="{{loading}}" class="loading-state">{{t.LOADING}}</view>
+        <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">{{t.NO_EXERCISES_RECORDED}}</view>
 
         <view wx:else class="exercise-groups">
           <view class="ec-card" wx:for="{{exerciseList}}" wx:key="id">
@@ -49,11 +49,11 @@
               </view>
               <view class="ec-info">
                 <view class="ec-name">{{locale === 'zh' ? item.name_zh : item.name_en}}</view>
-                <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? (locale === 'zh' ? '组' : 'set') : (locale === 'zh' ? '组' : 'sets')}}</view>
+                <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
               </view>
               <view class="ec-volume">
                 <view class="ec-vol-num">{{item.totalVolume || '—'}} kg</view>
-                <view class="ec-vol-label">{{locale === 'zh' ? '总重量' : 'VOLUME'}}</view>
+                <view class="ec-vol-label">{{t.TOTAL_VOLUME}}</view>
               </view>
             </view>
             <!-- ec-sets-grid: 2 columns -->
@@ -62,7 +62,7 @@
                 <view class="ec-set-num">{{index + 1}}</view>
                 <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
                 <view class="ec-set-sep">×</view>
-                <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{locale === 'zh' ? '次' : 'reps'}}</text></view>
+                <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS}}</text></view>
               </view>
             </view>
           </view>

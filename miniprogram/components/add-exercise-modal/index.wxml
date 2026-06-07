@@ -25,7 +25,7 @@
         </block>
       </view>
 
-      <view class="header-title">{{step === 'pick' ? (locale === 'zh' ? '添加动作' : 'ADD EXERCISE') : (locale === 'zh' ? '设置重量和次数' : 'SET WEIGHT & REPS')}}</view>
+      <view class="header-title">{{step === 'pick' ? t.ADD_EXERCISE : t.SET_WEIGHT_REPS}}</view>
 
       <view class="header-right">
         <view class="header-btn" bindtap="closeModal">
@@ -36,7 +36,7 @@
 
     <!-- Muscle Sidebar -->
     <view wx:if="{{selectedMuscleOpen && step === 'pick'}}" class="muscle-sidebar">
-      <view class="muscle-item {{selectedMuscle === 0 ? 'active' : ''}}" bindtap="selectMuscle" data-id="0">{{locale === 'zh' ? '全部肌群' : 'All Muscles'}}</view>
+      <view class="muscle-item {{selectedMuscle === 0 ? 'active' : ''}}" bindtap="selectMuscle" data-id="0">{{t.ALL_MUSCLES}}</view>
       <view wx:for="{{muscleListWithName}}" wx:key="id" class="muscle-item {{selectedMuscle === item.id ? 'active' : ''}}" bindtap="selectMuscle" data-id="{{item.id}}">
         <image wx:if="{{item.icon}}" class="muscle-icon" src="{{imgPrefix}}/body-icons/{{item.icon}}" mode="aspectFit" />
         <text class="muscle-item-name">{{item._name}}</text>
@@ -62,7 +62,7 @@
         <view class="filter-section">
           <scroll-view class="filter-scroll" scroll-x>
             <view class="filter-row">
-              <view class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}" bindtap="selectEquipment" data-id="0">{{locale === 'zh' ? '所有' : 'ALL'}} <text wx:if="{{selectedEquipment === 0}}" class="equip-name">{{locale === 'zh' ? '器械' : 'Equips'}}</text></view>
+              <view class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}" bindtap="selectEquipment" data-id="0">{{t.ALL}} <text wx:if="{{selectedEquipment === 0}}" class="equip-name">{{t.EQUIPS}}</text></view>
               <view wx:for="{{equipmentListWithName}}" wx:key="id" class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}" bindtap="selectEquipment" data-id="{{item.id}}">
                 <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
                 <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item._name}}</text>
@@ -124,7 +124,7 @@
               </view>
             </view>
             <view wx:if="{{historyMax}}" class="history-badge" bindtap="applyHistory">
-              <text class="history-badge-label">{{locale === 'zh' ? '上次' : 'Last'}}</text>
+              <text class="history-badge-label">{{t.LAST}}</text>
               <text class="history-badge-val">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</text>
             </view>
           </view>
@@ -134,7 +134,7 @@
             <video class="step2-video" src="{{vidPrefix}}/{{selectedItem.video_name}}" mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture></video>
           </view>
           <view wx:elif="{{selectedItem.image_name}}" class="video-placeholder">
-            <text class="video-placeholder-text">{{locale === 'zh' ? '该动作暂无演示视频' : 'No demo video available'}}</text>
+            <text class="video-placeholder-text">{{t.NO_DEMO_VIDEO_AVAILABLE}}</text>
           </view>
 
           <!-- Weight Input -->
@@ -180,7 +180,7 @@
 
     <!-- Bottom Confirm Button (Step 2 only) -->
     <view wx:if="{{step === 'set'}}" class="modal-footer">
-      <button class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}" bindtap="confirmAdd" disabled="{{weight < 0 || reps <= 0 || submitting}}">{{submitting ? (locale === 'zh' ? '添加中' :'ADDING...' ): (locale === 'zh' ? '添加训练' :'ADD TO WORKOUT')}}</button>
+      <button class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}" bindtap="confirmAdd" disabled="{{weight < 0 || reps <= 0 || submitting}}">{{submitting ? t.ADDING : t.ADD_TO_WORKOUT}}</button>
     </view>
 
   </view>

@@ -76,6 +76,7 @@ Page({
       _dataLoaded: true,
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
+      t: app.globalData.t,  // 注入 i18n 字典, WXML 用 {{t.KEY}}
     });
     const today = new Date();
     const iso = today.toISOString().split('T')[0];

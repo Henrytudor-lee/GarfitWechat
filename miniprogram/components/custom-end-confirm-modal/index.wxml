@@ -13,18 +13,18 @@
         <image class="brand-logo" src="/images/logo.png" mode="aspectFit" />
         <view class="brand">GFIT</view>
       </view>
-      <view class="confirm-label">{{_locale === 'zh' ? '确认结束训练' : 'END TRAINING'}}</view>
+      <view class="confirm-label">{{t.CONFIRM_END_TRAINING}}</view>
     </view>
 
     <!-- Content -->
     <view class="content-body">
-      <view class="content-text">{{_locale === 'zh' ? '确定要结束本次训练吗？' : 'Are you sure you want to end this training session?'}}</view>
+      <view class="content-text">{{t.ARE_YOU_SURE_END_TRAINING}}</view>
     </view>
 
     <!-- Action Buttons -->
     <view class="card-footer">
-      <button class="btn-secondary" bindtap="cancelConfirm">{{_locale === 'zh' ? '取消' : 'CANCEL'}}</button>
-      <button class="btn-primary" bindtap="confirmEnd">{{_locale === 'zh' ? '确认' : 'CONFIRM'}}</button>
+      <button class="btn-secondary" bindtap="cancelConfirm">{{t.CANCEL}}</button>
+      <button class="btn-primary" bindtap="confirmEnd">{{t.CONFIRM}}</button>
     </view>
 
   </view>

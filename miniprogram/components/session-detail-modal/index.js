@@ -29,6 +29,7 @@ Component({
     _durationDisplay: '--:--',
     _dateDisplay: '',
     totalSets: 0,
+    t: app.globalData.t,  // 注入 i18n 字典
   },
 
   observers: {

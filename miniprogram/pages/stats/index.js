@@ -83,6 +83,7 @@ Page({
       imgPrefix: app.globalData.imagePrefix,
       locale: app.globalData.language,
       theme: app.globalData.theme,
+      t: app.globalData.t,  // 注入 i18n 字典
     });
   },
 

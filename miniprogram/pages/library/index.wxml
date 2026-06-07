@@ -9,8 +9,8 @@
 
   <!-- Page Header -->
   <view class="page-header">
-    <view class="page-title">{{locale === 'en' ? 'EXERCISE LIBRARY' : '动作库'}}</view>
-    <view class="page-subtitle">{{locale === 'en' ? 'Access 7000+ professional movements' : '访问 7000+ 专业动作'}}</view>
+    <view class="page-title">{{t.EXERCISE_LIBRARY}}</view>
+    <view class="page-subtitle">{{t.ACCESS_7000PLUS_PROFESSIONAL_MOVEMENTS}}</view>
   </view>
 
   <!-- Search -->
@@ -18,7 +18,7 @@
     <text class="search-icon">🔍</text>
     <input
       class="search-input"
-      placeholder="{{locale === 'en' ? 'SEARCH EXERCISES...' : '搜索动作...'}}"
+      placeholder="{{t.SEARCH_EXERCISES}}"
       placeholder-class="search-placeholder"
       value="{{keyword}}"
       bindinput="onSearchInput"
@@ -46,7 +46,7 @@
           class="filter-chip {{selectedEquipment === null ? 'active' : ''}}"
           bindtap="onEquipmentTap"
           data-id="{{null}}"
-        >{{locale === 'en' ? 'ALL' : '全部'}} <text wx:if="{{selectedEquipment === null}}" class="equip-name">{{locale === 'en' ? 'Equips' : '器材'}}</text></view>
+        >{{t.ALL}} <text wx:if="{{selectedEquipment === null}}" class="equip-name">{{t.EQUIPS}}</text></view>
         <view
           wx:for="{{equipmentList}}"
           wx:key="id"
@@ -69,7 +69,7 @@
           class="filter-chip {{selectedMuscle === null ? 'active' : ''}}"
           bindtap="onMuscleTap"
           data-id="{{null}}"
-        >{{locale === 'en' ? 'ALL' : '全部'}} <text wx:if="{{selectedMuscle === null}}" class="equip-name">{{locale === 'en' ? 'Muscles' : '肌群'}}</text></view>
+        >{{t.ALL}} <text wx:if="{{selectedMuscle === null}}" class="equip-name">{{t.MUSCLES}}</text></view>
         <view
           wx:for="{{muscleList}}"
           wx:key="id"
@@ -89,8 +89,8 @@
 
   <!-- Scrollable Content -->
   <scroll-view class="content-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
-  <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{locale === 'en' ? 'LOADING...' : '加载中...'}}</view>
-  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{locale === 'en' ? 'NO EXERCISES FOUND' : '没有找到动作'}}</view>
+  <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{t.LOADING}}</view>
+  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
 
   <view wx:else class="exercise-grid">
     <view
@@ -110,7 +110,7 @@
         />
         <view wx:else class="card-img-placeholder">🏋️</view>
         <view class="card-gradient"></view>
-        <view wx:if="{{item.is_practiced}}" class="done-badge">{{locale === 'en' ? 'DONE' : '已完成'}}</view>
+        <view wx:if="{{item.is_practiced}}" class="done-badge">{{t.DONE}}</view>
         <view class="fav-icon-wrap {{item.is_favorite ? 'active' : ''}}" catchtap="onFavoriteTap" data-id="{{item.id}}">
           <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
           <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
@@ -132,15 +132,15 @@
     </view>
   </view>
 
-  <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">{{locale === 'en' ? 'LOAD MORE' : '加载更多'}}</view>
-  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— {{locale === 'en' ? 'ALL' : '全部'}} —</view>
+  <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMore">{{t.LOAD_MORE}}</view>
+  <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— {{t.ALL}} —</view>
 
   </scroll-view>
   <!-- /content-scroll -->
 
   <!-- Exercise Detail Bottom Sheet -->
   <view class="sheet-mask {{selectedExercise ? 'show' : ''}}" catchtouchmove="noop">
-    <view class="sheet" catchtap="noop">
+    <view class="sheet" catchtap="">
 
       <!-- Close Handle -->
       <view class="sheet-handle" bindtap="closeSheet"></view>
@@ -174,8 +174,8 @@
         <!-- 视频缺失提示: 有图无视频时叠在图片上, 无图时叠在占位符上 -->
         <view wx:if="{{!selectedExercise.video_name}}" class="sheet-media-tip">
           <text class="tip-icon">🎬</text>
-          <text class="tip-text">{{locale === 'en' ? 'No demo video for this exercise yet' : '该动作演示视频待补充'}}</text>
-          <text wx:if="{{selectedExercise.image_name}}" class="tip-sub">{{locale === 'en' ? 'Showing preview image only' : '当前显示预览图'}}</text>
+          <text class="tip-text">{{t.NO_DEMO_VIDEO_FOR_THIS_EXERCISE_YET}}</text>
+          <text wx:if="{{selectedExercise.image_name}}" class="tip-sub">{{t.SHOWING_PREVIEW_IMAGE_ONLY}}</text>
         </view>
       </view>
 
@@ -197,7 +197,7 @@
           class="sheet-btn"
           bindtap="{{isSelectMode ? 'doSelect' : 'addToWorkout'}}"
           data-item="{{selectedExercise}}"
-        >{{isSelectMode ? (locale === 'en' ? 'SELECT EXERCISE' : '选择动作') : (locale === 'en' ? 'ADD TO WORKOUT' : '添加到训练')}}</button>
+        >{{isSelectMode ? t.SELECT_EXERCISE : t.ADD_TO_WORKOUT}}</button>
       </view>
     </view>
   </view>

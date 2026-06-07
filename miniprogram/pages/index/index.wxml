@@ -6,29 +6,29 @@
 
   <!-- Hero Timer Card -->
   <view class="timer-card">
-    <view class="timer-label">{{locale === 'en' ? 'DURATION' : '时长'}}</view>
+    <view class="timer-label">{{t.DURATION}}</view>
     <view class="timer-display">{{elapsedTime}}</view>
     <view class="timer-stats-row">
       <view class="timer-stat">
         <view class="stat-val">{{totalVolume}}</view>
-        <view class="stat-key">{{locale === 'en' ? 'VOLUME (KG)' : '总重量(KG)'}}</view>
+        <view class="stat-key">{{t.VOLUME_KG}}</view>
       </view>
       <view class="stat-divider"></view>
       <view class="timer-stat">
         <view class="stat-val">{{exerciseCount}}</view>
-        <view class="stat-key">{{locale === 'en' ? 'EXERCISES' : '动作数'}}</view>
+        <view class="stat-key">{{t.EXERCISES}}</view>
       </view>
       <view class="stat-divider"></view>
       <view class="timer-stat">
         <view class="stat-val text-primary">{{restTime}}</view>
-        <view class="stat-key">{{locale === 'en' ? 'REST' : '休息'}}</view>
+        <view class="stat-key">{{t.REST}}</view>
       </view>
     </view>
   </view>
 
   <!-- Quick Start / End Training -->
   <button class="start-btn {{runningSession ? 'stop' : 'start'}}" bindtap="{{runningSession ? 'requestStopWorkout' : 'startWorkout'}}">
-    {{runningSession ? (locale === 'en' ? 'END TRAINING' : '结束训练') : (locale === 'en' ? 'QUICK START' : '快速开始')}}
+    {{runningSession ? t.END_TRAINING : t.QUICK_START}}
   </button>
 
   <!-- Floating FAB - Add Exercise -->
@@ -39,8 +39,8 @@
   <!-- Current Workout -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">{{locale === 'en' ? 'CURRENT WORKOUT' : '当前训练'}}</text>
-      <text class="section-badge {{runningSession ? 'active' : ''}}">{{runningSession ? (locale === 'en' ? 'IN PROGRESS' : '进行中') : (locale === 'en' ? 'READY' : '待开始')}}</text>
+      <text class="section-title">{{t.CURRENT_WORKOUT}}</text>
+      <text class="section-badge {{runningSession ? 'active' : ''}}">{{runningSession ? t.IN_PROGRESS : t.READY}}</text>
     </view>
 
     <view wx:if="{{exerciseGroups.length > 0}}" class="exercise-list">
@@ -73,16 +73,16 @@
     </view>
 
     <view wx:elif="{{runningSession}}" class="empty-card" bindtap="goToLibrary">
-      <text class="empty-hint">{{locale === 'en' ? 'TAP + TO ADD EXERCISES' : '点击 + 添加动作'}}</text>
+      <text class="empty-hint">{{t.TAP_PLUS_TO_ADD_EXERCISES}}</text>
     </view>
 
     <view wx:else class="empty-card">
-      <text class="empty-hint">{{locale === 'en' ? 'START TRAINING TO ADD EXERCISES' : '开始训练以添加动作'}}</text>
+      <text class="empty-hint">{{t.START_TRAINING_TO_ADD_EXERCISES}}</text>
     </view>
   </view>
   <view class="section">
     <view class="section-header">
-      <text class="section-title">{{locale === 'en' ? 'Fitness Calendar' : '训练日历'}}</text>
+      <text class="section-title">{{t.FITNESS_CALENDAR}}</text>
     </view>
     <!-- Calendar Mini -->
     <view class="calendar-card">
@@ -103,7 +103,7 @@
   <!-- History Bento Section -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">{{locale === 'en' ? 'HISTORY' : '历史记录'}}</text>
+      <text class="section-title">{{t.HISTORY}}</text>
       <view class="date-picker-btn" bindtap="openDatePicker">{{displayDate}}</view>
     </view>
 
@@ -113,7 +113,7 @@
         <view class="history-session-time">{{item.timeStr}}</view>
         <view class="history-session-info">
           <text class="history-session-stat">{{item.durationStr}}</text>
-          <text class="history-session-stat">{{item.exerciseCount || 0}} {{locale === 'en' ? 'EXERCISES' : '动作'}}</text>
+          <text class="history-session-stat">{{item.exerciseCount || 0}} {{t.EXERCISES}}</text>
         </view>
       </view>
     </view>
@@ -121,7 +121,7 @@
     <!-- Bento Grid (shown when no sessions for selected date) -->
     <view wx:else class="bento-grid">
       <view class="bento-card bento-today">
-        <view class="bento-label">{{locale === 'en' ? 'TODAY' : '今天'}}</view>
+        <view class="bento-label">{{t.TODAY}}</view>
         <view class="bento-day">{{todayDay}}</view>
         <view class="bento-month text-primary">{{todayMonth}}</view>
         <view class="bento-progress-bar">
@@ -129,7 +129,7 @@
         </view>
       </view>
       <view class="bento-card bento-yesterday">
-        <view class="bento-label">{{locale === 'en' ? 'YESTERDAY' : '昨天'}}</view>
+        <view class="bento-label">{{t.YESTERDAY}}</view>
         <view class="bento-day">{{yesterdayDay}}</view>
         <view class="bento-month text-muted">{{yesterdayMonth}}</view>
         <view class="bento-progress-bar">
@@ -137,9 +137,9 @@
         </view>
       </view>
       <view class="bento-card bento-monthly">
-        <view class="bento-label">{{locale === 'en' ? 'MONTHLY VOL' : '本月总量'}}</view>
+        <view class="bento-label">{{t.MONTHLY_VOL}}</view>
         <view class="bento-big-num text-primary">0 KG</view>
-        <view class="bento-hint text-primary">{{locale === 'en' ? 'START TRACKING' : '开始记录'}}</view>
+        <view class="bento-hint text-primary">{{t.START_TRACKING}}</view>
         <view class="bento-bg-icon">📊</view>
       </view>
     </view>
@@ -147,7 +147,7 @@
 
   <!-- Custom Date Picker Modal -->
   <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker">
-    <view class="picker-modal" catchtap="noop">
+    <view class="picker-modal" catchtap="">
       <!-- Month navigation -->
       <view class="picker-header">
         <view class="picker-nav" bindtap="prevMonth">
@@ -167,7 +167,7 @@
         <view wx:for="{{calendarDays}}" wx:key="index" class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}" bindtap="selectDay" data-day="{{item.day}}">{{item.day}}</view>
       </view>
       <!-- Today shortcut -->
-      <view class="picker-today-btn" bindtap="goToToday">{{locale === 'en' ? 'TODAY' : '今天'}}</view>
+      <view class="picker-today-btn" bindtap="goToToday">{{t.TODAY}}</view>
     </view>
   </view>
 
