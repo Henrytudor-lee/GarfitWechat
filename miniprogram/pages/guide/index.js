@@ -3,32 +3,20 @@ const app = getApp();
 
 const CARDS = [
   {
-    icon: '▶',
-    title: 'Start Your\nFirst Workout',
-    desc: 'Tap the green orb or + button at bottom-right to begin. Pick exercises from the library and set your weight & reps.',
+    icon: '',
+    gifSrc: '/images/guide/step1.gif',
+    title: '开始你的\n第一次训练',
+    desc: '从首页开始训练 → 新增动作 → 编辑重量和次数 → 结束训练',
     title_zh: '开始你的\n第一次训练',
-    desc_zh: '点击右下角的绿色圆球或 + 号开始。从动作库选择动作，设置重量和次数。',
-  },
-  {
-    icon: '🏋️',
-    title: 'Exercise\nLibrary',
-    desc: 'Browse 7000+ exercises. Filter by muscle group or equipment. Search by name and watch demo videos.',
-    title_zh: '动作库',
-    desc_zh: '浏览 7000+ 专业动作。按肌群或器材筛选，搜索动作名称，查看演示视频。',
+    desc_zh: '从首页开始训练 → 新增动作 → 编辑重量和次数 → 结束训练',
   },
   {
     icon: '📊',
-    title: 'Track Your\nProgress',
-    desc: 'View weekly volume, muscle distribution heatmap, weight progression charts, and your training streak.',
-    title_zh: '追踪你的\n训练数据',
-    desc_zh: '查看每周训练量、肌群分布热力图、重量进步曲线和连续训练天数。',
-  },
-  {
-    icon: '🚀',
-    title: "You're All\nSet!",
-    desc: 'Switch themes, change language, and check your AI Coach insights. Let\'s get fit! 💪',
-    title_zh: '准备就绪！',
-    desc_zh: '切换主题、修改语言、查看 AI 教练建议。一起变强吧！💪',
+    gifSrc: '/images/guide/step2.gif',
+    title: '查看训练数据',
+    desc: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
+    title_zh: '查看训练数据',
+    desc_zh: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
   },
 ];
 
@@ -67,6 +55,7 @@ Page({
     // 本地化卡片内容
     const cards = CARDS.map(c => ({
       icon: c.icon,
+      gifSrc: c.gifSrc,
       title: locale === 'en' ? c.title : c.title_zh,
       desc: locale === 'en' ? c.desc : c.desc_zh,
     }));

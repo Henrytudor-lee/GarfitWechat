@@ -18,9 +18,14 @@
       <block wx:for="{{cards}}" wx:key="index">
         <view class="guide-card">
           <view class="card-illustration">
-            <view class="glow-ring">
-              <view class="icon-circle accent">{{item.icon}}</view>
-            </view>
+            <block wx:if="{{item.gifSrc}}">
+              <image class="card-gif" src="{{item.gifSrc}}" mode="aspectFit" />
+            </block>
+            <block wx:else>
+              <view class="glow-ring">
+                <view class="icon-circle accent">{{item.icon}}</view>
+              </view>
+            </block>
           </view>
           <view class="card-step">{{'Step ' + (index + 1) + '/' + cards.length}}</view>
           <view class="card-title">{{item.title}}</view>
