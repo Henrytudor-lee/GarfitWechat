@@ -4,7 +4,7 @@ const app = getApp();
 const CARDS = [
   {
     icon: '',
-    gifSrc: '/images/guide/step1.gif',
+    gifName: 'step_1.gif',
     title: '开始你的\n第一次训练',
     desc: '从首页开始训练 → 新增动作 → 编辑重量和次数 → 结束训练',
     title_zh: '开始你的\n第一次训练',
@@ -12,13 +12,20 @@ const CARDS = [
   },
   {
     icon: '📊',
-    gifSrc: '/images/guide/step2.gif',
+    gifName: 'step_2.gif',
     title: '查看训练数据',
     desc: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
     title_zh: '查看训练数据',
     desc_zh: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
   },
 ];
+
+// 用云存储路径: images/guide/xxx.gif
+function getGifUrl(name) {
+  if (!name) return '';
+  const base = 'cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036';
+  return base + '/images/guide/' + name;
+}
 
 Page({
   data: {
@@ -55,7 +62,7 @@ Page({
     // 本地化卡片内容
     const cards = CARDS.map(c => ({
       icon: c.icon,
-      gifSrc: c.gifSrc,
+      gifSrc: getGifUrl(c.gifName),
       title: locale === 'en' ? c.title : c.title_zh,
       desc: locale === 'en' ? c.desc : c.desc_zh,
     }));
