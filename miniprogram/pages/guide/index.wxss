@@ -1,0 +1,215 @@
+/* pages/guide/index.wxss */
+page {
+  background: var(--page-bg, #08090a);
+  overflow: hidden;
+}
+
+.guide-page {
+  min-height: 100vh;
+  background: var(--bg, #08090a);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Lexend Deca', 'Lexend', -apple-system, sans-serif;
+  font-feature-settings: 'cv01', 'ss03';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Status Bar === */
+.status-bar-top {
+  height: 44px;
+}
+
+/* === Header === */
+.guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 32rpx 0;
+  min-height: 48rpx;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--quaternary-text, #62666d);
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  width: 28rpx;
+  border-radius: 4rpx;
+  background: var(--primary, #ccf200);
+}
+
+.skip-btn {
+  font-size: 26rpx;
+  font-weight: 510;
+  color: var(--text-muted, #8a8f98);
+  padding: 6rpx 12rpx;
+}
+
+/* === Cards Container === */
+.guide-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.guide-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* === Single Card === */
+.guide-card {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 48rpx 40rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.card-illustration {
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 24rpx;
+  background: var(--surface, #0f1011);
+  border: 1rpx solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 48rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-ring {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.glow-ring::after {
+  content: '';
+  position: absolute;
+  inset: -10rpx;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 270deg, var(--primary, #ccf200) 320deg, var(--primary, #ccf200) 360deg);
+  mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
+  -webkit-mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
+  animation: orbit-spin 2s linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-circle {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.icon-circle.accent {
+  background: var(--primary, #ccf200);
+  color: #000;
+  font-weight: 700;
+}
+
+.card-step {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--primary, #ccf200);
+  letter-spacing: 3rpx;
+  text-transform: uppercase;
+  margin-bottom: 16rpx;
+}
+
+.card-title {
+  font-size: 48rpx;
+  font-weight: 600;
+  color: var(--text-primary, #f7f8f8);
+  line-height: 1.2;
+  margin-bottom: 20rpx;
+  letter-spacing: -0.6rpx;
+}
+
+.card-desc {
+  font-size: 28rpx;
+  font-weight: 400;
+  color: var(--text-muted, #8a8f98);
+  line-height: 1.6;
+  max-width: 520rpx;
+  letter-spacing: -0.3rpx;
+}
+
+/* === Bottom Footer === */
+.guide-footer {
+  padding: 24rpx 32rpx 48rpx;
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+  background: linear-gradient(to top, var(--page-bg, #08090a) 60%, transparent);
+}
+
+.btn-primary {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: var(--primary, #ccf200);
+  color: #000;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 32rpx;
+  font-family: inherit;
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-ghost {
+  width: 160rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: transparent;
+  color: var(--text-muted, #8a8f98);
+  border: 1rpx solid rgba(255,255,255,0.08);
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  font-weight: 510;
+  text-align: center;
+  padding: 0;
+  font-family: inherit;
+}
+
+.btn-ghost::after {
+  border: none;
+}

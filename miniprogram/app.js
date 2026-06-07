@@ -23,6 +23,7 @@ App({
     // ---- 新用户欢迎弹框 ----
     isNewUser: false,
     showWelcome: false,
+    needsGuide: false,
   },
 
   onLaunch: async function () {
@@ -144,6 +145,7 @@ App({
                 this.globalData.practicedExercises = practiced_exercises || [];
                 this.globalData.isNewUser = is_new === true;
                 this.globalData.showWelcome = is_new === true;
+                if (is_new) this.globalData.needsGuide = true;
                 // Notify index page to check showWelcome
                 const pages = getCurrentPages();
                 if (pages.length > 0) {
