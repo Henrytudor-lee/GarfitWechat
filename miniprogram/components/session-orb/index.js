@@ -13,8 +13,8 @@ const SCREEN_HEIGHT_RPX = sysInfo.windowHeight * (750 / sysInfo.windowWidth);
 // 默认位置
 const DEFAULT_X = SCREEN_WIDTH_RPX - ORB_SIZE_RPX - MARGIN_RPX;
 
-// idle：右下角 (距底边 30rpx)
-const IDLE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 30;
+// idle：右下角 (tabbar 上方, tabbar ~154rpx 高, 留 16rpx 间距)
+const IDLE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 170;
 // active：fab 上方 (fab bottom=200rpx, fab 高=112, 间距 40rpx => orb bottom=200+112+40=352)
 const ACTIVE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 352;
 
