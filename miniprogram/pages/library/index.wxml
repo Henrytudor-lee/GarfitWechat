@@ -202,6 +202,15 @@
     </view>
   </view>
 
+  <!-- Add Exercise Modal (for addToWorkout flow) -->
+  <add-exercise-modal
+    isOpen="{{showAddModal}}"
+    sessionId="{{currentSessionId}}"
+    preselectedExercise="{{preselectedExercise}}"
+    bind:close="onAddModalClose"
+    bind:exerciseadded="onAddModalExerciseAdded"
+  />
+
   <!-- Custom Tab Bar -->
   <custom-tabbar active="library" theme="{{theme}}" />
 

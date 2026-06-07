@@ -114,6 +114,11 @@ Page({
     practicedExercises: [],
     filterFavor: false,
     filterPracticed: false,
+    // Add to workout modal state
+    showAddModal: false,
+    currentSessionId: null,
+    preselectedExercise: null,
+    addingToWorkout: false,
     // i18n + theme
     locale: 'en',
     theme: 'night',
@@ -319,46 +324,64 @@ Page({
     const item = e.currentTarget.dataset.item;
     this.setData({ selectedExercise: null });
 
-    // Check if session running
     const app = getApp();
-    const userId = app.globalData.userId;
-    if (!userId) return;
+    if (!app.globalData.userId) return;
 
-    const runRes = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'session.getRunning', openid: app.globalData.openid },
-    });
+    if (this.data.addingToWorkout) return;  // 防重复点击
+    this.setData({ addingToWorkout: true });
+    wx.showLoading({ title: 'LOADING...', mask: true });
 
-    let sessionId;
-    if (!runRes.result || !runRes.result.session) {
-      // Start session first
-      const createRes = await wx.cloud.callFunction({
+    try {
+      // 1. 查 running session
+      const runRes = await wx.cloud.callFunction({
         name: 'api',
-        data: { action: 'session.create', openid: app.globalData.openid },
+        data: { action: 'session.getRunning', openid: app.globalData.openid },
       });
-      if (!createRes.result || !createRes.result.success) return;
-      sessionId = (createRes.result && (createRes.result.sessionId || (createRes.result.session && createRes.result.session._id)));
-    } else {
-      sessionId = runRes.result.session._id;
+      let sessionId;
+      if (!runRes.result || !runRes.result.session) {
+        // 没有就创建
+        const createRes = await wx.cloud.callFunction({
+          name: 'api',
+          data: { action: 'session.create', openid: app.globalData.openid },
+        });
+        if (!createRes.result || !createRes.result.success) {
+          throw new Error('create session failed');
+        }
+        sessionId = createRes.result.sessionId
+          || (createRes.result.session && (createRes.result.session._id || createRes.result.session.id));
+      } else {
+        sessionId = runRes.result.session._id || runRes.result.session.id;
+      }
+
+      // 2. 弹 add-exercise-modal, 预选这个 exercise
+      //    分两次 setData: 先传 preselectedExercise 让 modal observer 跑, 再开 modal
+      this.setData({
+        currentSessionId: sessionId,
+        preselectedExercise: item,
+      });
+      // 下一帧再开 modal, 确保 modal observer 先处理完 preselectedExercise
+      this.setData({ showAddModal: true });
+    } catch (err) {
+      console.error('addToWorkout failed:', err);
+      wx.showToast({ title: '添加失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+      this.setData({ addingToWorkout: false });
     }
+  },
 
-    // Save exercise to session
-    await wx.cloud.callFunction({
-      name: 'api',
-      data: {
-        action: 'exercise.add',
-        session_id: sessionId,
-        openid: app.globalData.openid,
-        exercise_id: item.id,
-        name_zh: item.name_zh || item.name,
-        name_en: item.name || null,
-        image_name: item.image_name || null,
-        video_name: item.video_name || null,
-        weight: 0,
-        reps: 0,
-      },
+  onAddModalClose() {
+    this.setData({
+      showAddModal: false,
+      preselectedExercise: null,
     });
+  },
 
+  onAddModalExerciseAdded() {
+    this.setData({
+      showAddModal: false,
+      preselectedExercise: null,
+    });
     wx.showToast({ title: 'ADDED TO WORKOUT', icon: 'success' });
   },
 

@@ -108,16 +108,28 @@ Component({
       if (isOpen) {
         const imgPrefix = app.globalData.imagePrefix || '';
         const vidPrefix = app.globalData.videoPrefix || '';
-        this._reset(imgPrefix, vidPrefix);
+        // 仅当没有 preselected 时才 _reset, 否则 _reset 会清掉 preselectedExercise 设置的 selectedItem
+        if (!this.data.preselectedExercise) {
+          this._reset(imgPrefix, vidPrefix);
+        } else {
+          // 部分状态仍需更新 (imgPrefix, locale 等), 但保留 selectedItem/step
+          this.setData({
+            imgPrefix: imgPrefix || '',
+            vidPrefix: vidPrefix || '',
+            locale: app.globalData.language || 'zh',
+            t: app.globalData.t,
+          });
+        }
         this._loadSavedFilters();
-        this._loadUserExercises();  // load user's favor/practiced lists
+        this._loadUserExercises();
         this.loadList(true);
       } else {
         this._listLoaded = false;
       }
     },
     'preselectedExercise': function (ex) {
-      if (ex && this.data.isOpen) {
+      if (ex) {
+        // 直接选, 不依赖 isOpen (因 modal 可能 isOpen=false 时 parent 已经预传)
         this._selectExercise(ex);
       }
     },
