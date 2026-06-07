@@ -100,15 +100,7 @@
   opacity: 0.95;
 }
 
-.orb-aura-2 {
-  animation-duration: 2.5s;
-  animation-direction: reverse;
-  opacity: 0.5;
-  -webkit-mask: radial-gradient(circle, transparent 54rpx, #000 60rpx);
-  mask: radial-gradient(circle, transparent 54rpx, #000 60rpx);
-}
-
-/* === 呼吸缩放 (active 态) === */
+/* === 呼吸缩放 (active 态 logo) === */
 @keyframes orb-breath {
   0%, 100% { transform: scale(1.0); }
   50% { transform: scale(1.08); }
