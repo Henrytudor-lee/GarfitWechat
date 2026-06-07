@@ -37,8 +37,8 @@ Component({
     durationDisplay: '00:00',
     hasSession: false,
     _tickHandle: null,
-    positionX: 0,
-    positionY: 0,
+    positionX: DEFAULT_X,
+    positionY: IDLE_Y,
     // drag state (全部 rpx)
     dragging: false,
     _dragStartX: 0,
