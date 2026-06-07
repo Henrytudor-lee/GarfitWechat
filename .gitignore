@@ -3,6 +3,7 @@ package-lock.json
 miniprogram/node_modules/
 miniprogram/package-lock.json
 ._*
+._!*
 .DS_Store
 .hermes-project-memory
 scripts/**
