@@ -85,7 +85,7 @@ module.exports = {
   "START_YOUR_FITNESS_JOURNEY": "开始你的体能蜕变之旅",
   "STATS": "统计",
   "STREAK": "连续训练",
-  "TAP_PLUS_TO_ADD_EXERCISES": "点击 + 添加动作",
+  "TAP_PLUS_TO_ADD_EXERCISES": "点击 添加动作",
   "THEME": "主题",
   "TODAY": "今天",
   "TOTAL_SETS": "总组数",

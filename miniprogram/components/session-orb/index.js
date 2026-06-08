@@ -3,7 +3,7 @@ const app = getApp();
 
 const STORAGE_KEY = 'orb_position';
 const ORB_SIZE_RPX = 112;
-const MARGIN_RPX = 24;  // 距屏幕边缘 24rpx (更美观)
+const MARGIN_RPX = 16;  // 距屏幕边缘 24rpx (更美观)
 const FAB_BOTTOM_RPX = 200;
 const FAB_SIZE_RPX = 112;
 const FAB_GAP_RPX = 20;  // orb 移到 fab 上方时, 留 20rpx 间距

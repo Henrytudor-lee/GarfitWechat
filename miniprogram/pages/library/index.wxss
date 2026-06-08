@@ -128,9 +128,9 @@
 .search-bar {
   display: flex;
   align-items: center;
-  border-radius: 20rpx;
+  border-radius: 16rpx;
   padding: 0 24rpx;
-  height: 88rpx;
+  height: 64rpx;
   gap: 16rpx;
   margin-bottom: 32rpx;
 }
@@ -142,7 +142,7 @@
 
 .search-input {
   flex: 1;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 700;
   background: transparent;
   border: none;
