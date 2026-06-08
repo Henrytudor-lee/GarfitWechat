@@ -136,7 +136,8 @@
 }
 
 .search-icon {
-  font-size: 28rpx;
+  width: 28rpx;
+  height: 28rpx;
   flex-shrink: 0;
 }
 

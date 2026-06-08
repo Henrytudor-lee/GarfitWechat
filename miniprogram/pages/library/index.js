@@ -101,6 +101,7 @@ Page({
     selectedMuscle: null,
     equipmentList: EQUIPMENT_LIST,
     muscleList: MUSCLE_LIST,
+    iconSearchUrl: 'cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036/images/icons/icon-search.png',
     list: [],
     page: 1,
     pageSize: 20,

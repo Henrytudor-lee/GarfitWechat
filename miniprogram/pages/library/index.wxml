@@ -15,7 +15,7 @@
 
   <!-- Search -->
   <view class="search-bar">
-    <text class="search-icon">🔍</text>
+    <image class="search-icon" src="{{iconSearchUrl}}" mode="aspectFit" />
     <input
       class="search-input"
       placeholder="{{t.SEARCH_EXERCISES}}"
