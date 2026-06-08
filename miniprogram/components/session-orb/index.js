@@ -15,8 +15,8 @@ const DEFAULT_X = SCREEN_WIDTH_RPX - ORB_SIZE_RPX - MARGIN_RPX;
 
 // idle：右下角 (tabbar 上方, 留足间距)
 const IDLE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 220;
-// active：fab 上方 (fab bottom=200rpx, fab 高=112, 间距 40rpx => orb bottom=200+112+40=352)
-const ACTIVE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 352;
+// active：fab 上方 (fab bottom=200rpx, fab 高=112, 间距 168rpx => orb bottom=480)
+const ACTIVE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 480;
 
 // px -> rpx 转换系数
 const PX2RPX = 750 / sysInfo.windowWidth;
