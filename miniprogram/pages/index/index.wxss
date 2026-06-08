@@ -322,6 +322,31 @@
   text-transform: uppercase;
 }
 
+/* 缩小版 + 按钮 (在 empty-card 里, 仿右下 fab) */
+.empty-add {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 32rpx 40rpx;
+}
+.empty-mini-fab {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #000;
+  font-size: 32rpx;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16rpx rgba(204, 242, 0, 0.3);
+  flex-shrink: 0;
+}
+
 /* Recent Sessions */
 .recent-list {
   display: flex;

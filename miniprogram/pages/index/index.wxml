@@ -72,7 +72,8 @@
       </view>
     </view>
 
-    <view wx:elif="{{runningSession}}" class="empty-card" bindtap="goToLibrary">
+    <view wx:elif="{{runningSession}}" class="empty-card empty-add" bindtap="openAddModal">
+      <view class="empty-mini-fab">+</view>
       <text class="empty-hint">{{t.TAP_PLUS_TO_ADD_EXERCISES}}</text>
     </view>
 
