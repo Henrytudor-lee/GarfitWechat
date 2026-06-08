@@ -142,7 +142,8 @@ Component({
       this.setData({ _wasDragging: true });
       const newX = this.data._originX + dx;
       const newY = this.data._originY + dy;
-      // 边界限制 (rpx)
+      // 边界限制: X 只能在 [0, screenWidth - orbSize] (左右两侧)
+      // Y 在 0 ~ maxY (上面)
       const maxX = SCREEN_WIDTH_RPX - ORB_SIZE_RPX;
       const maxY = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 100;  // 100 留给 tabbar
       this.setData({
@@ -154,9 +155,14 @@ Component({
     onTouchEnd() {
       this.setData({ dragging: false });
       if (this.data._wasDragging) {
+        // 吸附到最近的边 (X 方向)
+        const x = this.data.positionX;
+        const halfScreen = SCREEN_WIDTH_RPX / 2;
+        const snapX = x + ORB_SIZE_RPX / 2 < halfScreen ? 0 : SCREEN_WIDTH_RPX - ORB_SIZE_RPX;
+        this.setData({ positionX: snapX });
         // 持久化 (rpx)
         wx.setStorageSync(STORAGE_KEY, {
-          x: this.data.positionX,
+          x: snapX,
           y: this.data.positionY,
         });
         // 屏蔽 tap 50ms

@@ -16,6 +16,12 @@
   transform-origin: center center;
   /* GPU 加速 */
   will-change: transform, left, top;
+  /* 松手后吸附动画 (dragging 态无动画) */
+  transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.session-orb.dragging {
+  transition: none;
 }
 
 /* === idle: lime 圆 + logo (无动画) === */
