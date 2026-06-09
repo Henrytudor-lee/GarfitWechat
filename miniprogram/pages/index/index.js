@@ -158,9 +158,10 @@ Page({
   async _loadData() {
     wx.showLoading({ title: 'LOADING...', mask: true });
 
-    const [runRes, recentRes] = await Promise.all([
+    const [runRes, recentRes, monthRes] = await Promise.all([
       wx.cloud.callFunction({ name: 'api', data: { action: 'session.getRunning', openid: app.globalData.openid } }),
       wx.cloud.callFunction({ name: 'api', data: { action: 'session.list', page: 1, pageSize: 5, openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'session.monthlyStats', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
@@ -185,6 +186,16 @@ Page({
         return { ...s, dateStr, durationStr: `${mins} MIN` };
       });
       this.setData({ recentSessions: sessions });
+    }
+
+    // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume)
+    if (monthRes.result && monthRes.result.success) {
+      const stats = monthRes.result;
+      this.setData({
+        todayProgress: stats.todayProgress || 0,
+        yesterdayProgress: stats.yesterdayProgress || 0,
+        monthlyVolumeStr: stats.monthlyVolumeStr || '0 KG',
+      });
     }
 
     // Load history sessions for selected date

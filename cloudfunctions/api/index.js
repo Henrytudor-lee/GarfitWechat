@@ -193,6 +193,31 @@ exports.main = async (event, context) => {
           [id, openid]);
         return { success: true };
 
+      } else if (sub === 'monthlyStats') {
+        // Bento 用的月度统计
+        // 1) 本月总训练量 (kg, sum of all sets weight * reps for finished sessions this month)
+        const [[volRow]] = await query(
+          "SELECT COALESCE(SUM(e.weight * e.reps), 0) AS total_kg " +
+          "FROM exercises e JOIN sessions s ON e.session_id = s.id " +
+          "WHERE s._openid = ? AND s.status = 'finished' " +
+          "AND s.start_time >= DATE_FORMAT(UTC_TIMESTAMP(), '%Y-%m-01')",
+          [openid]);
+        // 2) 今天 / 昨天各有多少 sets
+        const [[todayRow]] = await query(
+          "SELECT COUNT(*) AS cnt FROM sessions WHERE _openid = ? AND status = 'finished' AND DATE(start_time) = CURDATE()",
+          [openid]);
+        const [[yestRow]] = await query(
+          "SELECT COUNT(*) AS cnt FROM sessions WHERE _openid = ? AND status = 'finished' AND DATE(start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+          [openid]);
+        // 进度条: 当天完成 = 100%, 否则 0
+        const todayProgress = todayRow.cnt > 0 ? 100 : 0;
+        const yesterdayProgress = yestRow.cnt > 0 ? 100 : 0;
+        // kg 格式: 1000+ → "1.2K", else "X.X"
+        const totalKg = Math.round(parseFloat(volRow.total_kg) * 10) / 10;
+        const monthlyVolumeStr = totalKg >= 1000
+          ? (totalKg / 1000).toFixed(1) + 'T KG'
+          : totalKg + ' KG';
+        return { success: true, todayProgress, yesterdayProgress, monthlyVolumeStr, totalKg };
       } else if (sub === 'list') {
         const page = parseInt(event.page || 1);
         const pageSize = parseInt(event.pageSize || 20);

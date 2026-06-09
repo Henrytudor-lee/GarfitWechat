@@ -97,37 +97,6 @@
     </view>
   </view>
 
-  <!-- Bento Grid (always shown) -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">{{t.BENTO_TITLE}}</text>
-    </view>
-    <view class="bento-grid">
-      <view class="bento-card bento-today">
-        <view class="bento-label">{{t.TODAY}}</view>
-        <view class="bento-day">{{todayDay}}</view>
-        <view class="bento-month text-primary">{{todayMonth}}</view>
-        <view class="bento-progress-bar">
-          <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
-        </view>
-      </view>
-      <view class="bento-card bento-yesterday">
-        <view class="bento-label">{{t.YESTERDAY}}</view>
-        <view class="bento-day">{{yesterdayDay}}</view>
-        <view class="bento-month text-muted">{{yesterdayMonth}}</view>
-        <view class="bento-progress-bar">
-          <view class="bento-progress-fill muted" style="width: 0%"></view>
-        </view>
-      </view>
-      <view class="bento-card bento-monthly">
-        <view class="bento-label">{{t.MONTHLY_VOL}}</view>
-        <view class="bento-big-num text-primary">0 KG</view>
-        <view class="bento-hint text-primary">{{t.START_TRACKING}}</view>
-        <view class="bento-bg-icon">📊</view>
-      </view>
-    </view>
-  </view>
-
   <!-- History Section -->
   <view class="section">
     <view class="section-header">
@@ -149,6 +118,37 @@
     <!-- Empty state when no sessions for selected date -->
     <view wx:else class="history-empty">
       <text class="history-empty-hint">{{t.NO_SESSIONS_FOR_DATE}}</text>
+    </view>
+  </view>
+
+  <!-- Bento Grid (always shown) -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">{{t.BENTO_TITLE}}</text>
+    </view>
+    <view class="bento-grid">
+      <view class="bento-card bento-today">
+        <view class="bento-label">{{t.TODAY}}</view>
+        <view class="bento-day">{{todayDay}}</view>
+        <view class="bento-month text-primary">{{todayMonth}}</view>
+        <view class="bento-progress-bar">
+          <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
+        </view>
+      </view>
+      <view class="bento-card bento-yesterday">
+        <view class="bento-label">{{t.YESTERDAY}}</view>
+        <view class="bento-day">{{yesterdayDay}}</view>
+        <view class="bento-month text-muted">{{yesterdayMonth}}</view>
+        <view class="bento-progress-bar">
+          <view class="bento-progress-fill muted" style="width: {{yesterdayProgress}}%"></view>
+        </view>
+      </view>
+      <view class="bento-card bento-monthly">
+        <view class="bento-label">{{t.MONTHLY_VOL}}</view>
+        <view class="bento-big-num text-primary">{{monthlyVolumeStr}}</view>
+        <view class="bento-hint text-muted">{{t.MONTHLY_VOL_HINT}}</view>
+        <view class="bento-bg-icon">📊</view>
+      </view>
     </view>
   </view>
 
