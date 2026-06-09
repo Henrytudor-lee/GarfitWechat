@@ -468,10 +468,10 @@ Page({
       tappedDayDateStr: iso,  // 触发脉冲动画
     });
     this._loadHistorySessions();
-    // 600ms 后清掉, 让动画可以再次触发
+    // 400ms 后清掉, 让动画可以再次触发
     setTimeout(() => {
       this.setData({ tappedDayDateStr: '' });
-    }, 700);
+    }, 400);
   },
 
   async _loadHistorySessions() {
