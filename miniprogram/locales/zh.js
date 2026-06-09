@@ -39,7 +39,7 @@ module.exports = {
   "GENDER": "性别",
   "HELP_GUIDE": "帮助文档",
   "HELP_GUIDE_SUB": "了解如何使用",
-  "HISTORY": "历史记录",
+  "HISTORY": "当日训练",
   "INVALID_NICKNAME": "昵称格式不正确",
   "IN_PROGRESS": "进行中",
   "KG": "公斤",

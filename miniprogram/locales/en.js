@@ -39,7 +39,7 @@ module.exports = {
   "GENDER": "Gender",
   "HELP_GUIDE": "Help Guide",
   "HELP_GUIDE_SUB": "Learn how to use the app",
-  "HISTORY": "HISTORY",
+  "HISTORY": "TODAY'S SESSIONS",
   "INVALID_NICKNAME": "Invalid nickname",
   "IN_PROGRESS": "IN PROGRESS",
   "KG": "KG",
