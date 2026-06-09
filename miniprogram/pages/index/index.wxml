@@ -101,25 +101,11 @@
     </view>
   </view>
 
-  <!-- History Bento Section -->
+  <!-- Bento Grid (always shown) -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">{{t.HISTORY}}</text>
-      <view class="date-picker-btn" bindtap="openDatePicker">{{displayDate}}</view>
+      <text class="section-title">{{t.BENTO_TITLE}}</text>
     </view>
-
-    <!-- Sessions for selected date -->
-    <view wx:if="{{historySessions.length > 0}}" class="history-session-list">
-      <view class="history-session-item" wx:for="{{historySessions}}" wx:key="id" data-session="{{item}}" bindtap="onHistorySessionTap">
-        <view class="history-session-time">{{item.timeStr}}</view>
-        <view class="history-session-info">
-          <text class="history-session-stat">{{item.durationStr}}</text>
-          <text class="history-session-stat">{{item.exerciseCount || 0}} {{t.EXERCISES}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- Bento Grid (shown when no sessions for selected date) -->
     <view class="bento-grid">
       <view class="bento-card bento-today">
         <view class="bento-label">{{t.TODAY}}</view>
@@ -143,6 +129,30 @@
         <view class="bento-hint text-primary">{{t.START_TRACKING}}</view>
         <view class="bento-bg-icon">📊</view>
       </view>
+    </view>
+  </view>
+
+  <!-- History Section -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">{{t.HISTORY}}</text>
+      <view class="date-picker-btn" bindtap="openDatePicker">{{displayDate}}</view>
+    </view>
+
+    <!-- Sessions for selected date -->
+    <view wx:if="{{historySessions.length > 0}}" class="history-session-list">
+      <view class="history-session-item" wx:for="{{historySessions}}" wx:key="id" data-session="{{item}}" bindtap="onHistorySessionTap">
+        <view class="history-session-time">{{item.timeStr}}</view>
+        <view class="history-session-info">
+          <text class="history-session-stat">{{item.durationStr}}</text>
+          <text class="history-session-stat">{{item.exerciseCount || 0}} {{t.EXERCISES}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty state when no sessions for selected date -->
+    <view wx:else class="history-empty">
+      <text class="history-empty-hint">{{t.NO_SESSIONS_FOR_DATE}}</text>
     </view>
   </view>
 

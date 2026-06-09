@@ -1,4 +1,6 @@
 module.exports = {
+  "NO_SESSIONS_FOR_DATE": "该日暂无训练",
+  "BENTO_TITLE": "训练概览",
   "ACCESS_7000PLUS_PROFESSIONAL_MOVEMENTS": "访问 7000+ 专业动作",
   "ACTIVE_STREAK": "连续训练",
   "ADDING": "添加中",

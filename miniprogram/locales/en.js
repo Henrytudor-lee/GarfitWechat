@@ -1,4 +1,6 @@
 module.exports = {
+  "NO_SESSIONS_FOR_DATE": "NO SESSIONS THIS DAY",
+  "BENTO_TITLE": "AT A GLANCE",
   "ACCESS_7000PLUS_PROFESSIONAL_MOVEMENTS": "Access 7000+ professional movements",
   "ACTIVE_STREAK": "ACTIVE STREAK",
   "ADDING": "ADDING...",
