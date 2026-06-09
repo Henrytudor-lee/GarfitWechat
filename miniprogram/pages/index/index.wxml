@@ -96,7 +96,7 @@
         <text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
       </view>
       <view class="cal-days">
-        <text wx:for="{{calendarDays}}" wx:key="dateStr" class="{{item.worked ? 'day-worked' : ''}} {{item.today ? 'day-today' : ''}}" bindtap="onDayTap" data-day="{{item}}">{{item.day}}</text>
+        <text wx:for="{{calendarDays}}" wx:key="dateStr" class="{{item.worked ? 'day-worked' : ''}} {{item.today ? 'day-today' : ''}} {{item.dateStr === tappedDayDateStr ? 'day-tapped' : ''}}" bindtap="onDayTap" data-day="{{item}}">{{item.day}}</text>
       </view>
     </view>
   </view>
@@ -120,7 +120,7 @@
     </view>
 
     <!-- Bento Grid (shown when no sessions for selected date) -->
-    <view wx:else class="bento-grid">
+    <view class="bento-grid">
       <view class="bento-card bento-today">
         <view class="bento-label">{{t.TODAY}}</view>
         <view class="bento-day">{{todayDay}}</view>

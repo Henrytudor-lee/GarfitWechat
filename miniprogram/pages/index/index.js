@@ -31,6 +31,7 @@ Page({
     historyDate: '',        // ISO date string YYYY-MM-DD
     displayDate: '',         // formatted display string
     historySessions: [],     // sessions for historyDate
+    tappedDayDateStr: '',    // 当前脉冲高亮的日期 (动画触发)
     showDatePicker: false,
     pickerYear: new Date().getFullYear(),
     pickerMonth: new Date().getMonth(),  // 0-indexed
@@ -464,8 +465,13 @@ Page({
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
+      tappedDayDateStr: iso,  // 触发脉冲动画
     });
     this._loadHistorySessions();
+    // 600ms 后清掉, 让动画可以再次触发
+    setTimeout(() => {
+      this.setData({ tappedDayDateStr: '' });
+    }, 700);
   },
 
   async _loadHistorySessions() {
