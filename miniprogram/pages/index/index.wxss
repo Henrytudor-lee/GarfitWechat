@@ -484,7 +484,32 @@
 
 .bento-progress-fill.muted {
   background: rgba(255, 255, 255, 0.2);
-  width: 0% !important;
+}
+
+.bento-volume {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  margin-top: 20rpx;
+  min-height: 56rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  line-height: 1;
+}
+.bento-volume.has-volume {
+  color: var(--primary-text);
+}
+.bento-volume.muted {
+  color: rgba(255, 255, 255, 0.20);
+}
+.bento-volume-num {
+  font-size: 44rpx;
+  font-weight: 900;
+}
+.bento-volume-unit {
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
 }
 
 .bento-monthly {

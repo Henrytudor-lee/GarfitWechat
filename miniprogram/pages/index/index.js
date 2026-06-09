@@ -51,8 +51,14 @@ Page({
     todayDay: '',
     todayMonth: '',
     todayProgress: 0,
+    todayVolume: 0,
+    todayVolumeStr: '0',
     yesterdayDay: '',
     yesterdayMonth: '',
+    yesterdayProgress: 0,
+    yesterdayVolume: 0,
+    yesterdayVolumeStr: '0',
+    monthlyVolumeStr: '0 KG',
 
     // Modal state
     showEditModal: false,
@@ -188,13 +194,17 @@ Page({
       this.setData({ recentSessions: sessions });
     }
 
-    // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume)
+    // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume, todayVolume, yesterdayVolume)
     if (monthRes.result && monthRes.result.success) {
       const stats = monthRes.result;
       this.setData({
         todayProgress: stats.todayProgress || 0,
         yesterdayProgress: stats.yesterdayProgress || 0,
         monthlyVolumeStr: stats.monthlyVolumeStr || '0 KG',
+        todayVolume: stats.todayVolume || 0,
+        yesterdayVolume: stats.yesterdayVolume || 0,
+        todayVolumeStr: stats.todayVolumeStr || '0',
+        yesterdayVolumeStr: stats.yesterdayVolumeStr || '0',
       });
     }
 

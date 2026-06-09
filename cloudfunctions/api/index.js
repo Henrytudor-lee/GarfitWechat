@@ -202,22 +202,41 @@ exports.main = async (event, context) => {
           "WHERE s._openid = ? AND s.status = 'finished' " +
           "AND s.start_time >= DATE_FORMAT(UTC_TIMESTAMP(), '%Y-%m-01')",
           [openid]);
-        // 2) 今天 / 昨天各有多少 sets
+        // 2) 今天 / 昨天各有多少 sessions + 当日训练量
         const [[todayRow]] = await query(
-          "SELECT COUNT(*) AS cnt FROM sessions WHERE _openid = ? AND status = 'finished' AND DATE(start_time) = CURDATE()",
+          "SELECT COUNT(*) AS cnt, COALESCE(SUM(e.weight * e.reps), 0) AS vol " +
+          "FROM sessions s LEFT JOIN exercises e ON e.session_id = s.id " +
+          "WHERE s._openid = ? AND s.status = 'finished' AND DATE(s.start_time) = CURDATE()",
           [openid]);
         const [[yestRow]] = await query(
-          "SELECT COUNT(*) AS cnt FROM sessions WHERE _openid = ? AND status = 'finished' AND DATE(start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+          "SELECT COUNT(*) AS cnt, COALESCE(SUM(e.weight * e.reps), 0) AS vol " +
+          "FROM sessions s LEFT JOIN exercises e ON e.session_id = s.id " +
+          "WHERE s._openid = ? AND s.status = 'finished' AND DATE(s.start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
           [openid]);
         // 进度条: 当天完成 = 100%, 否则 0
         const todayProgress = todayRow.cnt > 0 ? 100 : 0;
         const yesterdayProgress = yestRow.cnt > 0 ? 100 : 0;
-        // kg 格式: 1000+ → "1.2K", else "X.X"
+        // kg 格式
+        const fmtKg = (n) => {
+          const v = Math.round(parseFloat(n) * 10) / 10;
+          if (v >= 1000) return (v / 1000).toFixed(1) + 'T';
+          if (v >= 10) return String(Math.round(v));
+          return v.toFixed(1);
+        };
+        const todayVolume = Math.round(parseFloat(todayRow.vol) * 10) / 10;
+        const yesterdayVolume = Math.round(parseFloat(yestRow.vol) * 10) / 10;
         const totalKg = Math.round(parseFloat(volRow.total_kg) * 10) / 10;
         const monthlyVolumeStr = totalKg >= 1000
           ? (totalKg / 1000).toFixed(1) + 'T KG'
           : totalKg + ' KG';
-        return { success: true, todayProgress, yesterdayProgress, monthlyVolumeStr, totalKg };
+        return {
+          success: true,
+          todayProgress, yesterdayProgress,
+          monthlyVolumeStr, totalKg,
+          todayVolume, yesterdayVolume,
+          todayVolumeStr: fmtKg(todayVolume),
+          yesterdayVolumeStr: fmtKg(yesterdayVolume),
+        };
       } else if (sub === 'list') {
         const page = parseInt(event.page || 1);
         const pageSize = parseInt(event.pageSize || 20);

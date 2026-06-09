@@ -131,6 +131,10 @@
         <view class="bento-label">{{t.TODAY}}</view>
         <view class="bento-day">{{todayDay}}</view>
         <view class="bento-month text-primary">{{todayMonth}}</view>
+        <view class="bento-volume {{todayVolume > 0 ? 'has-volume' : 'muted'}}">
+          <text class="bento-volume-num">{{todayVolumeStr}}</text>
+          <text class="bento-volume-unit">KG</text>
+        </view>
         <view class="bento-progress-bar">
           <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
         </view>
@@ -139,6 +143,10 @@
         <view class="bento-label">{{t.YESTERDAY}}</view>
         <view class="bento-day">{{yesterdayDay}}</view>
         <view class="bento-month text-muted">{{yesterdayMonth}}</view>
+        <view class="bento-volume {{yesterdayVolume > 0 ? 'has-volume' : 'muted'}}">
+          <text class="bento-volume-num">{{yesterdayVolumeStr}}</text>
+          <text class="bento-volume-unit">KG</text>
+        </view>
         <view class="bento-progress-bar">
           <view class="bento-progress-fill muted" style="width: {{yesterdayProgress}}%"></view>
         </view>
