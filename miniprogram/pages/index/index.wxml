@@ -36,11 +36,11 @@
     <text class="fab-icon">+</text>
   </view>
 
-  <!-- Current Workout -->
-  <view class="section">
+  <!-- Current Workout (only show during active session) -->
+  <view wx:if="{{runningSession}}" class="section">
     <view class="section-header">
       <text class="section-title">{{t.CURRENT_WORKOUT}}</text>
-      <text class="section-badge {{runningSession ? 'active' : ''}}">{{runningSession ? t.IN_PROGRESS : t.READY}}</text>
+      <text class="section-badge active">{{t.IN_PROGRESS}}</text>
     </view>
 
     <view wx:if="{{exerciseGroups.length > 0}}" class="exercise-list">
@@ -72,13 +72,9 @@
       </view>
     </view>
 
-    <view wx:elif="{{runningSession}}" class="empty-card empty-add" bindtap="openAddModal">
+    <view wx:else class="empty-card empty-add" bindtap="openAddModal">
       <view class="empty-mini-fab">+</view>
       <text class="empty-hint">{{t.TAP_PLUS_TO_ADD_EXERCISES}}</text>
-    </view>
-
-    <view wx:else class="empty-card">
-      <text class="empty-hint">{{t.START_TRAINING_TO_ADD_EXERCISES}}</text>
     </view>
   </view>
   <view class="section">
