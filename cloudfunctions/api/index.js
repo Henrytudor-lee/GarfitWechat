@@ -219,7 +219,7 @@ exports.main = async (event, context) => {
         // kg 格式
         const fmtKg = (n) => {
           const v = Math.round(parseFloat(n) * 10) / 10;
-          if (v >= 1000) return (v / 1000).toFixed(1) + 'T';
+          if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
           if (v >= 10) return String(Math.round(v));
           return v.toFixed(1);
         };
@@ -227,7 +227,7 @@ exports.main = async (event, context) => {
         const yesterdayVolume = Math.round(parseFloat(yestRow.vol) * 10) / 10;
         const totalKg = Math.round(parseFloat(volRow.total_kg) * 10) / 10;
         const monthlyVolumeStr = totalKg >= 1000
-          ? (totalKg / 1000).toFixed(1) + 'T KG'
+          ? (totalKg / 1000).toFixed(1) + 'K KG'
           : totalKg + ' KG';
         return {
           success: true,
