@@ -527,33 +527,17 @@ Page({
       data: { action: 'session.list', date: historyDate, openid: app.globalData.openid },
     });
     if (res.result && res.result.sessions) {
-      // Merge with local favorited session IDs
-      const favorIds = wx.getStorageSync('favorSessionIds') || [];
       const sessions = res.result.sessions.map(s => {
         const d = new Date(s.start_time);
         const timeStr = d.toLocaleTimeString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
         const mins = Math.floor((s.duration || 0) / 60);
         const durationStr = this.data.locale === 'zh' ? `${mins}分钟` : `${mins} MIN`;
-        return { ...s, timeStr, durationStr, is_favorite: favorIds.includes(s.id) };
+        return { ...s, timeStr, durationStr };
       });
       this.setData({ historySessions: sessions });
     } else {
       this.setData({ historySessions: [] });
     }
-  },
-
-  onHistorySessionFavTap(e) {
-    const id = e.currentTarget.dataset.id;
-    if (!id) return;
-    const favorIds = wx.getStorageSync('favorSessionIds') || [];
-    const isFav = favorIds.includes(id);
-    const newFav = isFav ? favorIds.filter(fid => fid !== id) : [...favorIds, id];
-    wx.setStorageSync('favorSessionIds', newFav);
-    // Optimistic UI update
-    const historySessions = this.data.historySessions.map(s =>
-      s.id === id ? { ...s, is_favorite: !isFav } : s
-    );
-    this.setData({ historySessions });
   },
 
   // ---- Workout controls ----
