@@ -421,6 +421,33 @@
   letter-spacing: 0.05em;
 }
 
+.history-session-fav {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform 0.15s ease, background 0.2s ease;
+  flex-shrink: 0;
+}
+.history-session-fav:active {
+  transform: scale(0.85);
+}
+.history-session-fav.is-fav {
+  background: rgba(204, 242, 0, 0.12);
+}
+.history-session-fav-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  color: var(--primary-text);
+  font-family: serif;
+  font-weight: 700;
+}
+.history-session-fav:not(.is-fav) .history-session-fav-icon {
+  color: rgba(255, 255, 255, 0.30);
+}
+
 .bento-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

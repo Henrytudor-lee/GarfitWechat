@@ -112,6 +112,9 @@
           <text class="history-session-stat">{{item.durationStr}}</text>
           <text class="history-session-stat">{{item.exerciseCount || 0}} {{t.EXERCISES}}</text>
         </view>
+        <view class="history-session-fav {{item.is_favorite ? 'is-fav' : ''}}" catchtap="onHistorySessionFavTap" data-session="{{item}}" data-id="{{item.id}}">
+          <text class="history-session-fav-icon">{{item.is_favorite ? '♥' : '♡'}}</text>
+        </view>
       </view>
     </view>
 
