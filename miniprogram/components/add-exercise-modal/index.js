@@ -167,7 +167,7 @@ Component({
         imgPrefix: imgPrefix || '',
         vidPrefix: vidPrefix || '',
         muscleIcon: imgPrefix ? `${imgPrefix}/icons/all.png` : '',
-        muscleLabel: 'Muscles',
+        muscleLabel: locale === 'zh' ? '肌群' : 'Muscles',
         favorExercises: app.globalData.favorExercises || [],
         practicedExercises: app.globalData.practicedExercises || [],
         locale,

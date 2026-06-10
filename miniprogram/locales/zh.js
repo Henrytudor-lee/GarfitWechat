@@ -1,4 +1,5 @@
 module.exports = {
+  "BACK": "返回",
   "LOADING_MORE": "加载更多...",
   "SEARCH_EXERCISES_MODAL": "搜索动作...",
   "SAVING": "保存中...",

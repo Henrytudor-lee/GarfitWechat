@@ -1,4 +1,5 @@
 module.exports = {
+  "BACK": "Back",
   "LOADING_MORE": "LOADING MORE...",
   "SEARCH_EXERCISES_MODAL": "SEARCH EXERCISES...",
   "SAVING": "SAVING...",
