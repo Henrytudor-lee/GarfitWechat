@@ -1,4 +1,5 @@
 module.exports = {
+  "REPS_UNIT": "次",
   "NO_DEMO_VIDEO_CONTACT": "请联系开发人员补充",
   "NO_DEMO_VIDEO_HINT": "该动作暂未收录演示视频",
   "BACK": "返回",

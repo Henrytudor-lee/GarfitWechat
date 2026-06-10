@@ -53,7 +53,7 @@
           </view>
           <view class="ec-info">
             <view class="ec-name">{{locale === 'en' ? item.name_en : item.name_zh}}</view>
-            <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? 'set' : 'sets'}}</view>
+            <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
           </view>
           <view class="ec-volume">
             <view class="ec-vol-num">{{item.totalVolume}} kg</view>
@@ -66,7 +66,7 @@
             <view class="ec-set-num">{{index + 1}}</view>
             <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
             <view class="ec-set-sep">×</view>
-            <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">reps</text></view>
+            <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS_UNIT}}</text></view>
           </view>
         </view>
       </view>
