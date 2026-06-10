@@ -533,5 +533,34 @@ Component({
         },
       });
     },
+
+    // step 2 头部右侧的 favorite 按钮: 直接切换 selectedItem 的 is_favorite
+    onSelectedFavoriteTap() {
+      const item = this.data.selectedItem;
+      if (!item) return;
+      const id = item.id;
+      const wasFav = !!item.is_favorite;
+      // optimistic update
+      this.setData({ 'selectedItem.is_favorite': !wasFav });
+      const { favorExercises } = this.data;
+      const newFav = wasFav
+        ? favorExercises.filter(fid => fid !== id)
+        : [...favorExercises, id];
+      this.setData({ favorExercises: newFav });
+      // 同步 list 里对应项 (如果 step=set 时 list 还在)
+      if (this.data.list && this.data.list.length > 0) {
+        const list = this.data.list.map(it => it.id === id ? { ...it, is_favorite: !wasFav } : it);
+        this.setData({ list });
+      }
+      // cloud call
+      wx.cloud.callFunction({
+        name: 'api',
+        data: {
+          action: 'exercise.toggleFavorite',
+          exercise_id: id,
+          openid: app.globalData.openid,
+        },
+      });
+    },
   },
 });

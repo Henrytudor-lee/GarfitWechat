@@ -73,6 +73,29 @@
   height: 36rpx;
 }
 
+.header-btn-fav {
+  padding: 4rpx;
+  border-radius: 50%;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.header-btn-fav:active {
+  transform: scale(0.9);
+}
+.header-btn-fav.is-fav {
+  background: rgba(204, 242, 0, 0.12);
+}
+
+.header-fav-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  color: var(--primary-text);
+  font-weight: 700;
+  font-family: serif;
+}
+.header-btn-fav:not(.is-fav) .header-fav-icon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .header-btn-text {
   font-size: 26rpx;
   color: var(--primary-text);
