@@ -130,14 +130,15 @@
   background: rgba(204, 242, 0, 0.18);
 }
 .action-btn-fav-icon {
-  font-size: 36rpx;
-  line-height: 1;
-  color: var(--primary-text);
-  font-family: serif;
-  font-weight: 700;
+  width: 40rpx;
+  height: 40rpx;
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.45;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
-.action-btn-fav:not(.is-fav) .action-btn-fav-icon {
-  color: rgba(255, 255, 255, 0.45);
+.action-btn-fav.is-fav .action-btn-fav-icon {
+  filter: none;
+  opacity: 1;
 }
 
 /* Sets list — scrollable */

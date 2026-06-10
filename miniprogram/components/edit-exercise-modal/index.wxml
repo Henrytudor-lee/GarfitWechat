@@ -15,7 +15,7 @@
       <view class="header-actions">
         <view class="action-btn-add" bindtap="addSet">+</view>
         <view class="action-btn-fav {{isFavorite ? 'is-fav' : ''}}" catchtap="onFavoriteTap">
-          <text class="action-btn-fav-icon">{{isFavorite ? '♥' : '♡'}}</text>
+          <image class="action-btn-fav-icon" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
         </view>
         <view class="action-btn-close" bindtap="closeModal">✕</view>
       </view>
