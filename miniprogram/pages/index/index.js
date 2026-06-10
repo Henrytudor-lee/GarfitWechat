@@ -94,14 +94,14 @@ Page({
       pickerMonth: today.getMonth(),
       pickerYearLabel: this._getPickerYearLabel(today.getFullYear(), today.getMonth()),
       todayDay: String(today.getDate()),
-      todayMonth: MONTH_NAMES_EN[today.getMonth()],
+      todayMonth: this._monthName(today.getMonth()),
       weekdays: this.data.locale === 'zh' ? DAY_NAMES_ZH : DAY_NAMES_EN,
     });
     this._initCalendar();
     const yesterday = new Date(Date.now() - 86400000);
     this.setData({
       yesterdayDay: String(yesterday.getDate()),
-      yesterdayMonth: MONTH_NAMES_EN[yesterday.getMonth()],
+      yesterdayMonth: this._monthName(yesterday.getMonth()),
     });
 
     // openid ready → load immediately; otherwise poll
@@ -133,6 +133,16 @@ Page({
     const locale = app.globalData.language || 'zh';
     if (this.data.theme !== theme || this.data.locale !== locale) {
       this.setData({ theme, locale });
+      // 切语言: 重新计算依赖 locale 的日期显示
+      const t = new Date();
+      const y = new Date(Date.now() - 86400000);
+      this.setData({
+        todayMonth: this._monthName(t.getMonth()),
+        yesterdayMonth: this._monthName(y.getMonth()),
+        weekdays: locale === 'zh' ? DAY_NAMES_ZH : DAY_NAMES_EN,
+        pickerYearLabel: this._getPickerYearLabel(this.data.pickerYear, this.data.pickerMonth),
+        displayDate: this._formatDisplayDate(this.data.historyDate),
+      });
     }
 
     const chosen = getApp().globalData.chosenExercise;
@@ -308,12 +318,25 @@ Page({
   },
 
   // ---- Date picker helpers ----
+  _monthName(idx) {
+    const isZh = (this.data.locale || 'zh') === 'zh';
+    return isZh ? MONTH_NAMES_ZH[idx] : MONTH_NAMES_EN[idx];
+  },
+
   _formatDisplayDate(iso) {
     const d = new Date(iso + 'T00:00:00');
+    const isZh = (this.data.locale || 'zh') === 'zh';
+    if (isZh) {
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
     return `${MONTH_NAMES_EN[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
   },
 
   _getPickerYearLabel(year, month) {
+    const isZh = (this.data.locale || 'zh') === 'zh';
+    if (isZh) {
+      return `${year}年${month + 1}月`;
+    }
     return `${MONTH_NAMES_EN[month]} ${year}`;
   },
 
