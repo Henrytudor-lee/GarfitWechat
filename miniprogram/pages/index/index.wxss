@@ -1021,11 +1021,19 @@
 }
 
 .day-today {
-  border: 2rpx solid rgba(255, 255, 255, 0.30);
+  background: var(--primary);
+  color: #000 !important;
+  font-weight: 900 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(200, 230, 0, 0.30);
+  position: relative;
 }
 
 .day-worked.day-today {
-  box-shadow: 0 0 0 4rpx rgba(200, 230, 0, 0.5);
+  background: var(--primary);
+  color: #000 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(200, 230, 0, 0.30);
 }
 
 .history-empty {
@@ -1071,7 +1079,10 @@
 }
 
 .page.theme-day .day-today {
-  border: 2rpx solid rgba(0, 0, 0, 0.20);
+  background: var(--primary);
+  color: #000 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(0, 0, 0, 0.10);
 }
 
 .page.theme-day .day-worked {
