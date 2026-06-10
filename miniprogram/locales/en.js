@@ -1,4 +1,6 @@
 module.exports = {
+  "NO_DEMO_VIDEO_CONTACT": "Please contact the dev team to add it",
+  "NO_DEMO_VIDEO_HINT": "NO DEMO VIDEO YET",
   "BACK": "Back",
   "LOADING_MORE": "LOADING MORE...",
   "SEARCH_EXERCISES_MODAL": "SEARCH EXERCISES...",

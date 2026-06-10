@@ -133,8 +133,10 @@
           <view wx:if="{{selectedItem.video_name}}" class="video-wrap">
             <video class="step2-video" src="{{vidPrefix}}/{{selectedItem.video_name}}" mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture></video>
           </view>
-          <view wx:elif="{{selectedItem.image_name}}" class="video-placeholder">
-            <text class="video-placeholder-text">{{t.NO_DEMO_VIDEO_AVAILABLE}}</text>
+          <view wx:else class="video-placeholder">
+            <view class="video-placeholder-icon">🎬</view>
+            <text class="video-placeholder-text">{{t.NO_DEMO_VIDEO_HINT}}</text>
+            <text class="video-placeholder-sub">{{t.NO_DEMO_VIDEO_CONTACT}}</text>
           </view>
 
           <!-- Weight Input -->

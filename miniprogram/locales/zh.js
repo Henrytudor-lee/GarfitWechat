@@ -1,4 +1,6 @@
 module.exports = {
+  "NO_DEMO_VIDEO_CONTACT": "请联系开发人员补充",
+  "NO_DEMO_VIDEO_HINT": "该动作暂未收录演示视频",
   "BACK": "返回",
   "LOADING_MORE": "加载更多...",
   "SEARCH_EXERCISES_MODAL": "搜索动作...",
