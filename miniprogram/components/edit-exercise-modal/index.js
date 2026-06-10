@@ -28,27 +28,35 @@ Component({
     imgPrefix: '',
     locale: 'zh',
     t: {},
+    isFavorite: false,
   },
 
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen && this.data.group) {
         const sets = this.data.group.sets.map(s => ({ ...s }));
+        // 同步 favor 状态
+        const favorExercises = app.globalData.favorExercises || [];
+        const isFavorite = favorExercises.includes(this.data.group.exercise_id);
         this.setData({
           imgPrefix: app.globalData.imagePrefix || '',
           locale: app.globalData.language || 'zh',
           t: app.globalData.t || {},
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
+          isFavorite,
         });
       }
     },
     'group': function(group) {
       if (group && this.data.isOpen) {
         const sets = group.sets.map(s => ({ ...s }));
+        const favorExercises = app.globalData.favorExercises || [];
+        const isFavorite = favorExercises.includes(group.exercise_id);
         this.setData({
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
+          isFavorite,
         });
       }
     },
@@ -59,6 +67,30 @@ Component({
       if (e.target === e.currentTarget) {
         this.closeModal();
       }
+    },
+
+    onFavoriteTap() {
+      const group = this.data.group;
+      if (!group || !group.exercise_id) return;
+      const id = group.exercise_id;
+      const wasFav = !!this.data.isFavorite;
+      // optimistic update
+      this.setData({ isFavorite: !wasFav });
+      // sync global favorExercises
+      const favorExercises = (app.globalData && app.globalData.favorExercises) || [];
+      const newFav = wasFav
+        ? favorExercises.filter(fid => fid !== id)
+        : [...favorExercises, id];
+      app.globalData.favorExercises = newFav;
+      // cloud call
+      wx.cloud.callFunction({
+        name: 'api',
+        data: {
+          action: 'exercise.toggleFavorite',
+          exercise_id: id,
+          openid: app.globalData.openid,
+        },
+      });
     },
 
     closeModal() {

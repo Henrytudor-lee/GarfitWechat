@@ -113,6 +113,33 @@
   justify-content: center;
 }
 
+.action-btn-fav {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.action-btn-fav:active {
+  transform: scale(0.9);
+}
+.action-btn-fav.is-fav {
+  background: rgba(204, 242, 0, 0.18);
+}
+.action-btn-fav-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  color: var(--primary-text);
+  font-family: serif;
+  font-weight: 700;
+}
+.action-btn-fav:not(.is-fav) .action-btn-fav-icon {
+  color: rgba(255, 255, 255, 0.45);
+}
+
 /* Sets list — scrollable */
 .sets-list {
   flex: 1;
