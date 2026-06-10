@@ -1,4 +1,6 @@
 module.exports = {
+  "FAV_REMOVED": "已取消喜爱标记",
+  "FAV_ADDED": "已标记为喜爱动作",
   "REPS_UNIT": "次",
   "NO_DEMO_VIDEO_CONTACT": "请联系开发人员补充",
   "NO_DEMO_VIDEO_HINT": "该动作暂未收录演示视频",

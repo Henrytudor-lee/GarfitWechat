@@ -226,6 +226,7 @@
   display: flex;
   flex-direction: column;
   gap: 8rpx;
+  box-sizing: border-box;
 }
 
 .set-row {

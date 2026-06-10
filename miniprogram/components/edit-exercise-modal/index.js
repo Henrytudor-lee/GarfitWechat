@@ -76,6 +76,12 @@ Component({
       const wasFav = !!this.data.isFavorite;
       // optimistic update
       this.setData({ isFavorite: !wasFav });
+      // toast
+      wx.showToast({
+        title: (this.data.t || {})[wasFav ? 'FAV_REMOVED' : 'FAV_ADDED'] || (wasFav ? 'Unfavorited' : 'Favorited'),
+        icon: 'none',
+        duration: 1200
+      });
       // sync global favorExercises
       const favorExercises = (app.globalData && app.globalData.favorExercises) || [];
       const newFav = wasFav
