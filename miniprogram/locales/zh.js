@@ -1,4 +1,10 @@
 module.exports = {
+  "LOADING_MORE": "加载更多...",
+  "SEARCH_EXERCISES_MODAL": "搜索动作...",
+  "SAVING": "保存中...",
+  "SAVE_CHANGES": "保存修改",
+  "UNIT": "单位",
+  "WEIGHT": "重量",
   "MONTHLY_VOL_HINT": "本月训练量",
   "NO_SESSIONS_FOR_DATE": "该日暂无训练",
   "BENTO_TITLE": "训练概览",

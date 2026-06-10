@@ -26,6 +26,8 @@ Component({
     activeSetsCount: 0,
     saving: false,
     imgPrefix: '',
+    locale: 'zh',
+    t: {},
   },
 
   observers: {
@@ -34,6 +36,8 @@ Component({
         const sets = this.data.group.sets.map(s => ({ ...s }));
         this.setData({
           imgPrefix: app.globalData.imagePrefix || '',
+          locale: app.globalData.language || 'zh',
+          t: app.globalData.t || {},
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
         });

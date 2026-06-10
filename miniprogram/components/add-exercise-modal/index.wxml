@@ -51,7 +51,7 @@
 
         <!-- Search -->
         <view class="search-bar">
-          <input class="search-input" placeholder="SEARCH EXERCISES..." placeholder-class="search-placeholder" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+          <input class="search-input" placeholder="{{t.SEARCH_EXERCISES_MODAL}}" placeholder-class="search-placeholder" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
           <view class="filter-icons-wrap">
             <text class="filter-icon-btn {{filterFavor ? 'active' : ''}}" bindtap="onFavorFilterTap">♥</text>
             <text class="filter-icon-btn {{filterPracticed ? 'active' : ''}}" bindtap="onPracticedFilterTap">☑</text>
@@ -73,8 +73,8 @@
 
         <!-- Exercise Grid - NOW SCROLLABLE -->
         <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore">
-          <view wx:if="{{loading && list.length === 0}}" class="loading-state">LOADING...</view>
-          <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">NO EXERCISES FOUND</view>
+          <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{t.LOADING}}</view>
+          <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
 
           <view wx:else class="grid-inner">
             <view wx:for="{{list}}" wx:key="id" class="exercise-card" data-item="{{item}}" bindtap="onExerciseTap">
@@ -83,7 +83,7 @@
                 <view wx:else class="card-img-placeholder">🏋️</view>
                 <view class="card-gradient"></view>
                 <!-- Top-left: DONE badge if practiced -->
-                <view wx:if="{{item.is_practiced}}" class="done-badge">DONE</view>
+                <view wx:if="{{item.is_practiced}}" class="done-badge">{{t.DONE}}</view>
                 <!-- Bottom-left: heart/favorite icon (catchtap stops event bubbling) -->
                 <view class="fav-icon-wrap" catchtap="onFavoriteTap" data-id="{{item.id}}">
                   <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
@@ -102,7 +102,7 @@
             </view>
           </view>
 
-          <view wx:if="{{loadingMore}}" class="load-more">LOADING MORE...</view>
+          <view wx:if="{{loadingMore}}" class="load-more">{{t.LOADING_MORE}}</view>
           <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
         </scroll-view>
       </view>
@@ -140,7 +140,7 @@
           <!-- Weight Input -->
           <view class="input-section">
             <view class="input-label-row">
-              <view class="input-label">WEIGHT ({{weight_unit}})</view>
+              <view class="input-label">{{t.WEIGHT}} ({{weight_unit}})</view>
               <view class="quick-chips-row">
                 <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
               </view>
@@ -161,7 +161,7 @@
           <!-- Reps Input -->
           <view class="input-section">
             <view class="input-label-row">
-              <view class="input-label">REPS</view>
+              <view class="input-label">{{t.REPS}}</view>
               <view class="quick-chips-row">
                 <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
               </view>

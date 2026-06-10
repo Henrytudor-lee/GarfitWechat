@@ -57,7 +57,7 @@
           </view>
           <view class="ec-volume">
             <view class="ec-vol-num">{{item.totalVolume}} kg</view>
-            <view class="ec-vol-label">TOTAL VOLUME</view>
+            <view class="ec-vol-label">{{t.TOTAL_VOLUME}}</view>
           </view>
         </view>
         <!-- Sets grid: 2 columns -->

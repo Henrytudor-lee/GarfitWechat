@@ -9,7 +9,7 @@
         <view wx:else class="header-img header-img-placeholder">🏋️</view>
         <view class="header-text">
           <view class="header-name">{{locale === 'zh' ? group.name_zh : group.name_en}}</view>
-          <view class="header-sets">{{activeSetsCount}} {{activeSetsCount === 1 ? 'set' : 'sets'}}</view>
+          <view class="header-sets">{{activeSetsCount}} {{activeSetsCount === 1 ? t.SET : t.SETS}}</view>
         </view>
       </view>
       <view class="header-actions">
@@ -27,7 +27,7 @@
 
         <!-- Weight -->
         <view class="set-field">
-          <view class="field-label">WEIGHT</view>
+          <view class="field-label">{{t.WEIGHT}}</view>
           <view class="field-row">
             <view class="field-btn" bindtap="decWeight" data-index="{{index}}">−</view>
             <input class="field-input" type="digit" value="{{item.weight}}" bindinput="onWeightInput" data-index="{{index}}" />
@@ -37,7 +37,7 @@
 
         <!-- Unit -->
         <view class="set-field set-field-unit">
-          <view class="field-label">UNIT</view>
+          <view class="field-label">{{t.UNIT}}</view>
           <view class="unit-toggle">
             <view class="unit-btn {{item.weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="kg">KG</view>
             <view class="unit-btn {{item.weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="lb">LB</view>
@@ -46,7 +46,7 @@
 
         <!-- Reps -->
         <view class="set-field">
-          <view class="field-label">REPS</view>
+          <view class="field-label">{{t.REPS}}</view>
           <view class="field-row">
             <view class="field-btn" bindtap="decReps" data-index="{{index}}">−</view>
             <input class="field-input" type="number" value="{{item.reps}}" bindinput="onRepsInput" data-index="{{index}}" />
@@ -62,7 +62,7 @@
 
     <!-- Save Button -->
     <view class="modal-footer">
-      <button class="save-btn {{saving ? 'disabled' : ''}}" bindtap="saveAll" disabled="{{saving}}">{{saving ? 'SAVING...' : 'SAVE CHANGES'}}</button>
+      <button class="save-btn {{saving ? 'disabled' : ''}}" bindtap="saveAll" disabled="{{saving}}">{{saving ? t.SAVING : t.SAVE_CHANGES}}</button>
     </view>
 
   </view>
