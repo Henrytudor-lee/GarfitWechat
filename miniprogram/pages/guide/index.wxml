@@ -18,8 +18,8 @@
       <block wx:for="{{cards}}" wx:key="index">
         <view class="guide-card">
           <view class="card-illustration">
-            <block wx:if="{{item.gifSrc}}">
-              <image class="card-gif" src="{{item.gifSrc}}" mode="aspectFit" />
+            <block wx:if="{{item.imageName && imgPrefix}}">
+              <image class="card-gif" src="{{imgPrefix}}/guide/{{item.imageName}}" mode="aspectFit" />
             </block>
             <block wx:else>
               <view class="glow-ring">
@@ -44,7 +44,6 @@
     </view>
     <view class="guide-footer">
       <button wx:if="{{currentStep > 0}}" class="btn-ghost" bindtap="onPrev">{{backText}}</button>
-      <view class="btn-ghost-spacer" wx:if="{{currentStep === 0}}"></view>
       <button class="btn-primary" bindtap="onNext">
         {{currentStep < cards.length - 1 ? nextText : doneText}}
       </button>

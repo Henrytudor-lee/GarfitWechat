@@ -4,33 +4,51 @@ const app = getApp();
 const CARDS = [
   {
     icon: '',
-    gifName: 'step_1.gif',
-    title: '开始你的\n第一次训练',
-    desc: '从首页开始训练 → 新增动作 → 编辑重量和次数 → 结束训练',
-    title_zh: '开始你的\n第一次训练',
-    desc_zh: '从首页开始训练 → 新增动作 → 编辑重量和次数 → 结束训练',
+    imageName: '1.png',
+    title: 'Start Training',
+    desc: 'Tap "Start Training" on the home page to begin a new session.',
+    title_zh: '开始训练',
+    desc_zh: '在首页点击"开始训练"按钮，即可创建一次新的训练会话。',
   },
   {
-    icon: '📊',
-    gifName: 'step_2.gif',
-    title: '查看训练数据',
-    desc: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
-    title_zh: '查看训练数据',
-    desc_zh: '在统计页面查看每周训练量、肌群分布、重量进步曲线。',
+    icon: '',
+    imageName: '2.png',
+    title: 'Add Exercise',
+    desc: 'Tap "+ Add Exercise" to browse or search the library and add a movement.',
+    title_zh: '新增动作',
+    desc_zh: '点击"+ 添加动作"，从动作库中浏览或搜索动作加入训练。',
+  },
+  {
+    icon: '',
+    imageName: '3.png',
+    title: 'Filter Exercise',
+    desc: 'Filter by body part or equipment, or use ♥ favorites / ☑ practiced to find what you need.',
+    title_zh: '筛选动作',
+    desc_zh: '通过左侧肌群、右侧器材筛选，或用 ♥ 收藏 / ☑ 练习过的动作快速定位。',
+  },
+  {
+    icon: '',
+    imageName: '4.png',
+    title: 'Enter Data',
+    desc: 'Set weight and reps for each exercise, then save to record your set.',
+    title_zh: '录入动作数据',
+    desc_zh: '为每个动作设置重量和次数，点击保存即可记入本次训练。',
+  },
+  {
+    icon: '',
+    imageName: '5.png',
+    title: 'Edit Exercise',
+    desc: 'Tap or long-press a card to edit weight, reps, or delete the set.',
+    title_zh: '编辑动作',
+    desc_zh: '点击或长按动作卡片，可调整重量、次数或删除该组。',
   },
 ];
-
-// 用云存储路径: images/guide/xxx.gif
-function getGifUrl(name) {
-  if (!name) return '';
-  const base = 'cloud://cloudbase-d9gwy4qvodf85fe69.636c-cloudbase-d9gwy4qvodf85fe69-1427916036';
-  return base + '/images/guide/' + name;
-}
 
 Page({
   data: {
     currentStep: 0,
     theme: 'night',
+    imgPrefix: '',
     cards: [],
     skipText: '跳过',
     backText: '← 返回',
@@ -45,6 +63,7 @@ Page({
   onLoad() {
     const locale = app.globalData.language || 'zh';
     const theme = app.globalData.theme || 'night';
+    const imgPrefix = app.globalData.imagePrefix || '';
 
     // 根据语言选择文案
     const langText = locale === 'en' ? {
@@ -62,13 +81,14 @@ Page({
     // 本地化卡片内容
     const cards = CARDS.map(c => ({
       icon: c.icon,
-      gifSrc: getGifUrl(c.gifName),
+      imageName: c.imageName,
       title: locale === 'en' ? c.title : c.title_zh,
       desc: locale === 'en' ? c.desc : c.desc_zh,
     }));
 
     this.setData({
       theme,
+      imgPrefix,
       cards,
       ...langText,
     });
