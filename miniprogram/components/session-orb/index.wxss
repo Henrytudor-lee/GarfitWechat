@@ -5,7 +5,9 @@
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
-  z-index: 100;
+  /* 必须高于 custom-tabbar 的 tabbar-wrap (999) 和 fab (1000),
+     否则 idle 态 orb 位置 (屏幕底部 332rpx) 会被 tabbar 整个盖住, 点击无法穿透 */
+  z-index: 1500;
   display: flex;
   align-items: center;
   justify-content: center;

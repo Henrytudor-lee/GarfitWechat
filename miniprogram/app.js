@@ -122,6 +122,52 @@ App({
   setRunningSession(session) {
     this.globalData.runningSession = session;
   },
+
+  // 兜底创建: 如果没有 running session 就创建一个
+  // 先查服务端确认 (避免依赖可能过期的 globalData), 没有再创建
+  async ensureRunningSession() {
+    if (!this.globalData.openid) return null;
+
+    // 先查服务端, 拿到权威状态
+    let session = null;
+    try {
+      const runRes = await wx.cloud.callFunction({
+        name: 'api',
+        data: { action: 'session.getRunning', openid: this.globalData.openid },
+      });
+      session = (runRes && runRes.result && runRes.result.session) || null;
+    } catch (e) {
+      console.error('ensureRunningSession: getRunning failed', e);
+    }
+
+    if (session && session.start_time) {
+      this.globalData.runningSession = session;
+      return session;
+    }
+
+    // 服务端没有 running session, 创建一个
+    wx.showLoading({ title: 'STARTING...', mask: true });
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'api',
+        data: { action: 'session.create', openid: this.globalData.openid },
+      });
+      if (res.result && res.result.success) {
+        const s = res.result.session
+          || { id: res.result.sessionId, start_time: new Date().toISOString(), _id: res.result.sessionId };
+        this.globalData.runningSession = s;
+        return s;
+      }
+      wx.showToast({ title: 'START FAILED', icon: 'none' });
+      return null;
+    } catch (e) {
+      console.error('ensureRunningSession: create failed', e);
+      wx.showToast({ title: 'START FAILED', icon: 'none' });
+      return null;
+    } finally {
+      wx.hideLoading();
+    }
+  },
   // ---- 欢迎弹框控制 ----
   closeWelcomeModal() {
     this.globalData.showWelcome = false;

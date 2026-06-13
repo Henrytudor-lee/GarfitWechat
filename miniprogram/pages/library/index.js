@@ -156,14 +156,14 @@ Page({
     this.setData({ orbSession: session });
   },
 
-  onOrbTap() {
-    // 有 session: 跳回 training 页 (index)
-    if (this.data.orbSession) {
-      wx.switchTab({ url: '/pages/index/index' });
-    } else {
-      // 无 session: 跳到 training 页并启动
-      wx.switchTab({ url: '/pages/index/index' });
+  async onOrbTap() {
+    // 无 session: 先创建一个, 再跳到 training 页
+    if (!this.data.orbSession) {
+      const session = await app.ensureRunningSession();
+      if (!session) return;
+      this.setData({ orbSession: session });  // orb 立即变 active
     }
+    wx.switchTab({ url: '/pages/index/index' });
   },
 
   async _loadUserExercises() {

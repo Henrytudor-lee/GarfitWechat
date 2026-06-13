@@ -240,8 +240,13 @@ Page({
     }
   },
 
-  onOrbTap() {
-    // 跳到 training 页 (running session 在那里)
+  async onOrbTap() {
+    // 无 session: 先创建一个, 再跳到 training 页
+    if (!this.data.orbSession) {
+      const session = await app.ensureRunningSession();
+      if (!session) return;
+      this.setData({ orbSession: session });  // orb 立即变 active
+    }
     wx.switchTab({ url: '/pages/index/index' });
   },
 

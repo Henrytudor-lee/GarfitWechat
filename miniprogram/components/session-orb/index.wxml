@@ -1,7 +1,6 @@
 <!--components/session-orb/index.wxml-->
 <view class="session-orb {{hasSession ? 'active' : 'idle'}} {{dragging ? 'dragging' : ''}}"
       style="left:{{positionX}}rpx;top:{{positionY}}rpx;"
-      bindtap="onTap"
       catchtouchstart="onTouchStart"
       catchtouchmove="onTouchMove"
       catchtouchend="onTouchEnd"

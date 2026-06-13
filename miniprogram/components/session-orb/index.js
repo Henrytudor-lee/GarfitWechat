@@ -198,6 +198,9 @@ Component({
         setTimeout(() => {
           this.setData({ _wasDragging: false });
         }, 50);
+      } else {
+        // 没拖拽 — 视为 tap (不依赖 bindtap, 直接在 touchend 触发)
+        this.onTap();
       }
     },
   },

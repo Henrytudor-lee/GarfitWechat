@@ -152,6 +152,9 @@ Page({
       return;
     }
 
+    // 从其他页面点 orb 创建 session 后, globalData 已更新; 同步到本页
+    this._syncRunningSessionFromGlobal();
+
     // onLoad already loaded data, skip — showWelcome check ran above
     if (this.data._dataLoaded) return;
 
@@ -542,18 +545,31 @@ Page({
 
   // ---- Workout controls ----
   async startWorkout() {
-    wx.showLoading({ title: 'STARTING...', mask: true });
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'session.create', openid: app.globalData.openid },
-    });
-    wx.hideLoading();
-    if (res.result && res.result.success) {
-      const session = res.result.session || { id: res.result.sessionId, start_time: new Date().toISOString(), _id: res.result.sessionId };
-      const sessionId = session._id || session.id;
-      this.setData({ runningSession: session, currentSessionId: sessionId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
-      this._startTimer(session.start_time || new Date().toISOString());
+    const session = await app.ensureRunningSession();
+    if (!session) return;
+    const sessionId = session._id || session.id;
+    this.setData({ runningSession: session, currentSessionId: sessionId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
+    this._startTimer(session.start_time || new Date().toISOString());
+    this._startRestTimer();
+  },
+
+  // 从其他页面 (library/profile/stats) 点 orb 创建 session 后, globalData.runningSession 已更新,
+  // onShow 时同步到本页, 避免 reload 整个 _loadData
+  _syncRunningSessionFromGlobal() {
+    const g = app.globalData.runningSession;
+    const l = this.data.runningSession;
+    const gId = g ? (g._id || g.id) : null;
+    const lId = l ? (l._id || l.id) : null;
+    if (gId === lId) return;
+
+    if (g) {
+      this.setData({ runningSession: g, currentSessionId: gId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
+      if (g.start_time) this._startTimer(g.start_time);
       this._startRestTimer();
+      this._loadExerciseGroups(gId);
+    } else {
+      this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
+      this._stopTimers();
     }
   },
 
@@ -583,6 +599,7 @@ Page({
     });
     wx.hideLoading();
     if (r.result && r.result.success) {
+      app.globalData.runningSession = null;  // 关键: 清掉全局, 否则后续 orb tap 会拿到过期数据
       this._stopTimers();
       // Show workout summary modal — duration in ms for _computeStats
       this.setData({
