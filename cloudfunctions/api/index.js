@@ -127,7 +127,7 @@ exports.main = async (event, context) => {
         'SELECT id, name, avatar, favor_exercises, practiced_exercises FROM users WHERE _openid = ? LIMIT 1',
         [openid]);
 
-      const is_new = !existingUser || !existingUser.name || !existingUser.avatar;
+      const is_new = !existingUser;
 
 
       if (existingUser) {
