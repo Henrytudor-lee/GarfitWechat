@@ -1,12 +1,12 @@
-/* components/session-orb/index.wxss */
+/* components/session-orb/index.wxss — cover-view 版本 */
+/* 注: cover-view 不支持 conic-gradient / mask, 所以原旋转光圈改为静态圆环 */
+
 .session-orb {
   position: fixed;
-  /* left/top 由 inline style 控制 (支持拖拽) */
+  /* left/top 由 inline style 控制 */
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
-  /* 必须高于 custom-tabbar 的 tabbar-wrap (999) 和 fab (1000),
-     否则 idle 态 orb 位置 (屏幕底部 332rpx) 会被 tabbar 整个盖住, 点击无法穿透 */
   z-index: 1500;
   display: flex;
   align-items: center;
@@ -14,25 +14,16 @@
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   -webkit-tap-highlight-color: transparent;
   overflow: visible;
-  /* transform-origin 用于呼吸缩放 */
   transform-origin: center center;
-  /* GPU 加速 */
   will-change: transform, left, top;
-  /* 松手后吸附动画 (dragging 态无动画) */
+  /* 松手后吸附动画 (cover-view 支持 transition) */
   transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.session-orb.dragging {
-  transition: none;
 }
 
 /* === idle: lime 圆 + logo (无动画) === */
 .session-orb.idle {
   background: var(--primary);
-  box-shadow:
-    0 8rpx 24rpx rgba(0, 0, 0, 0.25),
-    inset 0 -4rpx 0 rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
+  border: 2rpx solid var(--primary);
 }
 
 .session-orb.idle .orb-content {
@@ -44,14 +35,16 @@
 .orb-logo-idle {
   width: 70rpx;
   height: 70rpx;
-  /* 黑色 logo 在 lime 背景上: 反色以增加对比 */
+  /* cover-image 支持 filter, 反色以增加对比 */
   filter: invert(1);
 }
 
-/* === active: 深色圆 + logo + duration (圆球本身不缩放, 仅 logo) === */
+/* === active: 深色圆 + logo + duration === */
 .session-orb.active {
   background: var(--surface-high);
-  border: 2rpx solid var(--primary);
+  /* 静态圆环代替原旋转光圈: 内层深色, 外层 lime border
+     (cover-view 不支持 conic-gradient, 用 border + inset 阴影模拟) */
+  border: 4rpx solid var(--primary);
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
 }
 
@@ -60,8 +53,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 2;
-  position: relative;
   pointer-events: none;
 }
 
@@ -69,12 +60,6 @@
   width: 50rpx;
   height: 50rpx;
   margin-bottom: 2rpx;
-}
-
-/* 仅 active 态的 logo 呼吸缩放 (圆球本身不缩放) */
-.session-orb.active .orb-logo {
-  animation: orb-breath 1.6s ease-in-out infinite;
-  transform-origin: center center;
 }
 
 .orb-time {
@@ -86,61 +71,20 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* === 旋转光圈 (loading 轨迹) === */
-.orb-aura {
-  position: absolute;
-  top: -6rpx;
-  left: -6rpx;
-  right: -6rpx;
-  bottom: -6rpx;
-  border-radius: 50%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 270deg,
-    var(--primary) 320deg,
-    var(--primary) 360deg
-  );
-  -webkit-mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
-  mask: radial-gradient(circle, transparent 56rpx, #000 58rpx);
-  animation: orb-rotate 1.5s linear infinite;
-  opacity: 0.95;
-}
-
-/* === 呼吸缩放 (active 态 logo) === */
-@keyframes orb-breath {
-  0%, 100% { transform: scale(1.0); }
-  50% { transform: scale(1.08); }
-}
-
-@keyframes orb-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
+/* === tap 反馈 (按下时缩小) === */
 .orb-tap {
-  /* 按下时圆球自身缩小, 不影响内部 logo 的呼吸动画 */
   transform: scale(0.92) !important;
-}
-
-/* === 拖拽时态 === */
-.session-orb.dragging {
-  transform: scale(1.05);
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.4);
-  transition: none;  /* 拖拽时不走 transition 避免拖尾 */
 }
 
 /* === day 主题微调 === */
 .page.theme-day .session-orb.idle {
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15), inset 0 -2rpx 0 rgba(0, 0, 0, 0.05);
+  border-color: var(--primary);
 }
 .page.theme-day .session-orb.active {
   background: #ffffff;
   border-color: var(--primary);
 }
 .page.theme-day .orb-logo-idle {
-  /* day 主题: 不反色 (logo 自身可能已经是黑色背景) */
+  /* day 主题: 不反色 */
   filter: none;
-  background: transparent;
 }
