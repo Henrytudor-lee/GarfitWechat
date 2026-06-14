@@ -1,27 +1,23 @@
 <!--components/session-orb/index.wxml-->
-<!--
-  必须用 <cover-view> 而不是 <view>: session-orb 在 stats 页面会浮在底部,
-  但 stats 页面的体重进度图用 <canvas type="2d">. WeChat 原生 canvas 渲染在
-  独立的 native 层, 永远在 webview 之上, 普通 <view> 即使 z-index: 9999
-  也会被 canvas 盖住. <cover-view> 渲染在 native 层, 才能显示在 canvas 上面.
+<view class="session-orb {{hasSession ? 'active' : 'idle'}} {{dragging ? 'dragging' : ''}}"
+      style="left:{{positionX}}rpx;top:{{positionY}}rpx;"
+      catchtouchstart="onTouchStart"
+      catchtouchmove="onTouchMove"
+      catchtouchend="onTouchEnd"
+      hover-class="orb-tap">
+  <!-- 旋转光圈 (loading 效果, 仅 running 时显示) -->
+  <view wx:if="{{hasSession}}" class="orb-aura"></view>
 
-  代价:
-  - 不支持 catchtouchstart/move/end → 拖拽失效 (只支持 bindtap)
-  - 不支持 conic-gradient / mask → 旋转光圈改成静态 lime border + 单层 ring
--->
-<cover-view class="session-orb {{hasSession ? 'active' : 'idle'}}"
-            style="left:{{positionX}}rpx;top:{{positionY}}rpx;"
-            bindtap="onTap"
-            hover-class="orb-tap">
+  <!-- 内容 -->
   <block wx:if="{{hasSession}}">
-    <cover-view class="orb-content">
-      <cover-image class="orb-logo" src="/images/logo.png" />
-      <cover-view class="orb-time">{{durationDisplay}}</cover-view>
-    </cover-view>
+    <view class="orb-content">
+      <image class="orb-logo" src="/images/logo.png" mode="aspectFit" />
+      <text class="orb-time">{{durationDisplay}}</text>
+    </view>
   </block>
   <block wx:else>
-    <cover-view class="orb-content">
-      <cover-image class="orb-logo orb-logo-idle" src="/images/logo.png" />
-    </cover-view>
+    <view class="orb-content">
+      <image class="orb-logo orb-logo-idle" src="/images/logo.png" mode="aspectFit" />
+    </view>
   </block>
-</cover-view>
+</view>
