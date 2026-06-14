@@ -301,11 +301,6 @@ Page({
     }
   },
 
-  openDetail(e) {
-    const item = e.currentTarget.dataset.item;
-    this.setData({ selectedExercise: item });
-  },
-
   closeSheet() {
     this.setData({ selectedExercise: null });
   },
@@ -324,6 +319,48 @@ Page({
       return item;
     });
     this.setData({ list });
+
+    wx.cloud.callFunction({
+      name: 'api',
+      data: {
+        action: 'exercise.toggleFavorite',
+        exercise_id: id,
+        openid: app.globalData.openid,
+      },
+    });
+  },
+
+  onDetailFavTap() {
+    const ex = this.data.selectedExercise;
+    if (!ex || !ex.id) return;
+    const id = ex.id;
+    const { favorExercises } = this.data;
+    const wasFav = favorExercises.includes(id);
+
+    // Optimistic update: sync global + page state
+    const newFav = wasFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
+    this.setData({
+      favorExercises: newFav,
+      selectedExercise: { ...ex, is_favorite: !wasFav },
+    });
+    if (app.globalData) {
+      app.globalData.favorExercises = newFav;
+    }
+
+    // Sync the underlying list card (in case it's the same item)
+    const list = this.data.list.map(item => {
+      if (item.id === id) return { ...item, is_favorite: !wasFav };
+      return item;
+    });
+    this.setData({ list });
+
+    // Toast
+    const t = this.data.t || {};
+    wx.showToast({
+      title: t[wasFav ? 'FAV_REMOVED' : 'FAV_ADDED'] || (wasFav ? 'Unfavorited' : 'Favorited'),
+      icon: 'none',
+      duration: 1200,
+    });
 
     wx.cloud.callFunction({
       name: 'api',

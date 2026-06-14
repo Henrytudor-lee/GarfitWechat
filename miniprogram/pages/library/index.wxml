@@ -111,9 +111,8 @@
         <view wx:else class="card-img-placeholder">🏋️</view>
         <view class="card-gradient"></view>
         <view wx:if="{{item.is_practiced}}" class="done-badge">{{t.DONE}}</view>
-        <view class="fav-icon-wrap {{item.is_favorite ? 'active' : ''}}" catchtap="onFavoriteTap" data-id="{{item.id}}">
-          <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
-          <image wx:else src="{{imgPrefix}}/icons/heart.png" mode="aspectFit" />
+        <view wx:if="{{item.is_favorite}}" class="fav-icon-wrap" catchtap="onFavoriteTap" data-id="{{item.id}}">
+          <image src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
         </view>
         <view wx:if="{{item.video_name}}" class="play-overlay">▶</view>
       </view>
@@ -121,7 +120,6 @@
       <view class="card-footer">
         <view class="card-top">
           <view class="card-name">{{locale === 'en' ? item.name : (item.name_zh || item.name)}}</view>
-          <view class="card-info-btn" catchtap="openDetail" data-item="{{item}}">ⓘ</view>
         </view>
         <view class="card-tags">
           <image wx:if="{{item.equipment_icon}}" class="chip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
@@ -193,6 +191,16 @@
 
       <!-- Action Button -->
       <view class="sheet-action">
+        <view
+          class="sheet-fav-btn {{selectedExercise.is_favorite ? 'active' : ''}}"
+          catchtap="onDetailFavTap"
+          hover-class="tap-active"
+        >
+          <image
+            src="{{imgPrefix}}/icons/heart{{selectedExercise.is_favorite ? '_filled' : ''}}.png"
+            mode="aspectFit"
+          />
+        </view>
         <button
           class="sheet-btn"
           bindtap="{{isSelectMode ? 'doSelect' : 'addToWorkout'}}"

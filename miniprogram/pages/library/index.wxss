@@ -469,23 +469,19 @@
 .fav-icon-wrap {
   position: absolute;
   bottom: 8rpx;
-  left: 8rpx;
+  right: 8rpx;
   width: 44rpx;
   height: 44rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
   border-radius: 50%;
 }
 
 .fav-icon-wrap image {
-  width: 26rpx;
-  height: 26rpx;
-}
-
-.fav-icon-wrap.active {
-  background: rgba(204, 242, 0, 0.3);
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .play-overlay {
@@ -840,12 +836,47 @@
   padding: 0 24rpx 40rpx;
   flex-shrink: 0;
   padding-bottom: calc(140rpx + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.sheet-fav-btn {
+  width: 96rpx;
+  height: 96rpx;
+  flex-shrink: 0;
+  border-radius: 100rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sheet-fav-btn image {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.sheet-fav-btn.active {
+  background: rgba(204, 242, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.page.theme-day .sheet-fav-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .sheet-fav-btn.active {
+  background: rgba(58, 74, 0, 0.10);
+  border-color: var(--primary-text);
 }
 
 .sheet-btn {
-  width: 100%;
+  flex: 1;
   height: 96rpx;
-  line-height: 96rpx;
   white-space: nowrap;
   background: var(--primary);
   color: #000;
@@ -856,8 +887,11 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: none;
-  line-height: 96rpx;
   white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sheet-btn::after { border: none; }
 
