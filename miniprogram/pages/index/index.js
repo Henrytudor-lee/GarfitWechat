@@ -702,6 +702,11 @@ Page({
     if (app.closeWelcomeModal) {
       app.closeWelcomeModal();
     }
+    // 新用户: welcome 结束后进入 5 步引导页
+    // (welcome 现在只对真正首次访问的用户弹, 所以这里的 close 一定是新用户)
+    setTimeout(() => {
+      wx.navigateTo({ url: '/pages/guide/index' });
+    }, 300);
   },
 
   // Called by app.doSilentLogin when login completes — check showWelcome
