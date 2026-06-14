@@ -29,8 +29,8 @@
 
       <view class="header-right">
         <!-- step 2: favorite toggle -->
-        <view wx:if="{{step === 'set' && selectedItem}}" class="header-btn header-btn-fav {{selectedItem.is_favorite ? 'is-fav' : ''}}" catchtap="onSelectedFavoriteTap">
-          <text class="header-fav-icon">{{selectedItem.is_favorite ? '♥' : '♡'}}</text>
+        <view wx:if="{{step === 'set' && selectedItem}}" class="header-btn-fav {{selectedItem.is_favorite ? 'is-fav' : ''}}" catchtap="onSelectedFavoriteTap">
+          <image class="header-btn-fav-icon" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
         </view>
         <view class="header-btn" bindtap="closeModal">
           <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
