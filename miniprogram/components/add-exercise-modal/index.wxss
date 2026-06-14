@@ -775,6 +775,10 @@
   color: #666;
   border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
 }
+.modal-mask.theme-day .muscle-item.active {
+  background: rgba(58, 74, 0, 0.15);
+  color: var(--primary-text);
+}
 .modal-mask.theme-day .search-bar {
   background: #ffffff;
 }
@@ -788,6 +792,9 @@
 }
 .modal-mask.theme-day .filter-icon-btn {
   background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.4);
 }
 .modal-mask.theme-day .filter-chip {
   background: rgba(0, 0, 0, 0.06);
