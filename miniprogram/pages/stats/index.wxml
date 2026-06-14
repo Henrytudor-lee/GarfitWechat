@@ -136,7 +136,7 @@
   <!-- Custom Tab Bar -->
   <custom-tabbar active="stats" theme="{{theme}}" />
 
-  <!-- Session Orb -->
-  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
+  <!-- Session Orb — 抬高 200rpx 避开底部 canvas 图表 -->
+  <session-orb session="{{orbSession}}" theme="{{theme}}" bottom-offset="{{200}}" bind:orb-tap="onOrbTap" />
 
 </view>
