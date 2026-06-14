@@ -794,6 +794,11 @@
   color: #666;
   border-color: rgba(0, 0, 0, 0.1);
 }
+.modal-mask.theme-day .filter-chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
 .modal-mask.theme-day .filter-chip .equip-name {
   color: #666;
 }
@@ -878,6 +883,11 @@
   color: #666;
   background: rgba(0, 0, 0, 0.05);
   border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
 }
 
 /* ========================
