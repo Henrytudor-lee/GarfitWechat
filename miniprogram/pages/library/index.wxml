@@ -215,6 +215,7 @@
     isOpen="{{showAddModal}}"
     sessionId="{{currentSessionId}}"
     preselectedExercise="{{preselectedExercise}}"
+    theme="{{theme}}"
     bind:close="onAddModalClose"
     bind:exerciseadded="onAddModalExerciseAdded"
   />

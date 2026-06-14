@@ -67,6 +67,10 @@ Component({
       type: Object,
       value: null,
     },
+    theme: {
+      type: String,
+      value: 'night',
+    },
   },
 
   data: {

@@ -19,6 +19,10 @@ Component({
       type: String,
       value: 'en',
     },
+    theme: {
+      type: String,
+      value: 'night',
+    },
   },
 
   data: {

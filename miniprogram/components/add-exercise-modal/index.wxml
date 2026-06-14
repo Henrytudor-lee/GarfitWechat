@@ -1,5 +1,5 @@
 <!--components/add-exercise-modal/index.wxml-->
-<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+<view class="modal-mask {{theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
   <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Drag Handle -->

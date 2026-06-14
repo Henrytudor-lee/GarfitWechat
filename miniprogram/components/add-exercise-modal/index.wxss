@@ -732,3 +732,154 @@
   border-color: var(--primary);
   color: var(--primary-text);
 }
+
+/* ========================
+   Day Theme
+   ========================
+   兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+   这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+.modal-mask.theme-day {
+  --primary: #ccf200;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-day .modal-sheet {
+  background: #ffffff;
+}
+.modal-mask.theme-day .drag-handle {
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal-mask.theme-day .modal-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .header-title {
+  color: #000;
+}
+.modal-mask.theme-day .header-btn-fav.is-fav {
+  background: rgba(58, 74, 0, 0.15);
+}
+.modal-mask.theme-day .header-btn-fav:not(.is-fav) .header-fav-icon {
+  color: rgba(0, 0, 0, 0.4);
+}
+.modal-mask.theme-day .muscle-sidebar {
+  background: #f5f5f5;
+  border-right: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .muscle-item {
+  color: #666;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .search-bar {
+  background: #ffffff;
+}
+.modal-mask.theme-day .search-input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .search-placeholder {
+  color: #999;
+}
+.modal-mask.theme-day .filter-icon-btn {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .filter-chip {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .filter-chip .equip-name {
+  color: #666;
+}
+.modal-mask.theme-day .loading-state,
+.modal-mask.theme-day .empty-state {
+  color: #999;
+}
+.modal-mask.theme-day .no-more {
+  color: #999;
+}
+.modal-mask.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .card-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .card-gradient {
+  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+}
+.modal-mask.theme-day .fav-icon-wrap {
+  background: rgba(255, 255, 255, 0.8);
+}
+.modal-mask.theme-day .fav-icon-wrap.active {
+  background: rgba(58, 74, 0, 0.3);
+}
+.modal-mask.theme-day .card-name {
+  color: #000;
+}
+.modal-mask.theme-day .card-muscle-icon,
+.modal-mask.theme-day .card-equip-icon {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .selected-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-name {
+  color: #000;
+}
+.modal-mask.theme-day .tag-neutral {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+}
+.modal-mask.theme-day .input-label {
+  color: #666;
+}
+.modal-mask.theme-day .input-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .input-field {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .unit-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .modal-footer {
+  background: #ffffff;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .video-placeholder {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1rpx dashed rgba(0, 0, 0, 0.2);
+}
+.modal-mask.theme-day .video-placeholder-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+.modal-mask.theme-day .video-placeholder-sub {
+  color: rgba(0, 0, 0, 0.45);
+}
+.modal-mask.theme-day .quick-chips-label {
+  color: #999;
+}
+.modal-mask.theme-day .chip {
+  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ========================
+   Night Theme (fallback)
+   ======================== */
+.modal-mask.theme-night {
+  --primary: #ccf200;
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}

@@ -187,10 +187,10 @@
   </view>
 
   <!-- Add Exercise Modal -->
-  <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
+  <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" theme="{{theme}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
 
   <!-- Edit Exercise Modal -->
-  <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" locale="{{locale}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
+  <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" locale="{{locale}}" theme="{{theme}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
 
   <!-- Session Detail Modal -->
   <session-detail-modal isOpen="{{showSessionDetailModal}}" session="{{viewingSession}}" sessionId="{{viewingSessionId}}" locale="{{locale}}" bind:close="onSessionDetailClose" />

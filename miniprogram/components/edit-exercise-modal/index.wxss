@@ -292,3 +292,75 @@
 }
 
 .save-btn::after { border: none; }
+
+/* ========================
+   Day Theme
+   ========================
+   兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+   这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+.modal-mask.theme-day {
+  --primary: #ccf200;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-day .modal-sheet {
+  background: #ffffff;
+}
+.modal-mask.theme-day .modal-sheet::before {
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal-mask.theme-day .modal-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+.modal-mask.theme-day .header-img {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .header-name {
+  color: #000;
+}
+.modal-mask.theme-day .header-sets {
+  color: #666;
+}
+.modal-mask.theme-day .action-btn-close {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+.modal-mask.theme-day .action-btn-fav {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .action-btn-fav.is-fav {
+  background: rgba(58, 74, 0, 0.15);
+}
+.modal-mask.theme-day .set-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .field-label {
+  color: #666;
+}
+.modal-mask.theme-day .field-btn {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+.modal-mask.theme-day .field-input {
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.modal-mask.theme-day .unit-toggle {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.modal-mask.theme-day .unit-btn {
+  color: #666;
+}
+.modal-mask.theme-day .delete-btn {
+  color: #999;
+}
+
+/* ========================
+   Night Theme (fallback)
+   ======================== */
+.modal-mask.theme-night {
+  --primary: #ccf200;
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}
