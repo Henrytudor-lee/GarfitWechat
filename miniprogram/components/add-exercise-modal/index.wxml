@@ -9,7 +9,7 @@
     <view class="modal-header">
       <view class="header-left">
         <view wx:if="{{step === 'pick' && selectedMuscleOpen}}" class="header-btn" bindtap="closeMuscleMenu">
-          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_{{theme === 'day' ? 'dark' : 'light'}}.png" mode="aspectFit" />
         </view>
         <block wx:elif="{{step === 'pick'}}">
           <view class="header-btn" bindtap="toggleMuscleMenu">
@@ -33,7 +33,7 @@
           <image class="header-btn-fav-icon" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
         </view>
         <view class="header-btn" bindtap="closeModal">
-          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_{{theme === 'day' ? 'dark' : 'light'}}.png" mode="aspectFit" />
         </view>
       </view>
     </view>
