@@ -34,8 +34,7 @@ function collidesWithFab(orbX, orbY) {
 const ABOVE_FAB_Y = FAB_Y_START - FAB_GAP_RPX - ORB_SIZE_RPX;
 
 // idle: 屏幕底部 (tabbar 上方, 留足间距)
-// 注: 实际 Y 在 attached() 根据 bottomOffset 动态计算
-const IDLE_Y_BASE = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 220;
+const IDLE_Y = SCREEN_HEIGHT_RPX - ORB_SIZE_RPX - 220;
 // active: 默认放 fab 上方 (有 overlap 时会再调整)
 const ACTIVE_Y = ABOVE_FAB_Y;
 
@@ -52,12 +51,6 @@ Component({
       type: String,
       value: 'night',
     },
-    // 把 orb 整体往上挪 offset rpx, 用于 stats 页面避开底部 canvas 图表
-    // (WeChat 原生 canvas 总在 webview 之上, 无论 z-index 多高都盖住 orb)
-    bottomOffset: {
-      type: Number,
-      value: 0,
-    },
   },
 
   data: {
@@ -65,7 +58,7 @@ Component({
     hasSession: false,
     _tickHandle: null,
     positionX: DEFAULT_X,
-    positionY: IDLE_Y_BASE,  // attached() 会按 bottomOffset 重算
+    positionY: IDLE_Y,
     // drag state (全部 rpx)
     dragging: false,
     _dragStartX: 0,
@@ -83,11 +76,10 @@ Component({
 
   lifetimes: {
     attached() {
-      const idleY = this._getIdleY();
       // 从 storage 读取位置 (单位 rpx)
       let pos = wx.getStorageSync(STORAGE_KEY);
       if (!pos || typeof pos.x !== 'number') {
-        pos = { x: DEFAULT_X, y: idleY };
+        pos = { x: DEFAULT_X, y: IDLE_Y };
       }
       this.setData({ positionX: pos.x, positionY: pos.y });
       this._applySession(this.data.session);
@@ -98,10 +90,6 @@ Component({
   },
 
   methods: {
-    _getIdleY() {
-      return IDLE_Y_BASE - (this.data.bottomOffset || 0);
-    },
-
     _applySession(session) {
       const hasSession = !!(session && session.start_time);
       this.setData({ hasSession });
@@ -120,7 +108,7 @@ Component({
         this._stopTick();
         this.setData({ durationDisplay: '00:00' });
         // idle → 回到右下角默认位置
-        this.setData({ positionX: DEFAULT_X, positionY: this._getIdleY() });
+        this.setData({ positionX: DEFAULT_X, positionY: IDLE_Y });
       }
     },
 
