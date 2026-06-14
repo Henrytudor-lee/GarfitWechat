@@ -698,6 +698,14 @@
    ======================== */
 .page.theme-day {
   background: #f5f5f5;
+  /* 兜底: WeChat 自定义组件/页面 CSS 变量传递不可靠, 在 page 自己的作用域内再定义一次 */
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.page.theme-night {
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
 }
 
 .page.theme-day .today-title {

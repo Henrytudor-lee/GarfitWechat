@@ -57,6 +57,12 @@
   color: #52525b;
 }
 
+.tabbar-wrap.theme-day {
+  /* 兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+     这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+  --primary-text: #3a4a00;
+}
+
 .tabbar-wrap.theme-day .tab-item.active .tab-label {
   color: var(--primary-text);
 }

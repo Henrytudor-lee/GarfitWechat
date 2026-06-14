@@ -41,8 +41,8 @@ page.theme-day {
   --primary: #ccf200;
   --primary-dim: #b3d400;
   /* lime #ccf200 在白底上对比度差，文字/边框场景用深橄榄绿保可读 */
-  --primary-text: #7a8c00;
-  --primary-bg-soft: rgba(122, 140, 0, 0.15);
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
   --text-primary: #1a1a1a;
   --text-secondary: #52525b;
   --text-muted: #a1a1aa;

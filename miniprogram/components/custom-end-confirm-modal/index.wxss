@@ -16,6 +16,15 @@
 /* Day theme overrides */
 .modal-mask.theme-day {
   background: rgba(0, 0, 0, 0.5);
+  /* 兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+     这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-night {
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
 }
 
 /* Card */
