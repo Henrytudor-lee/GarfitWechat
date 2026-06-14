@@ -862,6 +862,11 @@
   color: #666;
   border-color: rgba(0, 0, 0, 0.1);
 }
+.modal-mask.theme-day .unit-btn.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
 .modal-mask.theme-day .modal-footer {
   background: #ffffff;
   border-top: 1rpx solid rgba(0, 0, 0, 0.1);

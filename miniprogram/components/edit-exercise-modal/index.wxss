@@ -352,6 +352,10 @@
 .modal-mask.theme-day .unit-btn {
   color: #666;
 }
+.modal-mask.theme-day .unit-btn.active {
+  color: #000;
+  background: var(--primary);
+}
 .modal-mask.theme-day .delete-btn {
   color: #999;
 }
