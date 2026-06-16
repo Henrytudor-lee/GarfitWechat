@@ -1,22 +1,20 @@
-<!--components/custom-tabbar/index.wxml—garcia-fitness-new bottom nav-->
-<view class="tabbar-wrap {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+<!--components/custom-tabbar/index.wxml — cover-view tabbar for canvas layering-->
+<cover-view class="tabbar-wrap {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
   <!-- Bottom Nav -->
-  <view class="tabbar">
-    <view
+  <cover-view class="tabbar">
+    <cover-view
       wx:for="{{tabs}}"
       wx:key="id"
       class="tab-item {{active === item.id ? 'active' : ''}}"
-      catchtap="switchTab"
       data-id="{{item.id}}"
       data-url="{{item.url}}"
+      bindtap="switchTab"
     >
-      <view class="tab-icon-wrap">
-        <image
-          src="{{active === item.id ? item.iconActive : item.icon}}"
-          class="tab-icon-img"
-        />
-      </view>
-      <text class="tab-label">{{item.label}}</text>
-    </view>
-  </view>
-</view>
+      <cover-image
+        src="{{active === item.id ? item.iconActive : item.icon}}"
+        class="tab-icon-img"
+      />
+      <cover-view class="tab-label">{{item.label}}</cover-view>
+    </cover-view>
+  </cover-view>
+</cover-view>
