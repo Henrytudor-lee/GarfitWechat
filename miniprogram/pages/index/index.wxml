@@ -10,8 +10,8 @@
     <view class="timer-display">{{elapsedTime}}</view>
     <view class="timer-stats-row">
       <view class="timer-stat">
-        <view class="stat-val">{{totalVolume}}</view>
-        <view class="stat-key">{{t.VOLUME_KG}}</view>
+        <view class="stat-val">{{totalCaloriesStr}}</view>
+        <view class="stat-key">{{t.CALORIES_LABEL}}</view>
       </view>
       <view class="stat-divider"></view>
       <view class="timer-stat">
@@ -56,8 +56,8 @@
             <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
           </view>
           <view class="ec-volume">
-            <view class="ec-vol-num">{{item.totalVolume}} kg</view>
-            <view class="ec-vol-label">{{t.TOTAL_VOLUME}}</view>
+            <view class="ec-vol-num">{{item.totalCalories}} {{t.CAL_UNIT_SHORT}}</view>
+            <view class="ec-vol-label">{{t.CAL_UNIT}}</view>
           </view>
         </view>
         <!-- Sets grid: 2 columns -->
@@ -132,8 +132,8 @@
         <view class="bento-day">{{todayDay}}</view>
         <view class="bento-month text-primary">{{todayMonth}}</view>
         <view class="bento-volume {{todayVolume > 0 ? 'has-volume' : 'muted'}}">
-          <text class="bento-volume-num">{{todayVolumeStr}}</text>
-          <text class="bento-volume-unit">KG</text>
+          <text class="bento-volume-num">{{todayCaloriesStr}}</text>
+          <text class="bento-volume-unit">{{t.CAL_UNIT_SHORT}}</text>
         </view>
         <view class="bento-progress-bar">
           <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
@@ -144,8 +144,8 @@
         <view class="bento-day">{{yesterdayDay}}</view>
         <view class="bento-month text-muted">{{yesterdayMonth}}</view>
         <view class="bento-volume {{yesterdayVolume > 0 ? 'has-volume' : 'muted'}}">
-          <text class="bento-volume-num">{{yesterdayVolumeStr}}</text>
-          <text class="bento-volume-unit">KG</text>
+          <text class="bento-volume-num">{{yesterdayCaloriesStr}}</text>
+          <text class="bento-volume-unit">{{t.CAL_UNIT_SHORT}}</text>
         </view>
         <view class="bento-progress-bar">
           <view class="bento-progress-fill muted" style="width: {{yesterdayProgress}}%"></view>
@@ -153,7 +153,7 @@
       </view>
       <view class="bento-card bento-monthly">
         <view class="bento-label">{{t.MONTHLY_VOL}}</view>
-        <view class="bento-big-num text-primary">{{monthlyVolumeStr}}</view>
+        <view class="bento-big-num text-primary">{{monthlyCaloriesStr}} {{t.CAL_UNIT_SHORT}}</view>
         <view class="bento-hint text-muted">{{t.MONTHLY_VOL_HINT}}</view>
         <view class="bento-bg-icon">📊</view>
       </view>

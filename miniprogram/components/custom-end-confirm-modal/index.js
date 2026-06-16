@@ -35,7 +35,8 @@ Component({
       if (isOpen) {
         const locale = app.globalData.language || 'zh';
         const theme = app.globalData.theme || 'night';
-        this.setData({ _locale: locale, _theme: theme });
+        const t = app.globalData.t || {};
+        this.setData({ _locale: locale, _theme: theme, t });
       }
     },
   },

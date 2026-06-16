@@ -11,7 +11,7 @@
  Target Server Version : 80030 (8.0.30-cynos-3.1.16.003)
  File Encoding         : 65001
 
- Date: 25/05/2026 22:44:51
+ Date: 15/06/2026 21:18:17
 */
 
 SET NAMES utf8mb4;
@@ -36,7 +36,9 @@ CREATE TABLE `users` (
   `gender` varchar(12) DEFAULT NULL COMMENT 'male - 男性；female - 女性； 可以为空',
   `birthday` timestamp NULL DEFAULT NULL COMMENT '用户生日',
   `purpose` tinyint DEFAULT '1' COMMENT '1 - 塑形；2 - 减肥；3 - 养生；默认值1',
+  `height` double DEFAULT '170' COMMENT '用户身高数据，单位cm',
+  `weight` double DEFAULT '60' COMMENT '用户体重数据，单位kg',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3;
 
 SET FOREIGN_KEY_CHECKS = 1;

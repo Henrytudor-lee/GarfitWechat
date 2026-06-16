@@ -19,7 +19,7 @@
   </view>
 
   <!-- Edit Nickname Modal -->
-  <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="cancelEditName">
+  <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="onNameMaskTap">
     <view class="edit-modal-box" catchtap="">
       <view class="edit-modal-title">{{t.EDIT_NICKNAME}}</view>
       <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{t.NICKNAME}}" maxlength="16" bindinput="onEditNameInput" />
@@ -56,7 +56,28 @@
       </view>
     </view>
 
-    <!-- Settings List -->
+    <!-- Edit Body Data Modal -->
+  <view class="edit-modal-mask" wx:if="{{showEditBodyModal}}" bindtap="onBodyMaskTap">
+    <view class="edit-modal-box" catchtap="">
+      <view class="edit-modal-title">{{t.EDIT_PERSONAL_INFO}}</view>
+      <view class="body-field-row">
+        <view class="body-field">
+          <text class="body-field-label">{{t.HEIGHT}} (cm)</text>
+          <input class="edit-modal-input body-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="170" />
+        </view>
+        <view class="body-field">
+          <text class="body-field-label">{{t.WEIGHT_BODY}} (kg)</text>
+          <input class="edit-modal-input body-input" type="digit" value="{{editWeight}}" bindinput="onWeightInput" placeholder="60" />
+        </view>
+      </view>
+      <view class="edit-modal-btns">
+        <button class="edit-modal-cancel" bindtap="cancelEditBody">{{t.CANCEL}}</button>
+        <button class="edit-modal-confirm" bindtap="confirmEditBody">{{t.CONFIRM}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Settings List -->
     <view class="settings-list">
       <!-- Language Toggle -->
       <view class="settings-item" bindtap="toggleLanguage">
@@ -90,6 +111,20 @@
           <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{t.DAY}}</text>
           <text class="pill {{theme === 'night' ? 'pill-active' : ''}}">{{t.NIGHT}}</text>
         </view>
+      </view>
+
+      <!-- Personal Info -->
+      <view class="settings-item" bindtap="onPersonalInfoTap" hover-class="item-hover">
+        <view class="settings-left">
+          <view class="settings-icon-wrap body-icon">
+            <text class="settings-icon-text">⚖</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title">{{t.PERSONAL_INFO}}</text>
+            <text class="settings-subtitle">{{bodyHeight || 170}}cm / {{bodyWeight || 60}}kg</text>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
       </view>
 
       <!-- AI Coach (locked) -->

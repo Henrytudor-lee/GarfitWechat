@@ -1,38 +1,6 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
-const { setVolume } = require('../../utils/unit.js');
-
-// 体积数值格式化: 整数保持整数, 有小数保留 1 位, 浮点精度噪声截断
-// 大数自动用 k / M 缩写: 12345 -> "12.3k", 1234567 -> "1.2M"
-function formatVolume(value) {
-  const n = Number(value) || 0;
-  const abs = Math.abs(n);
-
-  // 大数走 K / M 缩写 (大写 K 是国际 kilo 惯例, 与 kg 区分)
-  if (abs >= 1000000) {
-    const v = n / 1000000;
-    const r = Math.round(v * 10) / 10;
-    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'M';
-  }
-  if (abs >= 10000) {
-    const v = n / 1000;
-    const r = Math.round(v * 10) / 10;
-    return (Math.abs(r - Math.round(r)) < 0.05 ? String(Math.round(r)) : r.toFixed(1)) + 'K';
-  }
-
-  // 普通范围: 浮点容差 0.05, 整数保持整数
-  const rounded = Math.round(n * 10) / 10;
-  let str;
-  if (Math.abs(rounded - Math.round(rounded)) < 0.05) {
-    str = String(Math.round(rounded));
-  } else {
-    str = rounded.toFixed(1);
-  }
-  // 加千分位
-  const [intPart, decPart] = str.split('.');
-  const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return decPart ? `${withSep}.${decPart}` : withSep;
-}
+const { setVolume, volumeToCalories, formatCalories } = require('../../utils/unit.js');
 
 // Compute ISO yrweek key e.g. 202621 for 2026-W21
 function toYrweek(date) {
@@ -72,6 +40,8 @@ Page({
     mostTrained: [],
     // Weight records for selected exercise
     weightRecords: [],
+    // Leaderboard
+    leaderboard: [],
     // UI state
     loading: false,
     hasData: false,
@@ -105,12 +75,27 @@ Page({
     wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
-    const [statsRes] = await Promise.all([
+    const [statsRes, lbRes] = await Promise.all([
       wx.cloud.callFunction({ name: 'api', data: { action: 'stats.summary', openid: app.globalData.openid } }),
+      wx.cloud.callFunction({ name: 'api', data: { action: 'stats.leaderboard', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
     this.setData({ loading: false });
+
+    // Leaderboard
+    if (lbRes.result && lbRes.result.success && lbRes.result.leaderboard) {
+      const maxCal = Math.max(...lbRes.result.leaderboard.map(u => u.total_calories || 0), 1);
+      const leaderboard = lbRes.result.leaderboard.map((u, i) => ({
+        rank: i + 1,
+        name: u.name || '—',
+        avatar: u.avatar || '',
+        calories: u.total_calories || 0,
+        caloriesDisplay: formatCalories(u.total_calories || 0),
+        percent: Math.round(((u.total_calories || 0) / maxCal) * 100),
+      }));
+      this.setData({ leaderboard });
+    }
 
     if (!statsRes.result || !statsRes.result.success) {
       console.error('Stats load failed:', statsRes.result);
@@ -138,7 +123,8 @@ Page({
         ? wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
         : wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const vol = weekMap[yrweek] || 0;
-      weeklyVolume.push({ label, volume: vol, volumeDisplay: formatVolume(vol), yrweek });
+      const cal = volumeToCalories(vol);
+      weeklyVolume.push({ label, volume: cal, volumeDisplay: formatCalories(cal), yrweek });
     }
 
     // Percent relative to max
@@ -160,7 +146,7 @@ Page({
       });
     });
     const muscleDistribution = Object.entries(muscleMap)
-      .map(([name, value]) => ({ name, value, valueDisplay: formatVolume(value) }))
+      .map(([name, value]) => ({ name, value: volumeToCalories(value), valueDisplay: formatCalories(volumeToCalories(value)) }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
@@ -185,12 +171,13 @@ Page({
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
 
+    const totalCal = volumeToCalories(d.totalVolume || 0);
     this.setData({
       totalSessions: d.totalSessions || 0,
       currentStreak: d.currentStreak || 0,
       weekWorkouts: d.weekWorkouts || 0,
-      totalVolume: d.totalVolume || 0,
-      totalVolumeDisplay: formatVolume(d.totalVolume || 0),
+      totalVolume: totalCal,
+      totalVolumeDisplay: formatCalories(totalCal),
       exerciseList,
       weeklyVolume,
       muscleDistribution,

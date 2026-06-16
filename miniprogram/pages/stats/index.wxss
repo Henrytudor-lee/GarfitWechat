@@ -314,6 +314,106 @@
   margin-top: 8rpx;
 }
 
+/* Leaderboard */
+.lb-header {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0 12rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12rpx;
+}
+.page.theme-day .lb-header { border-color: rgba(0, 0, 0, 0.06); }
+
+.lb-header-rank { width: 56rpx; font-size: 18rpx; font-weight: 800; opacity: 0.4; letter-spacing: 0.1em; }
+.lb-header-name { flex: 1; }
+.lb-header-cal { width: 80rpx; text-align: right; font-size: 18rpx; font-weight: 800; opacity: 0.4; letter-spacing: 0.1em; }
+
+.lb-header-rank, .lb-header-cal { color: #71717a; }
+.page.theme-day .lb-header-rank, .page.theme-day .lb-header-cal { color: #a1a1aa; }
+
+.lb-rows { display: flex; flex-direction: column; gap: 16rpx; }
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.lb-rank {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 900;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: #71717a;
+}
+.page.theme-day .lb-rank { background: rgba(0, 0, 0, 0.06); color: #a1a1aa; }
+
+.lb-rank.gold { background: #facc15; color: #000; }
+.lb-rank.silver { background: #9ca3af; color: #000; }
+.lb-rank.bronze { background: #d97706; color: #fff; }
+
+.lb-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+.lb-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.lb-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.lb-name {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #e5e5e5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page.theme-day .lb-name { color: #1a1a1a; }
+
+.lb-track {
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.page.theme-day .lb-track { background: rgba(0, 0, 0, 0.06); }
+
+.lb-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  background: var(--primary);
+}
+
+.lb-cal {
+  width: 80rpx;
+  text-align: right;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #e5e5e5;
+  flex-shrink: 0;
+}
+.page.theme-day .lb-cal { color: #1a1a1a; }
+
 .bar-header {
   display: flex;
   align-items: center;

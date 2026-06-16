@@ -16,6 +16,10 @@ App({
     language: 'zh',
     t: {},
 
+    // ---- 用户身体数据 (卡路里计算用) ----
+    userWeight: 60,
+    userHeight: 170,
+
     // ---- 日夜间主题 ----
     theme: 'night',
     themeVars: {},
@@ -54,6 +58,8 @@ App({
     if (openid) this.globalData.openid = openid;
     this.globalData.favorExercises = wx.getStorageSync('favorExercises') || [];
     this.globalData.practicedExercises = wx.getStorageSync('practicedExercises') || [];
+    this.globalData.userWeight = wx.getStorageSync('userWeight') || 60;
+    this.globalData.userHeight = wx.getStorageSync('userHeight') || 170;
 
     this.globalData.loginPromise = this.doSilentLogin();
   },

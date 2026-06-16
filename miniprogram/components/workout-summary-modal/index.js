@@ -1,6 +1,6 @@
 // components/workout-summary-modal/index.js
 const app = getApp();
-const { setVolume } = require('../../utils/unit.js');
+const { setVolume, volumeToCalories } = require('../../utils/unit.js');
 
 Component({
   properties: {
@@ -31,7 +31,7 @@ Component({
     _stats: {
       exerciseCount: 0,
       durationStr: '0 min',
-      totalVolume: 0,
+      totalCalories: 0,
     },
   },
 
@@ -90,8 +90,8 @@ Component({
         ? (locale === 'zh' ? `${hours}小时${mins}分钟` : `${hours}h ${mins}m`)
         : (locale === 'zh' ? `${mins}分钟` : `${mins} min`);
 
-      let totalVolume = 0;
-      // 为每个动作预计算 totalVolume (WXML 不支持方法调用, 必须在 data 字段里)
+      let totalCalories = session.calories || 0;
+      // 为每个动作预计算 totalCalories (WXML 不支持方法调用, 必须在 data 字段里)
       const groups = exerciseList.map((ex) => {
         let vol = 0;
         if (ex.sets) {
@@ -99,10 +99,12 @@ Component({
             vol += setVolume(s);
           }
         }
-        return { ...ex, totalVolume: Math.round(vol) };
+        const cal = volumeToCalories(Math.round(vol));
+        return { ...ex, totalCalories: cal };
       });
-      for (const ex of groups) {
-        totalVolume += ex.totalVolume;
+      // 如果没有已存储的 calories, 从各组的 calories 求和
+      if (!totalCalories) {
+        totalCalories = groups.reduce((sum, g) => sum + g.totalCalories, 0);
       }
 
       this.setData({
@@ -110,7 +112,7 @@ Component({
         _stats: {
           exerciseCount: groups.length,
           durationStr,
-          totalVolume: Math.round(totalVolume),
+          totalCalories,
         },
       });
     },
@@ -126,8 +128,8 @@ Component({
       const {_stats} = this.data;
       return {
         title: app.globalData.language === 'zh'
-          ? `刚完成了 ${_stats.exerciseCount} 个动作，训练 ${_stats.durationStr}，总量 ${_stats.totalVolume} kg 💪`
-          : `Just finished ${_stats.exerciseCount} exercises, ${_stats.durationStr} workout, ${_stats.totalVolume} kg 💪`,
+          ? `刚完成了 ${_stats.exerciseCount} 个动作，训练 ${_stats.durationStr}，消耗 ${_stats.totalCalories} 大卡 💪`
+          : `Just finished ${_stats.exerciseCount} exercises, ${_stats.durationStr} workout, ${_stats.totalCalories} kcal 💪`,
         path: '/pages/index/index',
       };
     },

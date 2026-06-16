@@ -36,6 +36,18 @@
         <input class="name-input" type="text" placeholder="{{namePlaceholder}}" value="{{name}}" bindinput="onNameInput" />
       </view>
 
+      <!-- Height & Weight -->
+      <view class="form-row">
+        <view class="form-item form-item-half">
+          <text class="field-label">{{currentLang === 'zh' ? '身高' : 'Height'}} (cm)</text>
+          <input class="name-input" type="digit" value="{{height}}" bindinput="onHeightInput" placeholder="170" />
+        </view>
+        <view class="form-item form-item-half">
+          <text class="field-label">{{currentLang === 'zh' ? '体重' : 'Weight'}} (kg)</text>
+          <input class="name-input" type="digit" value="{{weight}}" bindinput="onWeightInput" placeholder="60" />
+        </view>
+      </view>
+
       <!-- Gender Selection -->
       <view class="form-item">
         <text class="field-label">{{genderLabel}}</text>

@@ -1,6 +1,6 @@
 // components/session-detail-modal/index.js
 const app = getApp();
-const { setVolume } = require('../../utils/unit.js');
+const { setVolume, volumeToCalories } = require('../../utils/unit.js');
 
 Component({
   properties: {
@@ -28,6 +28,7 @@ Component({
     loading: false,
     _durationDisplay: '--:--',
     _dateDisplay: '',
+    _calories: 0,
     totalSets: 0,
     t: app.globalData.t,  // 注入 i18n 字典
   },
@@ -48,6 +49,7 @@ Component({
         if (session.exercises) {
           this.setData({ exerciseList: session.exercises });
         }
+        this.setData({ _calories: session.calories || 0 });
         this._computeDate(session);
         this._computeDuration(session);
       }
@@ -100,7 +102,7 @@ Component({
               image_name: ex.image_name,
               exercise_id: ex.exercise_id,
               sets: [],
-              totalVolume: 0,
+              totalCalories: 0,
             };
           }
           if (ex.weight > 0 || ex.reps > 0) {
@@ -110,10 +112,14 @@ Component({
               reps: ex.reps,
               weight_unit: ex.weight_unit || 'kg',
             });
-            map[ex.exercise_id].totalVolume += setVolume(ex);
+            map[ex.exercise_id].totalCalories += setVolume(ex);
           }
         }
-        this.setData({ exerciseList: Object.values(map) });
+        const list = Object.values(map).map(g => ({
+          ...g,
+          totalCalories: volumeToCalories(Math.round(g.totalCalories)),
+        }));
+        this.setData({ exerciseList: list });
       }
     },
 

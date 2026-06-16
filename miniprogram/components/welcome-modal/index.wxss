@@ -81,6 +81,15 @@
   width: 100%;
 }
 
+.form-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.form-item-half {
+  flex: 1;
+}
+
 /* Name Input */
 .name-input {
   width: 100%;

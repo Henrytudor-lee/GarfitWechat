@@ -1,6 +1,6 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
-const { setVolume } = require('../../utils/unit.js');
+const { setVolume, volumeToCalories, formatCalories } = require('../../utils/unit.js');
 
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const MONTH_NAMES_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -12,6 +12,7 @@ Page({
     runningSession: null,
     elapsedTime: '00:00:00',
     totalVolume: 0,
+    totalCaloriesStr: '0',
     exerciseCount: 0,
     restTime: '--:--',
     exerciseGroups: [],
@@ -52,13 +53,13 @@ Page({
     todayMonth: '',
     todayProgress: 0,
     todayVolume: 0,
-    todayVolumeStr: '0',
+    todayCaloriesStr: '0',
     yesterdayDay: '',
     yesterdayMonth: '',
     yesterdayProgress: 0,
     yesterdayVolume: 0,
-    yesterdayVolumeStr: '0',
-    monthlyVolumeStr: '0 KG',
+    yesterdayCaloriesStr: '0',
+    monthlyCaloriesStr: '0',
 
     // Modal state
     showEditModal: false,
@@ -210,14 +211,18 @@ Page({
     // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume, todayVolume, yesterdayVolume)
     if (monthRes.result && monthRes.result.success) {
       const stats = monthRes.result;
+      // Convert volumes to calories for display
+      const todayVol = stats.todayVolume || 0;
+      const yesterdayVol = stats.yesterdayVolume || 0;
+      const monthlyKg = stats.totalKg || 0;
       this.setData({
         todayProgress: stats.todayProgress || 0,
         yesterdayProgress: stats.yesterdayProgress || 0,
-        monthlyVolumeStr: stats.monthlyVolumeStr || '0 KG',
-        todayVolume: stats.todayVolume || 0,
-        yesterdayVolume: stats.yesterdayVolume || 0,
-        todayVolumeStr: stats.todayVolumeStr || '0',
-        yesterdayVolumeStr: stats.yesterdayVolumeStr || '0',
+        todayCaloriesStr: formatCalories(volumeToCalories(todayVol)),
+        yesterdayCaloriesStr: formatCalories(volumeToCalories(yesterdayVol)),
+        monthlyCaloriesStr: formatCalories(volumeToCalories(monthlyKg)),
+        todayVolume: todayVol,
+        yesterdayVolume: yesterdayVol,
       });
     }
 
@@ -250,13 +255,16 @@ Page({
       const groups = Object.values(map).map(g => ({
         ...g,
         totalVolume: Math.round(g.totalVolume),
+        totalCalories: volumeToCalories(Math.round(g.totalVolume)),
       }));
       // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
       const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
+      const totalCal = volumeToCalories(volume);
       this.setData({
         exerciseGroups: groups,
         exerciseCount: groups.length,
         totalVolume: volume,
+        totalCaloriesStr: formatCalories(totalCal),
       });
     }
   },
@@ -548,7 +556,7 @@ Page({
     const session = await app.ensureRunningSession();
     if (!session) return;
     const sessionId = session._id || session.id;
-    this.setData({ runningSession: session, currentSessionId: sessionId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
+    this.setData({ runningSession: session, currentSessionId: sessionId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, totalCaloriesStr: '0' });
     this._startTimer(session.start_time || new Date().toISOString());
     this._startRestTimer();
   },
@@ -563,7 +571,7 @@ Page({
     if (gId === lId) return;
 
     if (g) {
-      this.setData({ runningSession: g, currentSessionId: gId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0 });
+      this.setData({ runningSession: g, currentSessionId: gId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, totalCaloriesStr: '0' });
       if (g.start_time) this._startTimer(g.start_time);
       this._startRestTimer();
       this._loadExerciseGroups(gId);
@@ -610,12 +618,14 @@ Page({
           totalVolume,
           exerciseCount,
           exercises: this.data.exerciseGroups,
+          calories: r.result.calories || 0,
         },
         workoutSummaryExercises: this.data.exerciseGroups,
         runningSession: null,
         currentSessionId: null,
         exerciseGroups: [],
         exerciseCount: 0,
+        totalCaloriesStr: '0',
         totalVolume: 0,
         elapsedTime: '00:00:00',
         restTime: '--:--',

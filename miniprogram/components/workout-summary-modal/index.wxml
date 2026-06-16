@@ -32,8 +32,8 @@
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
-        <view class="stat-val">{{_stats.totalVolume}} kg</view>
-        <view class="stat-lbl">{{t.VOLUME}}</view>
+        <view class="stat-val">{{_stats.totalCalories}} <text class="stat-unit">{{t.CAL_UNIT_SHORT}}</text></view>
+        <view class="stat-lbl">{{t.CAL_UNIT}}</view>
       </view>
     </view>
 
@@ -58,8 +58,8 @@
               <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
             </view>
             <view class="item-vol">
-              <text class="vol-num">{{item.totalVolume}}</text>
-              <text class="vol-unit">kg</text>
+              <text class="vol-num">{{item.totalCalories}}</text>
+              <text class="vol-unit">{{t.CAL_UNIT_SHORT}}</text>
             </view>
           </view>
           <!-- Sets grid: 2 columns -->

@@ -22,6 +22,8 @@ Component({
     birthday: '',
     gender: '',  // '' | 'male' | 'female'
     purpose: 0,  // 0 | 1 | 2 | 3
+    height: 170,
+    weight: 60,
 
     // 翻译文本
     welcomeText: '欢迎来到 G-FIT',
@@ -102,6 +104,8 @@ Component({
         birthday: '',
         gender: '',
         purpose: 0,
+        height: 170,
+        weight: 60,
       });
     },
 
@@ -118,6 +122,14 @@ Component({
     // 名称输入
     onNameInput(e) {
       this.setData({ name: e.detail.value });
+    },
+
+    onHeightInput(e) {
+      this.setData({ height: Number(e.detail.value) || 0 });
+    },
+
+    onWeightInput(e) {
+      this.setData({ weight: Number(e.detail.value) || 0 });
     },
 
     // 选择头像
@@ -185,6 +197,8 @@ Component({
       if (gender) payload.gender = gender;
       if (this.data.avatarPath) payload.avatar = this.data.avatarPath;
       if (purpose >= 1 && purpose <= 3) payload.purpose = purpose;
+      if (this.data.height) payload.height = this.data.height;
+      if (this.data.weight) payload.weight = this.data.weight;
 
       wx.cloud.callFunction({
         name: 'api',

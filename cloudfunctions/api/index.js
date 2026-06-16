@@ -188,10 +188,21 @@ exports.main = async (event, context) => {
           [id, openid]);
         if (sessions.length === 0) return { success: false, error: '会话不存在' };
 
+        // 计算卡路里: 总训练量(kg) × 用户体重(kg) × 0.0011
+        const [[volRow]] = await query(
+          'SELECT COALESCE(SUM(' + WEIGHT_KG_SQL + ' * e.reps), 0) AS total_volume FROM exercises e WHERE e.session_id = ?',
+          [id]);
+        const totalVolume = Number(volRow ? volRow.total_volume : 0);
+
+        const [[userRow]] = await query(
+          'SELECT weight FROM users WHERE _openid = ? LIMIT 1', [openid]);
+        const userWeight = userRow ? (userRow.weight || 60) : 60;
+        const calories = Math.round(totalVolume * userWeight * 0.0011);
+
         await query(
-          "UPDATE sessions SET status = 'finished', end_time = NOW(), duration = TIMESTAMPDIFF(SECOND, start_time, NOW()) WHERE id = ? AND _openid = ?",
-          [id, openid]);
-        return { success: true };
+          "UPDATE sessions SET status = 'finished', end_time = NOW(), duration = TIMESTAMPDIFF(SECOND, start_time, NOW()), calories = ? WHERE id = ? AND _openid = ?",
+          [calories, id, openid]);
+        return { success: true, calories };
 
       } else if (sub === 'monthlyStats') {
         // Bento 用的月度统计
@@ -285,7 +296,7 @@ exports.main = async (event, context) => {
 
       if (sub === 'get') {
         const [[user]] = await query(
-          'SELECT name, avatar, phone, created_at FROM users WHERE _openid = ? LIMIT 1',
+          'SELECT name, avatar, phone, created_at, height, weight FROM users WHERE _openid = ? LIMIT 1',
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
         return {
@@ -295,6 +306,8 @@ exports.main = async (event, context) => {
             avatar: user.avatar,
             phone: user.phone,
             created_at: user.created_at,
+            height: user.height || 170,
+            weight: user.weight || 60,
           },
         };
 
@@ -359,7 +372,7 @@ exports.main = async (event, context) => {
           [openid]);
         if (!user) return { success: false, error: '用户不存在' };
 
-        const { name, birthday, gender, purpose, avatar } = event;
+        const { name, birthday, gender, purpose, avatar, height, weight } = event;
         const fields = [];
         const vals = [];
 
@@ -380,6 +393,14 @@ exports.main = async (event, context) => {
           if (p < 1 || p > 3) return { success: false, error: 'purpose 必须是 1(塑形)/2(减肥)/3(养生)' };
           fields.push('purpose = ?');
           vals.push(p);
+        }
+        if (height !== undefined && height !== '') {
+          fields.push('height = ?');
+          vals.push(Number(height));
+        }
+        if (weight !== undefined && weight !== '') {
+          fields.push('weight = ?');
+          vals.push(Number(weight));
         }
         if (avatar !== undefined && avatar !== '') {
           fields.push('avatar = ?');
@@ -786,6 +807,17 @@ exports.main = async (event, context) => {
           return String(d).slice(0, 10);
         });
         return { success: true, dates };
+
+      } else if (sub === 'leaderboard') {
+        const [rows] = await query(
+          `SELECT u.name, u.avatar, SUM(s.calories) as total_calories
+           FROM sessions s
+           JOIN users u ON s._openid = u._openid
+           WHERE s.status = 'finished' AND s.calories > 0
+           GROUP BY s._openid, u.name, u.avatar
+           ORDER BY total_calories DESC
+           LIMIT 5`);
+        return { success: true, leaderboard: rows || [] };
 
       } else {
         return { success: false, error: '未知 action' };

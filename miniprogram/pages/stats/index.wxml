@@ -29,8 +29,32 @@
     </view>
     <view class="stat-card">
       <image class="stat-card-icon" src="{{imgPrefix}}/icons/icon-dumbbell.png" mode="aspectFit" />
-      <view class="stat-card-value stat-card-value-small">{{totalVolumeDisplay}} <text class="unit">kg</text></view>
-      <view class="stat-card-label">{{t.TOTAL_VOLUME}}</view>
+      <view class="stat-card-value stat-card-value-small">{{totalVolumeDisplay}} <text class="unit">{{t.CAL_UNIT_SHORT}}</text></view>
+      <view class="stat-card-label">{{t.CAL_UNIT}}</view>
+    </view>
+  </view>
+
+  <!-- Calorie Leaderboard -->
+  <view wx:if="{{leaderboard.length > 0}}" class="glass-card chart-card">
+    <view class="section-title">{{t.CALORIE_LEADERBOARD}}</view>
+    <view class="lb-header">
+      <text class="lb-header-rank">{{t.RANK}}</text>
+      <text class="lb-header-name"></text>
+      <text class="lb-header-cal">{{t.CAL_UNIT_SHORT}}</text>
+    </view>
+    <view class="lb-rows">
+      <view class="lb-row" wx:for="{{leaderboard}}" wx:key="rank">
+        <view class="lb-rank {{item.rank === 1 ? 'gold' : item.rank === 2 ? 'silver' : item.rank === 3 ? 'bronze' : ''}}">{{item.rank}}</view>
+        <image wx:if="{{item.avatar}}" class="lb-avatar" src="{{item.avatar}}" mode="aspectFill" />
+        <view wx:else class="lb-avatar lb-avatar-placeholder">👤</view>
+        <view class="lb-info">
+          <text class="lb-name">{{item.name}}</text>
+          <view class="lb-track">
+            <view class="lb-fill" style="width: {{item.percent}}%"></view>
+          </view>
+        </view>
+        <text class="lb-cal">{{item.caloriesDisplay}}</text>
+      </view>
     </view>
   </view>
 
@@ -41,7 +65,7 @@
     <view class="bar-header">
       <text class="bar-header-label"></text>
       <view class="bar-header-track"></view>
-      <text class="bar-header-unit">kg</text>
+      <text class="bar-header-unit">{{t.CAL_UNIT_SHORT}}</text>
     </view>
     <view class="bar-rows">
       <view class="bar-row" wx:for="{{weeklyVolume}}" wx:key="yrweek">
@@ -63,7 +87,7 @@
         <view class="muscle-legend-item" wx:for="{{muscleDistribution}}" wx:key="name">
           <view class="muscle-dot" style="background: {{item.color}}"></view>
           <text class="muscle-legend-name">{{item.name}}</text>
-          <text class="muscle-legend-val">{{item.valueDisplay}} <text class="unit">kg</text></text>
+          <text class="muscle-legend-val">{{item.valueDisplay}} <text class="unit">{{t.CAL_UNIT_SHORT}}</text></text>
         </view>
       </view>
     </view>

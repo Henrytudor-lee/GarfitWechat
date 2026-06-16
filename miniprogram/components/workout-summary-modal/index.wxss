@@ -179,6 +179,12 @@
   font-size: 28rpx;
 }
 
+.stat-unit {
+  font-size: 22rpx;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
 .stat-lbl {
   font-size: 16rpx;
   font-weight: 800;

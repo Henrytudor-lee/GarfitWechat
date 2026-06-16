@@ -17,6 +17,35 @@ function toKg(weight, unit) {
   return w;
 }
 
+/**
+ * 训练量(kg) 换算为估算卡路里(大卡)
+ * 公式: volume_kg × user_weight_kg × 0.0011
+ * @param {number} volumeKg 训练量(kg)
+ * @param {number} [userWeightKg] 用户体重(kg)，不传则从 globalData 或 storage 读取
+ * @returns {number} 估算卡路里，取整
+ */
+function volumeToCalories(volumeKg, userWeightKg) {
+  if (!userWeightKg) {
+    const app = getApp();
+    userWeightKg = (app && app.globalData && app.globalData.userWeight) || 60;
+    if (!userWeightKg) {
+      const stored = wx.getStorageSync('userWeight');
+      userWeightKg = stored || 60;
+    }
+  }
+  return Math.round(volumeKg * userWeightKg * 0.0011);
+}
+
+/**
+ * 格式化卡路里显示
+ * @param {number} kcal
+ * @returns {string}
+ */
+function formatCalories(kcal) {
+  if (kcal >= 1000) return (kcal / 1000).toFixed(1) + 'K';
+  return String(kcal);
+}
+
 module.exports = {
   KG_PER_LB,
   toKg,
@@ -30,4 +59,6 @@ module.exports = {
     const reps = Number(set.reps) || 0;
     return toKg(set.weight, set.weight_unit) * reps;
   },
+  volumeToCalories,
+  formatCalories,
 };

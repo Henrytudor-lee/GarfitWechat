@@ -30,6 +30,11 @@
           <view class="stat-label">{{t.SETS}}</view>
           <view class="stat-accent-bar"></view>
         </view>
+        <view class="stat-card">
+          <view class="stat-val">{{_calories}}</view>
+          <view class="stat-label">{{t.CAL_UNIT}}</view>
+          <view class="stat-accent-bar"></view>
+        </view>
       </view>
     </view>
 
@@ -52,8 +57,8 @@
                 <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
               </view>
               <view class="ec-volume">
-                <view class="ec-vol-num">{{item.totalVolume || '—'}} kg</view>
-                <view class="ec-vol-label">{{t.TOTAL_VOLUME}}</view>
+                <view class="ec-vol-num">{{item.totalCalories || '—'}} {{t.CAL_UNIT_SHORT}}</view>
+                <view class="ec-vol-label">{{t.CAL_UNIT}}</view>
               </view>
             </view>
             <!-- ec-sets-grid: 2 columns -->

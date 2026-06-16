@@ -36,6 +36,9 @@ Page({
     orbSession: null,
     showEditNameModal: false,
     editNameValue: '',
+    showEditBodyModal: false,
+    editHeight: 170,
+    editWeight: 60,
   },
 
   onLoad() {
@@ -87,7 +90,19 @@ Page({
       wx.setStorageSync('userName', profileData.name);
       wx.setStorageSync('avatarUrl', profileData.avatar);
       app.globalData.userInfo = { nickname: profileData.name, avatarUrl: profileData.avatar };
-      this.setData({ userInfo: { nickname: profileData.name, avatarUrl: profileData.avatar } });
+      const height = profileData.height || 170;
+      const weight = profileData.weight || 60;
+      app.globalData.userWeight = weight;
+      app.globalData.userHeight = height;
+      wx.setStorageSync('userWeight', weight);
+      wx.setStorageSync('userHeight', height);
+      this.setData({
+        userInfo: { nickname: profileData.name, avatarUrl: profileData.avatar },
+        editHeight: height,
+        editWeight: weight,
+        bodyHeight: height,
+        bodyWeight: weight,
+      });
     }
 
     const streak = (streakRes.result && streakRes.result.streak) || 0;
@@ -171,6 +186,11 @@ Page({
     this.setData({ editNameValue: e.detail.value });
   },
 
+  onNameMaskTap(e) {
+    if (e.target !== e.currentTarget) return;
+    this.setData({ showEditNameModal: false, editNameValue: '' });
+  },
+
   cancelEditName() {
     this.setData({ showEditNameModal: false, editNameValue: '' });
   },
@@ -228,6 +248,62 @@ Page({
     const next = app.getTheme();
     this.setData({ theme: next });
     wx.showToast({ title: next === 'day' ? 'Theme: Day' : 'Theme: Night', icon: 'none' });
+  },
+
+  // ---- Personal Info (body data) ----
+  onPersonalInfoTap() {
+    this.setData({
+      showEditBodyModal: true,
+      editHeight: this.data.bodyHeight || 170,
+      editWeight: this.data.bodyWeight || 60,
+    });
+  },
+
+  onHeightInput(e) {
+    this.setData({ editHeight: Number(e.detail.value) || 0 });
+  },
+
+  onWeightInput(e) {
+    this.setData({ editWeight: Number(e.detail.value) || 0 });
+  },
+
+  onBodyMaskTap(e) {
+    if (e.target !== e.currentTarget) return;
+    this.setData({ showEditBodyModal: false });
+  },
+
+  cancelEditBody() {
+    this.setData({ showEditBodyModal: false });
+  },
+
+  confirmEditBody() {
+    const height = this.data.editHeight;
+    const weight = this.data.editWeight;
+    if (height < 50 || height > 250 || weight < 20 || weight > 300) {
+      wx.showToast({ title: this.data.locale === 'en' ? 'Invalid values' : '数值不合法', icon: 'none' });
+      return;
+    }
+    wx.cloud.callFunction({
+      name: 'api',
+      data: { action: 'profile.updateFull', openid: app.globalData.openid, height, weight },
+      success: (res) => {
+        if (res.result && res.result.success) {
+          app.globalData.userWeight = weight;
+          app.globalData.userHeight = height;
+          wx.setStorageSync('userWeight', weight);
+          wx.setStorageSync('userHeight', height);
+          this.setData({
+            bodyHeight: height,
+            bodyWeight: weight,
+            showEditBodyModal: false,
+          });
+          wx.showToast({ title: this.data.locale === 'en' ? 'Updated' : '已更新', icon: 'success' });
+        }
+      },
+      fail: () => {
+        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
+      },
+    });
   },
 
   onHelpTap() {
