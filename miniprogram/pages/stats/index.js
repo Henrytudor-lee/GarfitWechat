@@ -40,6 +40,9 @@ Page({
     mostTrained: [],
     // Weight records for selected exercise
     weightRecords: [],
+    // Chart images (canvas → image to avoid native layer overlap)
+    muscleChartImage: '',
+    weightChartImage: '',
     // Leaderboard
     leaderboard: [],
     // UI state
@@ -272,11 +275,19 @@ Page({
         const canvas = res.node;
         const ctx = canvas.getContext('2d');
         const dpr = wx.getWindowInfo().pixelRatio || wx.getSystemInfoSync().pixelRatio;
-        const size = 200;
-        canvas.width = size * dpr;
-        canvas.height = size * dpr;
+        const w = 320;
+        const h = 200;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
         ctx.scale(dpr, dpr);
-        page._drawCurveChart(ctx, chartData, size, size, theme);
+        page._drawCurveChart(ctx, chartData, w, h, theme);
+        // Convert canvas to image so it stays in WebView layer
+        wx.canvasToTempFilePath({
+          canvas,
+          success: (imgRes) => {
+            page.setData({ weightChartImage: imgRes.tempFilePath });
+          },
+        });
       }).exec();
     };
     drawChart();
@@ -288,7 +299,7 @@ Page({
     if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) return;
 
     const isDay = theme === 'day';
-    const pad = { t: 12, r: 4, b: 28, l: 20 };
+    const pad = { t: 12, r: 12, b: 28, l: 28 };
     const W = width - pad.l - pad.r;
     const H = height - pad.t - pad.b;
     if (W <= 0 || H <= 0) return;
@@ -403,6 +414,13 @@ Page({
         canvas.height = size * dpr;
         ctx.scale(dpr, dpr);
         page._drawPieChart(ctx, muscleDistribution, size, size);
+        // Convert canvas to image so it stays in WebView layer
+        wx.canvasToTempFilePath({
+          canvas,
+          success: (imgRes) => {
+            page.setData({ muscleChartImage: imgRes.tempFilePath });
+          },
+        });
       }).exec();
     };
     drawChart();

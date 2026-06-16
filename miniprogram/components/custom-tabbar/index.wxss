@@ -1,6 +1,5 @@
-/* components/custom-tabbar/index.wxss — cover-view tabbar */
+/* components/custom-tabbar/index.wxss — garcia-fitness-new bottom nav */
 
-/* Wrap */
 .tabbar-wrap {
   position: fixed;
   bottom: 0;
@@ -58,11 +57,11 @@
 .tab-icon-img {
   width: 44rpx;
   height: 44rpx;
-  margin-bottom: 6rpx;
 }
 
 .tab-label {
   font-size: 18rpx;
   font-weight: 700;
+  margin-top: 6rpx;
   line-height: 1;
 }

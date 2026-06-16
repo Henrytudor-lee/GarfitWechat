@@ -82,7 +82,8 @@
   <view wx:if="{{muscleDistribution.length > 0}}" class="glass-card chart-card">
     <view class="section-title">{{t.MUSCLE_DISTRIBUTION}}</view>
     <view class="muscle-chart-wrap">
-      <canvas id="muscleChart" type="2d" class="pie-chart-canvas" />
+      <image wx:if="{{muscleChartImage}}" src="{{muscleChartImage}}" class="pie-chart-canvas" mode="aspectFit" />
+      <canvas wx:else id="muscleChart" type="2d" class="pie-chart-canvas" />
       <view class="muscle-legend">
         <view class="muscle-legend-item" wx:for="{{muscleDistribution}}" wx:key="name">
           <view class="muscle-dot" style="background: {{item.color}}"></view>
@@ -149,7 +150,8 @@
   <view wx:if="{{weightRecords.length > 0}}" class="glass-card chart-card">
     <view class="section-title">{{t.WEIGHT_PROGRESS}}</view>
     <view class="section-subtitle">{{weightRecords.length}} {{t.RECORDS}}</view>
-    <canvas id="weightChart" type="2d" class="weight-chart-canvas" />
+    <image wx:if="{{weightChartImage}}" src="{{weightChartImage}}" class="weight-chart-canvas" mode="aspectFit" />
+    <canvas wx:else id="weightChart" type="2d" class="weight-chart-canvas" />
   </view>
 
   <!-- Loading -->
