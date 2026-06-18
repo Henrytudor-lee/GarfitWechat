@@ -809,15 +809,43 @@ exports.main = async (event, context) => {
         return { success: true, dates };
 
       } else if (sub === 'leaderboard') {
-        const [rows] = await query(
-          `SELECT u.name, u.avatar, SUM(s.calories) as total_calories
-           FROM sessions s
-           JOIN users u ON s._openid = u._openid
-           WHERE s.status = 'finished' AND s.calories > 0
-           GROUP BY s._openid, u.name, u.avatar
-           ORDER BY total_calories DESC
-           LIMIT 5`);
-        return { success: true, leaderboard: rows || [] };
+        const type = event.type || 'calories'; // 'calories' | 'volume'
+        const period = event.period || 'year'; // 'year' | 'month' | 'day'
+
+        // Build date filter
+        let dateFilter = '';
+        if (period === 'year') {
+          dateFilter = 'AND YEAR(s.start_time) = YEAR(CURDATE())';
+        } else if (period === 'month') {
+          dateFilter = 'AND YEAR(s.start_time) = YEAR(CURDATE()) AND MONTH(s.start_time) = MONTH(CURDATE())';
+        } else if (period === 'day') {
+          dateFilter = 'AND DATE(s.start_time) = CURDATE()';
+        }
+
+        let sql, metricAlias;
+        if (type === 'volume') {
+          sql = `SELECT u.name, u.avatar, COALESCE(SUM(${WEIGHT_KG_SQL} * e.reps), 0) as total_metric
+                 FROM exercises e
+                 JOIN sessions s ON e.session_id = s.id
+                 JOIN users u ON s._openid = u._openid
+                 WHERE s.status = 'finished' ${dateFilter}
+                 GROUP BY s._openid, u.name, u.avatar
+                 ORDER BY total_metric DESC
+                 LIMIT 5`;
+          metricAlias = 'total_metric';
+        } else {
+          sql = `SELECT u.name, u.avatar, SUM(s.calories) as total_metric
+                 FROM sessions s
+                 JOIN users u ON s._openid = u._openid
+                 WHERE s.status = 'finished' AND s.calories > 0 ${dateFilter}
+                 GROUP BY s._openid, u.name, u.avatar
+                 ORDER BY total_metric DESC
+                 LIMIT 5`;
+          metricAlias = 'total_metric';
+        }
+
+        const [rows] = await query(sql);
+        return { success: true, leaderboard: rows || [], type, period };
 
       } else {
         return { success: false, error: '未知 action' };

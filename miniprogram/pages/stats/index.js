@@ -1,6 +1,6 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
-const { setVolume, volumeToCalories, formatCalories } = require('../../utils/unit.js');
+const { setVolume, volumeToCalories, formatCalories, formatLargeNum } = require('../../utils/unit.js');
 
 // Compute ISO yrweek key e.g. 202621 for 2026-W21
 function toYrweek(date) {
@@ -45,6 +45,8 @@ Page({
     weightChartImage: '',
     // Leaderboard
     leaderboard: [],
+    lbType: 'calories',  // 'calories' | 'volume'
+    lbPeriod: 'year',    // 'year' | 'month' | 'day'
     // UI state
     loading: false,
     hasData: false,
@@ -78,27 +80,15 @@ Page({
     wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
-    const [statsRes, lbRes] = await Promise.all([
+    const [statsRes] = await Promise.all([
       wx.cloud.callFunction({ name: 'api', data: { action: 'stats.summary', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'api', data: { action: 'stats.leaderboard', openid: app.globalData.openid } }),
     ]);
 
     wx.hideLoading();
     this.setData({ loading: false });
 
-    // Leaderboard
-    if (lbRes.result && lbRes.result.success && lbRes.result.leaderboard) {
-      const maxCal = Math.max(...lbRes.result.leaderboard.map(u => u.total_calories || 0), 1);
-      const leaderboard = lbRes.result.leaderboard.map((u, i) => ({
-        rank: i + 1,
-        name: u.name || '—',
-        avatar: u.avatar || '',
-        calories: u.total_calories || 0,
-        caloriesDisplay: formatCalories(u.total_calories || 0),
-        percent: Math.round(((u.total_calories || 0) / maxCal) * 100),
-      }));
-      this.setData({ leaderboard });
-    }
+    // Leaderboard — load with default type/period
+    this._loadLeaderboard();
 
     if (!statsRes.result || !statsRes.result.success) {
       console.error('Stats load failed:', statsRes.result);
@@ -202,6 +192,44 @@ Page({
     if (muscleDistribution.length > 0) {
       setTimeout(() => this._renderMuscleChart(), 300);
     }
+  },
+
+  async _loadLeaderboard() {
+    const { lbType, lbPeriod } = this.data;
+    const res = await wx.cloud.callFunction({
+      name: 'api',
+      data: { action: 'stats.leaderboard', openid: app.globalData.openid, type: lbType, period: lbPeriod },
+    });
+    if (res.result && res.result.success && res.result.leaderboard) {
+      const isVolume = lbType === 'volume';
+      const vals = res.result.leaderboard.map(u => u.total_metric || 0);
+      const maxVal = Math.max(...vals, 1);
+      const leaderboard = res.result.leaderboard.map((u, i) => ({
+        rank: i + 1,
+        name: u.name || '—',
+        avatar: u.avatar || '',
+        value: u.total_metric || 0,
+        valueDisplay: isVolume ? formatLargeNum(u.total_metric || 0) : formatCalories(u.total_metric || 0),
+        percent: Math.round(((u.total_metric || 0) / maxVal) * 100),
+      }));
+      this.setData({ leaderboard });
+    } else {
+      this.setData({ leaderboard: [] });
+    }
+  },
+
+  onLbTypeTap(e) {
+    const type = e.currentTarget.dataset.type;
+    if (type === this.data.lbType) return;
+    this.setData({ lbType: type });
+    this._loadLeaderboard();
+  },
+
+  onLbPeriodTap(e) {
+    const period = e.currentTarget.dataset.period;
+    if (period === this.data.lbPeriod) return;
+    this.setData({ lbPeriod: period });
+    this._loadLeaderboard();
   },
 
   async _loadExerciseData(exerciseId) {

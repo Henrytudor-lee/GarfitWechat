@@ -42,8 +42,20 @@ function volumeToCalories(volumeKg, userWeightKg) {
  * @returns {string}
  */
 function formatCalories(kcal) {
+  if (kcal >= 1000000) return (kcal / 1000000).toFixed(2) + 'M';
   if (kcal >= 1000) return (kcal / 1000).toFixed(1) + 'K';
   return String(kcal);
+}
+
+/**
+ * 格式化大数字显示 (用于排行榜重量等)
+ * @param {number} val
+ * @returns {string}
+ */
+function formatLargeNum(val) {
+  if (val >= 1000000) return (val / 1000000).toFixed(2) + 'M';
+  if (val >= 10000) return (val / 1000).toFixed(1) + 'K';
+  return String(Math.round(val));
 }
 
 module.exports = {
@@ -61,4 +73,5 @@ module.exports = {
   },
   volumeToCalories,
   formatCalories,
+  formatLargeNum,
 };

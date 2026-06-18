@@ -34,28 +34,47 @@
     </view>
   </view>
 
-  <!-- Calorie Leaderboard -->
-  <view wx:if="{{leaderboard.length > 0}}" class="glass-card chart-card">
-    <view class="section-title">{{t.CALORIE_LEADERBOARD}}</view>
-    <view class="lb-header">
-      <text class="lb-header-rank">{{t.RANK}}</text>
-      <text class="lb-header-name"></text>
-      <text class="lb-header-cal">{{t.CAL_UNIT_SHORT}}</text>
-    </view>
-    <view class="lb-rows">
-      <view class="lb-row" wx:for="{{leaderboard}}" wx:key="rank">
-        <view class="lb-rank {{item.rank === 1 ? 'gold' : item.rank === 2 ? 'silver' : item.rank === 3 ? 'bronze' : ''}}">{{item.rank}}</view>
-        <image wx:if="{{item.avatar}}" class="lb-avatar" src="{{item.avatar}}" mode="aspectFill" />
-        <view wx:else class="lb-avatar lb-avatar-placeholder">👤</view>
-        <view class="lb-info">
-          <text class="lb-name">{{item.name}}</text>
-          <view class="lb-track">
-            <view class="lb-fill" style="width: {{item.percent}}%"></view>
-          </view>
+  <!-- Exercise Leaderboard -->
+  <view class="glass-card chart-card lb-card">
+    <view class="lb-badge">{{t.EXERCISE_LEADERBOARD}}</view>
+    <view class="lb-title-row">
+      <view class="lb-toggles">
+        <!-- Type: segmented pill -->
+        <view class="lb-type-toggle">
+          <view class="lb-type-btn {{lbType === 'calories' ? 'active' : ''}}" bindtap="onLbTypeTap" data-type="calories">{{t.LB_CALORIES}}</view>
+          <view class="lb-type-btn {{lbType === 'volume' ? 'active' : ''}}" bindtap="onLbTypeTap" data-type="volume">{{t.LB_VOLUME}}</view>
         </view>
-        <text class="lb-cal">{{item.caloriesDisplay}}</text>
+        <!-- Period: small pills -->
+        <view class="lb-period-toggle">
+          <view class="lb-period-btn {{lbPeriod === 'year' ? 'active' : ''}}" bindtap="onLbPeriodTap" data-period="year">{{t.LB_YEAR}}</view>
+          <view class="lb-period-btn {{lbPeriod === 'month' ? 'active' : ''}}" bindtap="onLbPeriodTap" data-period="month">{{t.LB_MONTH}}</view>
+          <view class="lb-period-btn {{lbPeriod === 'day' ? 'active' : ''}}" bindtap="onLbPeriodTap" data-period="day">{{t.LB_DAY}}</view>
+        </view>
       </view>
     </view>
+
+    <view wx:if="{{leaderboard.length > 0}}" class="lb-body">
+      <view class="lb-header">
+        <text class="lb-header-rank">{{t.RANK}}</text>
+        <text class="lb-header-name"></text>
+        <text class="lb-header-cal">{{lbType === 'volume' ? 'KG' : t.CAL_UNIT_SHORT}}</text>
+      </view>
+      <view class="lb-rows">
+        <view class="lb-row" wx:for="{{leaderboard}}" wx:key="rank">
+          <view class="lb-rank {{item.rank === 1 ? 'gold' : item.rank === 2 ? 'silver' : item.rank === 3 ? 'bronze' : ''}}">{{item.rank}}</view>
+          <image wx:if="{{item.avatar}}" class="lb-avatar" src="{{item.avatar}}" mode="aspectFill" />
+          <view wx:else class="lb-avatar lb-avatar-placeholder">👤</view>
+          <view class="lb-info">
+            <text class="lb-name">{{item.name}}</text>
+            <view class="lb-track">
+              <view class="lb-fill" style="width: {{item.percent}}%"></view>
+            </view>
+          </view>
+          <text class="lb-cal">{{item.valueDisplay}}</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="lb-empty">{{t.NO_TRAINING_DATA_YET}}</view>
   </view>
 
   <!-- Weekly Volume Bar Chart — last 8 weeks -->
