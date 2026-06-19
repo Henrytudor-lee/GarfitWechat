@@ -322,8 +322,8 @@
 
 .lb-badge {
   position: absolute;
-  top: -18rpx;
-  left: -8rpx;
+  top: 24rpx;
+  left: -14rpx;
   background: var(--primary);
   color: #000;
   font-size: 22rpx;
