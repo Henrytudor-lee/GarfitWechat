@@ -4,7 +4,4 @@
     <image class="appbar-logo" src="/images/logo.png" mode="aspectFit" />
     <text class="appbar-title">GFIT</text>
   </view>
-  <view class="appbar-right">
-    <text class="appbar-lang">CN</text>
-  </view>
 </view>
