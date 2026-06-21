@@ -10,9 +10,33 @@ const KG_PER_LB = 0.4536;
 // SQL 片段: lb → kg 换算，保持与前端 toKg() 一致
 const WEIGHT_KG_SQL = `CASE e.weight_unit WHEN 'lb' THEN e.weight * ${KG_PER_LB} ELSE e.weight END`;
 
-// ── Shared pool (singleton) ──────────────────────────────────────────
+// ── Shared pool (singleton) + 时间判断的 idle 过期机制 ─────────────
+//
+// 设计思路：用"上次成功时间 + 阈值"替代 ping 验证
+//   - 短间隔（< 阈值）：信任 pool，跳过 ping（既省 RTT 又避开了半死状态 hang）
+//   - 长间隔（> 阈值）：强制 destroy + 重建，新物理连接一定健康
+//
+// 阈值通过环境变量 MYSQL_POOL_MAX_IDLE_MS 配置（默认 5 分钟）
+// 5 分钟的依据：云函数 NAT 网关通常 30~300s 回收空闲连接，5 分钟留足缓冲
+//
+// ───────────────────────────────────────────────────────────────────
+
 let pool = null;
+let lastUsedAt = 0;
+const POOL_MAX_IDLE_MS = parseInt(process.env.MYSQL_POOL_MAX_IDLE_MS || '300000', 10);
+
 function getPool() {
+  const now = Date.now();
+  // ── 时间判断：超过阈值就强制重建 ──
+  if (pool) {
+    const idle = now - lastUsedAt;
+    if (idle > POOL_MAX_IDLE_MS) {
+      console.log(`[pool] idle ${Math.round(idle/1000)}s > ${POOL_MAX_IDLE_MS/1000}s → destroy and rebuild`);
+      const oldPool = pool;
+      pool = null;
+      oldPool.end().catch(() => {});
+    }
+  }
   if (!pool) {
     pool = mysql.createPool({
       host: process.env.MYSQL_HOST,
@@ -21,7 +45,7 @@ function getPool() {
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
       waitForConnections: true,
-      connectionLimit: 5,
+      connectionLimit: 10,
       queueLimit: 0,
       enableKeepAlive: true,
       keepAliveInitialDelay: 10000,
@@ -31,21 +55,74 @@ function getPool() {
   return pool;
 }
 
-// ── Execute query with one automatic retry on stale connection ──────
+// ── 检查一条错误是否属于"连接已死"类型 ──────────────────────────────
+function isStaleConnError(err) {
+  if (!err) return false;
+  if (err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ETIMEDOUT') {
+    return true;
+  }
+  const msg = err.message || '';
+  return msg.includes('Malformed communication packet')
+      || msg.includes('Connection lost')
+      || msg.includes('Connection is in closed state')
+      || msg.includes('Pool is closed');
+}
+
+// ── 带超时的 Promise.race 包装 ──────────────────────────────────────
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(
+      () => reject(new Error(`${label} timeout after ${ms}ms`)),
+      ms
+    )),
+  ]);
+}
+
+// ── Execute query: 时间判断 + retry，ping 完全去掉 ──────────────────
 async function query(sql, params) {
-  const tryOnce = async () => {
-    const p = getPool();
-    return p.query(sql, params);
+  const tryOnce = async (forceNewPool) => {
+    if (forceNewPool && pool) {
+      console.log('[query] retry: force destroy pool');
+      const oldPool = pool;
+      pool = null;
+      oldPool.end().catch(() => {});
+    }
+
+    let conn = null;
+    try {
+      const p = getPool();
+      // getConnection 加 3s 超时（防 getConnection 阶段 hang）
+      conn = await withTimeout(p.getConnection(), 3000, 'getConnection');
+      // query 加 5s 超时（防 query 阶段 hang）
+      const [rows] = await withTimeout(conn.query(sql, params), 5000, 'query');
+      // ── 关键：成功后才更新 lastUsedAt ──
+      lastUsedAt = Date.now();
+      return [rows];
+    } catch (err) {
+      // 失败：销毁 conn（不 release，避免半死连接污染 pool）
+      if (conn) {
+        try { conn.destroy(); } catch (e) {}
+        conn = null;
+      }
+      throw err;
+    } finally {
+      if (conn) {
+        try { conn.release(); } catch (e) {}
+      }
+    }
   };
+
   try {
-    return await tryOnce();
+    return await tryOnce(false);
   } catch (err) {
-    const isStale = err.code === 'ECONNRESET' || err.code === 'PROTOCOL_CONNECTION_LOST'
-      || err.message && err.message.includes('Malformed communication packet');
-    if (isStale) {
-      // Destroy current pool so next call recreates it
-      if (pool) { pool.end().catch(() => {}); pool = null; }
-      return tryOnce();
+    // 死连接 / 超时 → 强制销毁 pool + retry 1 次
+    const isRetryable = isStaleConnError(err)
+      || (err.message || '').includes('getConnection timeout')
+      || (err.message || '').includes('query timeout');
+    if (isRetryable) {
+      console.log('[query] retry, reason:', err.message);
+      return await tryOnce(true);
     }
     throw err;
   }
