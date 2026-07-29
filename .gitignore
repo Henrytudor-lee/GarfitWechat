@@ -9,3 +9,4 @@ miniprogram/package-lock.json
 scripts/**
 result_backend.json
 result_frontend.json
+# Backend has its own repo at /Volumes/world/program/gfit-backend
