@@ -83,7 +83,7 @@
           <view wx:else class="grid-inner">
             <view wx:for="{{list}}" wx:key="id" class="exercise-card" data-item="{{item}}" bindtap="onExerciseTap">
               <view class="card-img-wrap">
-                <image wx:if="{{item.image_name}}" class="card-img" src="{{imgPrefix}}/{{item.image_name}}" mode="aspectFill" />
+                <image wx:if="{{item.image_name}}" class="card-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
                 <view wx:else class="card-img-placeholder">🏋️</view>
                 <view class="card-gradient"></view>
                 <!-- Top-left: DONE badge if practiced -->
@@ -118,7 +118,7 @@
 
           <!-- Selected Exercise Card -->
           <view class="selected-exercise-card">
-            <image wx:if="{{selectedItem.image_name}}" class="selected-img" src="{{imgPrefix}}/{{selectedItem.image_name}}" mode="aspectFill" />
+            <image wx:if="{{selectedItem.image_name}}" class="selected-img" src="{{imgPrefix}}/exer_images/{{selectedItem.image_name}}" mode="aspectFill" />
             <view wx:else class="selected-img selected-img-placeholder">🏋️</view>
             <view class="selected-info">
               <view class="selected-name">{{locale === 'zh' ? selectedItem.name_zh : selectedItem.name}}</view>
@@ -135,7 +135,7 @@
 
           <!-- Video -->
           <view wx:if="{{selectedItem.video_name}}" class="video-wrap">
-            <video class="step2-video" src="{{vidPrefix}}/{{selectedItem.video_name}}" mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture></video>
+            <video class="step2-video" src="{{vidPrefix}}/exer_videos/{{selectedItem.video_name}}" mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture></video>
           </view>
           <view wx:else class="video-placeholder">
             <view class="video-placeholder-icon">🎬</view>

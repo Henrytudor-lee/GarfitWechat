@@ -105,7 +105,7 @@
         <image
           wx:if="{{item.image_name}}"
           class="card-img"
-          src="{{imgPrefix}}/{{item.image_name}}"
+          src="{{imgPrefix}}/exer_images/{{item.image_name}}"
           mode="aspectFill"
         />
         <view wx:else class="card-img-placeholder">🏋️</view>
@@ -154,7 +154,7 @@
         <video
           wx:if="{{selectedExercise.video_name}}"
           class="sheet-video"
-          src="{{vidPrefix}}/{{selectedExercise.video_name}}"
+          src="{{vidPrefix}}/exer_videos/{{selectedExercise.video_name}}"
           controls
           show-center-play-btn
           enable-play-gesture
@@ -163,7 +163,7 @@
         <image
           wx:elif="{{selectedExercise.image_name}}"
           class="sheet-img"
-          src="{{imgPrefix}}/{{selectedExercise.image_name}}"
+          src="{{imgPrefix}}/exer_images/{{selectedExercise.image_name}}"
           mode="aspectFill"
         />
         <view wx:else class="sheet-img sheet-img-placeholder">

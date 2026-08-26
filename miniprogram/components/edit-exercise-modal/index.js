@@ -1,5 +1,6 @@
 // components/edit-exercise-modal/index.js
 const app = getApp();
+const api = require('../../utils/api.js');
 
 Component({
   properties: {
@@ -93,14 +94,7 @@ Component({
         : [...favorExercises, id];
       app.globalData.favorExercises = newFav;
       // cloud call
-      wx.cloud.callFunction({
-        name: 'api',
-        data: {
-          action: 'exercise.toggleFavorite',
-          exercise_id: id,
-          openid: app.globalData.openid,
-        },
-      });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
     },
 
     closeModal() {
@@ -191,27 +185,15 @@ Component({
           const original = group.sets.find(os => os.id === s.id);
 
           if (original && (original.weight !== s.weight || original.reps !== s.reps || original.weight_unit !== s.weight_unit)) {
-            await wx.cloud.callFunction({
-              name: 'api',
-              data: {
-                action: 'exercise.update',
-                id: s.id,
+            await api.callCloud('exercise.update', { id: s.id,
                 session_id: this.data.sessionId,
-                openid: app.globalData.openid,
                 weight: s.weight,
                 reps: s.reps,
-                weight_unit: s.weight_unit,
-              },
-            });
+                weight_unit: s.weight_unit });
           }
 
           if (!original && s.id > Date.now() - 100000) {
-            await wx.cloud.callFunction({
-              name: 'api',
-              data: {
-                action: 'exercise.add',
-                session_id: this.data.sessionId,
-                openid: app.globalData.openid,
+            await api.callCloud('exercise.add', { session_id: this.data.sessionId,
                 exercise_id: group.exercise_id,
                 name_zh: group.name_zh,
                 name_en: group.name_en || null,
@@ -219,9 +201,7 @@ Component({
                 video_name: group.video_name || null,
                 weight: s.weight,
                 reps: s.reps,
-                weight_unit: s.weight_unit,
-              },
-            });
+                weight_unit: s.weight_unit });
           }
         }
 
@@ -233,15 +213,8 @@ Component({
           return s.id <= Date.now() - 100000;
         });
         for (const s of toDelete) {
-          await wx.cloud.callFunction({
-            name: 'api',
-            data: {
-              action: 'exercise.delete',
-              id: s.id,
-              session_id: this.data.sessionId,
-              openid: app.globalData.openid,
-            },
-          });
+          await api.callCloud('exercise.delete', { id: s.id,
+              session_id: this.data.sessionId });
         }
 
         this.triggerEvent('saved');

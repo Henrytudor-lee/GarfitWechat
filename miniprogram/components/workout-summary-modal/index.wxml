@@ -49,7 +49,7 @@
             <image
               wx:if="{{item.image_name}}"
               class="item-img"
-              src="{{imgPrefix}}/{{item.image_name}}"
+              src="{{imgPrefix}}/exer_images/{{item.image_name}}"
               mode="aspectFill"
             />
             <view wx:else class="item-img item-img-placeholder">🏋️</view>

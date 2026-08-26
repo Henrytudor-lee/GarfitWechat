@@ -145,11 +145,18 @@ Component({
         sourceType: ['album', 'camera'],
         success: (res) => {
           const tempFilePath = res.tempFilePaths[0];
-          wx.cloud.uploadFile({
-            cloudPath: `avatars/${openid}.jpg`,
+          wx.uploadFile({
+            url: `${api.BASE_URL}/upload`,
             filePath: tempFilePath,
+            name: 'file',
+            formData: { prefix: 'avatars' },
             success: (uploadRes) => {
-              this.setData({ avatarPath: uploadRes.fileID });
+              try {
+                const data = JSON.parse(uploadRes.data);
+                this.setData({ avatarPath: data.url || uploadRes.data });
+              } catch (e) {
+                this.setData({ avatarPath: uploadRes.data });
+              }
             },
             fail: (err) => {
               console.error('uploadFile failed', err);
@@ -200,22 +207,17 @@ Component({
       if (this.data.height) payload.height = this.data.height;
       if (this.data.weight) payload.weight = this.data.weight;
 
-      wx.cloud.callFunction({
-        name: 'api',
-        data: payload,
-        success: (res) => {
-          if (res.result && res.result.success) {
-            wx.showToast({
-              title: this.data.confirmText + ' ✓',
-              icon: 'success',
-            });
-            this.closeModal();
-          }
-        },
-        fail: (err) => {
-          wx.showToast({ title: 'Error', icon: 'none' });
-          console.error('profile.updateFull failed', err);
-        },
+      api.callCloud(payload.action, payload).then((res) => {
+        if (res.result && res.result.success) {
+          wx.showToast({
+            title: this.data.confirmText + ' ✓',
+            icon: 'success',
+          });
+          this.closeModal();
+        }
+      }).catch((err) => {
+        wx.showToast({ title: 'Error', icon: 'none' });
+        console.error('profile.updateFull failed', err);
       });
     },
   },

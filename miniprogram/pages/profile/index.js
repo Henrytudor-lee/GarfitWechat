@@ -1,5 +1,7 @@
 // pages/profile/index.js — garcia-fitness-new style
+const { normalizeAvatar } = require('../../utils/avatar.js');
 const app = getApp();
+const api = require('../../utils/api.js');
 
 // Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
 function getFlameColor(streak) {
@@ -78,9 +80,9 @@ Page({
     this.setData({ isLoggedIn: true, locale, theme, userInfo });
 
     const [profileRes, streakRes, levelRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.get', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getStreak', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'api', data: { action: 'profile.getLevel', openid: app.globalData.openid } }),
+      api.callCloud('profile.get'),
+      api.callCloud('profile.getStreak'),
+      api.callCloud('profile.getLevel'),
     ]);
 
     wx.hideLoading();
@@ -88,8 +90,8 @@ Page({
     const profileData = profileRes.result && profileRes.result.profile;
     if (profileData) {
       wx.setStorageSync('userName', profileData.name);
-      wx.setStorageSync('avatarUrl', profileData.avatar);
-      app.globalData.userInfo = { nickname: profileData.name, avatarUrl: profileData.avatar };
+      wx.setStorageSync('avatarUrl', normalizeAvatar(profileData.avatar, app.globalData.imagePrefix));
+      app.globalData.userInfo = { nickname: profileData.name, avatarUrl: normalizeAvatar(profileData.avatar, app.globalData.imagePrefix) };
       const height = profileData.height || 170;
       const weight = profileData.weight || 60;
       app.globalData.userWeight = weight;
@@ -97,7 +99,7 @@ Page({
       wx.setStorageSync('userWeight', weight);
       wx.setStorageSync('userHeight', height);
       this.setData({
-        userInfo: { nickname: profileData.name, avatarUrl: profileData.avatar },
+        userInfo: { nickname: profileData.name, avatarUrl: normalizeAvatar(profileData.avatar, app.globalData.imagePrefix) },
         editHeight: height,
         editWeight: weight,
         bodyHeight: height,
@@ -146,16 +148,23 @@ Page({
         // Sync to cloud
         const userId = wx.getStorageSync('userId');
         if (userId) {
-          wx.cloud.uploadFile({
-            cloudPath: `avatars/${userId}_${Date.now()}.jpg`,
+          wx.uploadFile({
+            url: `${api.BASE_URL}/upload`,
             filePath: tempFilePath,
+            name: 'file',
+            formData: { prefix: 'avatars' },
             success: (uploadRes) => {
-              const avatarUrl = uploadRes.fileID;
-              wx.cloud.callFunction({
-                name: 'api',
-                data: { action: 'profile.updateAvatar', openid: app.globalData.openid, avatarUrl },
-              });
+              let avatarUrl = uploadRes.data;
+              try {
+                const data = JSON.parse(uploadRes.data);
+                avatarUrl = data.url || uploadRes.data;
+              } catch (e) {}
+              api.callCloud('profile.updateAvatar', { avatarUrl });
               wx.setStorageSync('avatarUrl', avatarUrl);
+            },
+            fail: (err) => {
+              console.error('upload avatar failed', err);
+              wx.showToast({ title: 'upload failed', icon: 'none' });
             },
           });
         }
@@ -205,9 +214,7 @@ Page({
       });
       return;
     }
-    wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'profile.update', openid: app.globalData.openid, name },
+    api.callCloud('profile.update', { name },
       success: (res) => {
         if (res.result && res.result.success === true) {
           const userInfo = { ...this.data.userInfo, nickname: name };
@@ -228,9 +235,7 @@ Page({
         wx.showToast({
           title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
           icon: 'none',
-        });
-      },
-    });
+        }); });
   },
 
   // Toggle language EN <-> CN (using global app i18n system)
@@ -283,9 +288,7 @@ Page({
       wx.showToast({ title: this.data.locale === 'en' ? 'Invalid values' : '数值不合法', icon: 'none' });
       return;
     }
-    wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'profile.updateFull', openid: app.globalData.openid, height, weight },
+    api.callCloud('profile.updateFull', { height, weight },
       success: (res) => {
         if (res.result && res.result.success) {
           app.globalData.userWeight = weight;
@@ -301,9 +304,7 @@ Page({
         }
       },
       fail: () => {
-        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
-      },
-    });
+        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' }); });
   },
 
   onHelpTap() {

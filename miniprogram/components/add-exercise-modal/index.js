@@ -1,5 +1,6 @@
 // components/add-exercise-modal/index.js
 const app = getApp();
+const api = require('../../utils/api.js');
 const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
 
 const EQUIPMENT_LIST = [
@@ -219,10 +220,7 @@ Component({
     async _loadUserExercises() {
       if (!app.globalData.openid) return;
       try {
-        const res = await wx.cloud.callFunction({
-          name: 'api',
-          data: { action: 'exercise.getUserExercises', openid: app.globalData.openid },
-        });
+        const res = await api.callCloud('exercise.getUserExercises');
         if (res.result && res.result.success) {
           this.setData({
             favorExercises: res.result.favor_exercises || [],
@@ -324,11 +322,7 @@ Component({
 
       const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises, filterFavor, filterPracticed } = this.data;
 
-      const res = await wx.cloud.callFunction({
-        name: 'api',
-        data: {
-          action: 'library.list',
-          keyword,
+      const res = await api.callCloud('library.list', { keyword,
           equipmentId: selectedEquipment ? selectedEquipment : '',
           bodyPart: selectedMuscle ? selectedMuscle : '',
           page,
@@ -336,9 +330,7 @@ Component({
           isFavor: filterFavor,
           isPracticed: filterPracticed,
           favorExerIds: favorExercises,
-          practicedExerIds: practicedExercises,
-        },
-      });
+          practicedExerIds: practicedExercises });
 
       this.setData({ loading: false, loadingMore: false });
 
@@ -391,14 +383,7 @@ Component({
       if (!userId || !item) return;
 
       try {
-        const res = await wx.cloud.callFunction({
-          name: 'api',
-          data: {
-            action: 'exercise.getMaxWeight',
-            exerciseId: item.id,
-            openid: app.globalData.openid,
-          },
-        });
+        const res = await api.callCloud('exercise.getMaxWeight', { exerciseId: item.id });
 
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
@@ -470,21 +455,9 @@ Component({
         const exId = selectedItem.id;
 
         // Fire markPracticed asynchronously — non-blocking
-        wx.cloud.callFunction({
-          name: 'api',
-          data: {
-            action: 'exercise.markPracticed',
-            exercise_id: exId,
-            openid: app.globalData.openid,
-          },
-        });
+        api.callCloud('exercise.markPracticed', { exercise_id: exId });
 
-        const res = await wx.cloud.callFunction({
-          name: 'api',
-          data: {
-            action: 'exercise.add',
-            session_id: sessionId,
-            openid: app.globalData.openid,
+        const res = await api.callCloud('exercise.add', { session_id: sessionId,
             exercise_id: exId,
             name_zh: selectedItem.name_zh || selectedItem.name,
             name_en: selectedItem.name || null,
@@ -492,9 +465,7 @@ Component({
             video_name: selectedItem.video_name || null,
             weight,
             reps,
-            weight_unit: weight_unit,
-          },
-        });
+            weight_unit: weight_unit });
 
         if (res.result && res.result.success) {
           wx.showToast({ title: 'ADDED TO WORKOUT', icon: 'success' });
@@ -528,14 +499,7 @@ Component({
       this.setData({ list });
 
       // Call cloud function
-      wx.cloud.callFunction({
-        name: 'api',
-        data: {
-          action: 'exercise.toggleFavorite',
-          exercise_id: id,
-          openid: app.globalData.openid,
-        },
-      });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
     },
 
     // step 2 头部右侧的 favorite 按钮: 直接切换 selectedItem 的 is_favorite
@@ -557,14 +521,7 @@ Component({
         this.setData({ list });
       }
       // cloud call
-      wx.cloud.callFunction({
-        name: 'api',
-        data: {
-          action: 'exercise.toggleFavorite',
-          exercise_id: id,
-          openid: app.globalData.openid,
-        },
-      });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
     },
   },
 });

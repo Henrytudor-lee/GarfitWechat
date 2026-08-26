@@ -1,5 +1,6 @@
 // components/session-detail-modal/index.js
 const app = getApp();
+const api = require('../../utils/api.js');
 const { setVolume, volumeToCalories } = require('../../utils/unit.js');
 
 Component({
@@ -80,14 +81,7 @@ Component({
 
       this.setData({ loading: true });
 
-      const res = await wx.cloud.callFunction({
-        name: 'api',
-        data: {
-          action: 'exercise.list',
-          session_id: this.data.sessionId,
-          openid: app.globalData.openid,
-        },
-      });
+      const res = await api.callCloud('exercise.list', { session_id: this.data.sessionId });
 
       this.setData({ loading: false });
 

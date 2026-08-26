@@ -1,5 +1,6 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
+const api = require('../../utils/api.js');
 const { setVolume, volumeToCalories, formatCalories } = require('../../utils/unit.js');
 
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -179,9 +180,9 @@ Page({
     wx.showLoading({ title: 'LOADING...', mask: true });
 
     const [runRes, recentRes, monthRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'api', data: { action: 'session.getRunning', openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'api', data: { action: 'session.list', page: 1, pageSize: 5, openid: app.globalData.openid } }),
-      wx.cloud.callFunction({ name: 'api', data: { action: 'session.monthlyStats', openid: app.globalData.openid } }),
+      api.callCloud('session.getRunning'),
+      api.callCloud('session.list', { page: 1, pageSize: 5 }),
+      api.callCloud('session.monthlyStats'),
     ]);
 
     wx.hideLoading();
@@ -231,10 +232,7 @@ Page({
   },
 
   async _loadExerciseGroups(sessionId) {
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'exercise.list', session_id: sessionId, openid: app.globalData.openid },
-    });
+    const res = await api.callCloud('exercise.list', { session_id: sessionId });
     if (res.result && res.result.success) {
       const map = {};
       for (const ex of res.result.exercises || []) {
@@ -449,10 +447,7 @@ Page({
   },
 
   async _loadCalendarMonth(year, month) {
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'stats.monthDates', openid: app.globalData.openid, year, month: month + 1 },
-    });
+    const res = await api.callCloud('stats.monthDates', { year, month: month + 1 });
     if (res.result && res.result.dates && Array.isArray(res.result.dates)) {
       this.setData({ calendarWorkedDays: res.result.dates });
       this._buildCalendarDays();
@@ -533,10 +528,7 @@ Page({
     const { historyDate } = this.data;
     if (!historyDate) return;
     // Fetch sessions for the given date
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'session.list', date: historyDate, openid: app.globalData.openid },
-    });
+    const res = await api.callCloud('session.list', { date: historyDate });
     if (res.result && res.result.sessions) {
       const sessions = res.result.sessions.map(s => {
         const d = new Date(s.start_time);
@@ -601,10 +593,7 @@ Page({
     if (this.data.runningSession && this.data.runningSession.start_time) {
       elapsedMs = Date.now() - new Date(this.data.runningSession.start_time).getTime();
     }
-    const r = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'session.finish', session_id: sessionId, openid: app.globalData.openid },
-    });
+    const r = await api.callCloud('session.finish', { session_id: sessionId });
     wx.hideLoading();
     if (r.result && r.result.success) {
       app.globalData.runningSession = null;  // 关键: 清掉全局, 否则后续 orb tap 会拿到过期数据
@@ -730,21 +719,14 @@ Page({
     if (!this.data.runningSession) return;
     const sessionId = this.data.currentSessionId || this.data.runningSession.id || this.data.runningSession._id;
     wx.showLoading({ title: 'ADDING...', mask: true });
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: {
-        action: 'exercise.add',
-        session_id: sessionId,
-        openid: app.globalData.openid,
+    const res = await api.callCloud('exercise.add', { session_id: sessionId,
         exercise_id: item._id || item.id,
         name_zh: item.name_zh || item.name,
         name_en: item.name || null,
         image_name: item.image_name || null,
         video_name: item.video_name || null,
         weight: 0,
-        reps: 0,
-      },
-    });
+        reps: 0 });
     wx.hideLoading();
     if (res.result && res.result.success) {
       this._loadExerciseGroups(sessionId);

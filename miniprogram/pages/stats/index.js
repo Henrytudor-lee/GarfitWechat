@@ -1,5 +1,6 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
+const api = require('../../utils/api.js');
 const { setVolume, volumeToCalories, formatCalories, formatLargeNum } = require('../../utils/unit.js');
 
 // Compute ISO yrweek key e.g. 202621 for 2026-W21
@@ -81,7 +82,7 @@ Page({
     this.setData({ loading: true });
 
     const [statsRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'api', data: { action: 'stats.summary', openid: app.globalData.openid } }),
+      api.callCloud('stats.summary'),
     ]);
 
     wx.hideLoading();
@@ -196,9 +197,7 @@ Page({
 
   async _loadLeaderboard() {
     const { lbType, lbPeriod } = this.data;
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: { action: 'stats.leaderboard', openid: app.globalData.openid, type: lbType, period: lbPeriod },
+    const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod },
     });
     if (res.result && res.result.success && res.result.leaderboard) {
       const isVolume = lbType === 'volume';
@@ -236,14 +235,8 @@ Page({
     const loadingText = (this.data.locale || 'zh') === 'zh' ? '加载中...' : 'LOADING...';
     wx.showLoading({ title: loadingText, mask: true });
     const [recRes, recordsRes] = await Promise.all([
-      wx.cloud.callFunction({
-        name: 'api',
-        data: { action: 'stats.exerciseMax', exercise_id: exerciseId, openid: app.globalData.openid },
-      }),
-      wx.cloud.callFunction({
-        name: 'api',
-        data: { action: 'stats.exerciseRecords', exercise_id: exerciseId, openid: app.globalData.openid },
-      }),
+      api.callCloud('stats.exerciseMax', { exercise_id: exerciseId }),
+      api.callCloud('stats.exerciseRecords', { exercise_id: exerciseId }),
     ]);
     wx.hideLoading();
 
@@ -380,9 +373,7 @@ Page({
         const prev = pts[i - 1];
         const mx = (prev.x + p.x) / 2;
         ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
-        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
-      }
-    });
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y); });
     ctx.lineTo(pts[pts.length - 1].x, pad.t + H);
     ctx.lineTo(pad.l, pad.t + H);
     ctx.closePath();

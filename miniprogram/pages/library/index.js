@@ -1,5 +1,6 @@
 // pages/library/index.js — garcia-fitness-new style
 const app = getApp();
+const api = require('../../utils/api.js');
 
 const EQUIPMENT_LIST = [
   { id: 1,  name: 'Barbell',         name_zh: '杠铃',        icon: 'barbell.png' },
@@ -169,10 +170,7 @@ Page({
   async _loadUserExercises() {
     if (!app.globalData.openid) return;
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'api',
-        data: { action: 'exercise.getUserExercises', openid: app.globalData.openid },
-      });
+      const res = await api.callCloud('exercise.getUserExercises');
       if (res.result && res.result.success) {
         this.setData({
           favorExercises: res.result.favor_exercises || [],
@@ -191,11 +189,7 @@ Page({
     const page = reset ? 1 : this.data.page;
     const { keyword, selectedEquipment, selectedMuscle, filterFavor, filterPracticed, favorExercises, practicedExercises } = this.data;
 
-    const res = await wx.cloud.callFunction({
-      name: 'api',
-      data: {
-        action: 'library.list',
-        keyword,
+    const res = await api.callCloud('library.list', { keyword,
         equipmentId: selectedEquipment || '',
         bodyPart: selectedMuscle || '',
         page,
@@ -203,9 +197,7 @@ Page({
         isFavor: filterFavor,
         isPracticed: filterPracticed,
         favorExerIds: favorExercises,
-        practicedExerIds: practicedExercises,
-      },
-    });
+        practicedExerIds: practicedExercises });
 
     this.setData({ loading: false });
 
@@ -320,14 +312,7 @@ Page({
     });
     this.setData({ list });
 
-    wx.cloud.callFunction({
-      name: 'api',
-      data: {
-        action: 'exercise.toggleFavorite',
-        exercise_id: id,
-        openid: app.globalData.openid,
-      },
-    });
+    api.callCloud('exercise.toggleFavorite', { exercise_id: id });
   },
 
   onDetailFavTap() {
@@ -362,14 +347,7 @@ Page({
       duration: 1200,
     });
 
-    wx.cloud.callFunction({
-      name: 'api',
-      data: {
-        action: 'exercise.toggleFavorite',
-        exercise_id: id,
-        openid: app.globalData.openid,
-      },
-    });
+    api.callCloud('exercise.toggleFavorite', { exercise_id: id });
   },
 
   onVideoTap(e) {
@@ -390,17 +368,11 @@ Page({
 
     try {
       // 1. 查 running session
-      const runRes = await wx.cloud.callFunction({
-        name: 'api',
-        data: { action: 'session.getRunning', openid: app.globalData.openid },
-      });
+      const runRes = await api.callCloud('session.getRunning');
       let sessionId;
       if (!runRes.result || !runRes.result.session) {
         // 没有就创建
-        const createRes = await wx.cloud.callFunction({
-          name: 'api',
-          data: { action: 'session.create', openid: app.globalData.openid },
-        });
+        const createRes = await api.callCloud('session.create');
         if (!createRes.result || !createRes.result.success) {
           throw new Error('create session failed');
         }

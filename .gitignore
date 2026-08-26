@@ -10,3 +10,9 @@ scripts/**
 result_backend.json
 result_frontend.json
 # Backend has its own repo at /Volumes/world/program/gfit-backend
+
+# Old local backend prototype (real one in /Volumes/world/program/gfit-backend)
+backend/
+
+# Backup files (created during migration)
+*.bak
