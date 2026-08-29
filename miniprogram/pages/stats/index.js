@@ -197,8 +197,7 @@ Page({
 
   async _loadLeaderboard() {
     const { lbType, lbPeriod } = this.data;
-    const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod },
-    });
+    const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod });
     if (res.result && res.result.success && res.result.leaderboard) {
       const isVolume = lbType === 'volume';
       const vals = res.result.leaderboard.map(u => u.total_metric || 0);
@@ -373,7 +372,9 @@ Page({
         const prev = pts[i - 1];
         const mx = (prev.x + p.x) / 2;
         ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
-        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y); });
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
+      }
+    });
     ctx.lineTo(pts[pts.length - 1].x, pad.t + H);
     ctx.lineTo(pad.l, pad.t + H);
     ctx.closePath();

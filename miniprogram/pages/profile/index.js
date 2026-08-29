@@ -204,7 +204,7 @@ Page({
     this.setData({ showEditNameModal: false, editNameValue: '' });
   },
 
-  confirmEditName() {
+  async confirmEditName() {
     const name = this.data.editNameValue.trim();
     const regex = /^[一-龥a-zA-Z0-9_]{1,16}$/;
     if (!regex.test(name)) {
@@ -214,28 +214,29 @@ Page({
       });
       return;
     }
-    api.callCloud('profile.update', { name },
-      success: (res) => {
-        if (res.result && res.result.success === true) {
-          const userInfo = { ...this.data.userInfo, nickname: name };
-          this.setData({ userInfo, showEditNameModal: false });
-          wx.setStorageSync('userName', name);
-          wx.showToast({
-            title: this.data.locale === 'en' ? 'Nickname updated' : '昵称已更新',
-            icon: 'success',
-          });
-        } else {
-          wx.showToast({
-            title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
-            icon: 'none',
-          });
-        }
-      },
-      fail: () => {
+    try {
+      const res = await api.callCloud('profile.update', { name });
+      if (res.result && res.result.success === true) {
+        const userInfo = { ...this.data.userInfo, nickname: name };
+        this.setData({ userInfo, showEditNameModal: false });
+        wx.setStorageSync('userName', name);
+        wx.showToast({
+          title: this.data.locale === 'en' ? 'Nickname updated' : '昵称已更新',
+          icon: 'success',
+        });
+      } else {
         wx.showToast({
           title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
           icon: 'none',
-        }); });
+        });
+      }
+    } catch (err) {
+      console.error('[profile] update name failed', err);
+      wx.showToast({
+        title: this.data.locale === 'en' ? 'Update failed' : '更新失败',
+        icon: 'none',
+      });
+    }
   },
 
   // Toggle language EN <-> CN (using global app i18n system)
@@ -281,30 +282,33 @@ Page({
     this.setData({ showEditBodyModal: false });
   },
 
-  confirmEditBody() {
+  async confirmEditBody() {
     const height = this.data.editHeight;
     const weight = this.data.editWeight;
     if (height < 50 || height > 250 || weight < 20 || weight > 300) {
       wx.showToast({ title: this.data.locale === 'en' ? 'Invalid values' : '数值不合法', icon: 'none' });
       return;
     }
-    api.callCloud('profile.updateFull', { height, weight },
-      success: (res) => {
-        if (res.result && res.result.success) {
-          app.globalData.userWeight = weight;
-          app.globalData.userHeight = height;
-          wx.setStorageSync('userWeight', weight);
-          wx.setStorageSync('userHeight', height);
-          this.setData({
-            bodyHeight: height,
-            bodyWeight: weight,
-            showEditBodyModal: false,
-          });
-          wx.showToast({ title: this.data.locale === 'en' ? 'Updated' : '已更新', icon: 'success' });
-        }
-      },
-      fail: () => {
-        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' }); });
+    try {
+      const res = await api.callCloud('profile.updateFull', { height, weight });
+      if (res.result && res.result.success) {
+        app.globalData.userWeight = weight;
+        app.globalData.userHeight = height;
+        wx.setStorageSync('userWeight', weight);
+        wx.setStorageSync('userHeight', height);
+        this.setData({
+          bodyHeight: height,
+          bodyWeight: weight,
+          showEditBodyModal: false,
+        });
+        wx.showToast({ title: this.data.locale === 'en' ? 'Updated' : '已更新', icon: 'success' });
+      } else {
+        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
+      }
+    } catch (err) {
+      console.error('[profile] update body failed', err);
+      wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
+    }
   },
 
   onHelpTap() {
