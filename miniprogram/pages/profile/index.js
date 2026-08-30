@@ -1,5 +1,6 @@
 // pages/profile/index.js — garcia-fitness-new style
 const { normalizeAvatar } = require('../../utils/avatar.js');
+const { compressToLimit } = require('../../utils/image.js');
 const app = getApp();
 const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
@@ -137,11 +138,11 @@ Page({
       },
     });
   },
-  changeAvatar() {
+  async changeAvatar() {
     wx.chooseImage({
       count: 1,
       sourceType: ['album'],
-      success: (res) => {
+      success: async (res) => {
         const tempFilePath = res.tempFilePaths[0];
         // Save to local storage immediately for display
         wx.setStorageSync('avatarTemp', tempFilePath);
@@ -151,9 +152,16 @@ Page({
         // Sync to cloud
         const userId = wx.getStorageSync('userId');
         if (userId) {
+          // 自动压缩到 1MB 以内, 避免后端 Multer 413
+          let uploadPath = tempFilePath;
+          try {
+            uploadPath = await compressToLimit(tempFilePath);
+          } catch (e) {
+            console.warn('[profile] compress failed, use original', e);
+          }
           wx.uploadFile({
             url: `${api.BASE_URL}/upload`,
-            filePath: tempFilePath,
+            filePath: uploadPath,
             name: 'file',
             header: { Authorization: `Bearer ${api.getToken()}` },
             formData: { prefix: 'avatars' },

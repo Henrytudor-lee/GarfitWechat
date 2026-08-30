@@ -1,6 +1,7 @@
 // components/welcome-modal/index.js
 const app = getApp();
 const i18n = require('../../utils/i18n.js');
+const { compressToLimit } = require('../../utils/image.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 Component({
@@ -140,7 +141,7 @@ Component({
     },
 
     // 选择头像
-    onChooseAvatar() {
+    async onChooseAvatar() {
       const openid = app.globalData.openid || '';
       if (!openid) {
         wx.showToast({ title: 'openid unavailable', icon: 'none' });
@@ -150,11 +151,18 @@ Component({
         count: 1,
         sizeType: ['compressed'],
         sourceType: ['album', 'camera'],
-        success: (res) => {
+        success: async (res) => {
           const tempFilePath = res.tempFilePaths[0];
+          // 自动压缩到 1MB 以内, 避免后端 Multer 413
+          let uploadPath = tempFilePath;
+          try {
+            uploadPath = await compressToLimit(tempFilePath);
+          } catch (e) {
+            console.warn('[welcome] compress failed, use original', e);
+          }
           wx.uploadFile({
             url: `${api.BASE_URL}/upload`,
-            filePath: tempFilePath,
+            filePath: uploadPath,
             name: 'file',
             header: { Authorization: `Bearer ${api.getToken()}` },
             formData: { prefix: 'avatars' },
