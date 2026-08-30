@@ -155,6 +155,7 @@ Page({
             url: `${api.BASE_URL}/upload`,
             filePath: tempFilePath,
             name: 'file',
+            header: { Authorization: `Bearer ${api.getToken()}` },
             formData: { prefix: 'avatars' },
             success: (uploadRes) => {
               let avatarUrl = uploadRes.data;
