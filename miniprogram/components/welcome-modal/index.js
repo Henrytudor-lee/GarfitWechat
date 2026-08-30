@@ -2,6 +2,7 @@
 const app = getApp();
 const i18n = require('../../utils/i18n.js');
 const { compressToLimit } = require('../../utils/image.js');
+const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 Component({
