@@ -159,11 +159,23 @@ Component({
             header: { Authorization: `Bearer ${api.getToken()}` },
             formData: { prefix: 'avatars' },
             success: (uploadRes) => {
+              // wx.uploadFile 的 success 对 5xx 也会触发, 必须自己检查 statusCode
+              if (uploadRes.statusCode !== 200) {
+                console.error('upload avatar failed', uploadRes);
+                wx.showToast({ title: 'upload failed (' + uploadRes.statusCode + ')', icon: 'none' });
+                return;
+              }
               try {
                 const data = JSON.parse(uploadRes.data);
-                this.setData({ avatarPath: data.url || uploadRes.data });
+                if (!data.success || !data.url) {
+                  console.error('upload avatar: bad response', data);
+                  wx.showToast({ title: 'upload failed', icon: 'none' });
+                  return;
+                }
+                this.setData({ avatarPath: data.url });
               } catch (e) {
-                this.setData({ avatarPath: uploadRes.data });
+                console.error('upload avatar: parse error', e, uploadRes.data);
+                wx.showToast({ title: 'upload failed', icon: 'none' });
               }
             },
             fail: (err) => {

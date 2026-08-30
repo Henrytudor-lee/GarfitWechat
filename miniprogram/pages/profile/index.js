@@ -158,11 +158,26 @@ Page({
             header: { Authorization: `Bearer ${api.getToken()}` },
             formData: { prefix: 'avatars' },
             success: (uploadRes) => {
-              let avatarUrl = uploadRes.data;
+              // wx.uploadFile 的 success 对 5xx 也会触发, 必须自己检查 statusCode
+              if (uploadRes.statusCode !== 200) {
+                console.error('upload avatar failed', uploadRes);
+                wx.showToast({ title: 'upload failed (' + uploadRes.statusCode + ')', icon: 'none' });
+                return;
+              }
+              let avatarUrl = '';
               try {
                 const data = JSON.parse(uploadRes.data);
-                avatarUrl = data.url || uploadRes.data;
-              } catch (e) {}
+                if (!data.success || !data.url) {
+                  console.error('upload avatar: bad response', data);
+                  wx.showToast({ title: 'upload failed', icon: 'none' });
+                  return;
+                }
+                avatarUrl = data.url;
+              } catch (e) {
+                console.error('upload avatar: parse error', e, uploadRes.data);
+                wx.showToast({ title: 'upload failed', icon: 'none' });
+                return;
+              }
               api.callCloud('profile.updateAvatar', { avatarUrl });
               wx.setStorageSync('avatarUrl', avatarUrl);
             },
