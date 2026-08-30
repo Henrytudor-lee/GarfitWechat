@@ -167,7 +167,8 @@ Page({
             formData: { prefix: 'avatars' },
             success: (uploadRes) => {
               // wx.uploadFile 的 success 对 5xx 也会触发, 必须自己检查 statusCode
-              if (uploadRes.statusCode !== 200) {
+              // 任何 4xx/5xx 都算失败 (NestJS @Post 默认 201, 不是 200)
+              if (uploadRes.statusCode >= 400) {
                 console.error('upload avatar failed', uploadRes);
                 wx.showToast({ title: 'upload failed (' + uploadRes.statusCode + ')', icon: 'none' });
                 return;
