@@ -189,6 +189,9 @@ Page({
               }
               api.callCloud('profile.updateAvatar', { avatarUrl });
               wx.setStorageSync('avatarUrl', avatarUrl);
+              // 立刻刷新 UI 显示新头像 (不依赖下次 onShow 重载)
+              this.setData({ 'userInfo.avatarUrl': avatarUrl });
+              wx.removeStorageSync('avatarTemp'); // tempFilePath 微信会清理, 别再用了
             },
             fail: (err) => {
               console.error('upload avatar failed', err);
