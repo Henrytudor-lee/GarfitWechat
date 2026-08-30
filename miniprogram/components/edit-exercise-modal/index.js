@@ -1,6 +1,7 @@
 // components/edit-exercise-modal/index.js
 const app = getApp();
 const api = require('../../utils/api.js');
+const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 Component({
   properties: {
@@ -39,7 +40,7 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen && this.data.group) {
-        const sets = this.data.group.sets.map(s => ({ ...s }));
+        const sets = this.data.group.sets.map(s => ({ ...s, weightStr: formatNumberForInput(s.weight) }));
         // 同步 favor 状态
         const favorExercises = app.globalData.favorExercises || [];
         const isFavorite = favorExercises.includes(this.data.group.exercise_id);
@@ -55,7 +56,7 @@ Component({
     },
     'group': function(group) {
       if (group && this.data.isOpen) {
-        const sets = group.sets.map(s => ({ ...s }));
+        const sets = group.sets.map(s => ({ ...s, weightStr: formatNumberForInput(s.weight) }));
         const favorExercises = app.globalData.favorExercises || [];
         const isFavorite = favorExercises.includes(group.exercise_id);
         this.setData({
@@ -117,9 +118,11 @@ Component({
 
     addSet() {
       const last = this.data.sets[this.data.sets.length - 1];
+      const w = last?.weight || 0;
       const newSet = {
         id: Date.now(),
-        weight: last?.weight || 0,
+        weight: w,
+        weightStr: formatNumberForInput(w),
         reps: last?.reps || 0,
         weight_unit: last?.weight_unit || 'kg',
         sequence: this.data.sets.length,
@@ -131,19 +134,28 @@ Component({
     incWeight(e) {
       const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
-      this.updateSet(index, 'weight', s.weight + 2.5);
+      const w = s.weight + 2.5;
+      this.updateSet(index, 'weight', w);
+      this.updateSet(index, 'weightStr', formatNumberForInput(w));
     },
 
     decWeight(e) {
       const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
-      this.updateSet(index, 'weight', Math.max(0, s.weight - 2.5));
+      const w = Math.max(0, s.weight - 2.5);
+      this.updateSet(index, 'weight', w);
+      this.updateSet(index, 'weightStr', formatNumberForInput(w));
     },
 
     onWeightInput(e) {
       const index = e.currentTarget.dataset.index;
-      const value = parseFloat(e.detail.value) || 0;
-      this.updateSet(index, 'weight', value);
+      const patch = syncDecimalValue('weight', e.detail.value);
+      if (patch) {
+        // patch has { weight, weightStr } — apply to this set
+        const sets = [...this.data.sets];
+        sets[index] = { ...sets[index], ...patch };
+        this.setData({ sets });
+      }
     },
 
     incReps(e) {

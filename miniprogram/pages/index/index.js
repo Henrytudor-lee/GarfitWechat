@@ -255,6 +255,8 @@ Page({
         totalVolume: Math.round(g.totalVolume),
         totalCalories: volumeToCalories(Math.round(g.totalVolume)),
       }));
+      // 训练首页约定: 最新添加的动作放在最前面 (数据库 ASC, 反转得到 DESC)
+      groups.reverse();
       // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
       const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
       const totalCal = volumeToCalories(volume);

@@ -63,11 +63,11 @@
       <view class="body-field-row">
         <view class="body-field">
           <text class="body-field-label">{{t.HEIGHT}} (cm)</text>
-          <input class="edit-modal-input body-input" type="digit" value="{{editHeight}}" bindinput="onHeightInput" placeholder="170" />
+          <input class="edit-modal-input body-input" type="number" value="{{editHeightStr}}" bindinput="onHeightInput" placeholder="170" />
         </view>
         <view class="body-field">
           <text class="body-field-label">{{t.WEIGHT_BODY}} (kg)</text>
-          <input class="edit-modal-input body-input" type="digit" value="{{editWeight}}" bindinput="onWeightInput" placeholder="60" />
+          <input class="edit-modal-input body-input" type="number" value="{{editWeightStr}}" bindinput="onWeightInput" placeholder="60" />
         </view>
       </view>
       <view class="edit-modal-btns">

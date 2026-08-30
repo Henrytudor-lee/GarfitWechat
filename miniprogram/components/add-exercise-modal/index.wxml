@@ -153,7 +153,7 @@
             </view>
             <view class="input-row">
               <view class="input-btn" bindtap="decWeight">−</view>
-              <input class="input-field" type="digit" value="{{weight}}" bindinput="onWeightInput" placeholder="0" />
+              <input class="input-field" type="number" value="{{weightStr}}" bindinput="onWeightInput" placeholder="0" />
               <view class="input-btn" bindtap="incWeight">+</view>
             </view>
           </view>

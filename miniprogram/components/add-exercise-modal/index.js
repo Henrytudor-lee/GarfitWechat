@@ -2,6 +2,7 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
+const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 const EQUIPMENT_LIST = [
   { id: 1, icon: 'barbell.png' },
@@ -95,6 +96,7 @@ Component({
     muscleListWithName: [],
     selectedItem: null,
     weight: 0,
+    weightStr: '0',
     reps: 0,
     weight_unit: 'kg',
     historyMax: null,
@@ -165,6 +167,7 @@ Component({
         loadingMore: false,
         selectedItem: null,
         weight: 0,
+        weightStr: '0',
         reps: 0,
         weight_unit: 'kg',
         historyMax: null,
@@ -374,7 +377,7 @@ Component({
     },
 
     _selectExercise(item) {
-      this.setData({ selectedItem: item, step: 'set', weight: 0, reps: 0 });
+      this.setData({ selectedItem: item, step: 'set', weight: 0, weightStr: '0', reps: 0 });
       this._loadHistoryMax(item);
     },
 
@@ -390,6 +393,7 @@ Component({
           this.setData({
             historyMax: { weight: d.weight, reps: d.reps, weight_unit: d.weight_unit || 'kg' },
             weight: d.weight,
+            weightStr: formatNumberForInput(d.weight),
             reps: d.reps || 0,
             weight_unit: d.weight_unit || 'kg',
           });
@@ -402,12 +406,13 @@ Component({
     applyHistory() {
       const h = this.data.historyMax;
       if (h) {
-        this.setData({ weight: h.weight, reps: h.reps });
+        this.setData({ weight: h.weight, weightStr: formatNumberForInput(h.weight), reps: h.reps });
       }
     },
 
     onWeightInput(e) {
-      this.setData({ weight: Number(e.detail.value) || 0 });
+      const patch = syncDecimalValue('weight', e.detail.value);
+      if (patch) this.setData(patch);
     },
 
     onRepsInput(e) {
@@ -415,11 +420,13 @@ Component({
     },
 
     incWeight() {
-      this.setData({ weight: this.data.weight + 2.5 });
+      const w = this.data.weight + 2.5;
+      this.setData({ weight: w, weightStr: formatNumberForInput(w) });
     },
 
     decWeight() {
-      this.setData({ weight: Math.max(0, this.data.weight - 2.5) });
+      const w = Math.max(0, this.data.weight - 2.5);
+      this.setData({ weight: w, weightStr: formatNumberForInput(w) });
     },
 
     incReps() {
@@ -431,7 +438,8 @@ Component({
     },
 
     setWeight(e) {
-      this.setData({ weight: Number(e.currentTarget.dataset.val) });
+      const w = Number(e.currentTarget.dataset.val);
+      this.setData({ weight: w, weightStr: formatNumberForInput(w) });
     },
 
     setReps(e) {

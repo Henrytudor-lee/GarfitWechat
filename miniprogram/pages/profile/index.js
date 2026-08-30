@@ -2,6 +2,7 @@
 const { normalizeAvatar } = require('../../utils/avatar.js');
 const app = getApp();
 const api = require('../../utils/api.js');
+const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 // Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
 function getFlameColor(streak) {
@@ -40,7 +41,9 @@ Page({
     editNameValue: '',
     showEditBodyModal: false,
     editHeight: 170,
+    editHeightStr: '170',
     editWeight: 60,
+    editWeightStr: '60',
   },
 
   onLoad() {
@@ -258,19 +261,25 @@ Page({
 
   // ---- Personal Info (body data) ----
   onPersonalInfoTap() {
+    const h = this.data.bodyHeight || 170;
+    const w = this.data.bodyWeight || 60;
     this.setData({
       showEditBodyModal: true,
-      editHeight: this.data.bodyHeight || 170,
-      editWeight: this.data.bodyWeight || 60,
+      editHeight: h,
+      editHeightStr: formatNumberForInput(h),
+      editWeight: w,
+      editWeightStr: formatNumberForInput(w),
     });
   },
 
   onHeightInput(e) {
-    this.setData({ editHeight: Number(e.detail.value) || 0 });
+    const patch = syncDecimalValue('editHeight', e.detail.value);
+    if (patch) this.setData(patch);
   },
 
   onWeightInput(e) {
-    this.setData({ editWeight: Number(e.detail.value) || 0 });
+    const patch = syncDecimalValue('editWeight', e.detail.value);
+    if (patch) this.setData(patch);
   },
 
   onBodyMaskTap(e) {

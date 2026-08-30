@@ -40,11 +40,11 @@
       <view class="form-row">
         <view class="form-item form-item-half">
           <text class="field-label">{{currentLang === 'zh' ? '身高' : 'Height'}} (cm)</text>
-          <input class="name-input" type="digit" value="{{height}}" bindinput="onHeightInput" placeholder="170" />
+          <input class="name-input" type="number" value="{{heightStr}}" bindinput="onHeightInput" placeholder="170" />
         </view>
         <view class="form-item form-item-half">
           <text class="field-label">{{currentLang === 'zh' ? '体重' : 'Weight'}} (kg)</text>
-          <input class="name-input" type="digit" value="{{weight}}" bindinput="onWeightInput" placeholder="60" />
+          <input class="name-input" type="number" value="{{weightStr}}" bindinput="onWeightInput" placeholder="60" />
         </view>
       </view>
 

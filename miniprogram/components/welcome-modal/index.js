@@ -1,6 +1,7 @@
 // components/welcome-modal/index.js
 const app = getApp();
 const i18n = require('../../utils/i18n.js');
+const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 Component({
   properties: {
@@ -23,7 +24,9 @@ Component({
     gender: '',  // '' | 'male' | 'female'
     purpose: 0,  // 0 | 1 | 2 | 3
     height: 170,
+    heightStr: '170',
     weight: 60,
+    weightStr: '60',
 
     // 翻译文本
     welcomeText: '欢迎来到 G-FIT',
@@ -105,7 +108,9 @@ Component({
         gender: '',
         purpose: 0,
         height: 170,
+        heightStr: '170',
         weight: 60,
+        weightStr: '60',
       });
     },
 
@@ -125,11 +130,13 @@ Component({
     },
 
     onHeightInput(e) {
-      this.setData({ height: Number(e.detail.value) || 0 });
+      const patch = syncDecimalValue('height', e.detail.value);
+      if (patch) this.setData(patch);
     },
 
     onWeightInput(e) {
-      this.setData({ weight: Number(e.detail.value) || 0 });
+      const patch = syncDecimalValue('weight', e.detail.value);
+      if (patch) this.setData(patch);
     },
 
     // 选择头像

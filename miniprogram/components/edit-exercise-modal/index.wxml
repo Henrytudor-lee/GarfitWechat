@@ -33,7 +33,7 @@
           <view class="field-label">{{t.WEIGHT}}</view>
           <view class="field-row">
             <view class="field-btn" bindtap="decWeight" data-index="{{index}}">−</view>
-            <input class="field-input" type="digit" value="{{item.weight}}" bindinput="onWeightInput" data-index="{{index}}" />
+            <input class="field-input" type="number" value="{{item.weightStr}}" bindinput="onWeightInput" data-index="{{index}}" />
             <view class="field-btn" bindtap="incWeight" data-index="{{index}}">+</view>
           </view>
         </view>
