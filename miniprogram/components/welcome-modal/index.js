@@ -153,6 +153,8 @@ Component({
         sourceType: ['album', 'camera'],
         success: async (res) => {
           const tempFilePath = res.tempFilePaths[0];
+          // 立刻显示本地预览 (不等上传完成)
+          this.setData({ avatarPath: tempFilePath });
           // 自动压缩到 1MB 以内, 避免后端 Multer 413
           let uploadPath = tempFilePath;
           try {
