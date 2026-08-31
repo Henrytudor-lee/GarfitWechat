@@ -211,24 +211,31 @@ Page({
 
     // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume, todayVolume, yesterdayVolume)
     if (monthRes.result && monthRes.result.success) {
-      const stats = monthRes.result;
-      // Convert volumes to calories for display
-      const todayVol = stats.todayVolume || 0;
-      const yesterdayVol = stats.yesterdayVolume || 0;
-      const monthlyKg = stats.totalKg || 0;
-      this.setData({
-        todayProgress: stats.todayProgress || 0,
-        yesterdayProgress: stats.yesterdayProgress || 0,
-        todayCaloriesStr: formatCalories(volumeToCalories(todayVol)),
-        yesterdayCaloriesStr: formatCalories(volumeToCalories(yesterdayVol)),
-        monthlyCaloriesStr: formatCalories(volumeToCalories(monthlyKg)),
-        todayVolume: todayVol,
-        yesterdayVolume: yesterdayVol,
-      });
+      this._applyMonthlyStats(monthRes.result);
     }
 
     // Load history sessions for selected date
     this._loadHistorySessions();
+  },
+
+  async _loadMonthlyStats() {
+    const res = await api.callCloud('session.monthlyStats');
+    if (res.result && res.result.success) this._applyMonthlyStats(res.result);
+  },
+
+  _applyMonthlyStats(stats) {
+    const todayVol = stats.todayVolume || 0;
+    const yesterdayVol = stats.yesterdayVolume || 0;
+    const monthlyKg = stats.totalKg || 0;
+    this.setData({
+      todayProgress: stats.todayProgress || 0,
+      yesterdayProgress: stats.yesterdayProgress || 0,
+      todayCaloriesStr: formatCalories(volumeToCalories(todayVol)),
+      yesterdayCaloriesStr: formatCalories(volumeToCalories(yesterdayVol)),
+      monthlyCaloriesStr: formatCalories(volumeToCalories(monthlyKg)),
+      todayVolume: todayVol,
+      yesterdayVolume: yesterdayVol,
+    });
   },
 
   async _loadExerciseGroups(sessionId) {
@@ -237,7 +244,11 @@ Page({
       const map = {};
       for (const ex of res.result.exercises || []) {
         if (!map[ex.exercise_id]) {
-          map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0 };
+          map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0, _latestTime: 0 };
+        }
+        const t = ex.create_time ? new Date(ex.create_time).getTime() : 0;
+        if (t > map[ex.exercise_id]._latestTime) {
+          map[ex.exercise_id]._latestTime = t;
         }
         if (ex.weight > 0 || ex.reps > 0) {
           const vol = setVolume(ex);
@@ -254,9 +265,11 @@ Page({
         ...g,
         totalVolume: Math.round(g.totalVolume),
         totalCalories: volumeToCalories(Math.round(g.totalVolume)),
+        latestTime: g._latestTime || 0,  // 该组最后一次 set 的 create_time 戳
       }));
-      // 训练首页约定: 最新添加的动作放在最前面 (数据库 ASC, 反转得到 DESC)
-      groups.reverse();
+      // 按"最近活动时间"降序: 最新加的 / 最新加组的动作排在最前面
+      // (之前 groups.reverse() 反转的是首次出现顺序, 回头给老动作加组时不会顶上去)
+      groups.sort((a, b) => b.latestTime - a.latestTime);
       // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
       const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
       const totalCal = volumeToCalories(volume);
@@ -621,6 +634,10 @@ Page({
         elapsedTime: '00:00:00',
         restTime: '--:--',
       });
+      // 刷新当日训练列表 + 月度统计 (DB 已写入 end_time/duration, 但内存 historySessions 还是旧的)
+      // 否则点进 session-detail-modal 会看到 '--:--' 因为 session.duration/end_time 不存在
+      this._loadHistorySessions();
+      this._loadMonthlyStats();
     }
   },
 
