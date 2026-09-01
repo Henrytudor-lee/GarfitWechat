@@ -162,7 +162,7 @@
 
   <!-- Custom Date Picker Modal -->
   <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker">
-    <view class="picker-modal" catchtap="">
+    <view class="picker-modal" catchtap="onPickerModalTap">
       <!-- Month navigation -->
       <view class="picker-header">
         <view class="picker-nav" bindtap="prevMonth">

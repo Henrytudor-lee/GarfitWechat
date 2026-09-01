@@ -6,6 +6,15 @@ const { setVolume, volumeToCalories, formatCalories } = require('../../utils/uni
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const MONTH_NAMES_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_NAMES_ZH = ['一', '二', '三', '四', '五', '六', '日'];
+// 把本地时区的 Date 转成 YYYY-MM-DD 字符串 (避免 toISOString() 跨日)
+function localYmd(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+
 const MONTH_NAMES_ZH = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
 Page({
@@ -88,7 +97,7 @@ Page({
       t: app.globalData.t,  // 注入 i18n 字典, WXML 用 {{t.KEY}}
     });
     const today = new Date();
-    const iso = today.toISOString().split('T')[0];
+    const iso = localYmd(today);
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
@@ -369,9 +378,9 @@ Page({
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days = [];
     for (let i = 0; i < firstDay; i++) days.push({ empty: true });
-    const today = new Date().toISOString().split('T')[0];
+    const today = localYmd(new Date());
     for (let i = 1; i <= daysInMonth; i++) {
-      const dateStr = new Date(year, month, i).toISOString().split('T')[0];
+      const dateStr = localYmd(new Date(year, month, i));
       days.push({
         day: i,
         empty: false,
@@ -394,6 +403,10 @@ Page({
   closeDatePicker() {
     this.setData({ showDatePicker: false });
   },
+
+  // No-op: 仅用于让 .picker-modal 上的 catchtap 注册成功,
+  // 阻止内部点击事件穿透到 overlay 的 bindtap="closeDatePicker"
+  onPickerModalTap() {},
 
 
   prevMonth() {
@@ -425,7 +438,7 @@ Page({
     if (!day) return;
     const { pickerYear, pickerMonth } = this.data;
     const d = new Date(pickerYear, pickerMonth, day);
-    const iso = d.toISOString().split('T')[0];
+    const iso = localYmd(d);
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
@@ -439,7 +452,7 @@ Page({
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-    const iso = today.toISOString().split('T')[0];
+    const iso = localYmd(today);
     this.setData({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),

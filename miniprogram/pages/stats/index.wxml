@@ -113,15 +113,21 @@
     </view>
   </view>
 
-  <!-- Most Trained Exercises -->
-  <view wx:if="{{mostTrained.length > 0}}" class="glass-card chart-card">
+  <!-- Most Trained Exercises (lazy-loaded: default 10, viewport 6) -->
+  <view wx:if="{{mostTrainedAll.length > 0}}" class="glass-card chart-card">
     <view class="section-title">{{t.MOST_TRAINED}}</view>
-    <view class="freq-list">
-      <view class="freq-item" wx:for="{{mostTrained}}" wx:key="name">
-        <text class="freq-name">{{item.name}}</text>
-        <text class="freq-count">{{item.count}} {{t.SETS}}</text>
+    <scroll-view scroll-y="true" class="freq-scroll"
+                 bindscrolltolower="_onMostTrainedScrollLower"
+                 lower-threshold="40" enhanced="true" show-scrollbar="false">
+      <view class="freq-list">
+        <view class="freq-item" wx:for="{{mostTrained}}" wx:key="exercise_id">
+          <image wx:if="{{item.image_name}}" class="freq-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" lazy-load="true" />
+          <view wx:else class="freq-img freq-img-placeholder">🏋️</view>
+          <text class="freq-name">{{item.name}}</text>
+          <text class="freq-count">{{item.count}} {{t.SETS}}</text>
+        </view>
       </view>
-    </view>
+    </scroll-view>
   </view>
 
   <!-- Exercise Selector -->

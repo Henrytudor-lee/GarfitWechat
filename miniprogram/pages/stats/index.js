@@ -38,7 +38,9 @@ Page({
     // Chart data
     weeklyVolume: [],   // [{label, volume, percent}]
     muscleDistribution: [],
-    mostTrained: [],
+    mostTrained: [],          // 可见子集 (懒加载)
+    mostTrainedAll: [],       // 完整排序后列表
+    mostTrainedLoaded: 0,     // 已加载条目数
     // Weight records for selected exercise
     weightRecords: [],
     // Chart images (canvas → image to avoid native layer overlap)
@@ -148,14 +150,17 @@ Page({
     const MUSCLE_COLORS = ['#ccf200', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8'];
     muscleDistribution.forEach((m, i) => { m.color = MUSCLE_COLORS[i % MUSCLE_COLORS.length]; });
 
-    // Most trained exercises — use locale-aware name
-    const mostTrained = historyExercises
+    // Most trained exercises — locale-aware name + image + lazy-load
+    const mostTrainedAll = historyExercises
       .map(ex => ({
+        exercise_id: ex.exercise_id,
         name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
+        image_name: ex.image_name || '',
         count: ex.records.length,
       }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
+      .sort((a, b) => b.count - a.count);
+    const MOST_TRAINED_PAGE = 10;
+    const mostTrained = mostTrainedAll.slice(0, MOST_TRAINED_PAGE);
 
     // Exercise list for selector — use locale-aware name
     const exerciseList = historyExercises.map(ex => ({
@@ -176,6 +181,8 @@ Page({
       weeklyVolume,
       muscleDistribution,
       mostTrained,
+      mostTrainedAll,
+      mostTrainedLoaded: mostTrained.length,
       hasData,
     });
 
@@ -193,6 +200,14 @@ Page({
     if (muscleDistribution.length > 0) {
       setTimeout(() => this._renderMuscleChart(), 300);
     }
+  },
+
+  _onMostTrainedScrollLower() {
+    const all = this.data.mostTrainedAll || [];
+    const loaded = this.data.mostTrainedLoaded || 0;
+    if (loaded >= all.length) return;
+    const next = all.slice(0, loaded + 10);
+    this.setData({ mostTrained: next, mostTrainedLoaded: next.length });
   },
 
   async _loadLeaderboard() {
