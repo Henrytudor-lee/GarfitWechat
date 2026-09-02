@@ -127,19 +127,6 @@
         <text class="settings-arrow">›</text>
       </view>
 
-      <!-- AI Coach (locked) -->
-      <view class="settings-item locked">
-        <view class="settings-left">
-          <view class="settings-icon-wrap lock-icon">
-            <text class="settings-icon-text">⚙</text>
-          </view>
-          <view class="settings-texts">
-            <text class="settings-title locked-text">{{t.AI_COACH}}</text>
-            <text class="settings-subtitle locked-text">{{t.COMING_SOON}}</text>
-          </view>
-        </view>
-        <image class="settings-lock-icon" src="{{imgPrefix}}/icons/icon-lock.png" mode="aspectFit" />
-      </view>
     </view>
 
     <!-- Help Guide -->

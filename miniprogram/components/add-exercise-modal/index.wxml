@@ -76,7 +76,7 @@
         </view>
 
         <!-- Exercise Grid - NOW SCROLLABLE -->
-        <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore">
+        <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore" scroll-top="{{pickScrollTop}}" bindscroll="onPickScroll">
           <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{t.LOADING}}</view>
           <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
 

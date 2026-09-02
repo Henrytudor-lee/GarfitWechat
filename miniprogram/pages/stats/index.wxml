@@ -80,9 +80,8 @@
   <!-- Weekly Volume Bar Chart — last 8 weeks -->
   <view wx:if="{{weeklyVolume.length > 0}}" class="glass-card chart-card">
     <view class="section-title">{{t.WEEKLY_TRAINING_VOLUME}}</view>
-    <view class="section-subtitle">{{t.LAST_8_WEEKS}}</view>
     <view class="bar-header">
-      <text class="bar-header-label"></text>
+      <text class="bar-header-label">{{t.LAST_8_WEEKS}}</text>
       <view class="bar-header-track"></view>
       <text class="bar-header-unit">{{t.CAL_UNIT_SHORT}}</text>
     </view>
@@ -137,7 +136,9 @@
     </view>
     <picker mode="selector" range="{{exerciseList}}" range-key="name" bindchange="onExerciseChange">
       <view class="select-display">
-        <text class="{{selectedExerciseName ? 'select-text-active' : 'select-text-placeholder'}}">
+        <image wx:if="{{selectedExerciseImage}}" class="select-img" src="{{imgPrefix}}/exer_images/{{selectedExerciseImage}}" mode="aspectFill" lazy-load="true" />
+        <view wx:else class="select-img select-img-placeholder">🏋️</view>
+        <text class="select-text {{selectedExerciseName ? 'select-text-active' : 'select-text-placeholder'}}">
           {{selectedExerciseName || t.CHOOSE_EXERCISE}}
         </text>
         <text class="select-arrow">›</text>

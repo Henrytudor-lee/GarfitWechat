@@ -533,6 +533,11 @@
 .bar-header-label {
   width: 100rpx;
   flex-shrink: 0;
+  font-size: 20rpx;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #71717a;
 }
 .bar-header-track {
   flex: 1;
@@ -797,8 +802,31 @@
 .select-display {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16rpx;
   padding: 12rpx 0 4rpx;
+}
+
+.select-img {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.select-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.select-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .select-text-placeholder {

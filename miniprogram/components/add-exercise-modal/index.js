@@ -108,6 +108,7 @@ Component({
     filterFavor: false,
     filterPracticed: false,
     locale: 'en',
+    pickScrollTop: 0,           // scroll-view 当前位置 (用于 step2 返回时恢复)
   },
 
   observers: {
@@ -145,6 +146,7 @@ Component({
   methods: {
     _reset(imgPrefix, vidPrefix) {
       const app = getApp();
+      this._pickScrollTop = 0;
       const locale = app.globalData.language || 'zh';
       const equipmentListWithName = EQUIPMENT_LIST.map(item => ({
         ...item,
@@ -181,6 +183,7 @@ Component({
         locale,
         equipmentListWithName,
         muscleListWithName,
+        pickScrollTop: 0,
       });
     },
 
@@ -248,6 +251,11 @@ Component({
       // Empty — catchtap on modal-sheet stops event bubbling so child taps don't reach mask
     },
 
+    // 记录 step='pick' 时 exercise-grid 的滚动位置 (避免每次 setData 触发整页重渲染)
+    onPickScroll(e) {
+      this._pickScrollTop = e.detail.scrollTop;
+    },
+
     goBack() {
       this.setData({
         step: 'pick',
@@ -256,6 +264,16 @@ Component({
         reps: 0,
         historyMax: null,
       });
+      // step 切换后 step1 视图重新挂载, scroll-view 是新的, 滚动位置归零.
+      // 下一帧把之前记住的位置写回 scroll-top 属性即可恢复.
+      const top = this._pickScrollTop || 0;
+      if (top > 0) {
+        // 先写 0 再写目标值, 绕过 WeChat "scroll-top 相同值不触发滚动" 的限制
+        this.setData({ pickScrollTop: 0 });
+        wx.nextTick(() => {
+          this.setData({ pickScrollTop: top });
+        });
+      }
     },
 
     toggleMuscleMenu() {
@@ -321,7 +339,13 @@ Component({
       const page = reset ? 1 : this.data.page;
       if (!reset && !this.data.hasMore) return;
 
-      this.setData({ loading: reset, loadingMore: !reset });
+      if (reset) {
+        // 切过滤/搜索时列表刷新, 滚动位置重置到顶部
+        this._pickScrollTop = 0;
+        this.setData({ pickScrollTop: 0, loading: reset, loadingMore: !reset });
+      } else {
+        this.setData({ loading: reset, loadingMore: !reset });
+      }
 
       const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises, filterFavor, filterPracticed } = this.data;
 

@@ -272,10 +272,6 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.settings-item.locked {
-  opacity: 0.45;
-}
-
 .settings-left {
   display: flex;
   align-items: center;
@@ -310,7 +306,6 @@
 }
 
 .theme-icon {}
-.lock-icon {}
 
 /* 设置图标文字 */
 .settings-icon-text {
@@ -338,13 +333,6 @@
 .page.theme-day .settings-title { color: #1a1a1a; }
 .page.theme-night .settings-title { color: #ffffff; }
 
-.settings-title.locked-text {
-  text-decoration: line-through;
-  text-decoration-style: dotted;
-}
-.page.theme-day .settings-title.locked-text { color: #a1a1aa; }
-.page.theme-night .settings-title.locked-text { color: #71717a; }
-
 /* 设置副标题 */
 .settings-subtitle {
   font-size: 20rpx;
@@ -354,10 +342,6 @@
 }
 .page.theme-day .settings-subtitle { color: #a1a1aa; }
 .page.theme-night .settings-subtitle { color: #71717a; }
-
-.settings-subtitle.locked-text {}
-.page.theme-day .settings-subtitle.locked-text { color: #a1a1aa; }
-.page.theme-night .settings-subtitle.locked-text { color: #52525b; }
 
 /* Toggle Pills — 胶囊切换器 */
 .toggle-pills {
@@ -475,7 +459,6 @@
 .page.theme-day .version-text { color: #a1a1aa; }
 .page.theme-night .version-text { color: #3f3f46; }
 
-.settings-lock-icon { width: 24rpx; height: 24rpx;}
 .settings-arrow {
   font-size: 36rpx;
   color: var(--text-muted, #62666d);

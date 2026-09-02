@@ -33,6 +33,7 @@ Page({
     exerciseList: [],
     selectedExerciseId: null,
     selectedExerciseName: '',
+    selectedExerciseImage: '',
     // Max record
     maxRecord: null,
     // Chart data
@@ -162,10 +163,11 @@ Page({
     const MOST_TRAINED_PAGE = 10;
     const mostTrained = mostTrainedAll.slice(0, MOST_TRAINED_PAGE);
 
-    // Exercise list for selector — use locale-aware name
+    // Exercise list for selector — locale-aware name + image
     const exerciseList = historyExercises.map(ex => ({
       id: ex.exercise_id,
       name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
+      image_name: ex.image_name || '',
     }));
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
@@ -192,6 +194,7 @@ Page({
       this.setData({
         selectedExerciseId: first.id,
         selectedExerciseName: first.name,
+        selectedExerciseImage: first.image_name,
       });
       this._loadExerciseData(first.id);
     }
@@ -260,7 +263,9 @@ Page({
 
     if (recordsRes.result && recordsRes.result.success) {
       const records = recordsRes.result.records || [];
-      this.setData({ weightRecords: records });
+      // 先清掉旧图, 让 <canvas id="weightChart"> 重新挂载到 DOM,
+      // 否则 _renderWeightChart 里 select('#weightChart').node() 拿不到节点, 曲线就一直是切换前的
+      this.setData({ weightRecords: records, weightChartImage: '' });
       setTimeout(() => this._renderWeightChart(records), 300);
     }
   },
@@ -284,6 +289,7 @@ Page({
     this.setData({
       selectedExerciseId: exercise.id,
       selectedExerciseName: exercise.name,
+      selectedExerciseImage: exercise.image_name || '',
     });
 
     this._loadExerciseData(exercise.id);
