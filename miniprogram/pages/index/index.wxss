@@ -172,10 +172,45 @@
   gap: 12rpx;
 }
 
+.exercise-card-track {
+  position: relative;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.exercise-card-track.latest-added {
+  padding: 1rpx;
+  box-shadow: 0 4rpx 16rpx rgba(200, 255, 0, 0.08);
+}
+
+.exercise-card-track.latest-added::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 280%;
+  height: 280%;
+  background: linear-gradient(
+    to bottom,
+    var(--primary) 0%,
+    #ffffff 100%
+  );
+  transform: translate(-50%, -50%);
+  animation: exercise-card-track-rotate 1.8s linear infinite;
+}
+
+.exercise-card-track.latest-added .exercise-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border-color: transparent;
+}
+
 .exercise-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20rpx;
+  border-radius: 18rpx;
   overflow: hidden;
 }
 
@@ -274,10 +309,18 @@
   color: #131313;
   font-size: 20rpx;
   font-weight: 700;
+  line-height: 36rpx;
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.ec-set-num.latest-set-num {
+  background: #ff4b3e;
+  color: #fff;
+  box-shadow: 0 0 0 2rpx rgba(255, 75, 62, 0.25);
 }
 
 .ec-set-val {
@@ -757,6 +800,15 @@
 .page.theme-day .exercise-card {
   background: rgba(0, 0, 0, 0.05);
   border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+@keyframes exercise-card-track-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.page.theme-day .exercise-card-track.latest-added {
+  box-shadow: 0 4rpx 16rpx rgba(120, 160, 0, 0.08);
 }
 
 .page.theme-day .ec-header {

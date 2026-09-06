@@ -44,7 +44,8 @@
     </view>
 
     <view wx:if="{{exerciseGroups.length > 0}}" class="exercise-list">
-      <view class="exercise-card" wx:for="{{exerciseGroups}}" wx:key="exercise_id" data-item="{{item}}" bindtap="onExerciseTap">
+      <view class="exercise-card-track {{item.isLatestAdded ? 'latest-added' : ''}}" wx:for="{{exerciseGroups}}" wx:key="exercise_id">
+        <view class="exercise-card" data-item="{{item}}" bindtap="onExerciseTap">
         <!-- Header: image + name/sets + volume -->
         <view class="ec-header">
           <view class="ec-img-wrap">
@@ -63,11 +64,12 @@
         <!-- Sets grid: 2 columns -->
         <view class="ec-sets-grid">
           <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
-            <view class="ec-set-num">{{index + 1}}</view>
+            <view class="ec-set-num {{item.isLatestAdded && s.id === item.latestSetId ? 'latest-set-num' : ''}}">{{index + 1}}</view>
             <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
             <view class="ec-set-sep">×</view>
             <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS_UNIT}}</text></view>
           </view>
+        </view>
         </view>
       </view>
     </view>

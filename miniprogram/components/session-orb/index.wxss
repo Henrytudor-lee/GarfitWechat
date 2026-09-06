@@ -51,7 +51,6 @@
 /* === active: 深色圆 + logo + duration (圆球本身不缩放, 仅 logo) === */
 .session-orb.active {
   background: var(--surface-high);
-  border: 2rpx solid var(--primary);
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
 }
 
@@ -137,7 +136,6 @@
 }
 .page.theme-day .session-orb.active {
   background: #ffffff;
-  border-color: var(--primary);
 }
 .page.theme-day .orb-logo-idle {
   /* day 主题: 不反色 (logo 自身可能已经是黑色背景) */

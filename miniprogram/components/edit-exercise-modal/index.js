@@ -189,6 +189,7 @@ Component({
 
       try {
         const { group, sets } = this.data;
+        let addedExerciseId = null;
 
         for (let i = 0; i < sets.length; i++) {
           const s = sets[i];
@@ -214,6 +215,7 @@ Component({
                 weight: s.weight,
                 reps: s.reps,
                 weight_unit: s.weight_unit });
+            addedExerciseId = group.exercise_id;
           }
         }
 
@@ -229,7 +231,7 @@ Component({
               session_id: this.data.sessionId });
         }
 
-        this.triggerEvent('saved');
+        this.triggerEvent('saved', { addedExerciseId });
         this.closeModal();
       } catch (err) {
         console.error('Save failed:', err);

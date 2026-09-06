@@ -501,7 +501,7 @@ Component({
 
         if (res.result && res.result.success) {
           wx.showToast({ title: 'ADDED TO WORKOUT', icon: 'success' });
-          this.triggerEvent('exerciseadded');
+          this.triggerEvent('exerciseadded', { addedExerciseId: exId });
           this.closeModal();
         } else {
           wx.showToast({ title: (res.result && res.result.error) || 'FAILED', icon: 'none' });

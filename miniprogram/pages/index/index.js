@@ -250,16 +250,26 @@ Page({
   async _loadExerciseGroups(sessionId) {
     const res = await api.callCloud('exercise.list', { session_id: sessionId });
     if (res.result && res.result.success) {
+      if (this._exerciseOrderSessionId !== sessionId) {
+        this._exerciseOrderSessionId = sessionId;
+        this._exerciseOrder = null;
+      }
       const map = {};
       for (const ex of res.result.exercises || []) {
         if (!map[ex.exercise_id]) {
-          map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0, _latestTime: 0 };
+          map[ex.exercise_id] = { ...ex, sets: [], totalVolume: 0, _latestTime: 0, _latestId: 0, _latestSetId: 0 };
         }
         const t = ex.create_time ? new Date(ex.create_time).getTime() : 0;
         if (t > map[ex.exercise_id]._latestTime) {
           map[ex.exercise_id]._latestTime = t;
         }
+        if (ex.id != null && ex.id > map[ex.exercise_id]._latestId) {
+          map[ex.exercise_id]._latestId = ex.id;
+        }
         if (ex.weight > 0 || ex.reps > 0) {
+          if (ex.id != null && ex.id > map[ex.exercise_id]._latestSetId) {
+            map[ex.exercise_id]._latestSetId = ex.id;
+          }
           const vol = setVolume(ex);
           map[ex.exercise_id].sets.push({
             id: ex.id,
@@ -275,10 +285,31 @@ Page({
         totalVolume: Math.round(g.totalVolume),
         totalCalories: volumeToCalories(Math.round(g.totalVolume)),
         latestTime: g._latestTime || 0,  // 该组最后一次 set 的 create_time 戳
+        latestId: g._latestId,
+        latestSetId: g._latestSetId,
       }));
-      // 按"最近活动时间"降序: 最新加的 / 最新加组的动作排在最前面
-      // (之前 groups.reverse() 反转的是首次出现顺序, 回头给老动作加组时不会顶上去)
-      groups.sort((a, b) => b.latestTime - a.latestTime);
+      const latestSetId = groups.reduce((latest, group) => Math.max(latest, group.latestSetId || 0), 0);
+      groups.forEach(group => {
+        group.isLatestAdded = latestSetId > 0 && group.latestSetId === latestSetId;
+      });
+      const existingOrder = this._exerciseOrder || [];
+      const addedExerciseId = this._pendingAddedExerciseId;
+      if (addedExerciseId != null) {
+        this._exerciseOrder = [
+          Number(addedExerciseId),
+          ...existingOrder.filter(id => Number(id) !== Number(addedExerciseId)),
+        ];
+        this._pendingAddedExerciseId = null;
+      } else if (!this._exerciseOrder) {
+        this._exerciseOrder = groups.map(group => group.exercise_id);
+      }
+      const orderIndex = new Map(this._exerciseOrder.map((id, index) => [Number(id), index]));
+      groups.sort((a, b) => {
+        const aIndex = orderIndex.has(Number(a.exercise_id)) ? orderIndex.get(Number(a.exercise_id)) : Number.MAX_SAFE_INTEGER;
+        const bIndex = orderIndex.has(Number(b.exercise_id)) ? orderIndex.get(Number(b.exercise_id)) : Number.MAX_SAFE_INTEGER;
+        return aIndex - bIndex;
+      });
+      if (groups.length > 0) groups[0].isLatestAdded = true;
       // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
       const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
       const totalCal = volumeToCalories(volume);
@@ -673,8 +704,10 @@ Page({
     this.setData({ showEditModal: false, editingGroup: null });
   },
 
-  onEditModalSaved() {
+  onEditModalSaved(e) {
     this.setData({ showEditModal: false, editingGroup: null });
+    const addedExerciseId = e && e.detail && e.detail.addedExerciseId;
+    if (addedExerciseId != null) this._pendingAddedExerciseId = addedExerciseId;
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
     if (sessionId) {
       this._loadExerciseGroups(sessionId);
@@ -709,8 +742,10 @@ Page({
     this.setData({ showAddModal: false });
   },
 
-  onAddModalExerciseAdded() {
+  onAddModalExerciseAdded(e) {
     this.setData({ showAddModal: false });
+    const addedExerciseId = e && e.detail && e.detail.addedExerciseId;
+    if (addedExerciseId != null) this._pendingAddedExerciseId = addedExerciseId;
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
     if (sessionId) {
       this._loadExerciseGroups(sessionId);
