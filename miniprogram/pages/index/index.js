@@ -188,43 +188,56 @@ Page({
   async _loadData() {
     wx.showLoading({ title: 'LOADING...', mask: true });
 
-    const [runRes, recentRes, monthRes] = await Promise.all([
+    // 修复: 用 allSettled 避免单个接口失败导致整个流程中断.
+    // (比如某个接口 401/403, 之前 Promise.all 会立刻 throw,
+    //  runningSession / exerciseGroups / recentSessions 全部丢失, 页面停在初始状态.)
+    const results = await Promise.allSettled([
       api.callCloud('session.getRunning'),
       api.callCloud('session.list', { page: 1, pageSize: 5 }),
       api.callCloud('session.monthlyStats'),
     ]);
 
-    wx.hideLoading();
+    const runRes = results[0].status === 'fulfilled' ? results[0].value : null;
+    const recentRes = results[1].status === 'fulfilled' ? results[1].value : null;
+    const monthRes = results[2].status === 'fulfilled' ? results[2].value : null;
 
-    if (runRes.result && runRes.result.session) {
-      const session = runRes.result.session;
-      const sessionId = session._id || session.id;
-      this.setData({ runningSession: session, currentSessionId: sessionId });
-      this._startTimer(session.start_time);
-      this._startRestTimer();  // start rest countdown
-      this._loadExerciseGroups(sessionId);
-    } else {
-      this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
-      this._stopTimers();
+    try {
+      if (runRes && runRes.result && runRes.result.session) {
+        const session = runRes.result.session;
+        const sessionId = session._id || session.id;
+        this.setData({ runningSession: session, currentSessionId: sessionId });
+        this._startTimer(session.start_time);
+        // 不在这里调 _startRestTimer: rest timer 由 _loadExerciseGroups
+        // 根据最新 create_time 计算, 这样切 tab / 切后台回来后
+        // timer 仍能反映真实休息时长
+        this._loadExerciseGroups(sessionId);
+      } else {
+        this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
+        this._stopTimers();
+      }
+
+      if (recentRes && recentRes.result && recentRes.result.sessions) {
+        const sessions = recentRes.result.sessions.map(s => {
+          const d = new Date(s.start_time);
+          const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+          const mins = Math.floor((s.duration || 0) / 60);
+          return { ...s, dateStr, durationStr: `${mins} MIN` };
+        });
+        this.setData({ recentSessions: sessions });
+      }
+
+      // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume, todayVolume, yesterdayVolume)
+      if (monthRes && monthRes.result && monthRes.result.success) {
+        this._applyMonthlyStats(monthRes.result);
+      }
+
+      // 即使上面某个接口失败, history 也独立加载 (不再被前面 reject 阻断)
+      this._loadHistorySessions();
+    } catch (err) {
+      console.error('_loadData failed:', err);
+    } finally {
+      wx.hideLoading();
     }
-
-    if (recentRes.result && recentRes.result.sessions) {
-      const sessions = recentRes.result.sessions.map(s => {
-        const d = new Date(s.start_time);
-        const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-        const mins = Math.floor((s.duration || 0) / 60);
-        return { ...s, dateStr, durationStr: `${mins} MIN` };
-      });
-      this.setData({ recentSessions: sessions });
-    }
-
-    // Bento: 月度数据 (todayProgress, yesterdayProgress, monthlyVolume, todayVolume, yesterdayVolume)
-    if (monthRes.result && monthRes.result.success) {
-      this._applyMonthlyStats(monthRes.result);
-    }
-
-    // Load history sessions for selected date
-    this._loadHistorySessions();
   },
 
   async _loadMonthlyStats() {
@@ -319,6 +332,11 @@ Page({
         totalVolume: volume,
         totalCaloriesStr: formatCalories(totalCal),
       });
+      // 用最新一条 set 的 create_time 作为休息时间起点.
+      // 这样: 切 tab / 切后台回来后, timer 仍能从 create_time 正确计时.
+      // 没有 sets 时, _updateRestTimer 内部回退到 session.start_time.
+      const latestSetTime = groups.reduce((m, g) => Math.max(m, g.latestTime || 0), 0);
+      this._updateRestTimer(latestSetTime);
     }
   },
 
@@ -340,37 +358,35 @@ Page({
     this.setData({ timer });
   },
 
-  _startRestTimer() {
-    if (this.data.restTimer) clearInterval(this.data.restTimer);
-    const startMs = Date.now();
-    this.setData({ restStartMs: startMs });
-    const update = () => {
-      const diff = Math.floor((Date.now() - startMs) / 1000);
-      const m = Math.floor(diff / 60);
-      const s = diff % 60;
-      this.setData({
-        restTime: `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`,
-      });
-    };
-    update();
-    const restTimer = setInterval(update, 500);
-    this.setData({ restTimer });
-  },
+  _updateRestTimer(latestTime) {
+    // 决定休息计时起点:
+    //   1. latestTime > 0 -> 最新一条 set 的 create_time (DB 写入时间)
+    //   2. 否则          -> 当前 session 的 start_time
+    //   3. 否则          -> 当前时间 (兜底)
+    // 关键: 不再用 Date.now(), 否则切 tab / 切后台回来后 timer 会被重置.
+    let startMs = 0;
+    if (latestTime && latestTime > 0) {
+      startMs = latestTime;
+    } else if (this.data.runningSession && this.data.runningSession.start_time) {
+      startMs = new Date(this.data.runningSession.start_time).getTime();
+    } else {
+      startMs = Date.now();
+    }
 
-  _resetRestTimer() {
-    // Reset rest countdown from now (called when exercise is added)
-    const startMs = Date.now();
+    // 起点没变 + timer 已在跑 -> 跳过, 避免无谓重置
+    if (this.data.restTimer && this.data.restStartMs === startMs) return;
+
+    if (this.data.restTimer) clearInterval(this.data.restTimer);
     this.setData({ restStartMs: startMs });
     const update = () => {
       const diff = Math.floor((Date.now() - startMs) / 1000);
+      if (diff < 0) return;  // 时钟回拨保护
       const m = Math.floor(diff / 60);
       const s = diff % 60;
       this.setData({
         restTime: `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`,
       });
     };
-    // Clear existing and restart
-    if (this.data.restTimer) clearInterval(this.data.restTimer);
     update();
     const restTimer = setInterval(update, 500);
     this.setData({ restTimer });
@@ -609,7 +625,8 @@ Page({
     const sessionId = session._id || session.id;
     this.setData({ runningSession: session, currentSessionId: sessionId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, totalCaloriesStr: '0' });
     this._startTimer(session.start_time || new Date().toISOString());
-    this._startRestTimer();
+    // 没有 sets: 用 session.start_time 作为休息时间起点 (兜底)
+    this._updateRestTimer(0);
   },
 
   // 从其他页面 (library/profile/stats) 点 orb 创建 session 后, globalData.runningSession 已更新,
@@ -624,8 +641,7 @@ Page({
     if (g) {
       this.setData({ runningSession: g, currentSessionId: gId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, totalCaloriesStr: '0' });
       if (g.start_time) this._startTimer(g.start_time);
-      this._startRestTimer();
-      this._loadExerciseGroups(gId);
+      this._loadExerciseGroups(gId);  // rest timer 由 _loadExerciseGroups 基于最新 create_time 设置
     } else {
       this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
       this._stopTimers();
@@ -710,8 +726,7 @@ Page({
     if (addedExerciseId != null) this._pendingAddedExerciseId = addedExerciseId;
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
     if (sessionId) {
-      this._loadExerciseGroups(sessionId);
-      this._resetRestTimer();  // reset rest timer after editing/saving sets
+      this._loadExerciseGroups(sessionId);  // rest timer 会在 _loadExerciseGroups 内基于最新 create_time 设置
     }
   },
 
@@ -748,8 +763,7 @@ Page({
     if (addedExerciseId != null) this._pendingAddedExerciseId = addedExerciseId;
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
     if (sessionId) {
-      this._loadExerciseGroups(sessionId);
-      this._resetRestTimer();  // reset rest timer on exercise add
+      this._loadExerciseGroups(sessionId);  // rest timer 会在 _loadExerciseGroups 内基于最新 create_time 设置
     }
   },
 
@@ -796,8 +810,7 @@ Page({
         reps: 0 });
     wx.hideLoading();
     if (res.result && res.result.success) {
-      this._loadExerciseGroups(sessionId);
-      this._resetRestTimer();  // reset rest timer on exercise add
+      this._loadExerciseGroups(sessionId);  // rest timer 会在 _loadExerciseGroups 内基于最新 create_time 设置
     }
   },
 });

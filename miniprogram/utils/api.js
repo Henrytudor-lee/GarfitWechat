@@ -2,11 +2,29 @@
 // 包装 wx.request，替代 wx.cloud.callFunction
 // - 自动从 storage 注入 JWT
 // - 统一处理响应: success → resolve(data), fail → reject(Error)
-// - 401 时清掉 token, 触发上层重新登录
+// - 401 / 403 都视为鉴权失效, 清掉 token 并触发上层重新登录
+//   (修复: 某个接口 403 后, 同一过期 token 会让其他接口连锁失败)
 
 const BASE_URL = 'https://gfit.l2ee.top';
 
 console.log('[api] BASE_URL =', BASE_URL);
+
+// ---- 鉴权失效 → 触发静默登录 (只触发一次, 防抖) ----
+let _loginInFlight = false;
+function triggerSilentLogin() {
+  if (_loginInFlight) return;
+  _loginInFlight = true;
+  try {
+    const app = typeof getApp === 'function' ? getApp() : null;
+    if (app && typeof app.doSilentLogin === 'function') {
+      app.doSilentLogin();
+    }
+  } catch (e) {
+    console.warn('[api] triggerSilentLogin failed', e);
+  }
+  // 1.5s 后解锁, 让下次真正需要重登时还能再触发
+  setTimeout(() => { _loginInFlight = false; }, 1500);
+}
 
 function getToken() {
   return wx.getStorageSync('token') || '';
@@ -29,9 +47,12 @@ function call(action, data = {}) {
         Authorization: token ? `Bearer ${token}` : '',
       },
       success: (res) => {
-        if (res.statusCode === 401) {
+        // 401 / 403 都视为鉴权失效: 清 token, 触发重新登录,
+        // 防止某个接口鉴权失败后, 后续接口因同一 token 全部失败
+        if (res.statusCode === 401 || res.statusCode === 403) {
           setToken('');
-          reject(new Error('未登录或 token 过期'));
+          triggerSilentLogin();
+          reject(new Error(res.statusCode === 401 ? '未登录或 token 过期' : '未授权'));
           return;
         }
         const body = res.data || {};
