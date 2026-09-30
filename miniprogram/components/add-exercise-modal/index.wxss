@@ -304,6 +304,47 @@
   padding: 24rpx 0;
 }
 
+/* Scroll-to-top FAB
+   位置: session-orb (active) 底部在屏底往上 ~332rpx 处,
+   故此按钮贴在屏底往上 ~220rpx (top ~300rpx),
+   与 orb 底部留 ~32rpx 视觉间距, 形成 "右上叠两个圆按钮" 的层级 */
+.scroll-top-fab {
+  position: absolute;
+  right: 24rpx;
+  bottom: 220rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.35),
+              0 0 24rpx rgba(204, 242, 0, 0.35);
+  z-index: 50;
+  opacity: 0;
+  transform: translateY(20rpx) scale(0.85);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.scroll-top-fab.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.scroll-top-fab-hover {
+  transform: translateY(0) scale(0.92) !important;
+  opacity: 0.85 !important;
+}
+.scroll-top-fab-arrow {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #0a0a0a;
+  /* 微调让箭头视觉居中 (Unicode 字符 baseline 偏高) */
+  margin-top: -4rpx;
+}
+
 .grid-inner {
   display: flex;
   flex-wrap: wrap;

@@ -51,7 +51,7 @@
     <view class="modal-content">
 
       <!-- STEP 1: Pick Exercise -->
-      <view wx:if="{{step === 'pick'}}" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+      <view wx:if="{{step === 'pick'}}" style="flex:1;display:flex;flex-direction:column;min-height:0;position:relative;">
 
         <!-- Search -->
         <view class="search-bar">
@@ -109,6 +109,11 @@
           <view wx:if="{{loadingMore}}" class="load-more">{{t.LOADING_MORE}}</view>
           <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
         </scroll-view>
+
+        <!-- Scroll-to-top FAB: 列表往下滚超过 300px 时浮现, 点击回顶 -->
+        <view class="scroll-top-fab {{showScrollTopBtn ? 'visible' : ''}}" catchtap="scrollToTop" hover-class="scroll-top-fab-hover" wx:if="{{step === 'pick'}}">
+          <text class="scroll-top-fab-arrow">↑</text>
+        </view>
       </view>
 
       <!-- STEP 2: Set Weight/Reps -->

@@ -109,6 +109,7 @@ Component({
     filterPracticed: false,
     locale: 'en',
     pickScrollTop: 0,           // scroll-view 当前位置 (用于 step2 返回时恢复)
+    showScrollTopBtn: false,    // 列表往下滚超过阈值时, 显示右下角回顶按钮
   },
 
   observers: {
@@ -184,6 +185,7 @@ Component({
         equipmentListWithName,
         muscleListWithName,
         pickScrollTop: 0,
+        showScrollTopBtn: false,
       });
     },
 
@@ -252,8 +254,20 @@ Component({
     },
 
     // 记录 step='pick' 时 exercise-grid 的滚动位置 (避免每次 setData 触发整页重渲染)
+    // 同时按阈值切换右下角 "回顶" 按钮
     onPickScroll(e) {
-      this._pickScrollTop = e.detail.scrollTop;
+      const top = e.detail.scrollTop;
+      this._pickScrollTop = top;
+      const shouldShow = top > 300;
+      if (this.data.showScrollTopBtn !== shouldShow) {
+        this.setData({ showScrollTopBtn: shouldShow });
+      }
+    },
+
+    // 点击右下角回顶按钮 -> 滚动到列表顶部
+    scrollToTop() {
+      this._pickScrollTop = 0;
+      this.setData({ pickScrollTop: 0, showScrollTopBtn: false });
     },
 
     goBack() {
