@@ -314,7 +314,16 @@ Page({
         ];
         this._pendingAddedExerciseId = null;
       } else if (!this._exerciseOrder) {
-        this._exerciseOrder = groups.map(group => group.exercise_id);
+        // Fresh page load (e.g. custom-tabbar 用 wx.reLaunch 切 tab 时 Page 实例被销毁,
+        // _exerciseOrder 被清空). 此时不能直接用 groups.map(...) — 因为 API 返回顺序是
+        // create_time ASC, Object.values(map) 顺序 = 首次出现的顺序 = 最早的动作在前.
+        // groups[0] 一旦不是最新动作, 配合下面 groups[0].isLatestAdded = true,
+        // "最新动作" 高亮就会同时打在两个 group 上 (forEach 标的最新 set + groups[0]).
+        // 用 latestTime DESC 兜底, 保证 groups[0] === 最新动作.
+        this._exerciseOrder = groups
+          .slice()
+          .sort((a, b) => b.latestTime - a.latestTime)
+          .map(g => g.exercise_id);
       }
       const orderIndex = new Map(this._exerciseOrder.map((id, index) => [Number(id), index]));
       groups.sort((a, b) => {

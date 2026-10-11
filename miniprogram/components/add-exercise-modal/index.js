@@ -146,6 +146,11 @@ Component({
 
   methods: {
     _reset(imgPrefix, vidPrefix) {
+      if (this._searchTimer) {
+        clearTimeout(this._searchTimer);
+        this._searchTimer = null;
+      }
+
       const app = getApp();
       this._pickScrollTop = 0;
       const locale = app.globalData.language || 'zh';
@@ -326,9 +331,22 @@ Component({
 
     onSearchInput(e) {
       this.setData({ keyword: e.detail.value });
+      // 输入即过滤 (debounce 300ms): 之前只有 bindconfirm (按回车) 才刷新列表,
+      // 用户清空检索字到空字符串时不会触发任何刷新, 列表停留在过滤后的状态.
+      if (this._searchTimer) clearTimeout(this._searchTimer);
+      this._searchTimer = setTimeout(() => {
+        this._searchTimer = null;
+        this.setData({ page: 1, list: [] });
+        this.loadList(true);
+      }, 300);
     },
 
     onSearch() {
+      // 按回车: 取消 pending 的 debounce, 立即刷新
+      if (this._searchTimer) {
+        clearTimeout(this._searchTimer);
+        this._searchTimer = null;
+      }
       this.setData({ page: 1, list: [] });
       this.loadList(true);
     },
