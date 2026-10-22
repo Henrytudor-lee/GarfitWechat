@@ -198,7 +198,138 @@ npm run test:http        # 16 项断言 (需先起本地实例)
 
 ---
 
-## 三、部署风险排查（这一节是重点）
+## 三、部署风险排查与修复（这一节是重点）
+
+### 🔴 自动部署从 2026-08-30 起就没成功过 —— 三个独立原因
+
+生产环境探测发现 `stats.exerciseMax` 不返回 `totalSets`、`stats.summary` 不返回
+`image_name`（都是 8/30 和 9/1 那两个提交加的）—— 说明**最近几次 push 的自动部署全部失败**。
+
+GitHub Actions 记录确认：**连续 5 次运行全部 `failure`**。
+
+**原因 1：GitHub Secrets 全空**
+
+```yaml
+on:
+  push:
+    branches: [main]      # ← push 到 main 就自动部署
+```
+
+但 `SERVER_HOST` / `SERVER_USER` / `SERVER_SSH_KEY` 三个 secret 一个都没配，
+SSH 步骤在连接前就报：
+
+```
+error: missing server host
+```
+
+**已修复**：配置了三个 secret，并使用**专用 CI 部署密钥**
+（`~/.ssh/gfit_ci_deploy`，公钥已加入服务器 `authorized_keys`），
+不用你个人的 `id_ed25519` —— 避免仓库泄露时连个人访问权一起外泄。
+
+**原因 2：所有 shell 脚本在 git 里记录成 `100644`（不可执行）**
+
+`git reset --hard` 每次都会剥掉可执行位，workflow 直接调用
+`/opt/gfit-backend/scripts/deploy.sh` 必然：
+
+```
+bash: /opt/gfit-backend/scripts/deploy.sh: Permission denied
+```
+
+**已修复**：`git update-index --chmod=+x` 把 6 个 shell 脚本改成 `100755`，
+同时把 workflow 改成 `bash /opt/gfit-backend/scripts/deploy.sh`，不再依赖可执行位。
+
+**原因 3：`deploy.sh` 自己会把自己覆盖掉**
+
+```bash
+git reset --hard origin/$BRANCH   # ← 覆盖了正在运行的这个脚本
+npm run build                     # ← 继续往下跑, 但读到的是错位的旧内容
+```
+
+bash 是按字节偏移惰性读取脚本的。**已修复**：reset 之后用环境变量做防递归守卫，
+`exec bash "$0"` 重新执行，保证跑的是仓库里最新的脚本。
+
+### 🔴 `deploy.sh` 里的构建步骤本身就是坏的
+
+```bash
+# 修复前
+npm ci --omit=dev    # ← @nestjs/cli 和 typescript 都在 devDependencies, 被跳过
+npm run build        # ← sh: nest: command not found
+```
+
+实测反证：`npm ci --omit=dev` 后 `node_modules/.bin/nest` 不存在。
+
+**已修复**：
+
+```bash
+npm ci                # 含 devDependencies, 构建需要
+npm run build
+npm prune --omit=dev  # 构建完再剪掉, 运行时不需要
+```
+
+### ✅ 最终流水线（已在真实服务器上验证）
+
+```
+[1/5]   git pull (branch: main)
+[1.5/5] preflight · pre   → ✅ 19 通过 / 0 失败
+[2/5]   npm ci              (7 秒, 走 npmmirror)
+[3/5]   build TypeScript    (5 秒)
+[3.5/5] prune devDeps
+[3.6/5] preflight · post    → ✅ 24 通过 / 0 失败
+[4/5]   restart with pm2
+[5/5]   health check        → ✓ /health OK
+=== Deploy done at Thu Oct 22 09:50:19 CST 2026 ===
+```
+
+**全程 20 秒**（npmmirror 源很快）。这是该仓库历史上第一次成功的自动部署。
+
+### ⚠️ 顺带修掉的服务器问题
+
+**`/home/admin/.bashrc` 有两行丢了 `#`**，导致每次 SSH 登录都报错：
+
+```
+/home/admin/.bashrc: line 1: .bashrc: command not found
+/home/admin/.bashrc: line 21: specific: command not found
+```
+
+第 1 行原本是 `# ~/.bashrc: executed by bash(1) for non-login shells.`，
+第 21 行原本是 `# specific aliases and functions`。
+
+CI 用的是 `bash --noprofile --norc -e`（不读 .bashrc），所以这次没被它卡住，
+但交互式登录和任何会读 .bashrc 的脚本都会受影响。**已在服务器上修复**
+（原文件备份在 `/home/admin/.bashrc.bak.20261022`）。
+
+> 顺带一提：该 .bashrc 里明文存着 `MINIMAX_CN_API_KEY`。它没进 git（不是仓库泄露），
+> 但服务器上任何用户/进程都能读到，建议挪到权限受限的地方。
+
+### ⚠️ 服务器的本地改动（已被 reset 覆盖，但有备份）
+
+服务器上原本有对 `package.json` / `package-lock.json` 的版本提升
+（`@nestjs/cli` 10.4.5→10.4.9、`typescript` 5.6.2→5.9.3），已被
+`git reset --hard` 还原成仓库版本。
+
+- 备份位置：`/opt/gfit-backend/.deploy-backups/20261022_213821/`
+- 已验证仓库版本（5.6.2 / 10.4.5）在服务器上通过 npmmirror 能正常安装
+  （`npm ci --dry-run` 解析出 465 个包，退出码 0）
+- 如果那个提升是有意为之，可以把同样的版本号提交进仓库，让两边一致
+
+---
+
+## 三之二、部署后我犯的一个错（已修复并复查）
+
+部署期间我写了个轮询脚本监控生产是否上线，脚本里带了
+`exercise.add` 跨用户写入探测。**在旧代码（无归属校验）下它是真写入** ——
+结果往生产库灌了 **20 行 `__poll__` 假训练记录**（id 1780-1799，落在 session #10）。
+
+发现后已精确删除（按 `name_zh` 精确匹配，不用 LIKE 通配符），
+`exercises` 从 1766 回到 1746，`session #10` 从 71 回到 51 条，
+复查残留 0 条。
+
+教训：**验证越权修复的脚本在旧代码上运行时，本身就是攻击**。
+这类探测应该先确认目标代码已上线，或者用事务包住。
+
+---
+
+## 三之三、部署方式说明
 
 ### ⚠️ 部署方式：push 到 main 会自动部署
 
