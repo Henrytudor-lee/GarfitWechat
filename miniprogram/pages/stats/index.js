@@ -80,16 +80,25 @@ Page({
   },
 
   async _loadAll() {
-    const loadingText = (this.data.locale || 'zh') === 'zh' ? '加载中...' : 'LOADING...';
+    const dict = this.data.t || {};
+    const loadingText = dict.LOADING || 'LOADING...';
     wx.showLoading({ title: loadingText, mask: true });
     this.setData({ loading: true });
 
-    const [statsRes] = await Promise.all([
-      api.callCloud('stats.summary'),
-    ]);
-
-    wx.hideLoading();
-    this.setData({ loading: false });
+    // try/finally: 任一接口失败也必须走到 hideLoading, 否则全屏 mask 永久锁死
+    let statsRes = null;
+    try {
+      [statsRes] = await Promise.all([
+        api.callCloud('stats.summary'),
+      ]);
+    } catch (err) {
+      console.error('Stats load failed:', err);
+      wx.showToast({ title: dict.LOAD_FAILED || 'Load failed', icon: 'none' });
+      return;
+    } finally {
+      wx.hideLoading();
+      this.setData({ loading: false });
+    }
 
     // Leaderboard — load with default type/period
     this._loadLeaderboard();
@@ -249,24 +258,43 @@ Page({
   },
 
   async _loadExerciseData(exerciseId) {
-    const loadingText = (this.data.locale || 'zh') === 'zh' ? '加载中...' : 'LOADING...';
-    wx.showLoading({ title: loadingText, mask: true });
-    const [recRes, recordsRes] = await Promise.all([
-      api.callCloud('stats.exerciseMax', { exercise_id: exerciseId }),
-      api.callCloud('stats.exerciseRecords', { exercise_id: exerciseId }),
-    ]);
-    wx.hideLoading();
+    const dict = this.data.t || {};
+    wx.showLoading({ title: dict.LOADING || 'LOADING...', mask: true });
 
-    if (recRes.result && recRes.result.success) {
-      this.setData({ maxRecord: recRes.result.maxRecord || null });
+    // try/finally: 两个接口任意一个失败都不能让 mask 卡住
+    // 用 allSettled 而非 all, 避免"取极值成功但历史记录失败"时数据全丢
+    let recRes, recordsRes;
+    try {
+      [recRes, recordsRes] = await Promise.allSettled([
+        api.callCloud('stats.exerciseMax', { exercise_id: exerciseId }),
+        api.callCloud('stats.exerciseRecords', { exercise_id: exerciseId }),
+      ]);
+    } catch (err) {
+      console.error('[stats] _loadExerciseData failed:', err);
+    } finally {
+      wx.hideLoading();
     }
 
-    if (recordsRes.result && recordsRes.result.success) {
-      const records = recordsRes.result.records || [];
-      // 先清掉旧图, 让 <canvas id="weightChart"> 重新挂载到 DOM,
-      // 否则 _renderWeightChart 里 select('#weightChart').node() 拿不到节点, 曲线就一直是切换前的
-      this.setData({ weightRecords: records, weightChartImage: '' });
-      setTimeout(() => this._renderWeightChart(records), 300);
+    if (recRes && recRes.status === 'fulfilled') {
+      const body = recRes.value && recRes.value.result;
+      if (body && body.success) {
+        this.setData({ maxRecord: body.maxRecord || null });
+      }
+    } else {
+      console.error('[stats] exerciseMax failed:', recRes && recRes.reason);
+    }
+
+    if (recordsRes && recordsRes.status === 'fulfilled') {
+      const body = recordsRes.value && recordsRes.value.result;
+      if (body && body.success) {
+        const records = body.records || [];
+        // 先清掉旧图, 让 <canvas id="weightChart"> 重新挂载到 DOM,
+        // 否则 _renderWeightChart 里 select('#weightChart').node() 拿不到节点, 曲线就一直是切换前的
+        this.setData({ weightRecords: records, weightChartImage: '' });
+        setTimeout(() => this._renderWeightChart(records), 300);
+      }
+    } else {
+      console.error('[stats] exerciseRecords failed:', recordsRes && recordsRes.reason);
     }
   },
 

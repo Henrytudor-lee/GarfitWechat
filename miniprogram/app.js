@@ -95,11 +95,19 @@ App({
   },
 
   // ---- 全局 running session ----
+  // 单一事实来源: 任何页面创建/结束 session 都必须写这里,
+  // 否则各页 local 状态与 global 脱节, onShow 同步时会误判成"session 被结束"而清空 UI.
+  setRunningSession(session) {
+    this.globalData.runningSession = session || null;
+  },
+
+  // 拉一次 running session 并写入 global.
+  // 被 library / stats / profile 三个页面的 onLoad 用来点亮 orb 状态.
   async loadRunningSession() {
     try {
       const res = await api.call('session.getRunning');
       const session = (res && res.session) || null;
-      this.globalData.runningSession = session;
+      this.setRunningSession(session);
       return session;
     } catch (e) {
       console.error('loadRunningSession failed:', e);
@@ -107,8 +115,19 @@ App({
     }
   },
 
-  setRunningSession(session) {
-    this.globalData.runningSession = session;
+  // ---- 鉴权就绪门闩 ----
+  // 页面不要再用 setTimeout 轮询 globalData.openid ——
+  // 那样既没法取消, 也没法区分"还在登录"和"登录失败"。
+  // 这里直接复用 onLaunch 里已经建好的 loginPromise。
+  // @param {number} timeoutMs 兜底超时, 避免 promise 永不 settle 时页面永远空白
+  // @returns {Promise<string|null>} resolve 出 openid; 登录失败/超时则 resolve(null)
+  whenAuthReady(timeoutMs = 15000) {
+    if (this.globalData.openid) return Promise.resolve(this.globalData.openid);
+    const pending = this.globalData.loginPromise || Promise.resolve();
+    return Promise.race([
+      pending.then(() => this.globalData.openid || null),
+      new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+    ]);
   },
 
   async ensureRunningSession() {
@@ -121,7 +140,7 @@ App({
     }
 
     if (session && session.start_time) {
-      this.globalData.runningSession = session;
+      this.setRunningSession(session);
       return session;
     }
 
@@ -130,7 +149,7 @@ App({
       const res = await api.call('session.create');
       if (res && res.success) {
         const s = res.session || { id: res.sessionId, start_time: new Date().toISOString() };
-        this.globalData.runningSession = s;
+        this.setRunningSession(s);
         return s;
       }
       wx.showToast({ title: 'START FAILED', icon: 'none' });

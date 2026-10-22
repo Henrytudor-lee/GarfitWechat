@@ -28,11 +28,6 @@ Page({
     exerciseGroups: [],
     recentSessions: [],
     imgPrefix: '',
-    timer: null,
-    restTimer: null,
-    sessionStartMs: 0,
-    restStartMs: 0,
-    _dataLoaded: false,   // guard: prevent duplicate _loadData from onLoad + onShow
 
     // i18n + theme
     locale: 'en',
@@ -91,7 +86,6 @@ Page({
   onLoad: async function() {
     this.setData({
       imgPrefix: app.globalData.imagePrefix,
-      _dataLoaded: true,
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t,  // 注入 i18n 字典, WXML 用 {{t.KEY}}
@@ -115,21 +109,45 @@ Page({
       yesterdayMonth: this._monthName(yesterday.getMonth()),
     });
 
-    // openid ready → load immediately; otherwise poll
-    if (app.globalData.openid) {
-      this._loadData();
-      this._initCalendar();  // safe: openid is available
-    } else {
-      const tryLoad = () => {
-        if (app.globalData.openid) {
-          this._loadData();
-          this._initCalendar();  // safe: openid is now available
-        } else {
-          setTimeout(tryLoad, 100);
-        }
-      };
-      tryLoad();
+    // 单一加载入口: 等鉴权就绪后拉数据。
+    // 原来是 setTimeout 轮询 globalData.openid —— 不可取消、openid 永不到达就永远空转,
+    // 而且 onLoad 和 onShow 各写了一份。
+    this._bootstrap();
+  },
+
+  /**
+   * 等鉴权就绪 → 拉数据。onLoad / onShow-from-background 共用这一条路径。
+   * - _booting: 防止 onLoad 和 onShow 同时触发两次加载
+   * - _dataLoaded: 真正的"数据已就绪"标记（修复前它在 onLoad 里被立刻置 true，语义是假的）
+   */
+  async _bootstrap() {
+    if (this._booting) return;
+    this._booting = true;
+    try {
+      const openid = await app.whenAuthReady();
+      if (this._unloaded) return;                 // 页面已卸载, 别再 setData
+      if (!openid) {
+        // 登录失败: 保持空态但不要伪装成"没有训练数据"
+        console.warn('[index] auth not ready');
+        this._dataLoaded = false;
+        return;
+      }
+      await this._loadData();
+      if (this._unloaded) return;
+      this._dataLoaded = true;
+      // 鉴权就绪后再补一次日历圆点 (onLoad 时可能还没登录)
+      this._initCalendar();
+    } catch (err) {
+      console.error('[index] _bootstrap failed:', err);
+      this._dataLoaded = false;
+    } finally {
+      this._booting = false;
     }
+  },
+
+  onHide() {
+    // 切后台 / 跳走。回来时数据可能已过期, onShow 据此决定重新拉取
+    this._wasHidden = true;
   },
 
   onShow() {
@@ -166,23 +184,26 @@ Page({
     // 从其他页面点 orb 创建 session 后, globalData 已更新; 同步到本页
     this._syncRunningSessionFromGlobal();
 
-    // onLoad already loaded data, skip — showWelcome check ran above
-    if (this.data._dataLoaded) return;
+    // 从后台切回来 → 一定要重新拉一次。
+    // 修复前这里被 `if (this.data._dataLoaded) return` 直接挡掉, 而那个标记在 onLoad
+    // 里就被置成了 true, 于是切后台回来既不刷新、又被 _syncRunningSessionFromGlobal
+    // 清空 UI → 一片空白。
+    if (this._wasHidden) {
+      this._wasHidden = false;
+      this._bootstrap();
+      return;
+    }
 
-    // openid not ready yet — poll until ready
-    const tryLoad = () => {
-      if (app.globalData.openid) {
-        this._loadData();
-      } else {
-        setTimeout(tryLoad, 100);
-      }
-    };
-    tryLoad();
+    if (this._dataLoaded) return;
+
+    // 首次进入且还没加载完 → 继续走同一条加载路径
+    this._bootstrap();
   },
 
   onUnload() {
-    if (this.data.timer) clearInterval(this.data.timer);
-    if (this.data.restTimer) clearInterval(this.data.restTimer);
+    this._unloaded = true;
+    // timer 句柄在实例属性上, 直接清; 不再走 setData
+    this._stopTimers();
   },
 
   async _loadData() {
@@ -201,10 +222,17 @@ Page({
     const recentRes = results[1].status === 'fulfilled' ? results[1].value : null;
     const monthRes = results[2].status === 'fulfilled' ? results[2].value : null;
 
+    // 请求期间页面可能已卸载（切 tab 走 reLaunch 会销毁页面实例）。
+    // 此时若继续往下走, _startTimer 会重新挂上定时器而 onUnload 已经清过一次 → 泄漏。
+    if (this._unloaded) return;
+
     try {
       if (runRes && runRes.result && runRes.result.session) {
         const session = runRes.result.session;
         const sessionId = session._id || session.id;
+        // 回写 global —— 不回写会让 global 与 local 脱节,
+        // 之后每次 onShow 的 _syncRunningSessionFromGlobal 都会误判成"外部结束 session"
+        app.setRunningSession(session);
         this.setData({ runningSession: session, currentSessionId: sessionId });
         this._startTimer(session.start_time);
         // 不在这里调 _startRestTimer: rest timer 由 _loadExerciseGroups
@@ -212,6 +240,8 @@ Page({
         // timer 仍能反映真实休息时长
         this._loadExerciseGroups(sessionId);
       } else {
+        // 确认没有 running session, 两边一起清空, 保持一致
+        app.setRunningSession(null);
         this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
         this._stopTimers();
       }
@@ -350,9 +380,9 @@ Page({
   },
 
   _startTimer(startTime) {
-    if (this.data.timer) clearInterval(this.data.timer);
+    if (this._timer) clearInterval(this._timer);
     const startMs = new Date(startTime).getTime();
-    this.setData({ sessionStartMs: startMs });
+    this._sessionStartMs = startMs;
     const update = () => {
       const diff = Math.floor((Date.now() - startMs) / 1000);
       const h = Math.floor(diff / 3600);
@@ -363,8 +393,9 @@ Page({
       });
     };
     update();
-    const timer = setInterval(update, 500);
-    this.setData({ timer });
+    // timer 句柄存实例属性而不是 data: 它不参与渲染,
+    // 放 data 里每次读写都要跨逻辑层→视图层序列化, 纯属浪费
+    this._timer = setInterval(update, 500);
   },
 
   _updateRestTimer(latestTime) {
@@ -383,10 +414,10 @@ Page({
     }
 
     // 起点没变 + timer 已在跑 -> 跳过, 避免无谓重置
-    if (this.data.restTimer && this.data.restStartMs === startMs) return;
+    if (this._restTimer && this._restStartMs === startMs) return;
 
-    if (this.data.restTimer) clearInterval(this.data.restTimer);
-    this.setData({ restStartMs: startMs });
+    if (this._restTimer) clearInterval(this._restTimer);
+    this._restStartMs = startMs;
     const update = () => {
       const diff = Math.floor((Date.now() - startMs) / 1000);
       if (diff < 0) return;  // 时钟回拨保护
@@ -397,13 +428,18 @@ Page({
       });
     };
     update();
-    const restTimer = setInterval(update, 500);
-    this.setData({ restTimer });
+    this._restTimer = setInterval(update, 500);
   },
 
   _stopTimers() {
-    if (this.data.timer) { clearInterval(this.data.timer); this.setData({ timer: null }); }
-    if (this.data.restTimer) { clearInterval(this.data.restTimer); this.setData({ restTimer: null }); }
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+    if (this._restTimer) { clearInterval(this._restTimer); this._restTimer = null; }
+  },
+
+  // i18n 取值: data.t 在 onLoad 注入, 语言切换后由 app 统一刷新
+  _t(key, fallback) {
+    const dict = this.data.t || {};
+    return dict[key] || fallback || key;
   },
 
   // ---- Date picker helpers ----
@@ -526,15 +562,23 @@ Page({
     const calMonthLabelEN = `${MONTH_NAMES_EN[calendarMonth]} ${calendarYear}`;
     const calMonthLabelZH = `${calendarYear}年${MONTH_NAMES_ZH[calendarMonth]}`;
     this.setData({ calMonthLabelEN, calMonthLabelZH });
-    this._loadCalendarMonth(calendarYear, calendarMonth);
+    // 日历格子是纯本地计算, 随时可画; 但"哪天练过"的圆点要调接口,
+    // 必须等鉴权就绪 —— 否则冷启动未登录时会发一个注定 401 的请求.
+    if (app.globalData.openid) this._loadCalendarMonth(calendarYear, calendarMonth);
     this._buildCalendarDays();
   },
 
   async _loadCalendarMonth(year, month) {
-    const res = await api.callCloud('stats.monthDates', { year, month: month + 1 });
-    if (res.result && res.result.dates && Array.isArray(res.result.dates)) {
-      this.setData({ calendarWorkedDays: res.result.dates });
-      this._buildCalendarDays();
+    try {
+      const res = await api.callCloud('stats.monthDates', { year, month: month + 1 });
+      if (this._unloaded) return;
+      if (res.result && res.result.dates && Array.isArray(res.result.dates)) {
+        this.setData({ calendarWorkedDays: res.result.dates });
+        this._buildCalendarDays();
+      }
+    } catch (err) {
+      // 静默失败: 日历圆点只是锦上添花, 不该让整页报错
+      console.warn('[index] _loadCalendarMonth failed:', err);
     }
   },
 
@@ -647,13 +691,20 @@ Page({
     const lId = l ? (l._id || l.id) : null;
     if (gId === lId) return;
 
-    if (g) {
+    if (gId) {
+      // global 有 session 且与本地不同 → global 是权威来源(其他页面刚创建/切换过)
       this.setData({ runningSession: g, currentSessionId: gId, exerciseGroups: [], exerciseCount: 0, totalVolume: 0, totalCaloriesStr: '0' });
       if (g.start_time) this._startTimer(g.start_time);
       this._loadExerciseGroups(gId);  // rest timer 由 _loadExerciseGroups 基于最新 create_time 设置
-    } else {
-      this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
-      this._stopTimers();
+      return;
+    }
+
+    if (lId) {
+      // global 空、本地有 → 绝不能当成"session 被外部结束"而清空 UI。
+      // 这正是切后台回来变空白的根因: _loadData 以前从不回写 global,
+      // 导致每次 onShow 都判定"global 空 / local 有" = 外部结束, 于是清空并停表。
+      // 正确处理: 把本地状态回写 global, 让两边重新一致。
+      app.setRunningSession(l);
     }
   },
 
@@ -671,16 +722,27 @@ Page({
     const locale = app.globalData.language || 'zh';
     wx.showLoading({ title: locale === 'zh' ? '结束中...' : 'ENDING...', mask: true });
     // Gather summary data first
-    let totalVolume = this.data.totalVolume;
-    let exerciseCount = this.data.exerciseCount;
+    const totalVolume = this.data.totalVolume;
+    const exerciseCount = this.data.exerciseCount;
     let elapsedMs = 0;
     if (this.data.runningSession && this.data.runningSession.start_time) {
       elapsedMs = Date.now() - new Date(this.data.runningSession.start_time).getTime();
     }
-    const r = await api.callCloud('session.finish', { session_id: sessionId });
-    wx.hideLoading();
+
+    // try/finally: finish 失败时也必须解除 mask, 否则页面被全屏遮罩锁死
+    let r = null;
+    try {
+      r = await api.callCloud('session.finish', { session_id: sessionId });
+    } catch (err) {
+      console.error('[index] stopWorkout failed:', err);
+      wx.showToast({ title: this._t('FINISH_FAILED') || 'Failed', icon: 'none' });
+      return;
+    } finally {
+      wx.hideLoading();
+    }
+
     if (r.result && r.result.success) {
-      app.globalData.runningSession = null;  // 关键: 清掉全局, 否则后续 orb tap 会拿到过期数据
+      app.setRunningSession(null);  // 关键: 清掉全局, 否则后续 orb tap 会拿到过期数据
       this._stopTimers();
       // Show workout summary modal — duration in ms for _computeStats
       this.setData({
@@ -809,15 +871,25 @@ Page({
     if (!this.data.runningSession) return;
     const sessionId = this.data.currentSessionId || this.data.runningSession.id || this.data.runningSession._id;
     wx.showLoading({ title: 'ADDING...', mask: true });
-    const res = await api.callCloud('exercise.add', { session_id: sessionId,
-        exercise_id: item._id || item.id,
-        name_zh: item.name_zh || item.name,
-        name_en: item.name || null,
-        image_name: item.image_name || null,
-        video_name: item.video_name || null,
-        weight: 0,
-        reps: 0 });
-    wx.hideLoading();
+    // try/finally: 失败也必须解除 mask
+    let res = null;
+    try {
+      res = await api.callCloud('exercise.add', { session_id: sessionId,
+          exercise_id: item._id || item.id,
+          name_zh: item.name_zh || item.name,
+          name_en: item.name || null,
+          image_name: item.image_name || null,
+          video_name: item.video_name || null,
+          weight: 0,
+          reps: 0 });
+    } catch (err) {
+      console.error('[index] addExerciseToSession failed:', err);
+      wx.showToast({ title: this._t('LOAD_FAILED') || 'Add failed', icon: 'none' });
+      return;
+    } finally {
+      wx.hideLoading();
+    }
+
     if (res.result && res.result.success) {
       this._loadExerciseGroups(sessionId);  // rest timer 会在 _loadExerciseGroups 内基于最新 create_time 设置
     }

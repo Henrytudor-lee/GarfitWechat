@@ -1,0 +1,243 @@
+-- ============================================================================
+-- 数据库迁移脚本  2026-10-13  (v2 — 按真实数据量重新标级)
+--   2026-10-22 已实际执行到生产库 47.108.200.98/gfit
+--
+-- ⚠️ 本文件已于 2026-10-22 执行完成 (3 项变更已落地), 保留作为记录与回滚参考。
+--    重新执行是幂等的 (每步都有存在性检查), 但没必要。
+--
+-- 实际执行结果:
+--   ✅ users._openid 收窄 varchar(64) + UNIQUE uk_users_openid
+--   ✅ users.favor_exercises / practiced_exercises 扩容 varchar(1000)
+--   ✅ 4 张表 utf8mb3 → utf8mb4 / utf8mb4_unicode_ci
+--   ✅ exercises_library 加 idx_lib_namezh_id (name_zh, id)
+--
+-- 实测收益 (EXPLAIN ANALYZE 服务端耗时, 7 次中位):
+--   users 登录路径  0.018ms → 0.000ms  (type=ALL → type=const, 用 uk_users_openid)
+--   library 首页   2.880ms → 0.086ms  (type=ALL → type=index, 33x)
+--   library 深翻页 2.310ms → 2.210ms  (无回归)
+--   sessions 列表  0.204ms → 0.138ms  (未加索引)
+--   exercises 统计 1.170ms → 0.722ms  (未加索引)
+--
+-- 备份与恢复脚本: /Volumes/world/program/.gfit-db-backup-20261022/
+--   restore_all.sql 已做往返实测 (351 字段零差异, emoji 4 字节完整保留)
+--   恢复: mysql -h47.108.200.98 -P3306 -ugfit -p gfit < restore_all.sql
+--
+-- ────────────────────────────────────────────────────────────────────────────
+-- 下面是原始方案全文, 保留备查
+-- ────────────────────────────────────────────────────────────────────────────
+--
+-- 目标库: gfit-backend 的 MySQL (47.108.200.98 / 库名 gfit)
+-- 配套说明: docs/code_quality_plan_20261013.md
+--
+-- ┌─────────────────────────────────────────────────────────────────────┐
+-- │ 本版结论: 8 个 STEP 里只有 2 个是"现在就该做"的 (STEP 1 / STEP 5)  │
+-- │ 其余全部降级为"带触发条件的待办", 别现在做                          │
+-- └─────────────────────────────────────────────────────────────────────┘
+--
+-- 数据量实测 (2026-10-22 直连生产库查得, 非 dump 估算):
+--   users          36 行
+--   sessions       207 行
+--   exercises      1746 行
+--   exercises_library  7641 行
+--
+-- ⚠️ db/*.sql 里的 AUTO_INCREMENT 是 2026-05/06 的旧快照, 严重过时
+--    (它显示 exercises 只有 66 行, 实际 1746) —— 评估性能前先查真实行数。
+--
+-- ⚠️ 执行前必做
+--   1) 全量备份: mysqldump -h47.108.200.98 -P3306 -ugfit -p gfit > backup_$(date +%F).sql
+--   2) 核对线上真实结构:
+--        SHOW CREATE TABLE users\G
+--        SELECT COUNT(*) FROM exercises_library;
+-- ============================================================================
+
+
+-- ############################################################################
+-- 【必要 ①】STEP 1 — users._openid 加 UNIQUE
+--
+-- 理由: 正确性, 不是性能。11 行加索引是毫秒级, 零数据变更。
+--
+-- 现状 (auth.service.ts:79-92 upsertUserAndSign):
+--     SELECT id, name, avatar, favor_exercises, practiced_exercises
+--       FROM users WHERE _openid = ? LIMIT 1        -- 没查到
+--     → INSERT INTO users (_openid, role, status) VALUES (?, 'user', 1)  -- 就插一条
+--   非原子的 check-then-act。同一 openid 并发登录会插出两条用户记录,
+--   之后 LIMIT 1 随机命中其中一条 → 收藏和训练数据永久分裂到两条记录,
+--   且不可自动合并, 属于不可逆的数据损坏。
+--
+--   客户端 api.js 有 1.5s 防抖, 但那是 per-device 的 —— 多设备 / 快速双启动仍能撞上。
+--
+-- ⚠️ 前置检查: 必须返回 0 行才能继续
+--   SELECT _openid, COUNT(*) c FROM users GROUP BY _openid HAVING c > 1;
+--   若有重复, 先人工合并 (哪条是主记录要人工定, 收藏/训练数据要手工搬), 再执行。
+--
+-- 顺带把 varchar(256) 收窄到 varchar(64): 微信 openid 固定 28 字符。
+--   256*3=768 字节, utf8mb3 下若线上曾用 COMPACT 行格式(767B 上限)建索引会失败。
+--   (注: 若你已执行 STEP 5 转成 utf8mb4, 256*4=1024 字节, 同样偏大, 收窄仍有意义)
+-- ############################################################################
+-- ALTER TABLE `users`
+--   MODIFY COLUMN `_openid` varchar(64) NOT NULL COMMENT '微信 openid, 唯一',
+--   ADD UNIQUE KEY `uk_users_openid` (`_openid`);
+
+
+-- ############################################################################
+-- 【必要 ②】STEP 5 — 字符集 utf8mb3 → utf8mb4
+--
+-- 理由: 唯一的"迟早会咬人"的正确性问题, 且成本几乎为零。
+--
+-- 现状: 4 张表全部 DEFAULT CHARSET=utf8mb3, 但 db/README.md:30 指导建库用 utf8mb4,
+--       docker-compose.yml 也设了 --character-set-server=utf8mb4
+--       —— 表级 utf8mb3 覆盖了库级/服务级设置, 三处自相矛盾。
+--
+-- 影响: utf8mb3 根本无法编码 4 字节字符 (emoji 😀、部分生僻汉字)。
+--       users.name 是用户自由输入的 → 昵称里加个表情, MySQL 直接报
+--         ERROR 1366 (HY000): Incorrect string value: '\xF0\x9F\x98\x80'
+--       整个 UPDATE 失败, 昵称存不进去。
+--       (VARCHAR(64) 按字符计数, 所以不是长度溢出 —— 是字符本身存不进去)
+--
+-- ⚠️ 如果 SHOW CREATE TABLE 显示线上已经是 utf8mb4, 这步跳过。
+-- ⚠️ 会重建整表, 但四张表都只有几十~几千行, 实际耗时可忽略。
+-- ############################################################################
+-- ALTER TABLE `users`             CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- ALTER TABLE `sessions`          CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- ALTER TABLE `exercises`         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- ALTER TABLE `exercises_library` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+-- ############################################################################
+-- 【待办·有触发条件】STEP 4 — exercises_library 索引
+--
+-- 触发条件: SELECT COUNT(*) FROM exercises_library > 1000
+--   (这是唯一现在就可能上千行的表, 标准健身动作库通常 800-1500 条)
+--
+-- 原因: library.list 的分页是 ORDER BY name_zh ASC LIMIT ? OFFSET ?,
+--       没有 name_zh 索引 → 每翻一页都 filesort 整个表。
+--       1000 行时约 1-3ms, 可感知但不致命; 到 5000 行就该加了。
+--
+-- 注意: body_part_id 走 FIND_IN_SET()、keyword 走 LIKE '%kw%' ——
+--       这两类结构性不可索引, 普通 B-Tree 索引无效, 需改范式 (见方案文档 P2-9)。
+--       这里只覆盖能索引的部分。
+-- ############################################################################
+-- ALTER TABLE `exercises_library`
+--   ADD KEY `idx_lib_namezh`    (`name_zh`),
+--   ADD KEY `idx_lib_favorite_namezh` (`is_favorite`, `name_zh`),
+--   ADD KEY `idx_lib_equipment` (`equipment_id`);
+
+
+-- ############################################################################
+-- 【待办·有触发条件】STEP 2 — sessions 索引
+--
+-- 触发条件: SELECT COUNT(*) FROM sessions > 5000
+--   (按每天训练 1 次算, 5000 行约需 14 年 —— 实际更可能是"用户数增长"触发的)
+--
+-- 原因: WHERE _openid=? AND status='finished' ORDER BY start_time DESC LIMIT 30
+--       当前 92 行全表扫 + filesort = 微秒级, 做了也看不出差别。
+--
+-- ⚠️ 不能直接 DROP idx_sessions_user_done —— user_id 前缀仍被排行榜 JOIN 使用
+--    (stats.service.ts:239  LEFT JOIN sessions s ON s.user_id = u.id)。
+--    所以先加新索引, 验证后再删旧的。
+-- ############################################################################
+-- ALTER TABLE `sessions`
+--   ADD KEY `idx_sessions_openid_status` (`_openid`, `status`),
+--   ADD KEY `idx_sessions_openid_start`  (`_openid`, `start_time`),
+--   ADD KEY `idx_sessions_user_status_start` (`user_id`, `status`, `start_time`);
+-- -- 确认生效后:
+-- ALTER TABLE `sessions` DROP INDEX `idx_sessions_user_done`;
+-- -- is_done 全代码零引用 (已 grep 验证), 确认后:
+-- ALTER TABLE `sessions` DROP COLUMN `is_done`;
+
+
+-- ############################################################################
+-- 【待办·有触发条件】STEP 3 — exercises 索引
+--
+-- 触发条件: SELECT COUNT(*) FROM exercises > 20000
+--
+-- 原因: 现状 66 行, stats.summary 里的全表扫完全无感。
+--       现有 (session_id) / (user_id) 两个单列索引留着也没问题。
+-- ############################################################################
+-- ALTER TABLE `exercises`
+--   ADD KEY `idx_ex_openid_exid_ct` (`_openid`, `exercise_id`, `create_time`),
+--   ADD KEY `idx_ex_session_ct`     (`session_id`, `create_time`);
+
+
+-- ############################################################################
+-- 【可选·纯洁癖】STEP 6 — sessions.status 默认值对齐
+--
+-- 代码总是显式写值 ('active' / 'finished'), 默认分支永远走不到。
+-- 改它没有任何功能影响, 只是消除"schema 和代码不一致"的技术债。
+-- 建议: 顺手改, 不用单独排期。
+-- ############################################################################
+-- ALTER TABLE `sessions` ALTER COLUMN `status` SET DEFAULT 'active';
+
+
+-- ############################################################################
+-- 【暂不做·先用代码挡】STEP 7 — CSV 存 ID 列表 → 关联表
+--
+-- 触发条件: 任一满足
+--   a) 出现真实用户收藏数逼近 63 (varchar(255) / 约 4 字节每 id)
+--   b) 收到 "ER_DATA_TOO_LONG for column 'favor_exercises'" 报错
+--
+-- 现状问题:
+--   - 容量上限约 63 个 id。MySQL 严格模式 → 整个收藏请求失败 (ER_DATA_TOO_LONG);
+--     非严格模式 → 静默截断, 用户收藏被悄悄丢弃。
+--   - toggleFavorite 是无事务的读-改-写整串 (exercises.service.ts:96-113),
+--     弱网下并发连点会丢收藏。
+--
+-- ★ 现在就能做、零 schema 改动的止血 (建议先做这个):
+--   在 exercises.service.ts 的 toggleFavorite / markPracticed 里,
+--   写库前检查 joinCsvIds(updated).length, 超过 60 就抛明确错误,
+--   而不是让它撞 MySQL 的 1406 或被静默截断。
+--
+-- 真正要迁关联表时再用这段 (需配套改后端代码):
+-- CREATE TABLE `user_exercise_flag` (
+--   `user_id`      int NOT NULL,
+--   `exercise_id`  int NOT NULL,
+--   `is_favor`     tinyint NOT NULL DEFAULT 0,
+--   `is_practiced` tinyint NOT NULL DEFAULT 0,
+--   `create_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   `update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`user_id`, `exercise_id`),
+--   KEY `idx_uef_exercise` (`exercise_id`),
+--   CONSTRAINT `fk_uef_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+--
+-- 注: CSV 拆解迁移 SQL 很绕, 数据量小时建议在应用层用现成的 splitCsvIds()
+--     读出来再批量 insert, 更可控。
+
+
+-- ############################################################################
+-- 【可选·有免建表替代方案】STEP 8 — 上传文件归属
+--
+-- 目的: 修掉 "任意登录用户可 DELETE 别人头像" (DELETE /upload 不校验归属)。
+--       根因是库里没有上传记录表, 无法做归属校验。
+--
+-- ★ 方案 A (免建表, 改动最小, 推荐先做):
+--   上传时 objectName 前缀带用户标识, e.g. "avatars/{openidHash}/xxx.png",
+--   删除时校验 objectName 的前缀是否属于当前用户。
+--   改动只在 upload.service.ts / upload.controller.ts, 不动数据库。
+--
+-- 方案 B (建表, 长期更规范):
+-- CREATE TABLE `media_files` (
+--   `id`           int NOT NULL AUTO_INCREMENT,
+--   `user_id`      int NOT NULL,
+--   `object_name`  varchar(512) NOT NULL COMMENT '相对 media 根目录的路径',
+--   `size`         int DEFAULT 0,
+--   `content_type` varchar(128) DEFAULT NULL,
+--   `create_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`id`),
+--   UNIQUE KEY `uk_media_object` (`object_name`),
+--   KEY `idx_media_user` (`user_id`),
+--   CONSTRAINT `fk_media_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ############################################################################
+-- 执行后验证
+-- ############################################################################
+-- SHOW INDEX FROM users;
+-- SHOW CREATE TABLE users\G
+-- SHOW CREATE TABLE sessions\G
+--
+-- 关键回归: 跑一次 stats.summary, 确认无慢查询
+-- EXPLAIN SELECT * FROM sessions WHERE _openid='xxx' AND status='finished'
+--          ORDER BY start_time DESC LIMIT 30\G
+-- EXPLAIN SELECT * FROM exercises WHERE _openid='xxx' AND exercise_id=1\G

@@ -183,59 +183,78 @@ Page({
   },
 
   async loadList(reset = false) {
-    if (this.data.loading) return;
+    // ---- 并发策略 ----
+    // 1) 请求序号 _listReqId：快速连点筛选时, 只有最后一次请求的结果会被采纳,
+    //    早到的旧响应被丢弃, 避免"选了新筛选却显示旧数据".
+    // 2) loading 只用于挡住 loadMore 的重复触发; 筛选(reset=true)必须能打断正在飞的请求,
+    //    否则入口处"先清空 list 再 loadList"会因为 loading 而被静默吞掉 → 白屏.
+    const reqId = (this._listReqId || 0) + 1;
+    this._listReqId = reqId;
+    if (!reset && this.data.loading) return;  // 加载中重复触发 loadMore, 忽略
     this.setData({ loading: true });
 
     const page = reset ? 1 : this.data.page;
     const { keyword, selectedEquipment, selectedMuscle, filterFavor, filterPracticed, favorExercises, practicedExercises } = this.data;
 
-    const res = await api.callCloud('library.list', { keyword,
-        equipmentId: selectedEquipment || '',
-        bodyPart: selectedMuscle || '',
-        page,
-        pageSize: this.data.pageSize,
-        isFavor: filterFavor,
-        isPracticed: filterPracticed,
-        favorExerIds: favorExercises,
-        practicedExerIds: practicedExercises });
+    try {
+      const res = await api.callCloud('library.list', { keyword,
+          equipmentId: selectedEquipment || '',
+          bodyPart: selectedMuscle || '',
+          page,
+          pageSize: this.data.pageSize,
+          isFavor: filterFavor,
+          isPracticed: filterPracticed,
+          favorExerIds: favorExercises,
+          practicedExerIds: practicedExercises });
 
-    this.setData({ loading: false });
+      // 已有更新的请求在飞 → 本次结果作废
+      if (reqId !== this._listReqId) return;
 
-    if (res.result && res.result.success) {
-      const { favorExercises, practicedExercises } = this.data;
-      const locale = this.data.locale;
-      const equipMap = locale === 'zh' ? EQUIP_MAP_ZH : EQUIP_MAP;
-      const bodyPartMap = locale === 'zh' ? BODY_PART_MAP_ZH : BODY_PART_MAP;
-      let items = (res.result.list || []).map(item => {
-        const id = item.id;
-        // Handle multi-muscle (comma-separated body_part_id)
-        const bpIds = String(item.body_part_id).split(',');
-        const muscleName = bpIds.map(bid => bodyPartMap[bid.trim()] || '').filter(Boolean).join(' / ');
-        const muscleNameZh = bpIds.map(bid => BODY_PART_MAP_ZH[bid.trim()] || '').filter(Boolean).join(' / ');
-        return {
-          ...item,
-          equipment_name: equipMap[String(item.equipment_id)] || 'Other',
-          equipment_name_zh: EQUIP_MAP_ZH[String(item.equipment_id)] || '',
-          equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-          muscle_name: muscleName,
-          muscle_name_zh: muscleNameZh,
-          is_favorite: favorExercises.includes(id),
-          is_practiced: practicedExercises.includes(id),
-        };
-      });
+      if (res.result && res.result.success) {
+        const { favorExercises, practicedExercises } = this.data;
+        const locale = this.data.locale;
+        const equipMap = locale === 'zh' ? EQUIP_MAP_ZH : EQUIP_MAP;
+        const bodyPartMap = locale === 'zh' ? BODY_PART_MAP_ZH : BODY_PART_MAP;
+        let items = (res.result.list || []).map(item => {
+          const id = item.id;
+          // Handle multi-muscle (comma-separated body_part_id)
+          const bpIds = String(item.body_part_id).split(',');
+          const muscleName = bpIds.map(bid => bodyPartMap[bid.trim()] || '').filter(Boolean).join(' / ');
+          const muscleNameZh = bpIds.map(bid => BODY_PART_MAP_ZH[bid.trim()] || '').filter(Boolean).join(' / ');
+          return {
+            ...item,
+            equipment_name: equipMap[String(item.equipment_id)] || 'Other',
+            equipment_name_zh: EQUIP_MAP_ZH[String(item.equipment_id)] || '',
+            equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
+            muscle_name: muscleName,
+            muscle_name_zh: muscleNameZh,
+            is_favorite: favorExercises.includes(id),
+            is_practiced: practicedExercises.includes(id),
+          };
+        });
 
-      // Sort: practiced first, then favorited, then rest
-      const sorted = items.sort((a, b) => {
-        if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
-        if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
-        return 0;
-      });
+        // Sort: practiced first, then favorited, then rest
+        const sorted = items.sort((a, b) => {
+          if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
+          if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
+          return 0;
+        });
 
-      this.setData({
-        list: reset ? sorted : [...this.data.list, ...sorted],
-        hasMore: items.length >= this.data.pageSize,
-        page: page + 1,
-      });
+        this.setData({
+          list: reset ? sorted : [...this.data.list, ...sorted],
+          hasMore: items.length >= this.data.pageSize,
+          page: page + 1,
+        });
+      }
+    } catch (err) {
+      // 失败时不要留下"空列表 + 正在加载"的假象
+      if (reqId === this._listReqId) {
+        console.error('[library] loadList failed:', err);
+        const dict = this.data.t || {};
+        wx.showToast({ title: dict.LOAD_FAILED || 'Load failed', icon: 'none' });
+      }
+    } finally {
+      if (reqId === this._listReqId) this.setData({ loading: false });
     }
   },
 

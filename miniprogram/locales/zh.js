@@ -129,4 +129,7 @@ module.exports = {
   "WORKOUT_COMPLETE": "训练完成",
   "YESTERDAY": "昨天",
   "YOUR_PERFORMANCE_DATA": "你的运动表现数据",
+  "LOAD_FAILED": "加载失败",
+  "SAVE_FAILED": "保存失败",
+  "FINISH_FAILED": "结束训练失败",
 };

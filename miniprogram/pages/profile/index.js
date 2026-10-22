@@ -192,14 +192,20 @@ Page({
               // 立刻刷新 UI 显示新头像 (不依赖下次 onShow 重载)
               this.setData({ 'userInfo.avatarUrl': avatarUrl });
               wx.removeStorageSync('avatarTemp'); // tempFilePath 微信会清理, 别再用了
+              // 成功提示放在这里, 而不是 chooseImage 的 success 里 ——
+              // 原来写在回调外, chooseImage 一返回就弹"上传成功", 上传还没开始;
+              // 上传失败时用户会先看到成功、再看到 failed.
+              wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
             },
             fail: (err) => {
               console.error('upload avatar failed', err);
               wx.showToast({ title: 'upload failed', icon: 'none' });
             },
           });
+        } else {
+          // 没有 userId (登录未完成) → 根本不会发起上传, 不能报成功
+          wx.showToast({ title: 'upload failed', icon: 'none' });
         }
-        wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
       },
     });
   },

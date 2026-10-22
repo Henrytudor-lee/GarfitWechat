@@ -129,4 +129,7 @@ module.exports = {
   "WORKOUT_COMPLETE": "Workout Complete",
   "YESTERDAY": "YESTERDAY",
   "YOUR_PERFORMANCE_DATA": "YOUR PERFORMANCE DATA",
+  "LOAD_FAILED": "Load failed",
+  "SAVE_FAILED": "Save failed",
+  "FINISH_FAILED": "Failed to finish workout",
 };
