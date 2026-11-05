@@ -3,6 +3,36 @@ const app = getApp();
 const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
+/**
+ * 取这组动作的计量方式
+ *
+ * group 来自训练页的 exerciseGroups, 里面:
+ *   group.count_mode          动作的计量方式(后端 JOIN library 带出)
+ *   group.sets[i].countMode   每组 set 自己的计量方式
+ */
+function pickCountMode(group) {
+  if (!group) return 'weight_reps';
+  if (group.count_mode) return group.count_mode;
+  const fromSet = (group.sets || [])[0]?.countMode;
+  return fromSet || 'weight_reps';
+}
+
+/**
+ * 组装可编辑的 set 列表
+ * - weightStr: 重量输入框的字符串(带格式)
+ * - durationStr / distanceStr: 时长/距离输入框的字符串
+ *   (input 的 value 必须是字符串, 数字会丢小数位且无法正常编辑)
+ */
+function buildSets(rawSets, countMode) {
+  return (rawSets || []).map((s) => ({
+    ...s,
+    countMode: s.countMode || countMode || 'weight_reps',
+    weightStr: formatNumberForInput(s.weight),
+    durationStr: s.duration_sec != null ? String(s.duration_sec) : '',
+    distanceStr: s.distance_km != null ? String(s.distance_km) : '',
+  }));
+}
+
 Component({
   properties: {
     isOpen: {
@@ -29,6 +59,7 @@ Component({
 
   data: {
     sets: [],
+    countMode: 'weight_reps',   // 计量方式: weight_reps | duration | distance_duration
     activeSetsCount: 0,
     saving: false,
     imgPrefix: '',
@@ -40,7 +71,8 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen && this.data.group) {
-        const sets = this.data.group.sets.map(s => ({ ...s, weightStr: formatNumberForInput(s.weight) }));
+        const countMode = pickCountMode(this.data.group);
+        const sets = buildSets(this.data.group.sets, countMode);
         // 同步 favor 状态
         const favorExercises = app.globalData.favorExercises || [];
         const isFavorite = favorExercises.includes(this.data.group.exercise_id);
@@ -48,6 +80,7 @@ Component({
           imgPrefix: app.globalData.imagePrefix || '',
           locale: app.globalData.language || 'zh',
           t: app.globalData.t || {},
+          countMode,
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
           isFavorite,
@@ -56,10 +89,12 @@ Component({
     },
     'group': function(group) {
       if (group && this.data.isOpen) {
-        const sets = group.sets.map(s => ({ ...s, weightStr: formatNumberForInput(s.weight) }));
+        const countMode = pickCountMode(group);
+        const sets = buildSets(group.sets, countMode);
         const favorExercises = app.globalData.favorExercises || [];
         const isFavorite = favorExercises.includes(group.exercise_id);
         this.setData({
+          countMode,
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
           isFavorite,
@@ -126,13 +161,21 @@ Component({
 
     addSet() {
       const last = this.data.sets[this.data.sets.length - 1];
-      const w = last?.weight || 0;
+      const mode = this.data.countMode || 'weight_reps';
+      const isWeight = mode === 'weight_reps';
+      const w = isWeight ? (last?.weight || 0) : 0;
       const newSet = {
         id: Date.now(),
         weight: w,
         weightStr: formatNumberForInput(w),
-        reps: last?.reps || 0,
+        reps: isWeight ? (last?.reps || 0) : 0,
         weight_unit: last?.weight_unit || 'kg',
+        // 计时/距离类的新 set 要带上对应的初值(否则存回去是 0/null)
+        duration_sec: mode === 'duration' ? (last?.duration_sec || 0) : 0,
+        durationStr: mode === 'duration' ? String(last?.duration_sec || 0) : '',
+        distance_km: mode === 'distance_duration' ? (last?.distance_km || 0) : 0,
+        distanceStr: mode === 'distance_duration' ? String(last?.distance_km || 0) : '',
+        countMode: mode,
         sequence: this.data.sets.length,
       };
       const sets = [...this.data.sets, newSet];
@@ -178,6 +221,55 @@ Component({
       this.updateSet(index, 'reps', Math.max(1, s.reps - 1));
     },
 
+    // ── 计时类: 秒数(步进 ±5 秒) ──
+    onDurationInput(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const raw = e.detail.value;
+      // 保留用户正在输入的原始字符串(数字会丢小数位且无法正常编辑)
+      this.updateSet(index, 'durationStr', raw);
+      this.updateSet(index, 'duration_sec', Number(raw) || 0);
+    },
+
+    incDuration(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const s = this.data.sets[index];
+      const sec = (s.duration_sec || 0) + 5;
+      this.updateSet(index, 'duration_sec', sec);
+      this.updateSet(index, 'durationStr', String(sec));
+    },
+
+    decDuration(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const s = this.data.sets[index];
+      const sec = Math.max(0, (s.duration_sec || 0) - 5);
+      this.updateSet(index, 'duration_sec', sec);
+      this.updateSet(index, 'durationStr', String(sec));
+    },
+
+    // ── 距离类: 公里(步进 ±0.5, 允许小数) ──
+    onDistanceInput(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const raw = e.detail.value;
+      this.updateSet(index, 'distanceStr', raw);
+      this.updateSet(index, 'distance_km', Number(raw) || 0);
+    },
+
+    incDistance(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const s = this.data.sets[index];
+      const km = Math.round(((s.distance_km || 0) + 0.5) * 100) / 100;
+      this.updateSet(index, 'distance_km', km);
+      this.updateSet(index, 'distanceStr', String(km));
+    },
+
+    decDistance(e) {
+      const index = Number(e.currentTarget.dataset.index);
+      const s = this.data.sets[index];
+      const km = Math.max(0, Math.round(((s.distance_km || 0) - 0.5) * 100) / 100);
+      this.updateSet(index, 'distance_km', km);
+      this.updateSet(index, 'distanceStr', String(km));
+    },
+
     onRepsInput(e) {
       const index = e.currentTarget.dataset.index;
       const value = parseInt(e.detail.value) || 0;
@@ -210,7 +302,11 @@ Component({
                 session_id: this.data.sessionId,
                 weight: s.weight,
                 reps: s.reps,
-                weight_unit: s.weight_unit });
+                weight_unit: s.weight_unit,
+                // 计时/距离类的 set 要带上对应字段; 不适用时传 undefined,
+                // JSON 序列化会省略该 key → 后端写 NULL(不会误清已有值)
+                duration_sec: s.countMode === 'duration' ? s.duration_sec : undefined,
+                distance_km: s.countMode === 'distance_duration' ? s.distance_km : undefined });
           }
 
           if (!original && s.id > Date.now() - 100000) {
@@ -222,7 +318,9 @@ Component({
                 video_name: group.video_name || null,
                 weight: s.weight,
                 reps: s.reps,
-                weight_unit: s.weight_unit });
+                weight_unit: s.weight_unit,
+                duration_sec: s.countMode === 'duration' ? (s.duration_sec || 0) : null,
+                distance_km: s.countMode === 'distance_duration' ? (s.distance_km || 0) : null });
             addedExerciseId = group.exercise_id;
           }
         }
