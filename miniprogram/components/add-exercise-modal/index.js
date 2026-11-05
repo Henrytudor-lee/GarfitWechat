@@ -696,7 +696,10 @@ Component({
     },
 
     onFavoriteTap(e) {
-      const id = e.currentTarget.dataset.id;
+      // ⚠️ dataset 的值是**字符串**, 而 favorExercises 是 number[]。
+      //    不转数字 → includes(id) 永远 false → isFav 恒为 false
+      //    → 乐观更新永远走"添加"分支, 列表里的收藏 icon 也不刷新(item.id === id 同样永假)
+      const id = Number(e.currentTarget.dataset.id);
       const { favorExercises } = this.data;
       const isFav = favorExercises.includes(id);
 

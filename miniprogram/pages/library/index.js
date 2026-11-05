@@ -320,7 +320,9 @@ Page({
   },
 
   onFavoriteTap(e) {
-    const id = e.currentTarget.dataset.id;
+    // ⚠️ 同 add-exercise-modal: dataset 是字符串, favorExercises 是 number[]
+    //    不转数字 → includes(id) 永远 false → 收藏状态判断和乐观更新全错
+    const id = Number(e.currentTarget.dataset.id);
     const { favorExercises } = this.data;
     const isFav = favorExercises.includes(id);
 
