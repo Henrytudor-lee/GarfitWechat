@@ -240,11 +240,18 @@ Page({
         // 根据最新 create_time 计算, 这样切 tab / 切后台回来后
         // timer 仍能反映真实休息时长
         this._loadExerciseGroups(sessionId);
-      } else {
-        // 确认没有 running session, 两边一起清空, 保持一致
+      } else if (runRes) {
+        // ── 请求成功, 确实没有 running session → 两边一起清空, 保持一致 ──
         app.setRunningSession(null);
         this.setData({ runningSession: null, currentSessionId: null, exerciseGroups: [], restTime: '--:--' });
         this._stopTimers();
+      } else {
+        // ★★★ 请求**失败**(401/网络错误) —— 绝不能清空!
+        //   2026-11-04 修复: 原来"失败"和"没有 session"都走 else 分支,
+        //   于是切后台回来只要 getRunning 恰好失败, 就把 runningSession 和
+        //   exerciseGroups 全清掉 → 页面变成初始化状态, 训练动作全没了。
+        //   失败时保留现有 UI, 等重试成功再更新。
+        console.warn('[index] session.getRunning failed, keep current UI (不当作"没有 session")');
       }
 
       if (recentRes && recentRes.result && recentRes.result.sessions) {
@@ -294,7 +301,14 @@ Page({
   },
 
   async _loadExerciseGroups(sessionId) {
-    const res = await api.callCloud('exercise.list', { session_id: sessionId });
+    let res;
+    try {
+      res = await api.callCloud('exercise.list', { session_id: sessionId });
+    } catch (err) {
+      // 请求失败 → 保留现有 groups, 不清空(训练动作不能因为一次失败就没了)
+      console.warn('[index] _loadExerciseGroups failed:', err);
+      return;
+    }
     if (res.result && res.result.success) {
       if (this._exerciseOrderSessionId !== sessionId) {
         this._exerciseOrderSessionId = sessionId;
@@ -671,19 +685,24 @@ Page({
   async _loadHistorySessions() {
     const { historyDate } = this.data;
     if (!historyDate) return;
-    // Fetch sessions for the given date
-    const res = await api.callCloud('session.list', { date: historyDate });
-    if (res.result && res.result.sessions) {
-      const sessions = res.result.sessions.map(s => {
-        const d = new Date(s.start_time);
-        const timeStr = d.toLocaleTimeString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-        const mins = Math.floor((s.duration || 0) / 60);
-        const durationStr = this.data.locale === 'zh' ? `${mins}分钟` : `${mins} MIN`;
-        return { ...s, timeStr, durationStr };
-      });
-      this.setData({ historySessions: sessions });
-    } else {
-      this.setData({ historySessions: [] });
+    try {
+      // Fetch sessions for the given date
+      const res = await api.callCloud('session.list', { date: historyDate });
+      if (res.result && res.result.sessions) {
+        const sessions = res.result.sessions.map(s => {
+          const d = new Date(s.start_time);
+          const timeStr = d.toLocaleTimeString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+          const mins = Math.floor((s.duration || 0) / 60);
+          const durationStr = this.data.locale === 'zh' ? `${mins}分钟` : `${mins} MIN`;
+          return { ...s, timeStr, durationStr };
+        });
+        this.setData({ historySessions: sessions });
+      } else {
+        this.setData({ historySessions: [] });
+      }
+    } catch (err) {
+      // 请求失败 ≠ 那天没有训练 → 保留现有列表, 不清空
+      console.warn('[index] _loadHistorySessions failed:', err);
     }
   },
 

@@ -82,7 +82,15 @@ Component({
 
       this.setData({ loading: true });
 
-      const res = await api.callCloud('exercise.list', { session_id: this.data.sessionId });
+      let res;
+      try {
+        res = await api.callCloud('exercise.list', { session_id: this.data.sessionId });
+      } catch (err) {
+        // 请求失败 → 保留现有列表, 不清空; loading 也要收掉(否则一直转圈)
+        console.warn('[session-detail] _loadExercises failed:', err);
+        this.setData({ loading: false });
+        return;
+      }
 
       this.setData({ loading: false });
 
