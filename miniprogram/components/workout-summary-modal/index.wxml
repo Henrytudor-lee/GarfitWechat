@@ -66,9 +66,16 @@
           <view class="sets-grid">
             <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
               <text class="set-num">{{index + 1}}</text>
-              <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
-              <text class="set-sep">×</text>
-              <text class="set-reps">{{s.reps}} reps</text>
+              <!-- 计时类: 只显示秒数(重量/次数对它无意义) -->
+              <text class="set-val" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
+              <!-- 距离类: 只显示距离 -->
+              <text class="set-val" wx:elif="{{s.distance_km > 0}}">{{s.distance_km}} {{t.KM}}</text>
+              <!-- 次数类: 重量 × 次数 -->
+              <block wx:else>
+                <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+                <text class="set-sep">×</text>
+                <text class="set-reps">{{s.reps}} reps</text>
+              </block>
             </view>
           </view>
         </view>

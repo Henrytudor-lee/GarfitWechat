@@ -99,6 +99,17 @@ Component({
     weightStr: '0',
     reps: 0,
     weight_unit: 'kg',
+    // ── 计量方式 ──
+    // 数据源: exercises_library.exercise_type (这个字段本来就有)
+    countMode: 'weight_reps',
+    setTitle: '',          // step2 标题(按计量方式变)
+    isDuration: false,     // 派生: 计时类动作(必填秒数)
+    isDistance: false,     // 派生: 距离类动作(必填距离, 时长可选)
+    timerRequired: false,  // 派生: 计时器是否必填
+    durationSec: 0,        // 计时动作秒数
+    distanceKm: 0,         // 距离动作公里数
+    distanceStr: '0',      // 距离输入框字符串(允许小数)
+    canSubmit: false,      // 派生: 提交按钮可用性(WXML 不做复杂表达式)
     historyMax: null,
     submitting: false,
     weightChips: [10, 20, 30, 40, 50],
@@ -178,6 +189,8 @@ Component({
         weightStr: '0',
         reps: 0,
         weight_unit: 'kg',
+        countMode: 'weight_reps',
+        setTitle: (app.globalData.t || {}).SET_WEIGHT_REPS || '设置重量和次数',
         historyMax: null,
         submitting: false,
         imgPrefix: imgPrefix || '',
@@ -433,7 +446,23 @@ Component({
     },
 
     _selectExercise(item) {
-      this.setData({ selectedItem: item, step: 'set', weight: 0, weightStr: '0', reps: 0 });
+      const mode = normalizeCountMode(item);
+      this.setData({
+        selectedItem: item,
+        step: 'set',
+        weight: 0,
+        weightStr: '0',
+        reps: 0,
+        countMode: mode,
+        setTitle: titleForMode(mode, app.globalData.t || {}),
+        isDuration: isDurationMode(mode),
+        isDistance: isDistanceMode(mode),
+        timerRequired: isDurationMode(mode),
+        durationSec: 0,
+        distanceKm: 0,
+        distanceStr: '0',
+      });
+      this._syncCanSubmit();
       this._loadHistoryMax(item);
     },
 
@@ -446,13 +475,20 @@ Component({
 
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
-          this.setData({
+          const patch = {
             historyMax: { weight: d.weight, reps: d.reps, weight_unit: d.weight_unit || 'kg' },
             weight: d.weight,
             weightStr: formatNumberForInput(d.weight),
             reps: d.reps || 0,
             weight_unit: d.weight_unit || 'kg',
-          });
+          };
+          // 计时类动作: 回填历史秒数(新字段, 老数据为 null → 保持 0)
+          if (d.duration_sec != null) {
+            patch.durationSec = d.duration_sec || 0;
+            patch.historyMax = Object.assign({}, patch.historyMax, { duration_sec: d.duration_sec });
+          }
+          this.setData(patch);
+          this._syncCanSubmit();
         }
       } catch (err) {
         console.error('Failed to load history max', err);
@@ -466,40 +502,99 @@ Component({
       }
     },
 
+    /**
+     * 同步提交按钮的可用状态。
+     * 计时类要求 durationSec > 0, 次数类要求 reps > 0。
+     * (不能沿用"reps <= 0 就禁用" —— 计时动作 reps 恒为 0)
+     */
+    _syncCanSubmit() {
+      const {
+        weight, reps, durationSec, distanceKm,
+        isDuration, isDistance, submitting,
+      } = this.data;
+      // 三档校验:
+      //   次数类(weight_reps)   → reps > 0
+      //   计时类(duration)       → durationSec > 0
+      //   距离类(distance_duration) → distanceKm > 0(时长可选)
+      let metricOk;
+      if (isDistance) {
+        metricOk = distanceKm > 0;
+      } else if (isDuration) {
+        metricOk = durationSec > 0;
+      } else {
+        metricOk = reps > 0;
+      }
+      const ok = !submitting && weight >= 0 && metricOk;
+      if (ok !== this.data.canSubmit) {
+        this.setData({ canSubmit: ok });
+      }
+    },
+
+    // ---- 距离输入 ----
+    onDistanceInput(e) {
+      const val = e.detail.value;
+      const num = Number(val);
+      this.setData({
+        distanceStr: val,
+        distanceKm: Number.isFinite(num) ? num : 0,
+      });
+      this._syncCanSubmit();
+    },
+
+    incDistance() {
+      const v = Math.round((this.data.distanceKm + 0.5) * 100) / 100;
+      this.setData({ distanceKm: v, distanceStr: String(v) });
+      this._syncCanSubmit();
+    },
+
+    decDistance() {
+      const v = Math.max(0, Math.round((this.data.distanceKm - 0.5) * 100) / 100);
+      this.setData({ distanceKm: v, distanceStr: String(v) });
+      this._syncCanSubmit();
+    },
+
     onWeightInput(e) {
       const patch = syncDecimalValue('weight', e.detail.value);
       if (patch) this.setData(patch);
+      this._syncCanSubmit();
     },
 
     onRepsInput(e) {
       this.setData({ reps: Number(e.detail.value) || 0 });
+      this._syncCanSubmit();
     },
 
     incWeight() {
       const w = this.data.weight + 2.5;
       this.setData({ weight: w, weightStr: formatNumberForInput(w) });
+      this._syncCanSubmit();
     },
 
     decWeight() {
       const w = Math.max(0, this.data.weight - 2.5);
       this.setData({ weight: w, weightStr: formatNumberForInput(w) });
+      this._syncCanSubmit();
     },
 
     incReps() {
       this.setData({ reps: this.data.reps + 1 });
+      this._syncCanSubmit();
     },
 
     decReps() {
       this.setData({ reps: Math.max(0, this.data.reps - 1) });
+      this._syncCanSubmit();
     },
 
     setWeight(e) {
       const w = Number(e.currentTarget.dataset.val);
       this.setData({ weight: w, weightStr: formatNumberForInput(w) });
+      this._syncCanSubmit();
     },
 
     setReps(e) {
       this.setData({ reps: Number(e.currentTarget.dataset.val) });
+      this._syncCanSubmit();
     },
 
     setUnit(e) {
@@ -507,11 +602,38 @@ Component({
       this.setData({ weight_unit: u });
     },
 
+    // ── 计时器回调 (set-timer 组件) ──
+    onTimerChange(e) {
+      this.setData({ durationSec: e.detail.seconds || 0 });
+      this._syncCanSubmit();
+    },
+
     async confirmAdd() {
-      const { selectedItem, weight, reps, weight_unit, submitting } = this.data;
-      if (!selectedItem || weight < 0 || reps <= 0 || submitting) return;
+      const {
+        selectedItem, weight, reps, weight_unit, submitting,
+        countMode, isDuration, isDistance, durationSec, distanceKm,
+      } = this.data;
+      if (!selectedItem || weight < 0 || submitting) return;
+
+      // ── 按计量方式校验 ──
+      // 次数类: reps > 0 | 计时类: durationSec > 0 | 距离类: distanceKm > 0(时长可选)
+      const t = this.data.t || {};
+      if (isDistance) {
+        if (distanceKm <= 0) {
+          wx.showToast({ title: t.SET_DISTANCE_HINT || '请先填写距离', icon: 'none' });
+          return;
+        }
+      } else if (isDuration) {
+        if (durationSec <= 0) {
+          wx.showToast({ title: t.SET_DURATION_HINT || '请先设置时长', icon: 'none' });
+          return;
+        }
+      } else if (reps <= 0) {
+        return;
+      }
 
       this.setData({ submitting: true });
+      this._syncCanSubmit();
 
       try {
         const userId = app.globalData.userId;
@@ -519,17 +641,40 @@ Component({
         const exId = selectedItem.id;
 
         // Fire markPracticed asynchronously — non-blocking
-        api.callCloud('exercise.markPracticed', { exercise_id: exId });
+        // 后端返回完整的最新 practiced 列表 → 同步到 globalData/storage,
+        // 否则本次会话里"已训练"筛选用的还是旧缓存(刚练过的动作筛不出来)
+        api.callCloud('exercise.markPracticed', { exercise_id: exId })
+          .then((r) => {
+            const list = r && r.result && r.result.practiced_exercises;
+            if (Array.isArray(list)) {
+              app.applyExerciseFlags({ practiced_exercises: list });
+              this.setData({ practicedExercises: list });
+            }
+          })
+          .catch(() => {});
 
-        const res = await api.callCloud('exercise.add', { session_id: sessionId,
-            exercise_id: exId,
-            name_zh: selectedItem.name_zh || selectedItem.name,
-            name_en: selectedItem.name || null,
-            image_name: selectedItem.image_name || null,
-            video_name: selectedItem.video_name || null,
-            weight,
-            reps,
-            weight_unit: weight_unit });
+        const payload = {
+          session_id: sessionId,
+          exercise_id: exId,
+          name_zh: selectedItem.name_zh || selectedItem.name,
+          name_en: selectedItem.name || null,
+          image_name: selectedItem.image_name || null,
+          video_name: selectedItem.video_name || null,
+          weight,
+          reps: (isDuration || isDistance) ? 0 : reps,
+          weight_unit: weight_unit,
+        };
+        // 计时类: 秒数写 duration_sec, reps 存 0(不适用)
+        if (isDuration) {
+          payload.duration_sec = durationSec;
+        }
+        // 距离类: 距离写 distance_km, 时长可选
+        if (isDistance) {
+          payload.distance_km = distanceKm;
+          if (durationSec > 0) payload.duration_sec = durationSec;
+        }
+
+        const res = await api.callCloud('exercise.add', payload);
 
         if (res.result && res.result.success) {
           wx.showToast({ title: 'ADDED TO WORKOUT', icon: 'success' });
@@ -543,6 +688,7 @@ Component({
         wx.showToast({ title: 'FAILED', icon: 'none' });
       } finally {
         this.setData({ submitting: false });
+        this._syncCanSubmit();
       }
     },
 
@@ -563,7 +709,15 @@ Component({
       this.setData({ list });
 
       // Call cloud function
-      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id })
+        .then((r) => {
+          const list = r && r.result && r.result.favor_exercises;
+          if (Array.isArray(list)) {
+            app.applyExerciseFlags({ favor_exercises: list });
+            this.setData({ favorExercises: list });
+          }
+        })
+        .catch(() => {});
     },
 
     // step 2 头部右侧的 favorite 按钮: 直接切换 selectedItem 的 is_favorite
@@ -585,7 +739,65 @@ Component({
         this.setData({ list });
       }
       // cloud call
-      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id })
+        .then((r) => {
+          const list = r && r.result && r.result.favor_exercises;
+          if (Array.isArray(list)) {
+            app.applyExerciseFlags({ favor_exercises: list });
+            this.setData({ favorExercises: list });
+          }
+        })
+        .catch(() => {});
     },
   },
 });
+
+/**
+ * 取动作的计量方式。
+ *
+ * 数据源: exercises_library.exercise_type (这个字段本来就有, 线上已有真实数据:
+ *   weight_reps 6522 条 / duration 1058 条 / distance_duration 61 条)
+ *
+ * 'Strength' 是列的历史遗留默认值(线上 0 行), 见到它按 weight_reps 处理。
+ */
+function normalizeCountMode(item) {
+  if (!item) return 'weight_reps';
+  const raw = item.exercise_type || 'weight_reps';
+  if (raw === 'Strength') return 'weight_reps';
+  if (['weight_reps', 'duration', 'distance_duration'].indexOf(raw) >= 0) return raw;
+  return 'weight_reps';
+}
+
+/**
+ * step2 弹框标题 —— 按计量方式给不同的说法。
+ *
+ * 之前无论什么动作都叫"设置重量和次数", 计时类动作(平板支撑)进去
+ * 显示"设置重量和次数"但下面只有一个计时器, 文案对不上。
+ */
+function titleForMode(mode, t) {
+  if (mode === 'duration') return t.SET_DURATION || '设置时长';
+  if (mode === 'distance_duration') return t.SET_DISTANCE || '设置距离和时长';
+  return t.SET_WEIGHT_REPS || '设置重量和次数';
+}
+
+/**
+ * 是否走"计时"录入分支(计时器必填)。
+ *
+ * 只有 'duration' 走 —— 平板支撑/波比跳/开合跳这类, 时长是唯一计量维度。
+ */
+function isDurationMode(mode) {
+  return mode === 'duration';
+}
+
+/**
+ * 是否走"距离"录入分支(距离必填, 时长可选)。
+ *
+ * 'distance_duration'(跑步/骑行/划船/椭圆机/踏步机, 61 行 47 个中文名)
+ * → 2026-11-04 用户拍板: "就只录入距离就行了"
+ *   · 不做配速、不做"配速+时长反推距离"
+ *   · 距离是独立输入框, 单位 km(实测这批动作全是公里级有氧)
+ *   · 时长仍然可以用计时器记, 但不填也能提交
+ */
+function isDistanceMode(mode) {
+  return mode === 'distance_duration';
+}

@@ -112,11 +112,15 @@ Page({
     const historyExercises = d.historyExercises || [];
 
     // Build weekly volume — last 8 weeks
+    // 卡路里 v1: 直接用后端给的 session 级卡路里, 不再从体积反推
     const weekMap = {};
+    const weekCalMap = {};
     (d.weeklyVolume || []).forEach(v => {
       const key = v.yrweek;
       if (!weekMap[key]) weekMap[key] = 0;
       weekMap[key] += Number(v.volume);
+      if (!weekCalMap[key]) weekCalMap[key] = 0;
+      weekCalMap[key] += Number(v.calories || 0);
     });
 
     const now = new Date();
@@ -129,7 +133,7 @@ Page({
         ? wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
         : wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const vol = weekMap[yrweek] || 0;
-      const cal = volumeToCalories(vol);
+      const cal = weekCalMap[yrweek] || 0;
       weeklyVolume.push({ label, volume: cal, volumeDisplay: formatCalories(cal), yrweek });
     }
 
@@ -151,6 +155,9 @@ Page({
         muscleMap[name] = (muscleMap[name] || 0) + total;
       });
     });
+    // 肌肉分布图: 输入是**按部位分摊的训练量**, 这里换算成卡路里做展示。
+    // ⚠️ v1 已知局限: 计时类/距离类动作的 volume=0, 不会出现在这张分布图里。
+    //    后续按动作类型优化卡路里算法时, 这里要改成按各动作的真实卡路里分摊。
     const muscleDistribution = Object.entries(muscleMap)
       .map(([name, value]) => ({ name, value: volumeToCalories(value), valueDisplay: formatCalories(volumeToCalories(value)) }))
       .sort((a, b) => b.value - a.value)
@@ -181,7 +188,8 @@ Page({
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
 
-    const totalCal = volumeToCalories(d.totalVolume || 0);
+    // 卡路里 v1: 用后端聚合好的真实值(不���从体积反推)
+    const totalCal = d.totalCalories || 0;
     this.setData({
       totalSessions: d.totalSessions || 0,
       currentStreak: d.currentStreak || 0,

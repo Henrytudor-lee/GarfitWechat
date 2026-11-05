@@ -1,7 +1,8 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
 const api = require('../../utils/api.js');
-const { setVolume, volumeToCalories, formatCalories } = require('../../utils/unit.js');
+const { setVolume, formatCalories } = require('../../utils/unit.js');
+const { calcSetsCalories, rowVolumeKg } = require('../../utils/calories.js');
 
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const MONTH_NAMES_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -282,9 +283,11 @@ Page({
     this.setData({
       todayProgress: stats.todayProgress || 0,
       yesterdayProgress: stats.yesterdayProgress || 0,
-      todayCaloriesStr: formatCalories(volumeToCalories(todayVol)),
-      yesterdayCaloriesStr: formatCalories(volumeToCalories(yesterdayVol)),
-      monthlyCaloriesStr: formatCalories(volumeToCalories(monthlyKg)),
+      // 卡路里 v1: 用后端给的真实值(按 session.calories 聚合),
+      // 不再从体积反推 —— 计时/距离动作的卡路里不在体积里。
+      todayCaloriesStr: formatCalories(stats.todayCalories || 0),
+      yesterdayCaloriesStr: formatCalories(stats.yesterdayCalories || 0),
+      monthlyCaloriesStr: formatCalories(stats.monthlyCalories || 0),
       todayVolume: todayVol,
       yesterdayVolume: yesterdayVol,
     });
@@ -309,7 +312,11 @@ Page({
         if (ex.id != null && ex.id > map[ex.exercise_id]._latestId) {
           map[ex.exercise_id]._latestId = ex.id;
         }
-        if (ex.weight > 0 || ex.reps > 0) {
+        // 计时类/距离类动作: weight=0 且 reps=0, 只有 duration_sec / distance_km
+        // —— 必须放行, 否则平板支撑、跑步这类记录会整组不显示。
+        const isDurationSet = Number(ex.duration_sec) > 0;
+        const isDistanceSet = Number(ex.distance_km) > 0;
+        if (ex.weight > 0 || ex.reps > 0 || isDurationSet || isDistanceSet) {
           if (ex.id != null && ex.id > map[ex.exercise_id]._latestSetId) {
             map[ex.exercise_id]._latestSetId = ex.id;
           }
@@ -319,14 +326,22 @@ Page({
             weight: ex.weight,
             weight_unit: ex.weight_unit,
             reps: ex.reps,
+            duration_sec: isDurationSet ? Number(ex.duration_sec) : 0,
+            distance_km: isDistanceSet ? Number(ex.distance_km) : 0,
+            // 计量方式 —— 卡路里按这个分档算(见 utils/calories.js)
+            countMode: ex.count_mode || 'weight_reps',
+            volumeKg: rowVolumeKg(ex),
           });
           map[ex.exercise_id].totalVolume += vol;
         }
       }
+      const userWeight = app.globalData.userWeight || 60;
       const groups = Object.values(map).map(g => ({
         ...g,
+        countMode: g.count_mode || 'weight_reps',
         totalVolume: Math.round(g.totalVolume),
-        totalCalories: volumeToCalories(Math.round(g.totalVolume)),
+        // 卡路里 v1: 按组的计量方式算, 不再是整个 session 一个公式
+        totalCalories: calcSetsCalories(g.sets, userWeight),
         latestTime: g._latestTime || 0,  // 该组最后一次 set 的 create_time 戳
         latestId: g._latestId,
         latestSetId: g._latestSetId,
@@ -364,7 +379,8 @@ Page({
       if (groups.length > 0) groups[0].isLatestAdded = true;
       // 全局 totalVolume 从各 group.totalVolume 求和 (避免重复 reduce 算 set 体积)
       const volume = groups.reduce((sum, g) => sum + g.totalVolume, 0);
-      const totalCal = volumeToCalories(volume);
+      // 卡路里 v1: 各组按自己的计量方式算完再求和
+      const totalCal = groups.reduce((sum, g) => sum + (g.totalCalories || 0), 0);
       this.setData({
         exerciseGroups: groups,
         exerciseCount: groups.length,

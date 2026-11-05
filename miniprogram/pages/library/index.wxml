@@ -184,7 +184,7 @@
           <view class="sheet-tags">
             <text class="chip chip-neutral">{{locale === 'en' ? selectedExercise.equipment_name : (selectedExercise.equipment_name_zh || selectedExercise.equipment_name)}}</text>
             <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{locale === 'en' ? selectedExercise.muscle_name : (selectedExercise.muscle_name_zh || selectedExercise.muscle_name)}}</text>
-            <text class="chip chip-neutral">{{selectedExercise.exercise_type || 'STRENGTH'}}</text>
+            <text class="chip chip-neutral">{{modeLabel}}</text>
           </view>
         </view>
       </scroll-view>

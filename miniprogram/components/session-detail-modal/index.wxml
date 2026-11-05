@@ -65,9 +65,16 @@
             <view class="ec-sets-grid">
               <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
                 <view class="ec-set-num">{{index + 1}}</view>
-                <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
-                <view class="ec-set-sep">×</view>
-                <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS}}</text></view>
+                <!-- 计时类: 只显示秒数 -->
+                <view class="ec-set-val reps" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+                <!-- 距离类: 只显示距离 -->
+                <view class="ec-set-val reps" wx:elif="{{s.distance_km > 0}}">{{s.distance_km}} <text class="ec-set-unit">{{t.KM}}</text></view>
+                <!-- 次数类: 重量 × 次数 -->
+                <block wx:else>
+                  <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
+                  <view class="ec-set-sep">×</view>
+                  <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS}}</text></view>
+                </block>
               </view>
             </view>
           </view>

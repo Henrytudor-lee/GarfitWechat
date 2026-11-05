@@ -25,7 +25,7 @@
         </block>
       </view>
 
-      <view class="header-title">{{step === 'pick' ? t.ADD_EXERCISE : t.SET_WEIGHT_REPS}}</view>
+      <view class="header-title">{{step === 'pick' ? t.ADD_EXERCISE : setTitle}}</view>
 
       <view class="header-right">
         <!-- step 2: favorite toggle -->
@@ -148,8 +148,10 @@
             <text class="video-placeholder-sub">{{t.NO_DEMO_VIDEO_CONTACT}}</text>
           </view>
 
-          <!-- Weight Input -->
-          <view class="input-section">
+          <!-- Weight Input —— 计时/距离类动作都不显示:
+               这两类只按时间或距离计量, 重量区是无关内容,
+               而且实测占掉 150pt, 把下面的录入区挤出屏幕 -->
+          <view class="input-section" wx:if="{{!isDuration && !isDistance}}">
             <view class="input-label-row">
               <view class="input-label">{{t.WEIGHT}} ({{weight_unit}})</view>
               <view class="quick-chips-row">
@@ -164,13 +166,13 @@
           </view>
 
           <!-- Unit Toggle -->
-          <view class="unit-toggle">
+          <view class="unit-toggle" wx:if="{{!isDuration && !isDistance}}">
             <view class="unit-btn {{weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="kg">KG</view>
             <view class="unit-btn {{weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="lb">LB</view>
           </view>
 
-          <!-- Reps Input -->
-          <view class="input-section">
+          <!-- Reps Input (次数类动作) -->
+          <view class="input-section" wx:if="{{!isDuration && !isDistance}}">
             <view class="input-label-row">
               <view class="input-label">{{t.REPS}}</view>
               <view class="quick-chips-row">
@@ -184,6 +186,34 @@
             </view>
           </view>
 
+          <!-- Distance Input (距离类动作: 跑步 / 骑行 / 划船 / 椭圆机 …) -->
+          <view class="input-section" wx:if="{{isDistance}}">
+            <view class="input-label-row">
+              <view class="input-label">{{t.DISTANCE}}</view>
+              <view class="quick-chips-row">
+                <text class="timer-unit-hint">{{t.KM}}</text>
+              </view>
+            </view>
+            <view class="input-row">
+              <view class="input-btn" bindtap="decDistance">−</view>
+              <input class="input-field" type="digit" value="{{distanceStr}}" bindinput="onDistanceInput" placeholder="0.00" />
+              <view class="input-btn" bindtap="incDistance">+</view>
+            </view>
+          </view>
+
+          <!-- Duration Timer —— 只给计时类动作(平板支撑 / 波比跳 / 开合跳 …)
+               距离类按需求"只录入距离", 不显示计时器 -->
+          <view class="input-section" wx:if="{{isDuration}}">
+            <view class="input-label-row">
+              <view class="input-label">{{t.SET_DURATION}}</view>
+              <view class="quick-chips-row">
+                <text class="timer-unit-hint" wx:if="{{!timerRequired}}">{{t.TIMER_OPTIONAL_HINT}}</text>
+                <text class="timer-unit-hint" wx:else>{{t.DURATION_UNIT}}</text>
+              </view>
+            </view>
+            <set-timer value="{{durationSec}}" t="{{t}}" bindchange="onTimerChange" />
+          </view>
+
         </scroll-view>
 
       </view>
@@ -191,7 +221,7 @@
 
     <!-- Bottom Confirm Button (Step 2 only) -->
     <view wx:if="{{step === 'set'}}" class="modal-footer">
-      <button class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}" bindtap="confirmAdd" disabled="{{weight < 0 || reps <= 0 || submitting}}">{{submitting ? t.ADDING : t.ADD_TO_WORKOUT}}</button>
+      <button class="confirm-btn {{canSubmit ? '' : 'disabled'}}" bindtap="confirmAdd" disabled="{{!canSubmit}}">{{submitting ? t.ADDING : t.ADD_TO_WORKOUT}}</button>
     </view>
 
   </view>

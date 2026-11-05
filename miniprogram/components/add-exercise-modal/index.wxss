@@ -951,3 +951,10 @@
   --primary-text: #ccf200;
   --primary-bg-soft: rgba(204, 242, 0, 0.15);
 }
+
+/* Timer section hint (duration 类动作的时长区) */
+.timer-unit-hint {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  line-height: 64rpx;
+}

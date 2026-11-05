@@ -1,7 +1,8 @@
 // components/session-detail-modal/index.js
 const app = getApp();
 const api = require('../../utils/api.js');
-const { setVolume, volumeToCalories } = require('../../utils/unit.js');
+const { setVolume } = require('../../utils/unit.js');
+const { calcSetsCalories, rowVolumeKg } = require('../../utils/calories.js');
 
 Component({
   properties: {
@@ -99,19 +100,30 @@ Component({
               totalCalories: 0,
             };
           }
-          if (ex.weight > 0 || ex.reps > 0) {
+          // 计时类/距离类动作: weight=0 且 reps=0, 只有 duration_sec / distance_km
+          // —— 必须放行, 否则平板支撑、跑步这类记录会整组不显示。
+          const isDurationSet = Number(ex.duration_sec) > 0;
+          const isDistanceSet = Number(ex.distance_km) > 0;
+          if (ex.weight > 0 || ex.reps > 0 || isDurationSet || isDistanceSet) {
             map[ex.exercise_id].sets.push({
               id: ex.id || ex._id,
               weight: ex.weight,
               reps: ex.reps,
               weight_unit: ex.weight_unit || 'kg',
+              duration_sec: isDurationSet ? Number(ex.duration_sec) : 0,
+              distance_km: isDistanceSet ? Number(ex.distance_km) : 0,
+              // 计量方式 —— 卡路里按这个分档算(见 utils/calories.js)
+              countMode: ex.count_mode || 'weight_reps',
+              volumeKg: rowVolumeKg(ex),
             });
-            map[ex.exercise_id].totalCalories += setVolume(ex);
           }
         }
+        const userWeight = app.globalData.userWeight || 60;
         const list = Object.values(map).map(g => ({
           ...g,
-          totalCalories: volumeToCalories(Math.round(g.totalCalories)),
+          countMode: g.count_mode || 'weight_reps',
+          // 卡路里 v1: 按组的计量方式算, 不再是整个 session 一个公式
+          totalCalories: calcSetsCalories(g.sets, userWeight),
         }));
         this.setData({ exerciseList: list });
       }

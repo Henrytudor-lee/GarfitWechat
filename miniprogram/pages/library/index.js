@@ -111,6 +111,7 @@ Page({
     imgPrefix: '',
     vidPrefix: '',
     selectedExercise: null,
+    modeLabel: '',          // 计量方式标签文案(由 exercise_type 映射)
     isSelectMode: false,
     favorExercises: [],
     practicedExercises: [],
@@ -308,7 +309,7 @@ Page({
       wx.navigateBack();
     } else {
       // Open detail sheet
-      this.setData({ selectedExercise: item });
+      this.setData({ selectedExercise: item, modeLabel: buildModeLabel(item, this.data.t || {}) });
     }
   },
 
@@ -331,7 +332,15 @@ Page({
     });
     this.setData({ list });
 
-    api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+    api.callCloud('exercise.toggleFavorite', { exercise_id: id })
+      .then((r) => {
+        const list = r && r.result && r.result.favor_exercises;
+        if (Array.isArray(list)) {
+          app.applyExerciseFlags({ favor_exercises: list });
+          this.setData({ favorExercises: list });
+        }
+      })
+      .catch(() => {});
   },
 
   onDetailFavTap() {
@@ -366,7 +375,15 @@ Page({
       duration: 1200,
     });
 
-    api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+    api.callCloud('exercise.toggleFavorite', { exercise_id: id })
+      .then((r) => {
+        const list = r && r.result && r.result.favor_exercises;
+        if (Array.isArray(list)) {
+          app.applyExerciseFlags({ favor_exercises: list });
+          this.setData({ favorExercises: list });
+        }
+      })
+      .catch(() => {});
   },
 
   onVideoTap(e) {
@@ -442,3 +459,16 @@ Page({
     wx.navigateBack();
   },
 });
+
+/**
+ * 计量方式 → 显示文案。
+ *
+ * 数据源: exercises_library.exercise_type (字段本来就有)
+ * 旧值 'Strength' 是历史遗留默认值(线上 0 行), 按次数类显示。
+ */
+function buildModeLabel(item, t) {
+  const raw = (item && item.exercise_type) || 'weight_reps';
+  if (raw === 'duration') return t.MODE_TIMED || 'TIMED';
+  if (raw === 'distance_duration') return t.MODE_DISTANCE || 'DISTANCE';
+  return t.REPS || 'REPS';
+}

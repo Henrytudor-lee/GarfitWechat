@@ -95,7 +95,15 @@ Component({
         : [...favorExercises, id];
       app.globalData.favorExercises = newFav;
       // cloud call
-      api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+      api.callCloud('exercise.toggleFavorite', { exercise_id: id })
+        .then((r) => {
+          const list = r && r.result && r.result.favor_exercises;
+          if (Array.isArray(list)) {
+            app.applyExerciseFlags({ favor_exercises: list });
+            this.setData({ favorExercises: list });
+          }
+        })
+        .catch(() => {});
     },
 
     closeModal() {

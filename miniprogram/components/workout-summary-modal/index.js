@@ -1,6 +1,7 @@
 // components/workout-summary-modal/index.js
 const app = getApp();
-const { setVolume, volumeToCalories } = require('../../utils/unit.js');
+const { setVolume } = require('../../utils/unit.js');
+const { calcSetsCalories } = require('../../utils/calories.js');
 
 Component({
   properties: {
@@ -91,15 +92,11 @@ Component({
         : (locale === 'zh' ? `${mins}分钟` : `${mins} min`);
 
       let totalCalories = session.calories || 0;
+      const userWeight = app.globalData.userWeight || 60;
       // 为每个动作预计算 totalCalories (WXML 不支持方法调用, 必须在 data 字段里)
+      // 卡路里 v1: 按该组的计量方式算 —— 计时类走 MET 法, 距离类走距离法
       const groups = exerciseList.map((ex) => {
-        let vol = 0;
-        if (ex.sets) {
-          for (const s of ex.sets) {
-            vol += setVolume(s);
-          }
-        }
-        const cal = volumeToCalories(Math.round(vol));
+        const cal = calcSetsCalories(ex.sets || [], userWeight);
         return { ...ex, totalCalories: cal };
       });
       // 如果没有已存储的 calories, 从各组的 calories 求和

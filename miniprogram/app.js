@@ -167,6 +167,31 @@ App({
     this.globalData.showWelcome = false;
   },
 
+  /**
+   * 更新"收藏/练过"的本地缓存。
+   *
+   * 后端在 markPracticed / toggleFavorite 之后会返回**完整的最新列表**,
+   * 这里统一落到 globalData + storage, 各页面就不用各自再拉一次。
+   *
+   * ⚠️ 之前的问题是: globalData.practicedExercises 只在启动/登录时更新,
+   *    加完动作后没人刷它 → "已训练"筛选用的还是旧列表, 刚练过的动作筛不出来。
+   *
+   * @param {object} payload { favor_exercises?: number[], practiced_exercises?: number[] }
+   */
+  applyExerciseFlags(payload) {
+    if (!payload) return;
+    const gd = this.globalData;
+
+    if (Array.isArray(payload.favor_exercises)) {
+      gd.favorExercises = payload.favor_exercises;
+      wx.setStorageSync('favorExercises', payload.favor_exercises);
+    }
+    if (Array.isArray(payload.practiced_exercises)) {
+      gd.practicedExercises = payload.practiced_exercises;
+      wx.setStorageSync('practicedExercises', payload.practiced_exercises);
+    }
+  },
+
   doSilentLogin: function () {
     return new Promise((resolve) => {
       wx.login({
