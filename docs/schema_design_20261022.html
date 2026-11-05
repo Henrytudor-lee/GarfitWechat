@@ -119,6 +119,267 @@
      关联表建得再对，粒度也是错的。详见 §4。</p>
 </div>
 
+<!-- ============ 0.5 ============ -->
+<h2 id="s05">0.5 方案重审(2026-11-04)</h2>
+
+<div class="card info">
+  <p style="margin:0">距初版 9 天,线上库结构<strong>完全没变</strong>(<code>count_mode</code> /
+     <code>canonical_id</code> / <code>duration_sec</code> / <code>user_exercise_stats</code> 全都还没有),
+     只在长数据(exercises 1,824 → 1,972,sessions 212 → 224)。本节是重读当前代码后,
+     对初版方案的自我纠错 —— <b>共 5 处,其中 1 处是会导致功能失效的严重问题</b>。</p>
+</div>
+
+<table>
+  <tr><th style="width:44px">#</th><th>问题</th><th>严重度</th><th>修正</th></tr>
+  <tr>
+    <td>1</td>
+    <td><b>"前端改动量 ≈ 0" 不成立</b>。前端 8 处 <code>includes(id)</code> 用原始 id 匹配,
+        关联表若存 canonical_id,后端返回 canonical 集合 → <b>"练过"标记集体熄灭</b></td>
+    <td><span class="badge b-r">严重</span></td>
+    <td><b>已被第 7 条整体推翻</b> —— 根因不是"忘了展开",而是<b>根本不该有 canonical_id</b>。
+        去掉后前端 8 处 includes() 天然零改动,语义直通</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><b>方法论漏洞</b>:<code>canonical_id</code> 是"同名归组",不是"同一动作的别名"。
+        我上次默认了"同名 = 同一动作",但 954 组图片不同恰恰可能意味着是不同动作</td>
+    <td><span class="badge b-a">中</span></td>
+    <td>方案① 的前提必须由你确认。数据给了强支持:<b>993 组里 742 组(74.7%)的 type+equip+body 全一致</b>
+        —— 2026-11-04 实测(三个维度有重叠,不能靠减法推算)。
+        只有 32 组 type 不一致、162 组 body 不一致 —— 那 162 组才是真需要人工看的</td>
+    <td><span class="badge b-a">—</span></td>
+    <td><b>已被第 7 条整体推翻</b> —— "同名=同一动作"这个前提本身不成立,
+        同名条目是合法变体,不该归组(见下方绿框)</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td><b>执行顺序说法不成立</b>。我上次写"Phase 1 在 Phase 0 之后跑能受益于去重结果",
+        但 Phase 0 只标记不合并,32 组 <code>exercise_type</code> 不一致的重复行依然各自独立</td>
+    <td><span class="badge b-a">中</span></td>
+    <td>需<b>单独加一步</b>"canonical 组内 count_mode 多数票对齐"(少数服从多数,平票取代表行)</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><b>stats 的 most-trained 语义会变</b>。<code>stats.service.ts:175</code> 按
+        <code>GROUP BY e.exercise_id</code> 聚合,引入 canonical 后 13 个 Crunch 会显示成 13 行。
+        这是你已经在用的功能</td>
+    <td><span class="badge b-a">中</span></td>
+    <td><b>已被第 7 条整体推翻</b> —— 不归组后,用户练了 3 个 Crunch 变体就显示 3 行,
+        这是<b>正确行为</b>,原方案反而会把它错并成 1 行</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td><b><code>count_mode</code> 宽度</b>。<code>distance_duration</code> 是 17 字符,
+        <code>varchar(16)</code> 会截断成 <code>distance_duratio</code></td>
+    <td><span class="badge b-g">已修</span></td>
+    <td>统一改 <code>varchar(20)</code>(HTML 已改;<code>phase1.sql</code> 本来就是 20)</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><b>"72 个悬空 id" 是我的 SQL 写错导致的假数据</b>(详见下方红框)</td>
+    <td><span class="badge b-r">严重</span></td>
+    <td>已全面纠正;相关清洗步骤整个删掉</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td><b><code>canonical_id</code> 归组是过度设计,方向错了</b>。
+        用户质疑"名字重复又如何?id唯一不就可以了么" —— <b>质疑成立</b></td>
+    <td><span class="badge b-r">严重</span></td>
+    <td>关联表去掉 <code>canonical_id</code> 列,回归最简形态(详见下方绿框)</td>
+  </tr>
+</table>
+
+<div class="card danger">
+  <h4 style="margin-top:0">🔴 第 6 处错误（初版数据造假）："72 个悬空 id" 是我的 SQL 写错</h4>
+  <p>初版 §2.1 断言"<code>users.practiced_exercises</code> 里有 72 个 id 在
+     <code>exercises_library</code> 中不存在"，并据此推断"库里的动作被删过"。</p>
+  <p><b>2026-11-04 两种独立方法交叉验证，结论是 0：</b></p>
+  <pre><code>方法A (JS Set 逐段精确比对)          → 悬空 0 个, 共 46 段全部命中
+方法B (SQL 正确段提取 + NOT EXISTS)      → 悬空 0 个
+exercises 表引用但 library 没有的孤儿 id → 0 个
+library id 分布: 1~9 / 10~99 / 100~451 / 1452~5880 / 27100~48277
+                 → 天然稀疏(多批追加导入),不是删除留下的洞</code></pre>
+  <p><b>根因</b>：我原来那条 SQL 用
+     <code>SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(str,','), n, 1), ',', -1)</code> 取第 n 段，
+     实际取到的是<b>第 (n-1) 段</b>（因为 <code>SUBSTRING_INDEX</code> 的 n 表示"第 n 个分隔符之前"）。
+     偏移一位导致取值错乱，产生 72 个假阳性。</p>
+  <p><b>结论</b>：动作库<b>没有</b>被删除过的动作 —— 这条数据风险不存在，
+     "悬空 id 清洗"这一步整个删掉。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">✅ 2026-11-04 用户决策（已定）</h4>
+  <ul>
+    <li><b>去重力度 → 暂不动库</b>：不改 <code>exercises_library</code> 结构。
+         <b>2026-11-04 进一步修正:连归组都不做</b> —— 同名条目是合法变体,
+         关联表不设 <code>canonical_id</code>,标记 = 练了哪条亮哪条</li>
+    <li><b>悬空 id → 不存在该问题</b>（见上）</li>
+    <li><b>计时器 → 做真计时器组件</b>：点开始 → 计时 → 停止自动填入秒数</li>
+    <li><b>列表折叠 → 先不做</b>：列表保持 13 条 Crunch 原样，只修好"练过"标记</li>
+  </ul>
+</div>
+
+<div class="card danger">
+  <h4 style="margin-top:0">🔴 第 10 处修正:"27 条 duration 历史记录要核对秒数" —— 这个待办本身是错的</h4>
+  <p>用户问:"27 条 duration 历史记录是哪里来的?我看我的 exercises 表里面都没有 duration 字段"
+     —— 问得对。<code>exercises</code> 表<b>确实没有</b> duration 字段,Phase 1 还没执行。</p>
+  <p><b>27 的完整推导链</b>:</p>
+  <pre><code>exercises_library.exercise_type='duration' 的动作      1058 个
+  ↓ 其中被用户真正训练过的                                   6 个
+  ↓ 这 6 个动作在 exercises 表产生的训练记录                  27 条  ← "27 条"在这</code></pre>
+  <p><b>但真正的问题不是"秒数丢了"—— 这 27 条里有 24 条根本不是计时记录:</b></p>
+  <table>
+    <tr><th>形态</th><th>duration 那 27 条</th><th>对照组 weight_reps(1945 条)</th></tr>
+    <tr><td><code>reps&gt;0 且 weight&gt;0</code></td><td><b>24</b></td><td>1755</td></tr>
+    <tr><td>只有 <code>reps</code></td><td>1</td><td>190</td></tr>
+    <tr><td>全 0</td><td>2</td><td>0</td></tr>
+  </table>
+  <p>形态几乎一样 → 这 24 条<b>本来就是负重次数训练</b>。明细:</p>
+  <pre><code>"1 2 棒训练（男性）"  21 条  reps 恒=10, weight 10~40lb  ← 1-2-3 负重训练体系, 该是 weight_reps
+"侧步杰克拳击"        1 条  reps=1,  weight=11kg                 ← 带负重
+"反向箭步蹲快速摆臂"   1 条  reps=8,  weight=10kg                 ← 带负重
+"后撤腿击球"          1 条  reps=8,  weight=10kg                 ← 带负重
+仰卧小腿拉伸（女性）    2 条  reps=0,  weight=0                    ← 真·计时, 但没记秒数
+平板支撑              1 条  reps=1,  weight=0                    ← 真·计时, 1 组还是 1 秒?说不清</code></pre>
+  <p><b>结论</b>:秒数<b>从来没被采集过</b>(字段不存在),没有"丢失的秒数"要补。
+     把 <code>reps</code> 写进 <code>duration_sec</code> 等于把"10 次负重"固化成"10 秒"。</p>
+  <p><b>真正该做的是修动作库的标注</b>,而且这是全库性问题 —— 702 组中文名重复里
+     有 <b>30 组 duration 与 weight_reps 混标</b>(引体向上 13 个 id 里 12+1 混标、
+     侧平板 4 个里 3+1、弹力带拉伸 5 个里 4+1……);
+     duration 1058 个里按关键词看<b>约 149 个</b>明显该是 weight_reps
+     (Squat/蹲 65 + Push/Press/推/举 45 + Row/划船 14 + Curl/弯举 14 + Drill/棒训练 11)。</p>
+  <p><b>而且这是功能正确性问题,优先级高于字段迁移</b> —— 标注不改,
+     新功能上线后用户加"深蹲"会弹出计时器、加"平板支撑"却只给次数框。</p>
+  <p class="sub">→ Phase 1 脚本的"历史数据回填"步骤整个删掉;
+     改成文末的<b>标注核对清单</b>(只读 SQL,导出后人工过一遍)。</p>
+</div>
+
+<div class="card danger">
+  <h4 style="margin-top:0">🔴 第 9 处修正：迁移脚本里有 2 个真 bug —— 肉眼看 SQL 发现不了</h4>
+  <p>2026-11-04 用<b>替身表实跑</b>迁移脚本(在真实库里建 <code>gfit_tmpcheck_*</code> 普通表,
+     灌真实数据,原样跑脚本,跑完删掉),抓到 2 个靠"看 SQL"永远发现不了的 bug:</p>
+  <table>
+    <tr><th>Bug</th><th>现象</th><th>根因</th><th>修法</th></tr>
+    <tr>
+      <td><b>段提取 off-by-one</b></td>
+      <td>多段 CSV <b>最后一段永远丢失</b>;单段 CSV(无逗号)<b>整条丢失</b><br>
+          实测丢: user1 的 '2052'、user2 的 '27819'(整条)、user4 的 '3715'</td>
+      <td>补了逗号后, <code>SUBSTRING_INDEX(x, ',', n)</code> 的 n 表示"第 n 个分隔符<b>之前</b>",
+          取第 1 段要用 <b>n+1</b></td>
+      <td><code>SUBSTRING_INDEX(..., nums.n + 1, ...)</code></td>
+    </tr>
+    <tr>
+      <td><b>CAST('') 报错</b></td>
+      <td>整个 INSERT 失败:<br>
+          <code>Truncated incorrect INTEGER value: ''</code></td>
+      <td>n=1 时取到空串, <code>CAST('' AS UNSIGNED)</code> 在严格模式下直接抛错</td>
+      <td>包一层 <code>NULLIF(..., '')</code> 让空串变 NULL, 再由 <code>WHERE ex_id &gt; 0</code> 过滤</td>
+    </tr>
+  </table>
+  <p><b>实跑验证结果</b>(替身表, 真实数据, 跑完清理):</p>
+  <pre><code>=== Phase 1: 5 条语句 ===   ✅ 全部通过   ✅ 幂等: 第二次执行全部通过
+=== Phase 3: 4 条语句 ===   ✅ 全部通过   ✅ 幂等: 第二次执行全部通过
+
+关联表回填行数: 52
+✅ 逐用户比对: 3 个有标记的用户, CSV 与关联表完全一致
+孤儿 exercise_id: 0        重复 (user, exercise) 行: 0
+✅ 替身表已清理(真实表零改动)</code></pre>
+  <p class="sub">验证脚本已留作正式工具:
+     <code>gfit-backend/scripts/sqlcheck.js</code>(改完迁移脚本跑一遍就知道对不对)。</p>
+</div>
+
+<div class="card danger">
+  <h4 style="margin-top:0">🔴 第 8 处修正（同样重要）：改动范围被我无谓地放大了</h4>
+  <p>用户原话:<b>"你的数据库改动怎么会这么大呢?我理解不是只需要 exercises 表新增 duration 等字段就可以了么"</b>
+     —— 质疑成立。</p>
+  <p>我把"用户明确要的"和"我自己加的"分开数了一遍:</p>
+  <table>
+    <tr><th>动作</th><th>谁提的</th><th>实际必要性</th><th>处置</th></tr>
+    <tr><td><code>exercises</code> 加 <code>duration_sec</code></td><td><b>用户要的</b></td>
+        <td>真缺 —— 计时动作的秒数没地方存</td><td><span class="badge b-g">保留</span></td></tr>
+    <tr><td>关联表 <code>user_exercise_stats</code></td><td><b>用户要的</b></td>
+        <td>真缺 —— CSV 长度上限</td><td><span class="badge b-g">保留</span></td></tr>
+    <tr><td>改名 <code>exercise_type</code>→<code>count_mode</code></td><td><b>我加的</b></td>
+        <td>不需要。字段本来就有, 改名带来后端 2 处列探测 + 前端兼容两套字段名</td>
+        <td><span class="badge b-r">已撤销</span></td></tr>
+    <tr><td>值域回填('Strength'/'Time' → 规范值)</td><td><b>我加的</b></td>
+        <td>不需要。线上<b>需要回填的行数 = 0</b></td><td><span class="badge b-r">已删</span></td></tr>
+    <tr><td><code>distance_m</code> 字段</td><td><b>我加的</b></td>
+        <td>不需要。用户只说"平板支撑计时/引体向上计数", 距离的单位和配速都还没定</td>
+        <td><span class="badge b-a">改为可选</span></td></tr>
+    <tr><td>关联表 4 个统计列<br>(practice_count / last_practiced_at / best_weight / best_reps)</td>
+        <td><b>我加的</b></td>
+        <td>不需要。全都能从 <code>exercises</code> 明细实时聚合;冗余存 = 双份事实来源 + 同步问题</td>
+        <td><span class="badge b-r">已删</span></td></tr>
+    <tr><td><code>canonical_id</code> 归组 + 前端折叠</td><td><b>我加的</b></td>
+        <td>不需要 —— 见第 7 条,方向就是错的</td><td><span class="badge b-r">已撤销</span></td></tr>
+  </table>
+  <p><b>最终库结构改动量</b>:</p>
+  <pre><code>需求②: ALTER TABLE exercises ADD COLUMN duration_sec int DEFAULT NULL;   -- 1 列
+需求①: CREATE TABLE user_exercise_stats (user_id, exercise_id, is_favor, is_practiced, ...);  -- 1 张新表
+
+exercises_library:  一列都不动
+users:             一列都不动(只读, 后续可选删两个 CSV 列)
+sessions:          不动</code></pre>
+  <p>根子上的问题:<b>我把"把 CSV 换成关系表"这个存储层替换,包装成了"动作库治理 + 计量体系重构 + 数据统计体系"</b>,
+     然后顺手把一堆自作主张的技术选型(改名/回填/预建统计列/归组)都塞了进去。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">✅ 第 7 处修正（最重要）：名字重复不是问题,是我的过度设计</h4>
+  <p>用户原话:<b>"动作库名字重复又如何呢?id唯一不就可以了么"</b> —— 质疑成立。</p>
+  <p>我初版给关联表加了 <code>canonical_id</code> 列,理由是"用户练了 101 个 id 但实际只练过 92 个动作,
+     标记会不亮"。实测证明这个理由<b>站不住</b>:</p>
+  <pre><code>"Lever Chest Press" 3 个 id (204/205/3516) 共 93 条训练记录:
+    204 → 57 条 / 15 场    205 → 20 条 / 5 场    3516 → 16 条 / 4 场
+  → 分布在 24 场不同的 session 里, 是"24 场训练分别选了 3 个条目",
+    不是"一次训练被切碎"。用户在变体之间切换, 只亮选过的那个 = 正确行为。
+
+整个库 212 场训练里, 同一 session 内出现同名多 id 的只有 4 场 (1.9%),
+且那 4 场用户可能是真要练两个变体。
+
+993 组同名条目: 图片全为空的 0 组, 视频全为 NULL 的 0 组, 954 组各有多个不同图片
+  → 每条都是独立的、有自己资源的动作条目。</code></pre>
+  <p><b>结论</b>:同名不同 id 是<b>合法数据</b>(不同握法/角度/器械的变体)。
+     强行归组反而会误标 —— 用户练了 3 个变体,不该把 13 个全标成"练过"。</p>
+  <p><b>连带收益</b>:去掉这层间接后,后端返回给前端的 id 集合<b>就是原始 id</b>,
+     前端 8 处 <code>includes(id)</code> 零改动,语义直通。
+     我初版说的"前端改动量 ≈ 0"本来就不成立,现在反而真的成立了。</p>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">名字重复真正留下的问题（与关联表无关,单独处理）</h4>
+  <ol>
+    <li><b>列表可读性</b> —— 702 组中文名重复(11 个"引体向上",英文名分别是
+        Chin-ups / Pull up / Chin-Up / Muscle-up…)。数据上每个 id 都有独立图片,
+        用户能靠图区分,但只显示中文名时看着重复 → <b>UI 层补英文名副标题</b>,不动数据</li>
+    <li><b>翻译错位</b> —— id=2081 <code>name_zh='引体向上'</code> 但 <code>name='Mountain Climber'</code>;
+        id=2077 <code>name_zh='混合握距引体向上'</code> 但 <code>name='Middle Back Stretch'</code>。
+        中文名是后加的,中间错位 → <b>人工核对 name_zh ↔ name 对应关系</b></li>
+  </ol>
+  <p><b>这两项都不要用"归组"解决</b> —— 归组会误标,还会掩盖真实的数据问题。</p>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">补充修正:duration 动作不一定不需要 weight</h4>
+  <p>初版写"duration 类隐藏 weight"。但实测 27 条 duration 记录里 <b>24 条 <code>weight>0</code></b>,
+     样本 "1 2 棒训练" = <code>reps=10, weight=40lb</code> —— 这是<b>负重</b>动作,
+     被错标成 duration。</p>
+  <p>修正:<code>count_mode</code> 只决定<b>主计量维度</b>(次数 / 秒数 / 距离),
+     <code>weight</code> 字段<b>始终可选显示</b>,填 0 表示不填。别写死"duration 就藏重量"。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">重审后结论不变的部分</h4>
+  <ul>
+    <li>需求② 的 <code>exercise_type</code> 字段确实存在（<code>SHOW CREATE TABLE</code> 已复核）</li>
+    <li>需求① 的关联表方向正确，且"前端零改动"这个<b>目标</b>仍然可达 —— 只是要靠后端展开实现</li>
+    <li>Phase 1 的幂等 DDL 方案成立</li>
+    <li>关联表 <code>user_exercise_stats</code> 的字段设计（PK 复合键 + 合并 favor/practiced +
+        预留统计列）经复核无问题</li>
+  </ul>
+</div>
+
 <!-- ============ 1 ============ -->
 <h2 id="s1">1. 实测数据基线</h2>
 
@@ -179,8 +440,10 @@
   <tr><th style="width:34px">#</th><th>问题</th><th>证据</th><th>严重度</th></tr>
   <tr>
     <td>1</td>
-    <td><b>悬空 ID</b>：库里动作被删/改 id 后，用户的"练过"标记变成指向不存在行的垃圾，永远洗不掉</td>
-    <td><code>users.practiced_exercises</code> 里有 <b>72 个 id 在 exercises_library 中不存在</b></td>
+    <td><b>悬空 ID</b>：<span class="badge b-g">❌ 已排除</span> —— 2026-11-04 用两种独立方法交叉验证,
+        <code>users.practiced_exercises</code> 里的 id <b>全部</b>都能在 <code>exercises_library</code> 中找到。
+        <code>exercises</code> 表引用但 library 没有的孤儿 id 也是 <b>0</b>。
+        <br><span class="badge b-r">初版写"72 个悬空 id"是我 SQL 写错了</span>(CSV 段提取偏移,漏取最后一段) —— 见 §0.5</td>
     <td><span class="badge b-r">高</span></td>
   </tr>
   <tr>
@@ -213,21 +476,39 @@
 <h3>2.2 表设计（推荐）</h3>
 
 <pre><code>CREATE TABLE `user_exercise_stats` (
-  `user_id`           int NOT NULL,
-  `exercise_id`       int NOT NULL,
-  `is_favor`          tinyint NOT NULL DEFAULT 0 COMMENT '是否收藏',
-  `is_practiced`      tinyint NOT NULL DEFAULT 0 COMMENT '是否练过(至少一次)',
-  `practice_count`    int NOT NULL DEFAULT 0 COMMENT '累计训练次数',
-  `last_practiced_at` timestamp NULL DEFAULT NULL COMMENT '最近一次训练时间',
-  `best_weight`       float DEFAULT NULL COMMENT '历史最佳重量(统一 kg 存储)',
-  `best_reps`         int DEFAULT NULL COMMENT '最佳成绩次数',
-  `create_time`       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time`       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_id`      int NOT NULL,
+  `exercise_id`  int NOT NULL COMMENT '动作 id (exercises_library.id), 不做归组',
+  `is_favor`     tinyint NOT NULL DEFAULT 0 COMMENT '是否收藏',
+  `is_practiced` tinyint NOT NULL DEFAULT 0 COMMENT '是否练过(至少一次)',
+  `create_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `exercise_id`),
   KEY `idx_ues_exercise` (`exercise_id`),
-  KEY `idx_ues_user_practiced` (`user_id`, `is_practiced`, `last_practiced_at`),
   CONSTRAINT `fk_ues_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+<div class="card ok">
+  <h4 style="margin-top:0">纯关系表:不存派生数据</h4>
+  <p>这张表只回答一件事:<b>"哪些动作被收藏/练过"</b>。</p>
+  <p>"练过几次"(COUNT)、"最近什么时候"(MAX create_time)、"最佳重量"(MAX)——
+     <b>全部能从 <code>exercises</code> 明细表实时聚合出来</b>,不必冗余存一份。
+     存派生数据会造成<b>双份事实来源 + 同步问题</b>:加一组 set 还得同步更新
+     <code>best_weight</code>,漏一次就出现"历史最佳对不上"这类幽灵 bug。</p>
+  <p class="sub">数据量参考:<code>exercises</code> 1,972 行 / 9 个用户 ——
+     实时聚合毫无压力。以后数据量上来再考虑物化。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">2026-11-04 修正:不做任何归组,<code>exercise_id</code> 就是原始 id</h4>
+  <p>初版给这张表加过 <code>canonical_id</code> 列(把同名动作归组,让"练过"标记跨变体传播)。
+     <b>已去掉</b> —— 见 §0.5 第 7 条。</p>
+  <p>核心理由:<b>id 唯一就够了,名字重复不是数据模型问题。</b>
+     同名不同 id 是<b>合法的独立条目</b>(不同握法/角度/器械的变体),
+     每条都有自己的图片和视频资源。用户练了 3 个变体,就该只有这 3 个亮 ☑ ——
+     把 13 个全标成"练过"反而是误标。</p>
+  <p>去掉这层间接的额外好处:后端返回给前端的 id 集合<b>就是原始 id</b>,
+     前端 8 处 <code>includes(id)</code> 一行都不用改,语义直通。</p>
+</div>
 
 <h4>字段设计逐条理由</h4>
 <table>
@@ -237,16 +518,21 @@
     <td>天然幂等，同一 (user, exercise) 只有一行 → <code>INSERT ... ON DUPLICATE KEY UPDATE</code> 一次搞定加收藏 / 标记练过；删用户自动 CASCADE</td>
   </tr>
   <tr>
+    <td><b>不做归组</b>（初版加过 <code>canonical_id</code>，已去掉）</td>
+    <td><b>id 唯一就够了，名字重复不是数据模型问题。</b>同名不同 id 是合法的独立条目
+        （不同握法/角度/器械的变体），每条都有独立图片视频资源。
+        用户练了 3 个变体，就该只有这 3 个亮 ☑ —— 归组反而是误标。
+        额外好处：后端返回的 id 集合<b>就是原始 id</b>，前端 8 处 <code>includes(id)</code> 零改动</td>
+  </tr>
+  <tr>
     <td><code>is_favor</code> 与 <code>is_practiced</code> <b>合并一张表</b></td>
     <td>两者粒度完全相同（都是 user × exercise），拆两张表纯属自找 JOIN；且"练过但没收藏 / 收藏但没练过"是高频组合，合并后一次查询拿全</td>
   </tr>
   <tr>
-    <td><code>practice_count</code> + <code>last_practiced_at</code></td>
-    <td>支撑"练过几次""多久没练了""最近练的哪些"；<b>更重要的是一次建到位</b>，只存布尔位的话以后加统计还得 ALTER + 回填一遍</td>
-  </tr>
-  <tr>
-    <td><code>best_weight</code> 统一存 kg</td>
-    <td>现在 <code>exercises</code> 是 <code>weight</code> + <code>weight_unit</code> 双列，聚合要做 CASE WHEN；关系表直接存归一化值，统计直接 <code>MAX()</code>。<b>只在新表归一，原表不动</b>（历史数据零影响）</td>
+    <td><b>不存派生统计列</b>（初版加过 practice_count / last_practiced_at /
+        best_weight / best_reps，已去掉）</td>
+    <td>全部能从 <code>exercises</code> 明细实时聚合，冗余存一份 = 双份事实来源 +
+        同步问题。要统计时写聚合 SQL 即可（1,972 行 / 9 个用户，毫无压力）</td>
   </tr>
   <tr>
     <td><code>idx_ues_user_practiced</code></td>
@@ -274,8 +560,8 @@
        用后端现成的 <code>splitCsvIds()</code> 拆 CSV → 批量 <code>INSERT IGNORE</code>。</p>
     <p class="sub">⚠️ 拆 CSV 拆到"第 n 个逗号段"用纯 SQL 很绕且易错（本次实测里一条多段聚合 SQL 就踩了语法坑）。
        应用层拆分更可控 —— 迁移文档 <code>db_migration_20261013.sql</code> STEP 7 也是这么建议的。</p>
-    <p><b>顺手清洗 72 个悬空 id</b>：不在 <code>exercises_library</code> 里的直接跳过，不进新表
-       （也意味着这 72 个标记会随之消失 —— 需要你确认是否可接受）。</p>
+    <p><b>悬空 id 清洗</b>：<span class="badge b-g">无需处理</span> —— 实测所有 id 都有效。
+       迁移只需按 id 拆 CSV → 批量 INSERT,不用做有效性过滤。</p>
   </div>
 </div>
 
@@ -304,11 +590,29 @@
   </div>
 </div>
 
-<div class="card ok">
-  <h4 style="margin-top:0">前端改动量 ≈ 0</h4>
-  <p>登录返回字段名和格式不变 → <code>add-exercise-modal</code> / <code>library</code> 的
-     <code>is_favorite</code> / <code>is_practiced</code> 标记逻辑一行都不用改。
-     唯一的净变化是 <code>library.list</code> 的筛选参数从"传 id 数组"变成"传布尔"，反而更干净。</p>
+<div class="card danger">
+  <h4 style="margin-top:0">⚠️ 修正:前端改动量不是 0(2026-11-04 重审发现)</h4>
+  <p>我上一版写"前端一行都不用改"是<b>错的</b>。前端有 <b>8 处</b>用原始 id 匹配:</p>
+  <pre><code>library/index.js:231-232      is_favorite: favorExercises.includes(id),
+                          is_practiced: practicedExercises.includes(id),
+add-exercise-modal/index.js:406-407   同上
+library/index.js:322/342      favorExercises.includes(id)
+edit-exercise-modal/index.js:46/61  favorExercises.includes(group.exercise_id)</code></pre>
+  <p>如果关联表存 <code>canonical_id</code>,后端返回的是 canonical 集合,
+     而列表项的 <code>id</code> 是原始 id → <code>includes()</code> 全部失配,
+     <b>"练过"标记会集体熄灭</b>(用户练的是 id=5873 的 Crunch,canonical 是 1717)。</p>
+  <h4>最终修法:彻底去掉 canonical_id（而非"让后端展开")</h4>
+  <pre><code>-- 关联表直接用原始 exercise_id, 不引入 canonical 这一层间接
+CREATE TABLE user_exercise_stats (
+  user_id int, exercise_id int,   -- exercise_id 就是 exercises_library.id
+  ...
+  PRIMARY KEY (user_id, exercise_id)
+);
+-- 后端返回 practiced 时直接查这一列:
+SELECT exercise_id FROM user_exercise_stats WHERE user_id = ? AND is_practiced = 1;
+-- 拿到的就是原始 id 数组, 8 处 includes() 天然一行都不用改</code></pre>
+  <p><b>根因不是"忘了展开",而是"根本不该有 canonical_id"</b> ——
+     同名条目是合法变体,归组会误标(详见 §0.5 第 7 条)。</p>
 </div>
 
 <!-- ============ 3 ============ -->
@@ -323,15 +627,77 @@
 
 <h3>3.1 Schema 改动</h3>
 
-<pre><code>-- ① 重命名 + 收敛取值 + 修默认值
-ALTER TABLE `exercises_library`
-  CHANGE COLUMN `exercise_type` `count_mode` varchar(16) NOT NULL DEFAULT 'weight_reps'
-    COMMENT '计量方式: weight_reps=重量+次数 | duration=计时 | distance_duration=距离+时长';
-
--- ② 补上真正缺失的采集字段
+<div class="card ok">
+  <h4 style="margin-top:0">需求② 的库结构改动 = 1 列</h4>
+  <p>2026-11-04 瘦身后的最终形态：</p>
+  <pre><code>-- 就这一行
 ALTER TABLE `exercises`
-  ADD COLUMN `duration_sec` int   DEFAULT NULL COMMENT '计时动作持续秒数',
-  ADD COLUMN `distance_m`  float DEFAULT NULL COMMENT '距离动作米数';</code></pre>
+  ADD COLUMN `duration_sec` int DEFAULT NULL COMMENT '计时动作持续秒数' AFTER `reps`;</code></pre>
+  <p><code>exercises_library</code> <b>一个字节都不动</b> —— 它的 <code>exercise_type</code>
+     字段本来就有,而且已有真实数据。</p>
+</div>
+
+<div class="card info">
+  <h4 style="margin-top:0">证据链：<code>exercise_type</code> 在线上生产库确实存在</h4>
+  <p><code>47.108.200.98:3306 / gfit</code>，<code>SHOW CREATE TABLE exercises_library</code> 原文：</p>
+  <pre><code>`exercise_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Strength',</code></pre>
+  <p>连接信息：<code>DATABASE()=gfit</code>、<code>@@hostname=28c0a18489ed</code>、<code>VERSION()=8.4.11</code>。
+     直接对该列 <code>GROUP BY</code> 成功（列不存在会直接报 1054）：
+     <code>weight_reps 6522 | duration 1058 | distance_duration 61</code>。</p>
+  <p>仓库内两份 schema 文件也都有：<code>fitness_wechat/docs/exercises_library.sql:31</code>、
+     <code>gfit-backend/db/exercises_library.sql:31</code>。</p>
+  <p class="sub">但旧云开发库（<code>sh-cynosdbmysql-grp-6ib8n15i.sql.tencentcdb.com:26415</code>）DNS 已解析不到，
+     无法核实。因此下面的 DDL 写成<b>幂等</b>：列在就改名，不在就新建，三种情况都能跑。</p>
+</div>
+
+<pre><code>-- ① 真正缺的: 计时动作的秒数（幂等包装见 phase1.sql）
+ALTER TABLE `exercises`
+  ADD COLUMN `duration_sec` int DEFAULT NULL COMMENT '计时动作持续秒数' AFTER `reps`;
+
+-- ② 距离（2026-11-04 用户拍板"就只录入距离就行了"）
+ALTER TABLE `exercises`
+  ADD COLUMN `distance_km` float DEFAULT NULL COMMENT '距离动作公里数 (km)' AFTER `duration_sec`;</code></pre>
+
+<div class="card ok">
+  <h4 style="margin-top:0">距离录入方案(已定):只录距离,不算配速,单位 km</h4>
+  <p>用户拍板:<b>"距离录入方案就只录入距离就行了"</b> →</p>
+  <ul>
+    <li><b>距离</b>:独立输入框,<b>必填</b>,单位 <b>km</b>(小数 2 位)</li>
+    <li><b>时长</b>:仍可用计时器记,但<b>可选</b> —— 只填距离也能提交</li>
+    <li><b>不做</b>:配速计算、配速反推距离</li>
+  </ul>
+  <p><b>为什么单位是 km</b> —— 2026-11-04 实测 <code>distance_duration</code> 全部 61 行 / 47 个中文名:</p>
+  <pre><code>跑步 3 / 快走 2 / 步行 2 / 行走 2 / 长跑 / 突击跑 / 短步跑步 / 冲刺
+跑步机 4 / 固定自行车 4 / 户外骑自行车 / 划船 2 / 椭圆机 4 / 踏步机 2
+登山者 4 / 跳绳 2 / 波比跳类 2 / 壶铃抱瓶原地行进
+→ 全是公里级有氧, 只有"冲刺"是米级(用 km 表达为 0.1)</code></pre>
+  <p>字段名直接带单位(<code>distance_km</code>),避免"存的是 m 还是 km"的歧义 ——
+     单位绑进字段名后, 以后要改单位得 ALTER + 数据换算,所以一次定死。</p>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">初版多做的三件事,现已全部去掉</h4>
+  <table>
+    <tr><th>初版动作</th><th>为什么去掉</th></tr>
+    <tr>
+      <td>改名 <code>exercise_type</code> → <code>count_mode</code></td>
+      <td>用户从没要求。连锁成本:后端 2 个 service 各 ~30 行列探测、前端兼容两套字段名、
+          值域回填、文档大改。收益只是"名字更自解释" —— 不值。<b>已回退</b></td>
+    </tr>
+    <tr>
+      <td>值域回填('Strength'/'Time' → 规范值)</td>
+      <td>线上实测<b>需要回填的行数 = 0</b>(exercise_type 只有三个规范值,
+          'Strength' 是列默认值但 0 行使用)。纯多余。<b>已删</b></td>
+    </tr>
+    <tr>
+      <td><code>distance_m</code> 字段</td>
+      <td>用户没提距离录入。单位(m/km)、配速要不要算进统计,都还没定。
+          擅自加字段 = 擅自加需求。<b>改成注释掉的 OPTIONAL 段</b></td>
+    </tr>
+  </table>
+  <p class="sub">完整可执行脚本见 <code>docs/db_migration_20261026_phase1.sql</code>(v2 瘦身版) —
+     含幂等包装、验证查询、回滚。</p>
+</div>
 
 <table>
   <tr><th>决策</th><th>理由</th></tr>
@@ -371,7 +737,7 @@ ALTER TABLE `exercises`
   <tr><th>count_mode</th><th>录入 UI</th><th>存哪</th><th>weight 字段</th></tr>
   <tr><td><code>weight_reps</code></td><td>重量输入 + 次数 chips <code>[4,8,10,12,15,20]</code>（现状）</td><td><code>weight</code> + <code>reps</code></td><td>显示</td></tr>
   <tr><td><code>duration</code></td><td><b>秒数输入 + 计时器按钮</b>（开始/暂停/停止）</td><td><code>duration_sec</code></td><td><b>隐藏</b></td></tr>
-  <tr><td><code>distance_duration</code></td><td>距离输入 + 秒数输入</td><td><code>distance_m</code> + <code>duration_sec</code></td><td><b>隐藏</b></td></tr>
+  <tr><td><code>distance_duration</code></td><td><b>距离输入(必填, km)</b> + 计时器(可选)</td><td><code>distance_km</code> + <code>duration_sec</code></td><td><b>隐藏</b></td></tr>
 </table>
 
 <h4>前端改动点（逐文件）</h4>
@@ -420,107 +786,284 @@ ALTER TABLE `exercises`
      样式和逻辑抽出来做单组计时器即可，不用从零写。</p>
 </div>
 
-<!-- ============ 4 ============ -->
-<h2 id="s4">4. 前置阻塞项：动作库去重 + 标注错位</h2>
+<!-- ============ 3.5 ============ -->
+<h2 id="s35">3.5 卡路里算法 v1（独立文件）</h2>
 
-<h3>4.1 重复行（阻塞需求 ①）</h3>
+<div class="card ok">
+  <h4 style="margin-top:0">为什么独立成文件</h4>
+  <p>原来卡路里散在两处,而且是<b>同一个公式抄了两遍</b>:</p>
+  <pre><code>后端 sessions.service.ts:  Math.round(totalVolume * userWeight * 0.0011)
+前端 utils/unit.js:        volumeToCalories(volume)  ← 同一公式</code></pre>
+  <p>而且都是<b>整个 session 一个公式</b>,不区分动作类型 —— 于是:</p>
+  <ul>
+    <li>计时类动作(平板支撑)秒数无处记录 → 卡路里恒为 0</li>
+    <li>距离类动作(跑步)训练量算成 0 → 卡路里恒为 0</li>
+  </ul>
+  <p>用户拍板:<b>"要计算,先单开一个卡路里计算的算法文件,先写一套简单的算法,
+     后续再根据动作类型的不同进行优化"</b></p>
+</div>
+
+<h3>v1 三档公式（都是简单版, 精度不高但方向正确）</h3>
 <table>
-  <tr><th>指标</th><th>实测</th></tr>
-  <tr><td>英文名重复组数</td><td><b>993 组</b>，多出 <b>1,287</b> 行冗余（占 7,641 行的 17%）</td></tr>
-  <tr><td>中文名重复组数</td><td><b>702 组</b>，多出 <b>971</b> 行</td></tr>
-  <tr><td>最严重</td><td>"Push-up" 13 行、"Crunch" 13 行、"引体向上" <b>11 行</b>、"Lever Chest Press" 8 行</td></tr>
-  <tr><td>完全相同（name 一字不差）</td><td>平板支撑 id 1914 / 1916，name 均为 "Front Plank"</td></tr>
+  <tr><th>计量方式</th><th>公式</th><th>说明</th></tr>
+  <tr>
+    <td><code>weight_reps</code></td>
+    <td><code>volumeKg × weightKg × 0.0011</code></td>
+    <td><b>沿用现有公式, 不动</b> —— 保证历史数据完全不变</td>
+  </tr>
+  <tr>
+    <td><code>duration</code></td>
+    <td><code>MET × weightKg × durationSec / 3600</code></td>
+    <td>MET 默认 5(中等强度)</td>
+  </tr>
+  <tr>
+    <td><code>distance_duration</code></td>
+    <td><code>weightKg × distanceKm × 0.9</code></td>
+    <td>距离法(跑步经验公式), 距离必填 → 更准</td>
+  </tr>
+</table>
+
+<pre><code>// 后端: gfit-backend/src/common/utils/calories.ts
+// 前端: fitness_wechat/miniprogram/utils/calories.js   ← 两份必须同步
+
+export const CALORIE_CONFIG = {
+  volumeFactor: 0.0011,
+  defaultMet: { weight_reps: 6, duration: 5, distance_duration: 8 },
+  distanceFactor: 0.9,
+};
+// 后续按动作类型优化时, 只改这张表, 调用方一行都不用动</code></pre>
+
+<h3>接入点</h3>
+<table>
+  <tr><th>位置</th><th>改动</th></tr>
+  <tr><td>后端 <code>sessions.service.ts</code> finish</td>
+      <td>不再用 <code>totalVolume × 体重 × 0.0011</code>,改为<b>逐组按 count_mode 算再求和</b>;
+          SQL JOIN <code>exercises_library</code> 取 <code>exercise_type</code></td></tr>
+  <tr><td>后端 <code>exercises.service.ts</code> list</td>
+      <td>JOIN library 带出 <code>count_mode</code> —— 前端要靠它分档算</td></tr>
+  <tr><td>后端 <code>stats.service.ts</code> summary</td>
+      <td>新增 <code>totalCalories</code> + 每周 calories。<b>单独聚合 <code>sessions.calories</code></b>,
+          不能再从体积反推</td></tr>
+  <tr><td>后端 <code>sessions.service.ts</code> monthlyStats</td>
+      <td>新增 today/yesterday/monthly 三个真实卡路里值</td></tr>
+  <tr><td>前端训练页 / 训练总结弹窗 / 训练详情弹窗</td>
+      <td>改用 <code>utils/calories.js</code>;计时类/距离类的 set 不再被过滤掉</td></tr>
+  <tr><td>前端统计页</td>
+      <td>总卡路里、周趋势改用后端聚合值</td></tr>
 </table>
 
 <div class="card danger">
-  <h4 style="margin-top:0">为什么这会毁掉需求 ①</h4>
-  <pre><code>用户练了 id=228「Pull up」
-  → 关联表写入 (user=1, exercise=228)
-  → library 列表里另外 10 个「引体向上」(112/229/339/1704/2081/2102/2103/2764/3617/4830/5870/5871)
-     仍然不带 ☑ 标记
-  → 用户视角："我明明练过引体向上，为什么标记没全亮？"</code></pre>
-  <p>需求 ① 建了关联表之后，<b>这个问题会变得更明显</b>（因为筛选逻辑正式上线了），而不是被解决。</p>
+  <h4 style="margin-top:0">⚠️ 一个容易踩的坑:卡路里不能 JOIN exercises 聚合</h4>
+  <pre><code>-- ❌ 错的: 一个 session JOIN 出 N 行 exercise, s.calories 被放大 N 倍
+SELECT COUNT(*), COALESCE(SUM(s.calories),0) FROM sessions s LEFT JOIN exercises e ON ...
+
+-- ✅ 对的: 卡路里是 session 级的事实, 独立聚合
+SELECT COALESCE(SUM(calories),0) FROM sessions WHERE _openid=? AND status='finished';</code></pre>
 </div>
-
-<h3>4.2 标注错位（阻塞需求 ②）</h3>
-
-<p><code>exercise_type</code> 是按<b>英文源数据</b>标注的，中文名是后加的，中间错了位：</p>
-<table>
-  <tr><th>id</th><th>name_zh</th><th>name（英文）</th><th>count_mode</th><th>判断</th></tr>
-  <tr><td>2081</td><td>引体向上</td><td>Mountain Climber</td><td><code>duration</code></td><td><span class="badge b-r">错</span> 中文名被安到了登山跑上</td></tr>
-  <tr><td>2077</td><td>混合握距引体向上</td><td>Middle Back Stretch</td><td><code>duration</code></td><td><span class="badge b-a">侥幸</span> 拉伸确实是 duration</td></tr>
-  <tr><td>112/228/229/339/1704/2102/2103/2764/3617/4830/5870/5871</td><td>引体向上</td><td>Chin-ups / Pull up / …</td><td><code>weight_reps</code></td><td><span class="badge b-g">对</span></td></tr>
-</table>
-
-<div class="card warn">
-  <h4 style="margin-top:0">好在你举的例子恰好没踩到</h4>
-  <p>平板支撑 (1914/1916) 和绝大多数引体向上 id 都标对了，所以功能一上线你大概率看不出问题。
-     但 <code>id=2081</code> 这类错位行会让"引体向上"出现两套行为（一个按次数、一个按计时），
-     <b>用户能感知到但很难归因</b>。建议上线前跑一遍 name_zh × name 语义不符的行做人工核对。</p>
-</div>
-
-<h3>4.3 去重策略建议</h3>
-<p>不建议物理删除重复行 —— <code>exercises</code> 表里有 1,746 行历史记录引用着这些 id，
-   删了会断链（虽然实测 orphans = 0，但那是"引用了仍存在的行"，删除会制造新的孤儿）。</p>
 
 <div class="card ok">
-  <h4 style="margin-top:0">推荐：加 canonical 映射，不动原始行</h4>
-  <pre><code>ALTER TABLE `exercises_library`
-  ADD COLUMN `canonical_id` int DEFAULT NULL COMMENT '归一后的动作 id, 指向代表行';
+  <h4 style="margin-top:0">验证结果（<code>gfit-backend/scripts/caloriecheck.js</code>）</h4>
+  <pre><code>真实 set 样本: 400 条
+✅ 前后端逐 set 一致 (400 条, 0 处差异)
+✅ 汇总: 前端=8205 后端=8205 (一致)
 
--- 代表行 canonical_id = 自己的 id；重复行 canonical_id = 代表行 id
--- 查重:  SELECT name, MIN(id) FROM exercises_library GROUP BY name HAVING COUNT(*)>1</code></pre>
-  <p>配合需求 ①：关联表的 <code>exercise_id</code> 存 <b>canonical_id</b>，
-     UI 展示时按 canonical 去重。这样"练过"标记自然覆盖所有重复行，
-     且历史数据零风险（只多一个字段 + 一次 UPDATE）。</p>
+典型场景(体重 60kg):
+   卧推 60kg × 10 次      → 39.6 kcal
+   平板支撑 60 秒          → 5 kcal
+   平板支撑 180 秒         → 15 kcal
+   跑步 5 km              → 270 kcal
+   冲刺 0.1 km            → 5.4 kcal
+   深蹲 80kg × 8 次        → 42.24 kcal
+
+✅ weight_reps 路径与旧公式完全一致 (399 条)   ← 历史数据不受影响</code></pre>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">v1 已知局限（后续优化方向）</h4>
+  <ul>
+    <li><b>MET 值是统一默认值</b> —— 平板支撑实际约 3.5 MET、波比跳约 8~10,
+        v1 一律按 5,波比跳会低估一半</li>
+    <li><b>距离法系数统一 0.9</b> —— 跑步约 0.9、骑行约 0.75、划船约 1.0</li>
+    <li><b>距离法优先于时长</b> —— 填了 5km + 10 分钟(实际只跑了一会儿)会高估</li>
+    <li><b>肌肉分布图漏掉计时/距离动作</b> —— 它按体积分摊,那些动作 volume=0</li>
+  </ul>
+  <p class="sub">优化入口都收敛在 <code>CALORIE_CONFIG</code> 和 <code>metOverride</code> 参数上 ——
+     按动作查 MET 表时, 由调用方传入 <code>metOverride</code> 即可, 公式本身不用改。</p>
+</div>
+
+<!-- ============ 4 ============ -->
+<h2 id="s4">4. 澄清:名字重复不是数据问题（2026-11-04 重写）</h2>
+
+<div class="card ok">
+  <h4 style="margin-top:0">结论:<code>exercises_library.id</code> 唯一就够了,名字重复不需要归一</h4>
+  <p>这一章原来是"去重方案"设计,包括加 <code>canonical_id</code> 标记、按 name 归组、
+     前端折叠变体。用户质疑"名字重复又如何?id唯一不就可以了么"之后,
+     重新查了一遍数据 —— <b>质疑成立,原方案方向错了</b>,整章重写如下。</p>
+</div>
+
+<h3>4.1 实测:同名条目是独立条目,不是重复记录</h3>
+
+<table>
+  <tr><th>检验项</th><th>实测</th><th>含义</th></tr>
+  <tr>
+    <td>训练记录是否被"切碎"</td>
+    <td>"Lever Chest Press" 3 个 id 共 93 条,分布在 <b>24 场不同 session</b>
+        (204→57条/15场, 205→20条/5场, 3516→16条/4场)</td>
+    <td>是"多场训练分别选了不同条目",<b>不是一次训练被切碎</b></td>
+  </tr>
+  <tr>
+    <td>同 session 内出现同名多 id 的比例</td>
+    <td>212 场训练里只有 <b>4 场(1.9%)</b></td>
+    <td>边界情况,且那 4 场用户可能就是想练两个变体</td>
+  </tr>
+  <tr>
+    <td>资源完整性</td>
+    <td>993 组同名条目中:<b>图片全为空的 0 组</b>、<b>视频全为 NULL 的 0 组</b>、
+        954 组各有多个不同图片</td>
+    <td>每条都是独立、有自己资源的动作条目</td>
+  </tr>
+  <tr>
+    <td>属性一致性</td>
+    <td>742/993 组(74.7%)的 type+equip+body 完全一致,162 组 body 不一致</td>
+    <td>一致的那批大概率是同动作不同演示资源;不一致的是真变体</td>
+  </tr>
+</table>
+
+<div class="card danger">
+  <h4 style="margin-top:0">如果按原方案归组,会怎样</h4>
+  <p>用户练了 3 个 "Crunch" 变体,归组后 13 个全部亮 ☑ —— <b>这是误标</b>。
+     用户会看到"我明明只练了 3 种,怎么 13 种都打勾了?"</p>
+  <p>更糟的是它会<b>掩盖真实的数据问题</b>:翻译错位(id=2081 中文"引体向上"实为 Mountain Climber)
+     会被归组逻辑糊过去,永远查不出来。</p>
+</div>
+
+<h3>4.2 关联表的最终形态:不做任何归组</h3>
+
+<pre><code>CREATE TABLE `user_exercise_stats` (
+  `user_id`      int NOT NULL,
+  `exercise_id`  int NOT NULL COMMENT '动作 id (exercises_library.id), 不做归组',
+  `is_favor`     tinyint NOT NULL DEFAULT 0,
+  `is_practiced` tinyint NOT NULL DEFAULT 0,
+  ...
+  PRIMARY KEY (`user_id`, `exercise_id`)
+);</code></pre>
+
+<p>标记逻辑 = <b>"练了哪条就哪条亮"</b>,语义精确,零假设。
+   后端返回给前端的 id 集合<b>就是原始 id</b>,前端 8 处 <code>includes(id)</code> 零改动。</p>
+
+<h3>4.3 名字重复真正留下的问题（与关联表无关）</h3>
+
+<div class="card warn">
+  <h4 style="margin-top:0">① 列表可读性</h4>
+  <p>702 组中文名重复 —— 11 个"引体向上",英文名分别是 Chin-ups / Pull up / Chin-Up /
+     Muscle-up / Pull-ups / Chin-ups…。</p>
+  <p>数据上每个 id 都有独立图片(993 组里 0 组图片为空),用户<b>能靠图区分</b>,
+     但只显示中文名时看着重复。</p>
+  <p><b>解法:UI 层补英文名副标题</b>,一行前端改动,不动数据、不动 schema。</p>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">② 翻译错位（真数据问题,需人工核对）</h4>
+  <table>
+    <tr><th>id</th><th>name_zh</th><th>name（英文）</th><th>问题</th></tr>
+    <tr><td>2081</td><td>引体向上</td><td>Mountain Climber</td><td>中文名安到了登山跑上</td></tr>
+    <tr><td>2077</td><td>混合握距引体向上</td><td>Middle Back Stretch</td><td>拉伸动作,中文名串了</td></tr>
+  </table>
+  <p>中文名是后加的,和英文源数据中间错位了。用户搜"登山跑"找不到它,
+     搜"引体向上"却出来个登山跑。</p>
+  <p><b>解法:人工核对 name_zh ↔ name 的对应关系</b>,数据修正,不用归组糊过去。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">总结:需求① 回归本质</h4>
+  <p>用户最初的诉求是<b>解决 <code>practiced_exercises</code> 的长度限制</b>。
+     这件事从头到尾只需要一张 <code>(user_id, exercise_id)</code> 关联表 ——
+     和动作库怎么命名、名字重不重复<b>毫无关系</b>。是我自己把问题复杂化了。</p>
 </div>
 
 <!-- ============ 5 ============ -->
 <h2 id="s5">5. 落地顺序与改动清单</h2>
 
 <div class="card">
-  <h4 style="margin-top:0">推荐顺序（去重是两条线的共同前置）</h4>
+  <h4 style="margin-top:0">执行顺序（2026-11-04 按用户决策重排）</h4>
   <table>
-    <tr><th>阶段</th><th>内容</th><th>为什么排这里</th></tr>
+    <tr><th>阶段</th><th>内容</th><th>状态 / 排期理由</th></tr>
     <tr>
       <td><b>Phase 0</b><br>动作库归一</td>
-      <td>加 <code>canonical_id</code>、回填、修错位的 <code>count_mode</code></td>
-      <td>两条线的共同前置。不做的话，需求 ① 的关联表粒度是错的，需求 ② 的 mode 也标不准</td>
+      <td>给 <code>exercises_library</code> 加 <code>canonical_id</code> + 回填</td>
+      <td><span class="badge b-a">已取消</span> —— 用户决策"暂不动库",
+          且 2026-11-04 确认<b>连归组都不需要</b>(§0.5 第 7 条)。
+          动作库一行不改,954 张图 852 个视频一个不丢</td>
+    </tr>
+    <tr>
+      <td><b>Phase 0.5</b><br>前端折叠重复项</td>
+      <td>library 列表按 <code>canonical_id</code> 折叠</td>
+      <td><span class="badge b-a">已取消</span> —— 用户决策"先不折叠,只修对标记"。
+          列表保持 13 条 Crunch 原样，只让 ☑ 标记正确</td>
     </tr>
     <tr>
       <td><b>Phase 1</b><br>需求 ② 数据层</td>
-      <td><code>exercise_type</code> → <code>count_mode</code>；<code>exercises</code> 加 <code>duration_sec</code> / <code>distance_m</code>；27 条历史记录人工核对</td>
-      <td>改动面小、纯 DDL，不碰业务逻辑，风险低</td>
+      <td><code>exercises</code> 加 <code>duration_sec</code>（<b>1 列</b>）；27 条历史记录人工核对</td>
+      <td><span class="badge b-g">脚本已就绪</span> <code>db_migration_20261026_phase1.sql</code> v2 瘦身版 ——
+          库结构改动 = 1 列，<code>exercises_library</code> 一列都不动</td>
     </tr>
     <tr>
       <td><b>Phase 2</b><br>需求 ② UI 层</td>
-      <td>add/edit modal 按 mode 分支 + 计时器；训练页 / 统计页显示</td>
-      <td><b>用户立刻能感知的体验提升</b>，平板支撑终于能记秒数</td>
+      <td>add/edit modal 按 mode 分支 + <b>真计时器组件</b>；训练页 / 统计页显示</td>
+      <td><span class="badge b-g">用户已拍板做真计时器</span> ——
+          点开始 → 计时 → 停止自动填入秒数。<b>用户立刻能感知的体验提升</b></td>
     </tr>
     <tr>
       <td><b>Phase 3</b><br>需求 ① 关联表</td>
-      <td>建表 → 回填 → 后端切读 → 删旧列</td>
-      <td>改动面最大（涉及 auth / exercises / library 三模块 + 前端筛选逻辑），放在有完整回归时做。长度不紧急（还有 4 倍余量），可以排在后面</td>
+      <td>建 <code>user_exercise_stats</code>（纯关系表，4 列 + 2 时间戳）→ 回填 → 后端切读 → 删旧列</td>
+      <td><span class="badge b-b">改动面最大</span> —— 涉及 auth / exercises / library 三模块 +
+          前端筛选逻辑。归组关系落在这一阶段，Phase 1 的 <code>count_mode</code> 值域回填
+          需要在 Phase 3 之后做"同名组内多数票对齐"（32 组不一致）</td>
     </tr>
   </table>
 </div>
 
 <div class="card">
   <h4 style="margin-top:0">如果只能做一件事</h4>
-  <p><b>做 Phase 0 的去重</b>。它不新增任何表、不改任何接口、风险最低，
-     但同时解锁两个需求，并直接修掉"练过标记不亮"这个用户可见的 bug。</p>
+  <p><b>做 Phase 1（需求② 的数据层 + 真计时器 UI）</b>。它不碰 <code>users</code> 表、不动
+     <code>exercises_library</code> 结构、纯 DDL 加两个字段，风险最低，
+     而且是用户<b>立刻能感知</b>的体验提升 —— 平板支撑终于能记秒数了。</p>
+  <p class="sub">需求① 的关联表改动面更大（涉及 auth / exercises / library 三模块），
+     但它解决的是"长度上限"问题 —— 线上最长一条 213 字符 / 43 个 id，
+     离 <code>varchar(1000)</code> 的上限还有 4 倍余量，<b>不紧急</b>。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">✅ 已就绪、无需你决策的部分</h4>
+  <ul>
+    <li><code>docs/db_migration_20261026_phase1.sql</code> —— 需求② 的幂等迁移脚本
+        （改名 + 收敛取值域 + 加 <code>duration_sec</code>/<code>distance_m</code> + 验证查询 + 回滚）</li>
+    <li>Phase 1 与 Phase 3 的后端/前端代码骨架</li>
+  </ul>
+  <p class="sub">执行前需注意：Phase 1 的 DDL 建议在 Phase 0 之后跑，因为 <code>count_mode</code> 的值域回填
+     会受益于 Phase 0 的去重结果（32 组 <code>exercise_type</code> 不一致的重复组会被一起对齐）。</p>
 </div>
 
 <!-- ============ 6 ============ -->
 <h2 id="s6">6. 待确认问题</h2>
 
 <ol>
-  <li><b>72 个悬空 practiced id</b>：库里的动作已经不存在了。迁移时直接丢弃（标记消失）还是保留在旧 CSV 列里？</li>
-  <li><b>duration 动作的 27 条历史记录</b>：<code>reps</code> 值到底是不是秒数？需要你人工看一眼再决定回填策略。</li>
-  <li><b>计时器交互</b>：是"手动输入秒数"就够，还是要"点开始 → 计时 → 停止自动填入"的真计时器？后者要多做一个组件。</li>
-  <li><b><code>distance_duration</code> 的 61 条</b>：距离要用什么单位（m / km）？配速要不要算出来并进统计？</li>
-  <li><b>去重力度</b>：13 行同名的 "Push-up"，是完全合并成一条，还是保留变体（如不同器械/不同角度）？后者需要你先定"什么算不同变体"的规则。</li>
-  <li><b><code>count_mode</code> 改名</b>：要不要同时给"真正的训练类型"（力量/有氧/柔韧）留一个独立字段？现在这两件事挤在一个字段的历史包袱里。</li>
+  <li><b>去重力度（最关键，阻塞全部后续）</b>：993 组同名里 954 组图片各不相同、852 组视频各不相同。
+      选哪个方案？ —— ① 只加 <code>canonical_id</code> 不删行（<b>推荐</b>，零资源损失，前端折叠）/
+      ② 按规则合并删行（省空间但丢 954 图 852 视频）/
+      ③ 只在关联表用 canonical 语义（列表重复问题留着）。</li>
+  <li><b>（已作废）72 个悬空 practiced id</b>：2026-11-04 复核后确认<b>不存在</b>这个问题 ——
+      用户的 practiced id 全部有效,exercises 表孤儿 id 也是 0。初版说的 72 个是我的 SQL 段提取写错导致的误报。</li>
+  <li><b>（已作废）"27 条 duration 历史记录核对秒数"</b>：2026-11-04 复核后确认<b>不存在</b>这个任务 ——
+      秒数从没被采集过,那 27 条里 24 条是负重次数训练(动作库类型标注错了)。
+      改为:<b>核对 <code>exercises_library.exercise_type</code> 标注</b>(30 组混标 + ~149 个关键词可疑),
+      只读 SQL 见 <code>db_migration_20261026_phase1.sql</code> 末尾【标注核对清单】。</li>
+  <li><b>计时器交互</b>：是"手动输入秒数"就够，还是要"点开始 → 计时 → 停止自动填入"的真计时器？后者要多做一个组件
+      （<code>session-orb</code> 已有计时逻辑可复用）。</li>
+  <li><b>（已定）<code>distance_duration</code> 的 61 条</b>：2026-11-04 用户拍板"就只录入距离就行了" ——
+      距离独立输入框必填、单位 <b>km</b>、时长可选、不做配速。已落地(见 §3.1)</li>
+  <li><b>要不要给"真正的训练类型"（力量/有氧/柔韧）留一个独立字段</b>？现在这两件事挤在同一个字段的历史包袱里，
+      <code>count_mode</code> 腾出来后正好可以分开。</li>
 </ol>
 
 <div class="foot">

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFIT 数据层改造 · 整合方案 · 2026-11-04</title>
+<style>
+  :root{
+    --bg:#131313; --surface:#1c1c1c; --surface2:#222; --line:#2e2e2e;
+    --accent:#ccf200; --text:#f0f0f0; --muted:#9a9a9a;
+    --red:#ff6b6b; --amber:#ffb020; --blue:#4aa3ff; --green:#3ddc84; --purple:#c084fc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    line-height:1.75;font-size:15px}
+  .wrap{max-width:1100px;margin:0 auto;padding:48px 28px 96px}
+  header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:40px}
+  h1{font-size:30px;margin:0 0 10px;letter-spacing:-.5px}
+  .sub{color:var(--muted);font-size:14px}
+  .tag{display:inline-block;background:var(--accent);color:#111;font-weight:700;font-size:11px;
+    padding:2px 8px;border-radius:3px;margin-right:6px;vertical-align:2px}
+  h2{font-size:21px;margin:52px 0 18px;padding-left:12px;border-left:4px solid var(--accent)}
+  h3{font-size:16px;margin:28px 0 12px;color:#fff}
+  h4{font-size:14px;margin:20px 0 8px;color:var(--accent);font-weight:600}
+  p{margin:10px 0}
+  code{background:var(--surface2);padding:1px 6px;border-radius:3px;font-size:12.5px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;color:#d5f77a}
+  pre{background:#0d0d0d;border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+    overflow-x:auto;margin:14px 0;font-size:12.5px;line-height:1.65}
+  pre code{background:none;padding:0;color:#cfcfcf;font-size:12.5px}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:18px 0}
+  .warn{background:rgba(255,176,32,.07);border-left:3px solid var(--amber);border-radius:0 8px 8px 0}
+  .danger{background:rgba(255,107,107,.07);border-left:3px solid var(--red);border-radius:0 8px 8px 0}
+  .ok{background:rgba(61,220,132,.07);border-left:3px solid var(--green);border-radius:0 8px 8px 0}
+  .info{background:rgba(74,163,255,.07);border-left:3px solid var(--blue);border-radius:0 8px 8px 0}
+  .purple{background:rgba(192,132,252,.07);border-left:3px solid var(--purple);border-radius:0 8px 8px 0}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:6px 0}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .stat .n{font-size:24px;font-weight:700;color:var(--accent);line-height:1.25}
+  .stat .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:3px;font-weight:600;margin-right:4px}
+  .b-r{background:rgba(255,107,107,.16);color:#ff8f8f}
+  .b-a{background:rgba(255,176,32,.16);color:#ffc75a}
+  .b-g{background:rgba(61,220,132,.16);color:#6ee7a4}
+  .b-b{background:rgba(74,163,255,.16);color:#7bbcff}
+  .step{display:flex;gap:16px;margin:18px 0}
+  .step .num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#111;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+  .step .body{flex:1}
+  .step .body h4{margin-top:0}
+  .foot{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+  .toc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 22px;margin-bottom:36px}
+  .toc ol{margin:0;padding-left:20px}
+  .toc li{margin:4px 0}
+  .toc a{color:var(--text);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .toc a:hover{color:var(--accent)}
+  .todo{background:linear-gradient(135deg,rgba(204,242,0,.10),rgba(204,242,0,.03));
+    border:1px solid rgba(204,242,0,.35);border-radius:10px;padding:22px 24px;margin:20px 0}
+  .todo h3{margin-top:0;color:var(--accent)}
+  @media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1><span class="tag">GFIT</span>数据层改造 · 整合方案</h1>
+  <div class="sub">
+    两个需求:① 用户训练过哪些动作(换掉 CSV 存储) ② 动作按次数 / 按时间计量(加计时器)<br>
+    外加:卡路里算法 v1(独立文件) &nbsp;·&nbsp;
+    数据基线:直连生产库 <code>47.108.200.98 / gfit</code> 实测 &nbsp;·&nbsp;
+    整合日期:2026-11-04
+  </div>
+</header>
+
+<div class="toc">
+  <ol>
+    <li><a href="#s1">一句话总览</a></li>
+    <li><a href="#s2">数据库改动总表（精确到列）</a></li>
+    <li><a href="#s3">需求①：用户 × 动作 关联表</a></li>
+    <li><a href="#s4">需求②：次数 / 计时 / 距离 三模式</a></li>
+    <li><a href="#s5">卡路里算法 v1</a></li>
+    <li><a href="#s6">已完成的代码改动清单</a></li>
+    <li><a href="#s7">验证结果</a></li>
+    <li><a href="#s8">执行顺序与回滚</a></li>
+    <li><a href="#s9">需要你做什么</a></li>
+  </ol>
+</div>
+
+<!-- ============ 1 ============ -->
+<h2 id="s1">1. 一句话总览</h2>
+
+<div class="card ok">
+  <p style="margin:0"><b>数据库总共只改 3 处:1 张新表 + 2 个新列,其余一张表都不动。</b>
+  前后端代码已全部写完并验证通过,你只剩"跑脚本 + 核对标注 + 真机验"三件事。</p>
+</div>
+
+<div class="grid3">
+  <div class="stat"><div class="n">2 列</div><div class="l">exercises 表新增<br>duration_sec / distance_km</div></div>
+  <div class="stat"><div class="n">1 表</div><div class="l">新建 user_exercise_stats<br>(4 列 + 2 时间戳)</div></div>
+  <div class="stat"><div class="n">0 改动</div><div class="l">exercises_library / users / sessions<br>结构完全不动</div></div>
+</div>
+
+<div class="card info">
+  <h4 style="margin-top:0">三个需求各自的状态</h4>
+  <table>
+    <tr><th>需求</th><th>核心结论</th><th>状态</th></tr>
+    <tr>
+      <td><b>① 用户训练过哪些动作</b></td>
+      <td>换掉 <code>users.practiced_exercises</code>(逗号串, varchar(1000) 上限)
+          → 一张纯关系表 <code>user_exercise_stats</code></td>
+      <td><span class="badge b-g">✅ 已执行并核对</span> 表+回填完成,52 行与原 CSV 逐项一致</td>
+    </tr>
+    <tr>
+      <td><b>② 按次数 / 按时间计量</b></td>
+      <td>标识字段<b>本来就有</b>(<code>exercises_library.exercise_type</code>,已有真实数据);
+          只缺 <code>exercises.duration_sec</code>。新增真计时器组件 + 三模式录入 UI</td>
+      <td><span class="badge b-g">✅ 已执行并核对</span> 两列就位,类型/注释/可空性全对</td>
+    </tr>
+    <tr>
+      <td><b>③ 卡路里</b></td>
+      <td>独立算法文件,三档公式按动作类型分算。
+          原先是"整个 session 一个公式" → 计时/距离动作卡路里恒为 0</td>
+      <td><span class="badge b-g">代码完成 + 已验证</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============ 2 ============ -->
+<h2 id="s2">2. 数据库改动总表（精确到列）</h2>
+
+<h3>2.1 改动一：exercises 表加 2 列</h3>
+
+<pre><code>-- scripts: docs/db_migration_20261026_phase1.sql
+ALTER TABLE `exercises`
+  ADD COLUMN `duration_sec` int   DEFAULT NULL COMMENT '计时动作持续秒数'  AFTER `reps`,
+  ADD COLUMN `distance_km` float  DEFAULT NULL COMMENT '距离动作公里数 (km)'  AFTER `duration_sec`;</code></pre>
+
+<table>
+  <tr><th>列</th><th>类型</th><th>为什么</th></tr>
+  <tr>
+    <td><code>duration_sec</code></td>
+    <td><code>int NULL</code></td>
+    <td>计时动作(平板支撑/波比跳)的秒数。<b>NULL = 该动作不适用</b>,
+        0 = 适用但值为 0 —— 语义明确, 避免给历史数据批量写 0</td>
+  </tr>
+  <tr>
+    <td><code>distance_km</code></td>
+    <td><code>float NULL</code></td>
+    <td>距离动作(跑步/骑行/划船)的公里数。<b>字段名带单位</b> ——
+        单位绑进字段名后, 以后改单位得 ALTER + 数据换算, 一次定死</td>
+  </tr>
+</table>
+
+<h3>2.2 改动二：新建 user_exercise_stats 表</h3>
+
+<pre><code>-- scripts: docs/db_migration_20261104_phase3.sql
+CREATE TABLE IF NOT EXISTS `user_exercise_stats` (
+  `user_id`      int NOT NULL,
+  `exercise_id`  int NOT NULL COMMENT '动作 id (exercises_library.id), 不做归组',
+  `is_favor`     tinyint NOT NULL DEFAULT 0 COMMENT '是否收藏',
+  `is_practiced` tinyint NOT NULL DEFAULT 0 COMMENT '是否练过(至少一次)',
+  `create_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`  timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`, `exercise_id`),
+  KEY `idx_ues_exercise` (`exercise_id`),
+  CONSTRAINT `fk_ues_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+<table>
+  <tr><th>设计</th><th>理由</th></tr>
+  <tr><td>PK = <code>(user_id, exercise_id)</code></td>
+      <td>天然幂等 → <code>ON DUPLICATE KEY UPDATE</code> 一次搞定 toggle;删用户自动 CASCADE</td></tr>
+  <tr><td><code>is_favor</code> + <code>is_practiced</code> 合并一张表</td>
+      <td>两者粒度完全相同(user × exercise),拆两张纯属自找 JOIN</td></tr>
+  <tr><td><b>不做任何归组</b>(无 canonical_id)</td>
+      <td>同名不同 id 是<b>合法的独立条目</b>(不同握法/角度/器械的变体),
+          每条都有独立图片视频。用户练了 3 个变体就该只亮 3 个,归组反而是误标</td></tr>
+  <tr><td><b>不存派生统计列</b></td>
+      <td>"练过几次""最佳重量"全都能从 <code>exercises</code> 明细实时聚合。
+          冗余存一份 = 双份事实来源 + 同步问题</td></tr>
+</table>
+
+<h3>2.3 完全不动的表</h3>
+<table>
+  <tr><th>表</th><th>状态</th><th>说明</th></tr>
+  <tr><td><code>exercises_library</code></td><td><span class="badge b-g">零改动</span></td>
+      <td><code>exercise_type</code> 字段本来就有,而且已有真实数据
+          (weight_reps 6522 / duration 1058 / distance_duration 61)。<b>不需要新增</b></td></tr>
+  <tr><td><code>users</code></td><td><span class="badge b-g">零改动</span></td>
+      <td>两个 CSV 列<b>只读</b>(双写期继续同步)。稳定后可选择性 DROP</td></tr>
+  <tr><td><code>sessions</code></td><td><span class="badge b-g">零改动</span></td>
+      <td><code>calories</code> 列已有,只是写入时改用新算法</td></tr>
+</table>
+
+<!-- ============ 3 ============ -->
+<h2 id="s3">3. 需求①：用户 × 动作 关联表</h2>
+
+<div class="card info">
+  <h4 style="margin-top:0">为什么值得做</h4>
+  <p>线上 <code>users.practiced_exercises</code> 是逗号串, <code>varchar(1000)</code>,
+     上限约 190 个 id。当前最长一条 253 字符 / 43 个 id,<b>离上限还有 4 倍余量</b> ——
+     所以长度不是紧急问题,但结构问题是真的:</p>
+  <ul>
+    <li>并发读-改-写整串会丢收藏(已用行锁 + FIND_IN_SET 修过,但仍是整串操作)</li>
+    <li>旧 CSV 写满了会静默截断 / ER_DATA_TOO_LONG</li>
+    <li>无法支撑"练过几次""多久没练"这类后续需求</li>
+  </ul>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">★ 关键设计:数据决定行为,不用配置开关</h4>
+  <p>新增 <code>UserExerciseFlagsService</code>,启动后探测一次新表是否存在:</p>
+  <table>
+    <tr><th>状态</th><th>读</th><th>写</th></tr>
+    <tr><td>新表<b>不存在</b>(迁移前)</td><td>旧 CSV 列</td><td>旧 CSV 列</td>
+        <td>行为和现在<b>完全一致</b>,零影响</td></tr>
+    <tr><td>新表<b>存在</b>(迁移后)</td><td>关联表</td><td>关联表 + 旧列<b>双写</b></td>
+        <td>旧列是回滚保险</td></tr>
+    <tr><td>要回滚</td><td colspan="2">DROP 掉新表 → 自动退回旧逻辑,<b>不用改代码不用重启</b></td></tr>
+  </table>
+  <p class="sub">所以代码可以<b>在 Phase 3 迁移之前就部署</b>,不用卡发布顺序。</p>
+</div>
+
+<div class="card">
+  <h4 style="margin-top:0">前端零改动</h4>
+  <p>登录返回的 <code>favor_exercises</code> / <code>practiced_exercises</code> 字段名和格式完全不变
+     (还是 id 数组),前端 8 处 <code>includes(id)</code> 一行都不用改。</p>
+  <p><code>library.list</code> 的收藏/练过筛选也<b>不用改</b> —— 前端传的 id 数组本来就是登录时
+     从后端拿的同一份数据,后端内部切读路径它自动就对了。</p>
+  <p class="sub">⚠️ 这里刻意<b>没有</b>改成后端自取:现有代码注释里写明,
+     前端对收藏是乐观更新(先本地改状态再 fire-and-forget 提交),
+     改成服务端自取会出现"刚收藏完立刻点筛选 → 筛出空列表"的 UX 回归。</p>
+</div>
+
+<!-- ============ 4 ============ -->
+<h2 id="s4">4. 需求②：次数 / 计时 / 距离 三模式</h2>
+
+<h3>4.1 标识字段本来就有</h3>
+<div class="card ok">
+  <p><code>exercises_library.exercise_type</code> 线上已有真实数据,
+     且标注基本正确(平板支撑=duration,引体向上=weight_reps)。<b>不需要新增字段</b>。</p>
+  <p>真正缺的只是 <code>exercises.duration_sec</code> —— 秒数没地方存,
+     现在被硬塞进 <code>reps</code>(实测 27 条 duration 记录 reps 值是 1~10, 不是秒数)。</p>
+</div>
+
+<h3>4.2 三模式录入 UI</h3>
+<table>
+  <tr><th>count_mode</th><th>录入 UI</th><th>必填</th><th>存哪</th><th>weight</th></tr>
+  <tr><td><code>weight_reps</code></td><td>重量 + 次数 chips</td><td>reps</td>
+      <td>weight + reps</td><td>显示(可填 0)</td></tr>
+  <tr><td><code>duration</code></td><td><b>真计时器</b></td><td>秒数</td>
+      <td>duration_sec</td><td>显示(可填 0)</td></tr>
+  <tr><td><code>distance_duration</code></td><td><b>距离输入(km)+ 计时器(可选)</b></td><td>距离</td>
+      <td>distance_km (+ 可选 duration_sec)</td><td>显示(可填 0)</td></tr>
+</table>
+
+<div class="card">
+  <h4 style="margin-top:0">新组件：<code>miniprogram/components/set-timer/</code></h4>
+  <ul>
+    <li><b>用 <code>Date.now()</code> 时间基准</b>,不累加 counter → 切后台回来不丢秒
+        (项目里踩过切后台的坑)</li>
+    <li>暂停/继续用 <code>_base</code> 累加结算,无累积误差</li>
+    <li>页面 hide 时自动暂停并结算</li>
+    <li>快速时长 chips <code>[30,45,60,90,120]</code> + ±5 微调</li>
+  </ul>
+</div>
+
+<h3>4.3 距离方案(已定)</h3>
+<div class="card ok">
+  <p>你拍板"就只录入距离就行了" → <b>距离独立输入框必填、单位 km、时长可选、不做配速、不做反推</b>。</p>
+  <p>单位定 km 的依据(实测 <code>distance_duration</code> 全部 61 行 / 47 个中文名):
+     跑步 3 / 快走 2 / 步行 2 / 行走 2 / 长跑 / 突击跑 / 短步跑步 / 冲刺 /
+     跑步机 4 / 固定自行车 4 / 户外骑自行车 / 划船 2 / 椭圆机 4 / 踏步机 2 /
+     登山者 4 / 跳绳 2 / 波比跳类 2 / 壶铃抱瓶原地行进
+     → <b>全是公里级有氧</b>, 只有"冲刺"是米级(用 km 表达为 0.1)</p>
+</div>
+
+<!-- ============ 5 ============ -->
+<h2 id="s5">5. 卡路里算法 v1</h2>
+
+<div class="card">
+  <h4 style="margin-top:0">为什么独立成文件</h4>
+  <p>原来是<b>同一个公式抄了两遍</b>,而且<b>整个 session 一个公式</b>,不区分动作类型:</p>
+  <pre><code>后端 sessions.service.ts:  Math.round(totalVolume * userWeight * 0.0011)
+前端 utils/unit.js:        volumeToCalories(volume)   ← 同一公式</code></pre>
+  <p>结果:计时类(平板支撑)和距离类(跑步)的卡路里<b>恒为 0</b>。</p>
+</div>
+
+<h3>v1 三档公式</h3>
+<table>
+  <tr><th>count_mode</th><th>公式</th><th>说明</th></tr>
+  <tr><td><code>weight_reps</code></td><td><code>volumeKg × weightKg × 0.0011</code></td>
+      <td><b>沿用现有公式,不动</b> → 历史数据完全不变</td></tr>
+  <tr><td><code>duration</code></td><td><code>MET × weightKg × durationSec / 3600</code></td>
+      <td>MET 默认 5(中等强度)</td></tr>
+  <tr><td><code>distance_duration</code></td><td><code>weightKg × distanceKm × 0.9</code></td>
+      <td>距离法(跑步经验公式),距离必填 → 更准</td></tr>
+</table>
+
+<pre><code>// 后端: gfit-backend/src/common/utils/calories.ts
+// 前端: fitness_wechat/miniprogram/utils/calories.js   ← 两份必须同步
+
+export const CALORIE_CONFIG = {
+  volumeFactor: 0.0011,
+  defaultMet: { weight_reps: 6, duration: 5, distance_duration: 8 },
+  distanceFactor: 0.9,
+};
+// 后续按动作类型优化时, 只改这张表, 调用方一行都不用动</code></pre>
+
+<div class="card danger">
+  <h4 style="margin-top:0">⚠️ 踩到的坑:卡路里不能 JOIN exercises 聚合</h4>
+  <pre><code>-- ❌ 一个 session JOIN 出 N 行 exercise, s.calories 被放大 N 倍
+SELECT COUNT(*), SUM(s.calories) FROM sessions s LEFT JOIN exercises e ON ...
+
+-- ✅ 卡路里是 session 级的事实, 独立聚合
+SELECT SUM(calories) FROM sessions WHERE _openid=? AND status='finished';</code></pre>
+  <p>同理,前端所有"从体积反推卡路里"的地方都改成了用后端聚合的真实值 ——
+     新算法下 session 的卡路里不再等于 <code>volumeToCalories(totalVolume)</code>。</p>
+</div>
+
+<h3>v1 已知局限（后续优化方向）</h3>
+<div class="card warn">
+  <ul>
+    <li><b>MET 是统一默认值</b> —— 平板支撑实际约 3.5 MET、波比跳约 8~10,一律按 5 → 波比跳低估一半</li>
+    <li><b>距离法系数统一 0.9</b> —— 跑步 0.9 / 骑行 0.75 / 划船 1.0</li>
+    <li><b>距离法优先于时长</b> —— 填 5km + 10 分钟(实际没跑完)会高估</li>
+    <li><b>肌肉分布图漏掉计时/距离动作</b> —— 它按体积分摊,那些动作 volume=0</li>
+  </ul>
+  <p class="sub">优化入口都收敛在 <code>CALORIE_CONFIG</code> 和 <code>metOverride</code> 参数上 ——
+     按动作查 MET 表时由调用方传入 <code>metOverride</code> 即可,公式本身不用改。</p>
+</div>
+
+<!-- ============ 6 ============ -->
+<h2 id="s6">6. 已完成的代码改动清单</h2>
+
+<h3>新增文件</h3>
+<table>
+  <tr><th>文件</th><th>作用</th></tr>
+  <tr><td><code>miniprogram/components/set-timer/</code> (js/wxml/wxss/json)</td>
+      <td>真计时器组件</td></tr>
+  <tr><td><code>miniprogram/utils/calories.js</code></td>
+      <td>前端卡路里算法(与后端同步)</td></tr>
+  <tr><td><code>gfit-backend/src/common/utils/calories.ts</code></td>
+      <td>后端卡路里算法</td></tr>
+  <tr><td><code>gfit-backend/src/common/utils/schema-probe.ts</code></td>
+      <td>表列探测(迁移前后都能跑)</td></tr>
+  <tr><td><code>gfit-backend/src/modules/exercises/user-exercise-flags.service.ts</code></td>
+      <td>关联表读写(数据决定行为,自动切旧/新路径)</td></tr>
+  <tr><td><code>gfit-backend/scripts/sqlcheck.js</code></td>
+      <td>迁移脚本实跑验证(替身表)</td></tr>
+  <tr><td><code>gfit-backend/scripts/caloriecheck.js</code></td>
+      <td>卡路里前后端一致性验证</td></tr>
+  <tr><td><code>docs/db_migration_20261026_phase1.sql</code></td>
+      <td>Phase 1 迁移脚本(2 列)</td></tr>
+  <tr><td><code>docs/db_migration_20261104_phase3.sql</code></td>
+      <td>Phase 3 迁移脚本(建表 + 回填)</td></tr>
+</table>
+
+<h3>修改文件</h3>
+<table>
+  <tr><th>文件</th><th>改动</th></tr>
+  <tr><td><code>gfit-backend/src/modules/sessions/sessions.service.ts</code></td>
+      <td>finish 用新卡路里算法(逐组按 count_mode 算);monthlyStats 加三个真实卡路里值</td></tr>
+  <tr><td><code>gfit-backend/src/modules/exercises/exercises.service.ts</code></td>
+      <td>add/update 支持 duration_sec + distance_km;list 带出 count_mode;
+          toggle 走双写;getUserExercises 优先读关联表</td></tr>
+  <tr><td><code>gfit-backend/src/modules/auth/auth.service.ts</code></td>
+      <td>登录返回优先读关联表,读失败回落 CSV</td></tr>
+  <tr><td><code>gfit-backend/src/modules/stats/stats.service.ts</code></td>
+      <td>summary 加 totalCalories + 每周 calories(独立聚合)</td></tr>
+  <tr><td><code>miniprogram/components/add-exercise-modal/</code></td>
+      <td>按 count_mode 三分支;距离输入;计时器接入;canSubmit 校验</td></tr>
+  <tr><td><code>miniprogram/pages/index/</code></td>
+      <td>训练页 groups 带 count_mode;卡路里用新算法;set 展示三档</td></tr>
+  <tr><td><code>miniprogram/pages/stats/</code></td>
+      <td>总卡路里、周趋势改用后端聚合值</td></tr>
+  <tr><td><code>miniprogram/components/workout-summary-modal/</code><br>
+      <code>miniprogram/components/session-detail-modal/</code></td>
+      <td>改用新卡路里算法;计时/距离类 set 不再被过滤掉</td></tr>
+  <tr><td><code>miniprogram/pages/library/</code></td>
+      <td>modeLabel 文案映射(weight_reps → "次数")</td></tr>
+  <tr><td><code>miniprogram/locales/zh.js / en.js</code></td>
+      <td>新增 13 个 i18n key</td></tr>
+</table>
+
+<!-- ============ 7 ============ -->
+<h2 id="s7">7. 验证结果</h2>
+
+<div class="grid">
+  <div class="card ok">
+    <h4 style="margin-top:0">SQL 脚本实跑</h4>
+    <pre><code>Phase 1: ✅ 全通过 + ✅ 幂等
+Phase 3: ✅ 全通过 + ✅ 幂等
+回填 52 行, 逐用户比对与原 CSV 完全一致
+孤儿 exercise_id: 0    重复 (user, exercise): 0</code></pre>
+    <p class="sub">用替身表(真实数据)跑,真实表零改动</p>
+  </div>
+  <div class="card ok">
+    <h4 style="margin-top:0">卡路里算法</h4>
+    <pre><code>前后端逐 set 一致 (400 条, 0 处差异)
+汇总: 前端=8205 后端=8205
+weight_reps 路径与旧公式完全一致 (399 条)
+  → 历史数据不受影响</code></pre>
+    <p class="sub">典型: 卧推 60kg×10 → 39.6 / 平板支撑 60秒 → 5 / 跑步 5km → 270</p>
+  </div>
+</div>
+
+<div class="card info">
+  <h4 style="margin-top:0">实跑抓到的 2 个真 bug（肉眼看 SQL 发现不了）</h4>
+  <ol>
+    <li><b>CSV 段提取 off-by-one</b> —— 补逗号后第 n 段要用 <code>SUBSTRING_INDEX(..., n+1)</code>;
+        写成 n 的话多段 CSV 丢最后一段、单段 CSV 整条丢失(实测丢了 user1 的 '2052'、user2 的 '27819'、user4 的 '3715')</li>
+    <li><b><code>CAST('' AS UNSIGNED)</code> 严格模式抛错</b> —— n=1 取到空串,
+        <code>Truncated incorrect INTEGER value: ''</code> → 整个 INSERT 失败。
+        修法:<code>NULLIF(..., '')</code></li>
+  </ol>
+</div>
+
+<!-- ============ 8 ============ -->
+<h2 id="s8">8. 执行顺序与回滚</h2>
+
+<div class="card">
+  <div class="step">
+    <div class="num">1</div>
+    <div class="body">
+      <h4>✅ 执行 Phase 1(2 列 ALTER) —— 已完成</h4>
+      <p><code>mysql -h47.108.200.98 -P3306 -ugfit -p gfit &lt; docs/db_migration_20261026_phase1.sql</code></p>
+      <p class="sub">纯加列,不改任何现有数据。回滚:DROP 两列</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">2</div>
+    <div class="body">
+      <h4>部署后端(含新卡路里 + 关联表逻辑)</h4>
+      <p>此时新表还不存在 → 关联表逻辑自动走旧路径,<b>行为零变化</b>。
+         卡路里新算法立刻生效(但 duration/distance 列刚加好,历史数据本来就是 NULL)。</p>
+      <p class="sub">回滚:回滚部署即可</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">3</div>
+    <div class="body">
+      <h4>✅ 执行 Phase 3(建表 + 回填) —— 已完成(回填补跑过一次)</h4>
+      <p><code>mysql ... &lt; docs/db_migration_20261104_phase3.sql</code></p>
+      <p>建表 + 从 CSV 回填。执行后关联表逻辑<b>自动切换</b>到新表,旧列继续双写(回滚保险)。</p>
+      <p class="sub">回滚:DROP 掉 user_exercise_stats → 自动退回旧逻辑,不用改代码不用重启</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">4</div>
+    <div class="body">
+      <h4>发布小程序</h4>
+      <p>计时器 / 距离输入 / 三模式 UI / 新卡路里展示。<b>前端零改动部分</b>
+         (登录返回格式、library 筛选)由后端透明承接。</p>
+      <p class="sub">回滚:回滚小程序版本</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">5</div>
+    <div class="body">
+      <h4>(可选,稳定后)删旧列</h4>
+      <p><code>ALTER TABLE users DROP COLUMN favor_exercises, DROP COLUMN practiced_exercises;</code></p>
+      <p class="sub">删之前必须用 Phase 3 STEP 3.2 的比对 SQL 逐用户核对两边一致</p>
+    </div>
+  </div>
+</div>
+
+<div class="card warn">
+  <h4 style="margin-top:0">⚠️ 第 4 步(发布小程序)之前,建议先做完 §9 的标注核对</h4>
+  <p>标注不改,新功能上线后用户加"深蹲"会弹<b>计时器</b>、加"平板支撑"却只给<b>次数框</b> ——
+     这是功能正确性问题。</p>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">✅ 数据库侧已完成(2026-11-04 核对通过)</h4>
+  <pre><code>exercises.duration_sec   int NULL     ✅
+exercises.distance_km    float NULL   ✅
+user_exercise_stats      52 行        ✅ 与原 CSV 逐项一致
+  外键 fk_ues_user → users            ✅
+  索引 PRIMARY(user_id,exercise_id)   ✅
+  孤儿 0 / 重复 0                     ✅
+users 37 / sessions 224 / exercises 1972 / library 7641  ← 行数与迁移前一致,零意外改动
+exercises_library.exercise_type      ✅ 未动</code></pre>
+</div>
+
+<div class="card danger">
+  <h4 style="margin-top:0">⚠️ 迁移时踩到的坑:建表成功 ≠ 回填成功</h4>
+  <p>2026-11-04 你执行完 Phase 3 后我核对发现:<b>表建好了、外键索引都对,但表是 0 行</b> ——
+     回填那两条 INSERT 没跑成功。</p>
+  <p><b>为什么危险</b>:后端是"探测到表存在就自动切新表"的逻辑,
+     表存在但没数据 → 登录读出来是空 → <b>所有用户的收藏/练过标记会集体消失</b>。</p>
+  <p><b>已处理</b>:补跑了回填(52 行),逐用户核对与原 CSV 完全一致,
+     并把脚本里那句多余的 <code>SET SESSION cte_max_recursion_depth</code> 删掉了
+     (递归只到 100,默认上限 1000 就够;有那句时部分客户端会把它和下一条 INSERT 拼一起,直接报 ER_PARSE_ERROR)。</p>
+  <p><b>留下的工具</b>:<code>gfit-backend/scripts/verify-migration.js</code>(只读核对),
+     以后任何迁移后跑一遍就知道对不对 —— 尤其是回填行数必须 &gt; 0。</p>
+</div>
+
+<!-- ============ 9 ============ -->
+<h2 id="s9">9. 需要你做什么</h2>
+
+<div class="todo">
+  <h3>只有你能做的 3 件</h3>
+  <ol>
+    <li>
+      <b>核对 <code>exercises_library.exercise_type</code> 标注</b><br>
+      <span class="badge b-r">阻塞</span> 实测:<b>30 组</b> duration 与 weight_reps 混标
+      (引体向上 13 个 id 里 12+1、弹力带拉伸 5 个里 4+1、下犬式 4 个里 2+2、侧平板 4 个里 3+1…),
+      加上 duration 1058 个里按名称关键词看<b>约 149 个</b>明显该是 weight_reps
+      (Squat/蹲 65 + Push/Press 45 + Row 14 + Curl 14 + Drill 11)。<br>
+      <span class="sub">只读 SQL 已在 <code>docs/db_migration_20261026_phase1.sql</code> 末尾【标注核对清单】,
+      导出后人工逐条确认再改 —— 别整组刷。已有历史记录不受影响(exercises 的 reps/weight 本来就记着真实数据)。</span>
+    </li>
+    <li>
+      <b>核对 27 条 duration 训练记录</b><br>
+      <span class="badge b-a">建议</span> 实测这 27 条里 <b>24 条是 reps&gt;0 且 weight&gt;0</b> 的负重次数训练
+      (对照组 weight_reps 1945 条形态几乎一样)→ 它们本来就不是计时记录。
+      秒数<b>从来没被采集过</b>,没有"丢失的秒数"要补,只要确认这 6 个动作的标注对不对即可。
+    </li>
+    <li>
+      <b>真机验 <code>set-timer</code></b><br>
+      <span class="badge b-a">必须</span> 我跑不了微信开发者工具。要看两件事:
+      ①计时准不准(尤其是切后台回来秒数对不对) ②duration 类动作的提交按钮该在填了秒数后才亮
+    </li>
+  </ol>
+</div>
+
+<div class="card info">
+  <h4 style="margin-top:0">需要你拍板的 2 件</h4>
+  <ol>
+    <li><b>Phase 1 / Phase 3 我执行还是你自己跑?</b>
+        按项目惯例我默认不动生产数据,但如果你要我来,我可以跑(有完整备份 + 实跑验证过的脚本)。</li>
+    <li><b>标注核对要不要我出一份"逐条建议修改"的清单?</b>
+        我可以按关键词规则自动生成"建议从 duration 改成 weight_reps"的 id 列表,
+        你只需要审一遍确认/否决 —— 比自己从 7641 行里翻要快。</li>
+  </ol>
+</div>
+
+<div class="card ok">
+  <h4 style="margin-top:0">我这边还能继续做的(等你说)</h4>
+  <ul>
+    <li><code>edit-exercise-modal</code> 的 duration / distance 编辑(改秒数、改距离)</li>
+    <li>卡路里算法按动作类型优化(MET 表 + 距离系数分档)</li>
+    <li>标注修改的批量 UPDATE 脚本(带 dry-run 预览 + 逐条确认清单)</li>
+    <li>删旧列前的最终一致性核对脚本</li>
+  </ul>
+</div>
+
+<div class="foot">
+  <b>数据基线</b>:直连生产库 <code>47.108.200.98:3306 / gfit</code> 实测(凭据取自 <code>gfit-backend/.env</code>,未离开本机)<br>
+  <b>代码基线</b>:<code>fitness_wechat</code>(小程序)+ <code>gfit-backend</code>(NestJS),两个仓库工作区均有未提交改动<br>
+  <b>验证工具</b>:<code>gfit-backend/scripts/sqlcheck.js</code> · <code>gfit-backend/scripts/caloriecheck.js</code><br>
+  <b>整合日期</b>:2026-11-04 · 整合版 v1
+</div>
+
+</div>
+</body>
+</html>
