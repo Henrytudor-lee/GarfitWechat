@@ -317,7 +317,10 @@ Component({
     },
 
     selectMuscle(e) {
-      const id = e.currentTarget.dataset.id;
+      // ⚠️ dataset 的值是**字符串**, 必须转数字:
+      //    选"全部"时 id='0', 字符串 '0' 是 truthy → 传给后端 → FIND_IN_SET('0', body_part_id)
+      //    永远匹配不到 → 列表空了。(selectEquipment 早就转了, 这里漏了)
+      const id = Number(e.currentTarget.dataset.id);
       const muscleItem = MUSCLE_LIST.find(m => m.id === id);
       const imgPrefix = app.globalData.imagePrefix || '';
       this.setData({

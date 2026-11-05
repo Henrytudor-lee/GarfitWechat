@@ -276,7 +276,9 @@ Page({
   },
 
   onMuscleTap(e) {
-    const id = e.currentTarget.dataset.id;
+    // ⚠️ 同 add-exercise-modal: dataset 是字符串, "0" 是 truthy,
+    //    不转数字会让"全部"变成 FIND_IN_SET('0', body_part_id) → 列表空
+    const id = Number(e.currentTarget.dataset.id);
     if (id === this.data.selectedMuscle) return;
     this.setData({ selectedMuscle: id, page: 1, list: [] });
     this.loadList(true);
