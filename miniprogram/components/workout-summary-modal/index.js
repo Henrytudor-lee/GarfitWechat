@@ -96,6 +96,12 @@ Component({
     },
 
     _computeStats(session) {
+      // ⚠️ set 的字段命名有两套, 别混用:
+      //    · 下划线(duration_sec / distance_km / weight_unit)—— 数据库列名直出,
+      //      首页 / 会话详情 / 这个弹框走的是这一套;
+      //    · 驼峰(durationSec / distanceKm / weightUnit)—— 卡路里算法(前后端共用)的契约,
+      //      utils/set-model.js 和分享页走的是这一套。
+      //    如果以后要把**分享页**的数据喂进这个弹框, 得先做一次字段转换。
       const exerciseList = session.exercises || [];
       // ⚠️ session.duration 的单位是**秒**(后端 TIMESTAMPDIFF(SECOND, ...)),
       //    调用方负责传秒(客户端毫秒 / 1000), 这里按秒换算分钟, 不要按毫秒

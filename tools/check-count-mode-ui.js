@@ -552,5 +552,96 @@ console.log('\n════ 4) set 展示的互斥分支 ════');
   }
 }
 
+
+console.log('\n════ 5) set-model 产出的标记与 wxml 是否对得上 ════');
+{
+  // ⚠️ 2026-11-07 用户截图: 编辑弹框点"+"新增的行, 标签显示成「负重」(应该是「重量」),
+  //    而且缺了「次数」列。根因: buildSets 给已有 set 加了标记, addSet 忘了加。
+  //    现在两条路径都收口到 utils/set-model.js, 这里直接测它的产出,
+  //    再把产出的 set 喂给 wxml 求值 —— 端到端验证"数据 + 模板"合起来显示对不对。
+  const setModel = require(path.join(ROOT, 'utils', 'set-model.js'));
+
+  const FORMS = [
+    { mode: 'weight_reps', expect: { isDuration: false, isDistance: false, isRepsMode: true }, label: '重量' },
+    { mode: 'duration', expect: { isDuration: true, isDistance: false, isRepsMode: false }, label: '负重' },
+    { mode: 'distance_duration', expect: { isDuration: false, isDistance: true, isRepsMode: false }, label: '负重' },
+  ];
+
+  for (const f of FORMS) {
+    // 1) buildSets: 已有组
+    const raw = [{
+      id: 1, weight: 20, weight_unit: 'kg', reps: 12,
+      duration_sec: f.mode === 'duration' ? 45 : 0,
+      distance_km: f.mode === 'distance_duration' ? 5 : 0,
+      countMode: f.mode,
+    }];
+    const built = setModel.buildSets(raw, f.mode)[0];
+    ck(`buildSets/${f.mode}: 显示模式标记正确`,
+      built.isDuration === f.expect.isDuration
+      && built.isDistance === f.expect.isDistance
+      && built.isRepsMode === f.expect.isRepsMode,
+      `duration=${built.isDuration} distance=${built.isDistance} reps=${built.isRepsMode}`);
+
+    // 2) newSetFrom: 新增组 —— 之前就是这条路径漏了标记
+    const added = setModel.newSetFrom(built, f.mode, 1, 99999);
+    ck(`newSetFrom/${f.mode}: 显示模式标记正确`,
+      added.isDuration === f.expect.isDuration
+      && added.isDistance === f.expect.isDistance
+      && added.isRepsMode === f.expect.isRepsMode,
+      `duration=${added.isDuration} distance=${added.isDistance} reps=${added.isRepsMode}`);
+    ck(`newSetFrom/${f.mode}: 带 isNew 标志`,
+      added.isNew === true);
+  }
+
+  // 3) 缺 countMode 时用动作的计量方式兜底
+  const fallback = setModel.withModeFlags({ id: 1, weight: 10 }, 'duration');
+  ck('withModeFlags: 缺 countMode 时用兜底模式',
+    fallback.isDuration === true && fallback.isRepsMode === false,
+    `duration=${fallback.isDuration} reps=${fallback.isRepsMode}`);
+
+  // 4) 端到端: 把 set-model 产出的 set 喂给 edit 弹框的 wxml 求值
+  const wxmlFile = path.join(ROOT, 'components/edit-exercise-modal/index.wxml');
+  const root = parse(fs.readFileSync(wxmlFile, 'utf8'));
+  for (const f of FORMS) {
+    const set = setModel.buildSets([{
+      id: 1, weight: 20, weight_unit: 'kg', reps: 12,
+      duration_sec: f.mode === 'duration' ? 45 : 0,
+      distance_km: f.mode === 'distance_duration' ? 5 : 0,
+      countMode: f.mode,
+    }], f.mode)[0];
+    const scope = {
+      ...set,
+      item: set,
+      s: set,
+      index: 0,
+      isDuration: false, isDistance: false, isRepsMode: true,
+      t: {}, locale: 'zh', theme: 'night',
+      // ⚠️ 弹框根节点是 wx:if="{{isOpen && group}}" ——
+      //    缺这两个整棵树都会被判不可见, 断言就变成空转(永远"不显示")。
+      isOpen: true,
+      group: { count_mode: f.mode, sets: [set] },
+    };
+    const vis = computeVisibility(root, scope);
+    const leaves = collectLeaves(root, vis).filter((l) => {
+      const cls = ((l.node.attrs && l.node.attrs.class) || '') + ' ' + (l.parentCls || '');
+      return !/num|delete/.test(cls);
+    });
+    const txt = leaves.map((l) => textOf(l.node)).join(' ');
+    const hasDuration = txt.indexOf('SET_DURATION') >= 0;
+    // 距离列的**标签**是 {{t.DISTANCE}}; t.KM 出现在输入框的单位里
+    // (input 是自闭合标签, 没有文本子节点, 搜不到) —— 两个都认。
+    const hasDistance = txt.indexOf('t.DISTANCE') >= 0 || txt.indexOf('t.KM') >= 0;
+    const hasReps = txt.indexOf('t.REPS') >= 0;
+    const expectDuration = f.mode === 'duration';
+    const expectDistance = f.mode === 'distance_duration';
+    ck(`wxml 渲染/${f.mode}: 时长列 ${expectDuration ? '显示' : '不显示'}`,
+      hasDuration === expectDuration, `实际=${hasDuration}`);
+    ck(`wxml 渲染/${f.mode}: 距离列 ${expectDistance ? '显示' : '不显示'}`,
+      hasDistance === expectDistance, `实际=${hasDistance}`);
+    ck(`wxml 渲染/${f.mode}: 次数列 ${f.mode === 'weight_reps' ? '显示' : '不显示'}`,
+      hasReps === (f.mode === 'weight_reps'), `实际=${hasReps}`);
+  }
+}
+
 console.log(`\n════ 结果: ✅ ${pass} 通过 / ❌ ${fail} 失败 ════\n`);
 process.exit(fail === 0 ? 0 : 1);

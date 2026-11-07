@@ -2,6 +2,10 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
+// set 的构造与'显示模式'标记统一收口到这里 ——
+// 两条路径(buildSets 已有组 / newSetFrom 新增组)各写一遍标记, 迟早还会漏
+// (2026-11-07 实测: 新增组漏了标记 → 标签走成「负重」+ 缺「次数」列)。
+const { buildSets, newSetFrom } = require('../../utils/set-model.js');
 
 /**
  * 取 i18n 字典, 并补齐可能缺失的 key。
@@ -33,37 +37,6 @@ function pickCountMode(group) {
   if (group.count_mode) return group.count_mode;
   const fromSet = (group.sets || [])[0]?.countMode;
   return fromSet || 'weight_reps';
-}
-
-/**
- * 组装可编辑的 set 列表
- * - weightStr: 重量输入框的字符串(带格式)
- * - repsStr: 次数输入框的字符串(用户清空时不能被回写成 0)
- * - durationStr / distanceStr: 时长/距离输入框的字符串
- *   (input 的 value 必须是字符串, 数字会丢小数位且无法正常编辑)
- * - isDuration / isDistance / isRepsMode: 给 WXML 判断该显示哪几段
- *
- * ⚠️ 2026-11-07: 补上这三个标记, 因为原来 wxml 里用了 wx:if → wx:if → wx:else
- *    的写法, 而 wx:else 配对的是**紧邻的上一个 if**(distance 那个),
- *    于是 duration 模式里 "距离 if 为 false → 走 else" → 重量/单位/次数被一起渲染,
- *    计时类动作显示成四段(见用户截图)。现在改成只用 wx:if, 条件互斥, 不依赖配对规则。
- */
-function buildSets(rawSets, countMode) {
-  return (rawSets || []).map((s) => {
-    const mode = s.countMode || countMode || 'weight_reps';
-    return {
-      ...s,
-      countMode: mode,
-      isDuration: mode === 'duration',
-      isDistance: mode === 'distance_duration',
-      // 只有次数类才有"次数"这一段; 计时类按时长、距离类按距离
-      isRepsMode: mode !== 'duration' && mode !== 'distance_duration',
-      weightStr: formatNumberForInput(s.weight),
-      repsStr: s.reps != null ? String(s.reps) : '',
-      durationStr: s.duration_sec != null ? String(s.duration_sec) : '',
-      distanceStr: s.distance_km != null ? String(s.distance_km) : '',
-    };
-  });
 }
 
 Component({
@@ -214,27 +187,7 @@ Component({
     addSet() {
       const last = this.data.sets[this.data.sets.length - 1];
       const mode = this.data.countMode || 'weight_reps';
-      const isWeight = mode === 'weight_reps';
-      const w = isWeight ? (last?.weight || 0) : 0;
-      const newSet = {
-        id: Date.now(),
-        // 临时 id 用 Date.now(), 但"是不是新增的"用显式标志判断。
-        // 原来靠 `s.id > Date.now() - 100000` 猜 → 用户加完组停留超过 100 秒
-        // 再保存, 新组会被静默丢弃; 删除时还会拿临时 id 去调 delete → 报 500。
-        isNew: true,
-        weight: w,
-        weightStr: formatNumberForInput(w),
-        reps: isWeight ? (last?.reps || 0) : 0,
-        repsStr: String(isWeight ? (last?.reps || 0) : 0),
-        weight_unit: last?.weight_unit || 'kg',
-        // 计时/距离类的新 set 要带上对应的初值(否则存回去是 0/null)
-        duration_sec: mode === 'duration' ? (last?.duration_sec || 0) : 0,
-        durationStr: mode === 'duration' ? String(last?.duration_sec || 0) : '',
-        distance_km: mode === 'distance_duration' ? (last?.distance_km || 0) : 0,
-        distanceStr: mode === 'distance_duration' ? String(last?.distance_km || 0) : '',
-        countMode: mode,
-        sequence: this.data.sets.length,
-      };
+      const newSet = newSetFrom(last, mode, this.data.sets.length, Date.now());
       const sets = [...this.data.sets, newSet];
       this.setData({ sets, activeSetsCount: sets.filter(s => !s.deleted).length });
     },
