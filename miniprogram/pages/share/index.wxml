@@ -127,20 +127,26 @@
 
             <view class="sheet-sets">
               <view class="sheet-sets-title">{{t.SETS}}</view>
-              <view class="sheet-set-row" wx:for="{{detail.sets}}" wx:for-item="s" wx:key="id">
-                <text class="sheet-set-num">{{index + 1}}</text>
-                <block wx:if="{{s.distanceKm > 0}}">
-                  <text>{{s.distanceKm}} {{t.KM}}</text>
-                  <text wx:if="{{s.durationSec > 0}}"> · {{s.durationSec}} {{t.DURATION_UNIT}}</text>
-                  <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
-                </block>
-                <block wx:elif="{{s.durationSec > 0}}">
-                  <text>{{s.durationSec}} {{t.DURATION_UNIT}}</text>
-                  <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
-                </block>
-                <block wx:else>
-                  <text>{{s.weight}} {{s.weightUnit || 'kg'}} × {{s.reps}} {{t.REPS}}</text>
-                </block>
+              <!-- 一行两条: 一条一行显得太空; 奇数条时最后一条独占整行 -->
+              <view class="sheet-sets-grid">
+                <view class="sheet-set-row {{index === detail.sets.length - 1 && detail.sets.length % 2 === 1 ? 'wide' : ''}}"
+                      wx:for="{{detail.sets}}" wx:for-item="s" wx:key="id">
+                  <text class="sheet-set-num">{{index + 1}}</text>
+                  <view class="sheet-set-text">
+                    <block wx:if="{{s.distanceKm > 0}}">
+                      <text>{{s.distanceKm}} {{t.KM}}</text>
+                      <text wx:if="{{s.durationSec > 0}}"> · {{s.durationSec}} {{t.DURATION_UNIT}}</text>
+                      <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
+                    </block>
+                    <block wx:elif="{{s.durationSec > 0}}">
+                      <text>{{s.durationSec}} {{t.DURATION_UNIT}}</text>
+                      <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
+                    </block>
+                    <block wx:else>
+                      <text>{{s.weight}} {{s.weightUnit || 'kg'}} × {{s.reps}} {{t.REPS}}</text>
+                    </block>
+                  </view>
+                </view>
               </view>
             </view>
           </view>
