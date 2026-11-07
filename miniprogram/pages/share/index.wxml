@@ -147,6 +147,11 @@
         </scroll-view>
 
         <view class="sheet-foot">
+          <!-- 收藏: 动作级收藏, 跟训练无关, 分享页也能收藏 -->
+          <view class="sheet-fav-btn {{detail.is_favorite ? 'active' : ''}}"
+                catchtap="onToggleFavorite" hover-class="tap-active">
+            <image src="{{imgPrefix}}/icons/heart{{detail.is_favorite ? '_filled' : ''}}.png" mode="aspectFit" />
+          </view>
           <view class="sheet-close" bindtap="closeDetail">✕</view>
         </view>
       </view>

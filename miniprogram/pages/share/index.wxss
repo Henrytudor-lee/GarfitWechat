@@ -366,7 +366,26 @@
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom, 0px));
   border-top: 1rpx solid rgba(255, 255, 255, 0.08);
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 收藏按钮 —— 与动作库页同款(心形图标, 已收藏时高亮) */
+.sheet-fav-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
   justify-content: center;
+}
+.sheet-fav-btn.active {
+  background: rgba(204, 242, 0, 0.18);
+}
+.sheet-fav-btn image {
+  width: 38rpx;
+  height: 38rpx;
 }
 .sheet-close {
   width: 64rpx;

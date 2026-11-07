@@ -66,6 +66,10 @@ Page({
     detailOpen: false,
     detail: null,
 
+    // 收藏: 动作级收藏(存在 user_exercise_stats), 与训练/会话无关,
+    // 所以**分享页也能收藏**。状态从 app.globalData 读 —— 全局唯一事实来源。
+    favorExercises: [],
+
     imgPrefix: '',
     vidPrefix: '',
     locale: 'zh',
@@ -82,6 +86,7 @@ Page({
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t || {},
+      favorExercises: this._favorIds(),
     });
     if (!token) {
       this.setData({ loading: false, errorCode: 'NOT_FOUND', error: this._t('SHARE_NOT_FOUND') });
@@ -91,14 +96,37 @@ Page({
   },
 
   onShow() {
-    // 主题/语言可能在设置里改过
+    // 主题/语言可能在设置里改过;
+    // 收藏列表也要刷新 —— 静默登录是异步的, 用户可能在页面停留期间才登录完成。
     this.setData({
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t || {},
       imgPrefix: app.globalData.imagePrefix || '',
       vidPrefix: app.globalData.videoPrefix || '',
+      favorExercises: this._favorIds(),
     });
+    this._refreshDetailFav();
+  },
+
+  /** 全局收藏 id 列表(number[]) —— app.globalData 是唯一事实来源 */
+  _favorIds() {
+    const list = app.globalData.favorExercises;
+    return Array.isArray(list) ? list.map(Number) : [];
+  },
+
+  /** 某个动作当前是否已收藏 */
+  _isFav(id) {
+    return this._favorIds().includes(Number(id));
+  },
+
+  /** 详情弹层打开/收藏变化后, 刷新弹层里的收藏态 */
+  _refreshDetailFav() {
+    const d = this.data.detail;
+    if (!d || !d.exercise_id) return;
+    const isFav = this._isFav(d.exercise_id);
+    if (d.is_favorite === isFav) return;
+    this.setData({ 'detail.is_favorite': isFav });
   },
 
   _t(key, fallback) {
@@ -172,6 +200,7 @@ Page({
       detailOpen: true,
       detail: {
         ...g,
+        is_favorite: this._isFav(g.exercise_id),
         nameText: isZh ? (g.name_zh || g.name_en) : (g.name_en || g.name_zh),
         muscleNames: idsToNames(g.body_part_id, BODY_PART_MAP, BODY_PART_MAP_ZH, isZh),
         equipmentNames: idsToNames(g.equipment_id, EQUIP_MAP, EQUIP_MAP_ZH, isZh),
@@ -182,6 +211,61 @@ Page({
 
   closeDetail() {
     this.setData({ detailOpen: false, detail: null });
+  },
+
+  /**
+   * 收藏 / 取消收藏 当前详情弹层里的动作
+   *
+   * 动作收藏是**动作级**的(存在 user_exercise_stats), 跟训练/会话无关,
+   * 所以在分享页也能收藏 —— 看到别人的动作不错, 直接收藏进自己的库。
+   *
+   * 跟动作库页同一套逻辑: 乐观更新 → 调接口 → 用服务端返回的完整列表覆盖
+   * (applyExerciseFlags 会同步写 globalData + storage, 各页面状态一致) → 失败回滚。
+   */
+  async onToggleFavorite() {
+    const detail = this.data.detail;
+    const id = Number(detail && detail.exercise_id);
+    if (!id) return;
+    if (this._favBusy) return;
+
+    // 收藏需要身份。本 app 是**静默登录**模式, 等它完成就行, 用户不用做任何事。
+    const openid = await app.whenAuthReady();
+    if (!openid || !app.globalData.userId) {
+      wx.showToast({ title: this._t('NOT_LOGGED_IN'), icon: 'none' });
+      return;
+    }
+    // 静默登录刚完成 → globalData 里的收藏列表才是最新的, 重新读一次再判断
+    const favorIds = this._favorIds();
+    const isFav = favorIds.includes(id);
+    const prevFavor = favorIds;
+
+    this._favBusy = true;
+    // 乐观更新
+    const nextFav = isFav ? favorIds.filter((x) => x !== id) : [...favorIds, id];
+    this.setData({ favorExercises: nextFav, 'detail.is_favorite': !isFav });
+
+    try {
+      const res = await api.callCloud('exercise.toggleFavorite', { exercise_id: id });
+      const list = res && res.result && res.result.favor_exercises;
+      if (Array.isArray(list)) {
+        // 用服务端返回的完整列表覆盖 globalData + storage
+        app.applyExerciseFlags({ favor_exercises: list });
+        this.setData({ favorExercises: list.map(Number) });
+        this._refreshDetailFav();
+      }
+      wx.showToast({
+        title: this._t(isFav ? 'FAV_REMOVED' : 'FAV_ADDED'),
+        icon: 'none',
+      });
+    } catch (err) {
+      // 回滚成请求前的样子
+      this.setData({ favorExercises: prevFavor });
+      this._refreshDetailFav();
+      console.error('[share] toggleFavorite failed:', err);
+      wx.showToast({ title: this._t('LOAD_FAILED'), icon: 'none' });
+    } finally {
+      this._favBusy = false;
+    }
   },
 
   onDetailMaskTap(e) {
