@@ -42,6 +42,12 @@ Component({
   },
 
   methods: {
+    onSheetTap() {
+      // 空实现: catchtap 用来阻止点击冒泡到遮罩
+      // (原来写的是 catchtap="" —— handler 名非法, 运行时会报
+      //  'does not have a method ""')
+    },
+
     onMaskTap(e) {
       if (e.target === e.currentTarget) {
         this.cancelConfirm();

@@ -54,6 +54,7 @@ Page({
     // UI state
     loading: false,
     hasData: false,
+    loadError: false,   // 请求失败态: 与"还没有训练数据"区分开
     orbSession: null,
   },
 
@@ -80,10 +81,22 @@ Page({
   },
 
   async _loadAll() {
+    // 并发守卫: 快速来回切 tab 时, 全局 showLoading/hideLoading 遮罩(全局单例)会互相干扰 ——
+    // 先完成的那次会提前撤掉另一次仍在飞的遮罩, loading 布尔值也会提前置 false → 空态闪现。
+    if (this._loadingAll) return;
+    this._loadingAll = true;
+    try {
+      await this._loadAllInner();
+    } finally {
+      this._loadingAll = false;
+    }
+  },
+
+  async _loadAllInner() {
     const dict = this.data.t || {};
     const loadingText = dict.LOADING || 'LOADING...';
     wx.showLoading({ title: loadingText, mask: true });
-    this.setData({ loading: true });
+    this.setData({ loading: true, loadError: false });
 
     // try/finally: 任一接口失败也必须走到 hideLoading, 否则全屏 mask 永久锁死
     let statsRes = null;
@@ -94,6 +107,9 @@ Page({
     } catch (err) {
       console.error('Stats load failed:', err);
       wx.showToast({ title: dict.LOAD_FAILED || 'Load failed', icon: 'none' });
+      // ⚠️ 失败 ≠ 没数据: 不置 loadError 的话, wxml 会同时显示
+      //    toast"加载失败" 和 "还没有训练数据", 自相矛盾。
+      this.setData({ loadError: true });
       return;
     } finally {
       wx.hideLoading();
@@ -101,7 +117,7 @@ Page({
     }
 
     // Leaderboard — load with default type/period
-    this._loadLeaderboard();
+    this._loadLeaderboard().catch(() => {});
 
     if (!statsRes.result || !statsRes.result.success) {
       console.error('Stats load failed:', statsRes.result);
@@ -213,13 +229,22 @@ Page({
         selectedExerciseName: first.name,
         selectedExerciseImage: first.image_name,
       });
-      this._loadExerciseData(first.id);
+      this._loadExerciseData(first.id).catch(() => {});
     }
 
     // Render muscle pie chart after data is set
     if (muscleDistribution.length > 0) {
+      // ⚠️ 先清掉旧图, 让 <canvas id="muscleChart"> 重新挂载到 DOM,
+      // 否则 _renderMuscleChart 里 select('#muscleChart').node() 拿不到节点,
+      // 曲线/饼图就一直是第一次的数据 (同体重图的处理)。
+      this.setData({ muscleChartImage: '' });
       setTimeout(() => this._renderMuscleChart(), 300);
     }
+  },
+
+  // 错误态的"重试"按钮
+  onRetry() {
+    this._loadAll().catch(() => {});
   },
 
   _onMostTrainedScrollLower() {
@@ -231,22 +256,34 @@ Page({
   },
 
   async _loadLeaderboard() {
+    // 请求序号: 连续切 type/period 时, 只有最后一次请求的结果会被采纳,
+    // 否则旧参数的响应会覆盖新参数的列表, 顶部 tab 高亮与列表内容对不上。
+    const reqId = (this._lbReqId || 0) + 1;
+    this._lbReqId = reqId;
+
     const { lbType, lbPeriod } = this.data;
-    const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod });
-    if (res.result && res.result.success && res.result.leaderboard) {
-      const isVolume = lbType === 'volume';
-      const vals = res.result.leaderboard.map(u => u.total_metric || 0);
-      const maxVal = Math.max(...vals, 1);
-      const leaderboard = res.result.leaderboard.map((u, i) => ({
-        rank: i + 1,
-        name: u.name || '—',
-        avatar: u.avatar || '',
-        value: u.total_metric || 0,
-        valueDisplay: isVolume ? formatLargeNum(u.total_metric || 0) : formatCalories(u.total_metric || 0),
-        percent: Math.round(((u.total_metric || 0) / maxVal) * 100),
-      }));
-      this.setData({ leaderboard });
-    } else {
+    try {
+      const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod });
+      if (reqId !== this._lbReqId) return;  // 有更新的请求在飞 → 本次结果作废
+      if (res.result && res.result.success && res.result.leaderboard) {
+        const isVolume = lbType === 'volume';
+        const vals = res.result.leaderboard.map(u => u.total_metric || 0);
+        const maxVal = Math.max(...vals, 1);
+        const leaderboard = res.result.leaderboard.map((u, i) => ({
+          rank: i + 1,
+          name: u.name || '—',
+          avatar: u.avatar || '',
+          value: u.total_metric || 0,
+          valueDisplay: isVolume ? formatLargeNum(u.total_metric || 0) : formatCalories(u.total_metric || 0),
+          percent: Math.round(((u.total_metric || 0) / maxVal) * 100),
+        }));
+        this.setData({ leaderboard });
+      } else {
+        this.setData({ leaderboard: [] });
+      }
+    } catch (err) {
+      if (reqId !== this._lbReqId) return;
+      console.error('[stats] _loadLeaderboard failed:', err);
       this.setData({ leaderboard: [] });
     }
   },
@@ -255,17 +292,21 @@ Page({
     const type = e.currentTarget.dataset.type;
     if (type === this.data.lbType) return;
     this.setData({ lbType: type });
-    this._loadLeaderboard();
+    this._loadLeaderboard().catch(() => {});
   },
 
   onLbPeriodTap(e) {
     const period = e.currentTarget.dataset.period;
     if (period === this.data.lbPeriod) return;
     this.setData({ lbPeriod: period });
-    this._loadLeaderboard();
+    this._loadLeaderboard().catch(() => {});
   },
 
   async _loadExerciseData(exerciseId) {
+    // 请求序号: 快速在"最大纪录"picker 里切动作时, 曲/maxRecord 必须是最后一个动作的
+    const reqId = (this._exReqId || 0) + 1;
+    this._exReqId = reqId;
+
     const dict = this.data.t || {};
     wx.showLoading({ title: dict.LOADING || 'LOADING...', mask: true });
 
@@ -280,8 +321,12 @@ Page({
     } catch (err) {
       console.error('[stats] _loadExerciseData failed:', err);
     } finally {
-      wx.hideLoading();
+      // 只有最新一次请求才能撤遮罩, 否则旧请求会把新请求的遮罩提前撤掉
+      if (reqId === this._exReqId) wx.hideLoading();
     }
+
+    // 有更新的请求在飞 → 本次结果作废
+    if (reqId !== this._exReqId) return;
 
     if (recRes && recRes.status === 'fulfilled') {
       const body = recRes.value && recRes.value.result;
@@ -328,7 +373,7 @@ Page({
       selectedExerciseImage: exercise.image_name || '',
     });
 
-    this._loadExerciseData(exercise.id);
+    this._loadExerciseData(exercise.id).catch(() => {});
   },
 
   _renderWeightChart(records) {

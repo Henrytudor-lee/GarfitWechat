@@ -45,6 +45,8 @@ Page({
     editHeightStr: '170',
     editWeight: 60,
     editWeightStr: '60',
+    // 资料(身高/体重)是否已从服务端加载完成: 未完成前不允许保存, 否则会拿默认值覆盖真实数据
+    profileLoaded: false,
   },
 
   onLoad() {
@@ -59,8 +61,15 @@ Page({
   },
 
   async onShow() {
-    await this.loadData();
-    // Refresh session orb
+    // ⚠️ 原来直接 await this.loadData(): 任一接口失败会抛错中断整条链,
+    //    后面的 loadRunningSession + setData({orbSession}) 不执行 → orb 停在旧状态,
+    //    同时产生未捕获的 Promise rejection。
+    try {
+      await this.loadData();
+    } catch (err) {
+      console.error('[profile] loadData failed:', err);
+    }
+    // Refresh session orb (无论 loadData 成功与否都要刷新)
     const orbSession = await app.loadRunningSession();
     this.setData({ orbSession });
   },
@@ -69,7 +78,6 @@ Page({
     const userId = wx.getStorageSync('userId');
     if (!userId) {
       this.setData({ isLoggedIn: false });
-      wx.hideLoading();
       return;
     }
 
@@ -83,15 +91,17 @@ Page({
 
     this.setData({ isLoggedIn: true, locale, theme, userInfo });
 
-    const [profileRes, streakRes, levelRes] = await Promise.all([
+    // allSettled 而不是 all: 三个接口互不依赖, 任意一个失败不应该让另外两个的结果也丢掉
+    const settled = await Promise.allSettled([
       api.callCloud('profile.get'),
       api.callCloud('profile.getStreak'),
       api.callCloud('profile.getLevel'),
     ]);
+    const [profileRes, streakRes, levelRes] = settled.map((r) => (
+      r.status === 'fulfilled' ? r.value : null
+    ));
 
-    wx.hideLoading();
-
-    const profileData = profileRes.result && profileRes.result.profile;
+    const profileData = profileRes && profileRes.result && profileRes.result.profile;
     if (profileData) {
       wx.setStorageSync('userName', profileData.name);
       wx.setStorageSync('avatarUrl', normalizeAvatar(profileData.avatar, app.globalData.imagePrefix));
@@ -108,11 +118,13 @@ Page({
         editWeight: weight,
         bodyHeight: height,
         bodyWeight: weight,
+        // 资料加载完成: 之前不允许打开身高/体重弹层 (见 onPersonalInfoTap)
+        profileLoaded: true,
       });
     }
 
-    const streak = (streakRes.result && streakRes.result.streak) || 0;
-    const levelData = (levelRes.result && levelRes.result.data) || { label: 'ROOKIE', lv: 1, score: 0 };
+    const streak = (streakRes && streakRes.result && streakRes.result.streak) || 0;
+    const levelData = (levelRes && levelRes.result && levelRes.result.data) || { label: 'ROOKIE', lv: 1, score: 0 };
 
     this.setData({
       streak,
@@ -130,7 +142,12 @@ Page({
       confirmColor: '#ef4444',
       success: (res) => {
         if (res.confirm) {
-          wx.clearStorageSync();
+          // ⚠️ 原来用 wx.clearStorageSync() —— 会把 language / theme 一并清掉,
+          //    用户只点了"退出登录", 语言和主题就被静默重置回默认。
+          //    改成白名单清除, 只清账号相关的。
+          ['userId', 'openid', 'token', 'userName', 'avatarUrl', 'avatarTemp'].forEach((k) => {
+            try { wx.removeStorageSync(k); } catch (e) { /* ignore */ }
+          });
           app.globalData.userId = null;
           app.globalData.openid = null;
           app.doSilentLogin();
@@ -138,12 +155,30 @@ Page({
       },
     });
   },
+
+  /**
+   * "登录/注册"按钮 —— 原来 wxml 绑的是 goToLogin, 但这个方法**根本没定义**,
+   * 点按钮会抛 "goToLogin is not a function", 未登录用户的第一入口完全失效。
+   * 本 app 是静默登录模式, 所以"登录"就是触发一次静默登录再刷新数据。
+   */
+  goToLogin() {
+    wx.showLoading({ title: 'LOADING...', mask: true });
+    app.doSilentLogin()
+      .then(() => this.loadData())
+      .catch((err) => {
+        console.error('[profile] goToLogin failed:', err);
+        wx.showToast({ title: (this.data.t || {}).LOGIN_FAILED || '登录失败', icon: 'none' });
+      })
+      .finally(() => wx.hideLoading());
+  },
   async changeAvatar() {
     wx.chooseImage({
       count: 1,
       sourceType: ['album'],
       success: async (res) => {
         const tempFilePath = res.tempFilePaths[0];
+        // 快照旧头像: 上传失败时要能把 UI 和 storage 一起还原
+        const prevAvatar = this.data.userInfo.avatarUrl || wx.getStorageSync('avatarUrl') || '';
         // Save to local storage immediately for display
         wx.setStorageSync('avatarTemp', tempFilePath);
         this.setData({
@@ -169,22 +204,20 @@ Page({
               // wx.uploadFile 的 success 对 5xx 也会触发, 必须自己检查 statusCode
               // 任何 4xx/5xx 都算失败 (NestJS @Post 默认 201, 不是 200)
               if (uploadRes.statusCode >= 400) {
-                console.error('upload avatar failed', uploadRes);
-                wx.showToast({ title: 'upload failed (' + uploadRes.statusCode + ')', icon: 'none' });
+                // 状态码只进 console, 不给普通用户看
+                this._avatarUploadFailed(prevAvatar, uploadRes);
                 return;
               }
               let avatarUrl = '';
               try {
                 const data = JSON.parse(uploadRes.data);
                 if (!data.success || !data.url) {
-                  console.error('upload avatar: bad response', data);
-                  wx.showToast({ title: 'upload failed', icon: 'none' });
+                  this._avatarUploadFailed(prevAvatar, data);
                   return;
                 }
                 avatarUrl = data.url;
               } catch (e) {
-                console.error('upload avatar: parse error', e, uploadRes.data);
-                wx.showToast({ title: 'upload failed', icon: 'none' });
+                this._avatarUploadFailed(prevAvatar, { parseError: e, data: uploadRes.data });
                 return;
               }
               api.callCloud('profile.updateAvatar', { avatarUrl });
@@ -198,16 +231,30 @@ Page({
               wx.showToast({ title: 'AVATAR UPDATED', icon: 'success' });
             },
             fail: (err) => {
-              console.error('upload avatar failed', err);
-              wx.showToast({ title: 'upload failed', icon: 'none' });
+              this._avatarUploadFailed(prevAvatar, err);
             },
           });
         } else {
           // 没有 userId (登录未完成) → 根本不会发起上传, 不能报成功
-          wx.showToast({ title: 'upload failed', icon: 'none' });
+          this._avatarUploadFailed(prevAvatar, 'no userId');
         }
       },
     });
+  },
+
+  /**
+   * 头像上传失败统一处理:
+   *   1. 回滚 UI 到旧头像 (原来只写临时路径, 失败后一直显示临时图)
+   *   2. 清掉 avatarTemp (原来只有成功分支才删, 失败后残留)
+   *   3. toast 只给文案, HTTP 状态码只进 console
+   */
+  _avatarUploadFailed(prevAvatar, detail) {
+    console.error('[profile] avatar upload failed:', detail);
+    this.setData({ 'userInfo.avatarUrl': prevAvatar });
+    try {
+      wx.removeStorageSync('avatarTemp');
+    } catch (e) { /* ignore */ }
+    wx.showToast({ title: '上传失败', icon: 'none' });
   },
 
   async onOrbTap() {
@@ -295,8 +342,17 @@ Page({
 
   // ---- Personal Info (body data) ----
   onPersonalInfoTap() {
-    const h = this.data.bodyHeight || 170;
-    const w = this.data.bodyWeight || 60;
+    // ⚠️ 资料还没加载完 → 不允许打开弹层。
+    //    原来直接用 this.data.bodyHeight/bodyWeight, 但这两个字段只在 loadData 成功时才存在,
+    //    loadData 失败(或用户手速够快)时拿到的是默认值 170/60,
+    //    点一次"确认"就把真实的 178/72 覆盖成 170/60。
+    if (!this.data.profileLoaded) {
+      wx.showToast({ title: this.data.locale === 'en' ? 'Loading...' : '加载中', icon: 'none' });
+      return;
+    }
+    // 优先用页面上的真实值, 其次用全局(storage 恢复过的)值, 最后才用默认值
+    const h = this.data.bodyHeight || app.globalData.userHeight || 170;
+    const w = this.data.bodyWeight || app.globalData.userWeight || 60;
     this.setData({
       showEditBodyModal: true,
       editHeight: h,
@@ -326,6 +382,11 @@ Page({
   },
 
   async confirmEditBody() {
+    // 资料没加载完 → 不允许写回 (否则会把默认值 170/60 写到服务端)
+    if (!this.data.profileLoaded) {
+      wx.showToast({ title: this.data.locale === 'en' ? 'Loading...' : '加载中', icon: 'none' });
+      return;
+    }
     const height = this.data.editHeight;
     const weight = this.data.editWeight;
     if (height < 50 || height > 250 || weight < 20 || weight > 300) {
@@ -357,4 +418,7 @@ Page({
   onHelpTap() {
     wx.navigateTo({ url: '/pages/guide/index' });
   },
+
+  // 空事件处理器: wxml 里 catchtap="noop" 需要它存在, 否则会抛 "noop is not a function"
+  noop() {},
 });

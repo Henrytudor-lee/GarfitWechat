@@ -4,6 +4,24 @@ const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 /**
+ * 取 i18n 字典, 并补齐可能缺失的 key。
+ *
+ * ⚠️ i18n 字典是**启动时的快照**(app.onLaunch 里取的)——
+ *    开发者新增 key 后如果没重新编译就取不到, 标签会渲染成**空白**。
+ *    实测(2026-11-07): "负重"标签空白 → 那一列比旁边矮一截 →
+ *    被 .set-item 的 align-items:center 居中后, 时长组比负重组低 8px, 整行错位。
+ *    这里兜底成 WEIGHT, 至少不空白(重新编译后正常显示"负重")。
+ *
+ * 用模块级函数而不是实例方法 —— data 的初始值可能在 methods 挂载前求值。
+ */
+function pickDict() {
+  const dict = { ...(app.globalData.t || {}) };
+  if (!dict.LOAD) dict.LOAD = dict.WEIGHT;
+  return dict;
+}
+
+
+/**
  * 取这组动作的计量方式
  *
  * group 来自训练页的 exerciseGroups, 里面:
@@ -20,17 +38,32 @@ function pickCountMode(group) {
 /**
  * 组装可编辑的 set 列表
  * - weightStr: 重量输入框的字符串(带格式)
+ * - repsStr: 次数输入框的字符串(用户清空时不能被回写成 0)
  * - durationStr / distanceStr: 时长/距离输入框的字符串
  *   (input 的 value 必须是字符串, 数字会丢小数位且无法正常编辑)
+ * - isDuration / isDistance / isRepsMode: 给 WXML 判断该显示哪几段
+ *
+ * ⚠️ 2026-11-07: 补上这三个标记, 因为原来 wxml 里用了 wx:if → wx:if → wx:else
+ *    的写法, 而 wx:else 配对的是**紧邻的上一个 if**(distance 那个),
+ *    于是 duration 模式里 "距离 if 为 false → 走 else" → 重量/单位/次数被一起渲染,
+ *    计时类动作显示成四段(见用户截图)。现在改成只用 wx:if, 条件互斥, 不依赖配对规则。
  */
 function buildSets(rawSets, countMode) {
-  return (rawSets || []).map((s) => ({
-    ...s,
-    countMode: s.countMode || countMode || 'weight_reps',
-    weightStr: formatNumberForInput(s.weight),
-    durationStr: s.duration_sec != null ? String(s.duration_sec) : '',
-    distanceStr: s.distance_km != null ? String(s.distance_km) : '',
-  }));
+  return (rawSets || []).map((s) => {
+    const mode = s.countMode || countMode || 'weight_reps';
+    return {
+      ...s,
+      countMode: mode,
+      isDuration: mode === 'duration',
+      isDistance: mode === 'distance_duration',
+      // 只有次数类才有"次数"这一段; 计时类按时长、距离类按距离
+      isRepsMode: mode !== 'duration' && mode !== 'distance_duration',
+      weightStr: formatNumberForInput(s.weight),
+      repsStr: s.reps != null ? String(s.reps) : '',
+      durationStr: s.duration_sec != null ? String(s.duration_sec) : '',
+      distanceStr: s.distance_km != null ? String(s.distance_km) : '',
+    };
+  });
 }
 
 Component({
@@ -44,7 +77,11 @@ Component({
       value: null,
     },
     sessionId: {
-      type: String,
+      // ⚠️ 父组件传进来的是**数字**(session id 是 int 自增主键),
+      //    属性却声明成 String → 微信框架类型不匹配会报警告,
+      //    某些基础库版本会直接丢成默认值 null → session_id 传不上去。
+      //    两个类型都声明, 兼容数字和字符串。
+      type: [String, Number],
       value: null,
     },
     locale: {
@@ -79,7 +116,7 @@ Component({
         this.setData({
           imgPrefix: app.globalData.imagePrefix || '',
           locale: app.globalData.language || 'zh',
-          t: app.globalData.t || {},
+          t: pickDict(),
           countMode,
           sets,
           activeSetsCount: sets.filter(s => !s.deleted).length,
@@ -104,10 +141,15 @@ Component({
   },
 
   methods: {
+
     onMaskTap(e) {
       if (e.target === e.currentTarget) {
         this.closeModal();
       }
+    },
+
+    onSheetTap() {
+      // Empty — catchtap on modal-sheet stops event bubbling so child taps don't reach mask
     },
 
     onFavoriteTap() {
@@ -125,20 +167,30 @@ Component({
       });
       // sync global favorExercises
       const favorExercises = (app.globalData && app.globalData.favorExercises) || [];
+      const oldFav = favorExercises;   // 回滚用快照
       const newFav = wasFav
         ? favorExercises.filter(fid => fid !== id)
         : [...favorExercises, id];
-      app.globalData.favorExercises = newFav;
+      // ⚠️ 之前是 app.globalData.favorExercises = newFav —— 绕过了 applyExerciseFlags,
+      //    storage 没写 → 重启后收藏状态回退。统一走 applyExerciseFlags。
+      app.applyExerciseFlags({ favor_exercises: newFav });
       // cloud call
       api.callCloud('exercise.toggleFavorite', { exercise_id: id })
         .then((r) => {
           const list = r && r.result && r.result.favor_exercises;
           if (Array.isArray(list)) {
             app.applyExerciseFlags({ favor_exercises: list });
-            this.setData({ favorExercises: list });
+            // 服务端才是事实来源 → 用服务端列表重算, 纠正乐观值
+            this.setData({ isFavorite: list.includes(id) });
           }
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.error('toggleFavorite failed', err);
+          // ⚠️ 之前是 .catch(() => {}) → 服务器拒绝后心形一直保持翻转, 既不回滚也不提示
+          app.applyExerciseFlags({ favor_exercises: oldFav });
+          this.setData({ isFavorite: wasFav });
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
     },
 
     closeModal() {
@@ -166,9 +218,14 @@ Component({
       const w = isWeight ? (last?.weight || 0) : 0;
       const newSet = {
         id: Date.now(),
+        // 临时 id 用 Date.now(), 但"是不是新增的"用显式标志判断。
+        // 原来靠 `s.id > Date.now() - 100000` 猜 → 用户加完组停留超过 100 秒
+        // 再保存, 新组会被静默丢弃; 删除时还会拿临时 id 去调 delete → 报 500。
+        isNew: true,
         weight: w,
         weightStr: formatNumberForInput(w),
         reps: isWeight ? (last?.reps || 0) : 0,
+        repsStr: String(isWeight ? (last?.reps || 0) : 0),
         weight_unit: last?.weight_unit || 'kg',
         // 计时/距离类的新 set 要带上对应的初值(否则存回去是 0/null)
         duration_sec: mode === 'duration' ? (last?.duration_sec || 0) : 0,
@@ -212,13 +269,19 @@ Component({
     incReps(e) {
       const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
-      this.updateSet(index, 'reps', s.reps + 1);
+      const v = (s.reps || 0) + 1;
+      this.updateSet(index, 'reps', v);
+      this.updateSet(index, 'repsStr', String(v));
     },
 
     decReps(e) {
       const index = e.currentTarget.dataset.index;
       const s = this.data.sets[index];
-      this.updateSet(index, 'reps', Math.max(1, s.reps - 1));
+      // 下限改成 0: reps=0 的组按"−"反而变成 1, 用户没法减到 0。
+      // "reps 必须 > 0"应该在保存时校验, 不是用步进器夹逼。
+      const v = Math.max(0, (s.reps || 0) - 1);
+      this.updateSet(index, 'reps', v);
+      this.updateSet(index, 'repsStr', String(v));
     },
 
     // ── 计时类: 秒数(步进 ±5 秒) ──
@@ -272,8 +335,14 @@ Component({
 
     onRepsInput(e) {
       const index = e.currentTarget.dataset.index;
-      const value = parseInt(e.detail.value) || 0;
-      this.updateSet(index, 'reps', value);
+      // ⚠️ input.value 必须绑字符串字段: 用户全选删除时 e.detail.value = '',
+      //    直接 parseInt('')||0 → 0 → setData 把 0 写回输入框 → 框里立刻显示 "0",
+      //    还得再删一次; 而且"空串"被当成 0 提交。
+      const raw = e.detail.value;
+      const num = parseInt(raw, 10);
+      const sets = [...this.data.sets];
+      sets[index] = { ...sets[index], repsStr: raw, reps: isNaN(num) ? 0 : num };
+      this.setData({ sets });
     },
 
     setUnit(e) {
@@ -295,21 +364,38 @@ Component({
           const s = sets[i];
           if (s.deleted) continue;
 
-          const original = group.sets.find(os => os.id === s.id);
+          const original = (group.sets || []).find(os => os.id === s.id);
 
-          if (original && (original.weight !== s.weight || original.reps !== s.reps || original.weight_unit !== s.weight_unit)) {
+          // ★ 判定"这组有没有被改过"时**必须**包含时长/距离,
+          //   否则计时类(duration)/距离类(distance_duration)的 set
+          //   三个字段天然不变 → 条件恒为 false → update 一次都不会发,
+          //   用户改了秒数却"保存成功"但数据没变。
+          const durChanged = original
+            && s.countMode === 'duration'
+            && (original.duration_sec || 0) !== (s.duration_sec || 0);
+          const distChanged = original
+            && s.countMode === 'distance_duration'
+            && (original.distance_km || 0) !== (s.distance_km || 0);
+
+          if (original && (original.weight !== s.weight || original.reps !== s.reps
+                           || original.weight_unit !== s.weight_unit
+                           || durChanged || distChanged)) {
             await api.callCloud('exercise.update', { id: s.id,
                 session_id: this.data.sessionId,
                 weight: s.weight,
                 reps: s.reps,
                 weight_unit: s.weight_unit,
                 // 计时/距离类的 set 要带上对应字段; 不适用时传 undefined,
-                // JSON 序列化会省略该 key → 后端写 NULL(不会误清已有值)
+                // JSON 序列化会省略该 key → 后端**不动**这一列。
+                // ⚠️ 2026-11-05 修正: 原来这条注释写的是"后端写 NULL(不会误清已有值)",
+                //    而后端当时的实现恰恰相反 —— 没传的字段一律 push(null) 写成 NULL,
+                //    "改个重量就把已有的秒数抹掉"。后端已改成只写显式传入的字段。
                 duration_sec: s.countMode === 'duration' ? s.duration_sec : undefined,
                 distance_km: s.countMode === 'distance_duration' ? s.distance_km : undefined });
           }
 
-          if (!original && s.id > Date.now() - 100000) {
+          // 用 isNew 判断, 不用时间戳猜(见 addSet 里的说明)
+          if (!original && s.isNew) {
             await api.callCloud('exercise.add', { session_id: this.data.sessionId,
                 exercise_id: group.exercise_id,
                 name_zh: group.name_zh,
@@ -327,10 +413,12 @@ Component({
 
         const toDelete = sets.filter(s => {
           if (!s.deleted) return false;
+          // ★ 新增的组还没入库, 从来不需要发 delete
+          //   (原来会拿临时 id 去调 delete → 后端报 500 → 整个保存中断)
+          if (s.isNew) return false;
           // DB records have small integer ids — always delete
           if (s.id < 1e12) return true;
-          // Client-side temporary ids (Date.now()) — only delete if older than 100s
-          return s.id <= Date.now() - 100000;
+          return true;
         });
         for (const s of toDelete) {
           await api.callCloud('exercise.delete', { id: s.id,

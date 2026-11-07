@@ -1,6 +1,6 @@
 <!--components/workout-summary-modal/index.wxml-->
 <view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
-  <view class="modal-card" catchtap="">
+  <view class="modal-card" catchtap="onSheetTap">
 
     <!-- Background decoration -->
     <view class="card-bg"></view>
@@ -66,10 +66,27 @@
           <view class="sets-grid">
             <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
               <text class="set-num">{{index + 1}}</text>
-              <!-- 计时类: 只显示秒数(重量/次数对它无意义) -->
-              <text class="set-val" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
-              <!-- 距离类: 只显示距离 -->
-              <text class="set-val" wx:elif="{{s.distance_km > 0}}">{{s.distance_km}} {{t.KM}}</text>
+              <!-- ⚠️ 三个分支必须用**相邻的 block + if/elif/else**,
+                   不能写成 "if / if / if / elif / if / if / else" ——
+                   那样 wx:elif 会配到紧邻的上一个 if(wx:else 同理),
+                   结果 duration 类会同时渲染"时长·负重"**和** else 分支的
+                   "重量 × 0 reps"(2026-11-07 用户截图: 交叉跳跃显示成
+                   "60秒 20kg 20kg × 0 reps")。
+                   下面的写法与 pages/index/index.wxml 一致(那边已验证正确)。 -->
+              <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
+              <block wx:if="{{s.distance_km > 0}}">
+                <text class="set-val">{{s.distance_km}} {{t.KM}}</text>
+                <text class="set-sep" wx:if="{{s.duration_sec > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
+                <text class="set-sep" wx:if="{{s.weight > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+              </block>
+              <!-- 计时类: 时长必显, 负重可选 -->
+              <block wx:elif="{{s.duration_sec > 0}}">
+                <text class="set-val">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
+                <text class="set-sep" wx:if="{{s.weight > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+              </block>
               <!-- 次数类: 重量 × 次数 -->
               <block wx:else>
                 <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>

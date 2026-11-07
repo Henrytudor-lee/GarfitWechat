@@ -588,6 +588,9 @@
 .input-btn {
   width: 80rpx;
   height: 80rpx;
+  /* ⚠️ 必须 border-box: 小程序默认是 content-box,
+     带 1rpx border 时实际高度会变成 82rpx, 比输入框高 2rpx → 一行里不齐平 */
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16rpx;
   display: flex;
@@ -601,6 +604,9 @@
 .input-field {
   flex: 1;
   height: 80rpx;
+  line-height: 80rpx;     /* 文字垂直居中 */
+  padding: 0 8rpx;        /* 上下 padding 去掉(高度已由 line-height 承担) */
+  box-sizing: border-box; /* border 算进 80rpx */
   background: rgba(255, 255, 255, 0.05);
   border: 1rpx solid rgba(255, 255, 255, 0.1);
   border-radius: 16rpx;
@@ -619,9 +625,12 @@
   z-index: 1;
 }
 
+/* ⚠️ 必须和 .input-btn / .input-field 同高(80rpx) —— 原来这里是 64rpx,
+   一行里三个控件参差不齐。 */
 .unit-btn {
   flex: 1;
-  height: 64rpx;
+  height: 80rpx;
+  box-sizing: border-box;  /* 同 .input-btn: border 算进高度, 否则多 2rpx */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16rpx;
   display: flex;
@@ -641,10 +650,15 @@
 
 /* Modal Footer */
 .modal-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  /* ⚠️ 2026-11-07 修: 原来是 position:absolute; bottom:0 —— 绝对定位**脱离文档流**,
+     于是 .step2-wrap(flex:1) 的可用高度 = 整个 sheet 高度, 滚动区一直延伸到
+     按钮底下 → 最后一段内容被按钮盖住, **滚到底也看不到**
+     (计时器正好在最下面, 计时类动作最容易中招)。
+
+     改成普通流内的 flex 子项(和 edit-exercise-modal 一致):
+     .modal-sheet 本身是 display:flex; flex-direction:column,
+     .step2-wrap(flex:1) 会自动收缩, 给 footer 让出高度。 */
+  flex-shrink: 0;
   padding: 32rpx;
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom, 0px));
   background: rgba(0, 0, 0, 0.9);
@@ -957,4 +971,13 @@
   font-size: 24rpx;
   color: var(--text-muted);
   line-height: 64rpx;
+}
+
+/* 负重提示 —— 计时/距离类动作也可以负重(手握哑铃的交叉跳跃 / 负重爬坡步行),
+   说明这个重量是"额外负重", 0 = 自重 */
+.load-hint {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  opacity: 0.75;
+  margin-top: 8rpx;
 }

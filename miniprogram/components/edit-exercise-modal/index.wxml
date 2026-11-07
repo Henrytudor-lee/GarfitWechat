@@ -1,6 +1,6 @@
 <!--components/edit-exercise-modal/index.wxml-->
 <view class="modal-mask {{theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen && group}}" bindtap="onMaskTap">
-  <view class="modal-sheet" catchtap="">
+  <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Header -->
     <view class="modal-header">
@@ -28,8 +28,13 @@
         <!-- Set Number -->
         <view class="set-num">{{index + 1}}</view>
 
-        <!-- 计时类: 秒数 -->
-        <view class="set-field" wx:if="{{item.countMode === 'duration'}}">
+        <!-- 计时类: 秒数 / 距离类: 公里
+             ⚠️ 2026-11-07 修正: 原来这里是 wx:if(duration) → wx:if(distance) → wx:else,
+             而 wx:else 配对的是**紧邻的上一个 if**(distance 那个) →
+             duration 模式下 "距离 if 为 false → 走 else" → 重量/单位/次数被一起渲染,
+             计时类动作显示成四段(用户截图)。
+             现在只用 wx:if, 条件互斥, 不依赖 if/else 配对规则. -->
+        <view class="set-field" wx:if="{{item.isDuration}}">
           <view class="field-label">{{t.SET_DURATION}}</view>
           <view class="field-row">
             <view class="field-btn" bindtap="decDuration" data-index="{{index}}">−</view>
@@ -38,8 +43,7 @@
           </view>
         </view>
 
-        <!-- 距离类: 公里 -->
-        <view class="set-field" wx:if="{{item.countMode === 'distance_duration'}}">
+        <view class="set-field" wx:if="{{item.isDistance}}">
           <view class="field-label">{{t.DISTANCE}}</view>
           <view class="field-row">
             <view class="field-btn" bindtap="decDistance" data-index="{{index}}">−</view>
@@ -48,37 +52,37 @@
           </view>
         </view>
 
-        <!-- 次数类: 重量 + 单位 + 次数 -->
-        <block wx:else>
-          <!-- Weight -->
-          <view class="set-field">
-            <view class="field-label">{{t.WEIGHT}}</view>
-            <view class="field-row">
-              <view class="field-btn" bindtap="decWeight" data-index="{{index}}">−</view>
-              <input class="field-input" type="number" value="{{item.weightStr}}" bindinput="onWeightInput" data-index="{{index}}" />
-              <view class="field-btn" bindtap="incWeight" data-index="{{index}}">+</view>
-            </view>
+        <!-- 重量 + 单位: 三种模式都显示
+             ⚠️ 2026-11-07: 原来重量区是"次数类专属", 计时/距离类直接不显示。
+             但计时/距离类动作**也可能是负重的**:
+             手握两个哑铃的交叉跳跃、负重爬坡步行、背负装备的登山 …
+             所以重量对这三类都是"这个 set 额外承受的负重", 0 = 自重。 -->
+        <view class="set-field">
+          <view class="field-label">{{item.isRepsMode ? t.WEIGHT : t.LOAD}}</view>
+          <view class="field-row">
+            <view class="field-btn" bindtap="decWeight" data-index="{{index}}">−</view>
+            <input class="field-input" type="digit" value="{{item.weightStr}}" bindinput="onWeightInput" data-index="{{index}}" />
+            <view class="field-btn" bindtap="incWeight" data-index="{{index}}">+</view>
           </view>
+        </view>
 
-          <!-- Unit -->
-          <view class="set-field set-field-unit">
-            <view class="field-label">{{t.UNIT}}</view>
-            <view class="unit-toggle">
-              <view class="unit-btn {{item.weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="kg">KG</view>
-              <view class="unit-btn {{item.weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="lb">LB</view>
-            </view>
+        <view class="set-field set-field-unit">
+          <view class="field-label">{{t.UNIT}}</view>
+          <view class="unit-toggle">
+            <view class="unit-btn {{item.weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="kg">KG</view>
+            <view class="unit-btn {{item.weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-index="{{index}}" data-weight-unit="lb">LB</view>
           </view>
+        </view>
 
-          <!-- Reps -->
-          <view class="set-field">
-            <view class="field-label">{{t.REPS}}</view>
-            <view class="field-row">
-              <view class="field-btn" bindtap="decReps" data-index="{{index}}">−</view>
-              <input class="field-input" type="number" value="{{item.reps}}" bindinput="onRepsInput" data-index="{{index}}" />
-              <view class="field-btn" bindtap="incReps" data-index="{{index}}">+</view>
-            </view>
+        <!-- 次数: 只有次数类才有(计时类按时长、距离类按距离) -->
+        <view class="set-field" wx:if="{{item.isRepsMode}}">
+          <view class="field-label">{{t.REPS}}</view>
+          <view class="field-row">
+            <view class="field-btn" bindtap="decReps" data-index="{{index}}">−</view>
+            <input class="field-input" type="number" value="{{item.repsStr}}" bindinput="onRepsInput" data-index="{{index}}" />
+            <view class="field-btn" bindtap="incReps" data-index="{{index}}">+</view>
           </view>
-        </block>
+        </view>
 
         <!-- Delete -->
         <image class="delete-btn" src="/images/icons/delete.png" bindtap="deleteSet" data-index="{{index}}"></image>

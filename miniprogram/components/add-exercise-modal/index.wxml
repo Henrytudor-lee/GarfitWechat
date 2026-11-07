@@ -97,7 +97,7 @@
               <view class="card-footer">
                 <view class="card-name">{{locale === 'zh' ? item.name_zh : item.name}}</view>
                 <view class="card-icons">
-                  <block wx:for="{{item.muscle_icons}}" wx:key="index">
+                  <block wx:for="{{item.muscle_icons}}" wx:key="*this">
                     <image class="card-muscle-icon" src="{{imgPrefix}}/body-icons/{{item}}" mode="aspectFit" />
                   </block>
                   <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
@@ -132,9 +132,17 @@
                 <text class="tag tag-neutral">{{locale === 'zh' ? (selectedItem.muscle_name_zh || '') : (selectedItem.muscle_name || '')}}</text>
               </view>
             </view>
+            <!-- LAST badge: 回填"上次这个动作的记录"
+                 ⚠️ 2026-11-07: 原来只有重量次数类才显示(计时/距离类整个隐藏)。
+                 现在计时/距离类也显示 —— 但内容按模式不同:
+                   次数类 → "50kg × 8"
+                   计时类 → "45秒" (+ 负重时 "45秒 · 10kg")
+                   距离类 → "5km"  (+ 负重时 "5km · 10kg") -->
             <view wx:if="{{historyMax}}" class="history-badge" bindtap="applyHistory">
               <text class="history-badge-label">{{t.LAST}}</text>
-              <text class="history-badge-val">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</text>
+              <text class="history-badge-val" wx:if="{{!isDuration && !isDistance}}">{{historyMax.weight}}{{historyMax.weight_unit}} × {{historyMax.reps}}</text>
+              <text class="history-badge-val" wx:if="{{isDuration}}">{{historyMax.duration_sec != null ? historyMax.duration_sec : 0}}{{t.DURATION_UNIT}}<text wx:if="{{historyMax.weight > 0}}"> · {{historyMax.weight}}{{historyMax.weight_unit}}</text></text>
+              <text class="history-badge-val" wx:if="{{isDistance}}">{{historyMax.distance_km != null ? historyMax.distance_km : 0}}{{t.KM}}<text wx:if="{{historyMax.weight > 0}}"> · {{historyMax.weight}}{{historyMax.weight_unit}}</text></text>
             </view>
           </view>
 
@@ -148,40 +156,45 @@
             <text class="video-placeholder-sub">{{t.NO_DEMO_VIDEO_CONTACT}}</text>
           </view>
 
-          <!-- Weight Input —— 计时/距离类动作都不显示:
-               这两类只按时间或距离计量, 重量区是无关内容,
-               而且实测占掉 150pt, 把下面的录入区挤出屏幕 -->
-          <view class="input-section" wx:if="{{!isDuration && !isDistance}}">
+          <!-- Weight Input —— 三种模式都显示。
+               ⚠️ 2026-11-07 修正: 原来这里对计时/距离类是 `wx:if="{{!isDuration && !isDistance}}"`
+               (整个隐藏), 而且 JS 里还把 weight 强制写成 0 → 负重被直接丢弃。
+               但计时/距离类动作**也可能是负重的**:
+               手握两个哑铃的交叉跳跃、负重爬坡步行、背负装备的登山 …
+               所以重量对这三类都成立, 含义是"这个 set 额外承受的负重", 0 = 自重。
+               次数才是"次数类专属" —— 计时类按时长、距离类按距离。 -->
+          <view class="input-section">
             <view class="input-label-row">
-              <view class="input-label">{{t.WEIGHT}} ({{weight_unit}})</view>
+              <view class="input-label">{{(isDuration || isDistance) ? t.LOAD : t.WEIGHT}} ({{weight_unit}})</view>
               <view class="quick-chips-row">
-                <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
+                <view wx:for="{{weightChips}}" wx:key="*this" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
               </view>
             </view>
             <view class="input-row">
               <view class="input-btn" bindtap="decWeight">−</view>
-              <input class="input-field" type="number" value="{{weightStr}}" bindinput="onWeightInput" placeholder="0" />
+              <input class="input-field" type="digit" value="{{weightStr}}" bindinput="onWeightInput" placeholder="0" />
               <view class="input-btn" bindtap="incWeight">+</view>
             </view>
+            <view class="load-hint" wx:if="{{isDuration || isDistance}}">{{t.LOAD_HINT}}</view>
           </view>
 
           <!-- Unit Toggle -->
-          <view class="unit-toggle" wx:if="{{!isDuration && !isDistance}}">
+          <view class="unit-toggle">
             <view class="unit-btn {{weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="kg">KG</view>
             <view class="unit-btn {{weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="lb">LB</view>
           </view>
 
-          <!-- Reps Input (次数类动作) -->
+          <!-- Reps Input (只有次数类动作才有"次数") -->
           <view class="input-section" wx:if="{{!isDuration && !isDistance}}">
             <view class="input-label-row">
               <view class="input-label">{{t.REPS}}</view>
               <view class="quick-chips-row">
-                <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
+                <view wx:for="{{repsChips}}" wx:key="*this" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
               </view>
             </view>
             <view class="input-row">
               <view class="input-btn" bindtap="decReps">−</view>
-              <input class="input-field" type="number" value="{{reps}}" bindinput="onRepsInput" placeholder="0" />
+              <input class="input-field" type="number" value="{{repsStr}}" bindinput="onRepsInput" placeholder="0" />
               <view class="input-btn" bindtap="incReps">+</view>
             </view>
           </view>
@@ -211,7 +224,7 @@
                 <text class="timer-unit-hint" wx:else>{{t.DURATION_UNIT}}</text>
               </view>
             </view>
-            <set-timer value="{{durationSec}}" t="{{t}}" bindchange="onTimerChange" />
+            <set-timer value="{{durationSec}}" t="{{t}}" bindchange="onTimerChange" bindfinish="onTimerFinish" />
           </view>
 
         </scroll-view>

@@ -7,6 +7,9 @@
 // 2026-11-04 新建。原来只有 utils/unit.js 里的 volumeToCalories 一个公式
 // (volume_kg × 体重 × 0.0011), 整个 session 一个公式, 不区分动作类型 ——
 // 于是计时类(平板支撑)和距离类(跑步)的卡路里恒为 0。
+//
+// 2026-11-07 升级到 v2: 计时/距离类动作也可以负重(手握哑铃的交叉跳跃、
+// 负重爬坡步行) → 负重按 loadFactor 折算成"等效体重"参与计算。
 
 const { toKg } = require('./unit.js');
 
@@ -25,6 +28,10 @@ const CALORIE_CONFIG = {
   },
   // 距离法: kcal = 体重(kg) × 距离(km) × distanceFactor
   distanceFactor: 0.9,
+  // 额外负重的等效折算: 等效体重 = 用户体重 + 负重(kg) × loadFactor
+  // ⚠️ 经验系数, 非文献定值 —— 公开文献里没有公认的"哑铃负重→等效体重"比例。
+  //    0.5 的含义: 举起哑铃时大约一半的外部负荷真正转化为代谢负担。
+  loadFactor: 0.5,
 };
 
 function num(v) {
@@ -49,8 +56,21 @@ function metCalories(met, userWeightKg, durationSec) {
 }
 
 /**
+ * 等效体重: 用户体重 + 额外负重 × loadFactor
+ *
+ * 次数类的重量**不算**负重 —— 它的重量已经通过训练量(体积法)计进去了,
+ * 再折一次会重复计算。
+ */
+function effectiveWeight(userWeightKg, loadKg, mode) {
+  if (mode === 'weight_reps') return userWeightKg;
+  return userWeightKg + Math.max(0, loadKg) * CALORIE_CONFIG.loadFactor;
+}
+
+/**
  * 计算单个 set 的卡路里
- * @param {Object} set { countMode, volumeKg, durationSec, distanceKm, metOverride }
+ * @param {Object} set { countMode, volumeKg, weightKg, durationSec, distanceKm, metOverride }
+ *   weightKg: 该 set 记录的重量(kg, 已换算)。次数类是"举起的重量",
+ *             计时/距离类是"额外负重"
  * @param {number} userWeightKg 用户体重(kg)
  * @returns {number} 卡路里(小数, 汇总后再取整)
  */
@@ -58,26 +78,28 @@ function calcSetCalories(set, userWeightKg) {
   const weight = num(userWeightKg) || 60;
   const mode = normalizeCountMode(set && set.countMode);
   const volumeKg = num(set && set.volumeKg);
+  const weightKg = num(set && set.weightKg);
   const durationSec = num(set && set.durationSec);
   const distanceKm = num(set && set.distanceKm);
   const met = num(set && set.metOverride) || CALORIE_CONFIG.defaultMet[mode];
+  const effWeight = effectiveWeight(weight, weightKg, mode);
 
   if (mode === 'duration') {
-    if (durationSec > 0) return metCalories(met, weight, durationSec);
+    if (durationSec > 0) return metCalories(met, effWeight, durationSec);
     if (volumeKg > 0) return volumeKg * weight * CALORIE_CONFIG.volumeFactor;
     return 0;
   }
 
   if (mode === 'distance_duration') {
-    if (distanceKm > 0) return weight * distanceKm * CALORIE_CONFIG.distanceFactor;
-    if (durationSec > 0) return metCalories(met, weight, durationSec);
+    if (distanceKm > 0) return effWeight * distanceKm * CALORIE_CONFIG.distanceFactor;
+    if (durationSec > 0) return metCalories(met, effWeight, durationSec);
     if (volumeKg > 0) return volumeKg * weight * CALORIE_CONFIG.volumeFactor;
     return 0;
   }
 
   // weight_reps —— 沿用现有体积法(保证历史数据一致)
   if (volumeKg > 0) return volumeKg * weight * CALORIE_CONFIG.volumeFactor;
-  if (durationSec > 0) return metCalories(met, weight, durationSec);
+  if (durationSec > 0) return metCalories(met, effWeight, durationSec);
   return 0;
 }
 
@@ -123,6 +145,19 @@ function rowVolumeKg(row) {
   return toKg(num(row.weight), row.weight_unit || 'kg') * reps;
 }
 
+/**
+ * 从一个 set 行算出该 set 记录的重量(kg) —— **不乘次数**
+ *
+ * 语义随计量方式变:
+ *   · 次数类       → 举起的重量
+ *   · 计时/距离类  → 额外负重(手握哑铃 / 背负重物)
+ * 卡路里算法按这个字段算等效体重。
+ */
+function rowWeightKg(row) {
+  if (!row) return 0;
+  return toKg(num(row.weight), row.weight_unit || 'kg');
+}
+
 module.exports = {
   CALORIE_CONFIG,
   normalizeCountMode,
@@ -130,4 +165,5 @@ module.exports = {
   calcSetsCalories,
   calcSessionCalories,
   rowVolumeKg,
+  rowWeightKg,
 };

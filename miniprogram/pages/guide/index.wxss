@@ -4,6 +4,47 @@ page {
   overflow: hidden;
 }
 
+/* ========================
+   Day Theme 变量
+   ========================
+   app.wxss 里的 `page.theme-day` 在小程序里是死规则(page 元素没法加 class),
+   所以日间主题的变量必须在本页自己的作用域里再定义一次,
+   否则 var(--bg) / var(--text-primary) 全都取到夜间的值 → 整页深色。
+   取值来源:
+     --primary-text / --primary-bg-soft ← pages/index/index.wxss:745-746
+     其余变量                          ← app.wxss:35-51 (page.theme-day 调色板)
+*/
+.page.theme-day {
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-low: #f0f0f0;
+  --surface-high: #e0e0e0;
+  --card-bg: rgba(0, 0, 0, 0.05);
+  --card-border: rgba(0, 0, 0, 0.10);
+  --primary: #ccf200;
+  --primary-dim: #b3d400;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+  --text-primary: #1a1a1a;
+  --text-secondary: #52525b;
+  --text-muted: #a1a1aa;
+  --quaternary-text: #a1a1aa;
+  --divider: rgba(0, 0, 0, 0.10);
+}
+
+/* 日间主题可读性补丁: 夜间取值在白底上看不见 */
+.page.theme-day .card-step {
+  color: var(--primary-text, #3a4a00);
+}
+
+.page.theme-day .btn-ghost {
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .card-illustration {
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+
 .guide-page {
   min-height: 100vh;
   background: var(--bg, #08090a);

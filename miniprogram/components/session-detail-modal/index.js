@@ -1,7 +1,7 @@
 // components/session-detail-modal/index.js
 const app = getApp();
 const api = require('../../utils/api.js');
-const { setVolume } = require('../../utils/unit.js');
+const { setVolume, toKg } = require('../../utils/unit.js');
 const { calcSetsCalories, rowVolumeKg } = require('../../utils/calories.js');
 
 Component({
@@ -15,7 +15,11 @@ Component({
       value: null,
     },
     sessionId: {
-      type: String,
+      // ⚠️ 父组件传进来的是**数字**(session id 是 int 自增主键),
+      //    属性却声明成 String → 微信框架类型不匹配会报警告,
+      //    某些基础库版本会直接丢成默认值 null → session_id 传不上去。
+      //    两个类型都声明, 兼容数字和字符串。
+      type: [String, Number],
       value: null,
     },
     locale: {
@@ -38,7 +42,11 @@ Component({
   observers: {
     'isOpen': function(isOpen) {
       if (isOpen) {
-        this.setData({ imgPrefix: app.globalData.imagePrefix || '' });
+        // i18n 字典要从 app.globalData 重新取, 否则切换语言后弹框里还是旧语言
+        this.setData({
+          imgPrefix: app.globalData.imagePrefix || '',
+          t: app.globalData.t || {},
+        });
       }
     },
     'isOpen, sessionId': function(isOpen, sessionId) {
@@ -49,7 +57,15 @@ Component({
     'session': function(session) {
       if (session && this.data.isOpen) {
         if (session.exercises) {
-          this.setData({ exerciseList: session.exercises });
+          // sets 恒为数组, 否则 wxml 里 item.sets.length 会报错
+          this.setData({
+            exerciseList: session.exercises.map((ex) => ({
+              ...ex,
+              sets: Array.isArray(ex.sets) ? ex.sets : [],
+              // id 用动作 id, 保证 wx:key 唯一
+              id: ex.exercise_id || ex.id,
+            })),
+          });
         }
         this.setData({ _calories: session.calories || 0 });
         this._computeDate(session);
@@ -72,7 +88,13 @@ Component({
       }
     },
 
+    onSheetTap() {
+      // 空实现: catchtap 用来阻止点击冒泡到遮罩
+    },
+
     closeModal() {
+      // 作废在途请求, 避免关闭后响应回来又把数据 setData 上去
+      this._reqId = (this._reqId || 0) + 1;
       this.setData({ exerciseList: [] });
       this.triggerEvent('close');
     },
@@ -80,17 +102,28 @@ Component({
     async _loadExercises() {
       if (!this.data.sessionId) return;
 
+      // 请求序号: 快速切换会话时, 只有最后一次请求的结果才允许落地
+      // (A 的响应后到 → 不能把 A 的数据覆盖到 B 的标题下)
+      const reqId = (this._reqId || 0) + 1;
+      this._reqId = reqId;
+      const sessionId = this.data.sessionId;
+
       this.setData({ loading: true });
 
       let res;
       try {
-        res = await api.callCloud('exercise.list', { session_id: this.data.sessionId });
+        res = await api.callCloud('exercise.list', { session_id: sessionId });
       } catch (err) {
+        // 过期请求 → 直接丢弃, 不碰 loading / 列表
+        if (reqId !== this._reqId || !this.data.isOpen) return;
         // 请求失败 → 保留现有列表, 不清空; loading 也要收掉(否则一直转圈)
         console.warn('[session-detail] _loadExercises failed:', err);
         this.setData({ loading: false });
         return;
       }
+
+      // 过期请求(期间已经打开/关闭过别的会话) → 丢弃结果
+      if (reqId !== this._reqId || !this.data.isOpen) return;
 
       this.setData({ loading: false });
 
@@ -100,6 +133,8 @@ Component({
           if (!map[ex.exercise_id]) {
             map[ex.exercise_id] = {
               _id: ex._id,
+              // id 用动作 id, 保证 wx:key 唯一
+              id: ex.exercise_id,
               name_en: ex.name_en,
               name_zh: ex.name_zh || ex.name_en,
               image_name: ex.image_name,
@@ -118,6 +153,9 @@ Component({
               weight: ex.weight,
               reps: ex.reps,
               weight_unit: ex.weight_unit || 'kg',
+              // 该 set 记录的重量(kg): 次数类是举起重量, 计时/距离类是额外负重
+              // → 卡路里按等效体重折算(见 utils/calories.js)
+              weightKg: toKg(ex.weight, ex.weight_unit || 'kg'),
               duration_sec: isDurationSet ? Number(ex.duration_sec) : 0,
               distance_km: isDistanceSet ? Number(ex.distance_km) : 0,
               // 计量方式 —— 卡路里按这个分档算(见 utils/calories.js)

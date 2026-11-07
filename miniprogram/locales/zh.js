@@ -16,6 +16,7 @@ module.exports = {
   "SAVE_CHANGES": "保存修改",
   "SET_DISTANCE": "设置距离和时长",
   "SET_DISTANCE_HINT": "请先填写距离",
+  "ACTION_SETUP": "动作配置",
   "SET_DURATION": "设置时长",
   "SET_DURATION_HINT": "请先设置时长",
   "TIMER_OPTIONAL_HINT": "时长可选",
@@ -148,4 +149,9 @@ module.exports = {
   "LOAD_FAILED": "加载失败",
   "SAVE_FAILED": "保存失败",
   "FINISH_FAILED": "结束训练失败",
+  "LOAD": "负重",
+  "LOAD_HINT": "手握哑铃等额外负重(可选)",
+  "RETRY": "重试",
+  "LOAD_FAILED_HINT": "加载失败, 点这里重试",
+  "NO_DATA_HINT": "换个筛选条件试试",
 };

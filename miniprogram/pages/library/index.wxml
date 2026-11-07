@@ -90,7 +90,13 @@
   <!-- Scrollable Content -->
   <scroll-view class="content-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
   <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{t.LOADING}}</view>
-  <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
+  <view wx:elif="{{list.length === 0 && !loading && !loadError}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
+  <!-- 加载失败态: 不能和"没有找到动作"混为一谈 -->
+  <view wx:elif="{{list.length === 0 && !loading && loadError}}" class="error-state">
+    <text class="error-text">{{t.LOAD_FAILED || 'Load failed'}}</text>
+    <text class="error-subtext">{{locale === 'zh' ? '加载失败, 点击重试' : 'Failed to load, tap to retry'}}</text>
+    <button class="error-retry-btn" bindtap="onSearch">{{locale === 'zh' ? '重试' : 'RETRY'}}</button>
+  </view>
 
   <view wx:else class="exercise-grid">
     <view
@@ -138,7 +144,7 @@
 
   <!-- Exercise Detail Bottom Sheet -->
   <view class="sheet-mask {{selectedExercise ? 'show' : ''}}" catchtouchmove="noop">
-    <view class="sheet" catchtap="">
+    <view class="sheet" catchtap="noop">
 
       <!-- Close Handle -->
       <view class="sheet-handle" bindtap="closeSheet"></view>

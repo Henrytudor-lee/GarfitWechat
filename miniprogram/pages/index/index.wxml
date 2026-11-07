@@ -4,6 +4,13 @@
   <!-- Top App Bar -->
   <appbar theme="{{theme}}" />
 
+  <!-- 加载失败态: 与"今天还没训练"区分开, 并给一个重试入口。
+       原来登录失败/超时只是 console.warn, 用户看到的是一片空白, 无提示无重试。 -->
+  <view class="load-error-banner" wx:if="{{loadError}}" bindtap="_bootstrap">
+    <text class="load-error-text">{{t.LOAD_FAILED_HINT}}</text>
+    <text class="load-error-btn">{{t.RETRY}}</text>
+  </view>
+
   <!-- Hero Timer Card -->
   <view class="timer-card">
     <view class="timer-label">{{t.DURATION}}</view>
@@ -63,17 +70,21 @@
         </view>
         <!-- Sets grid: 2 columns -->
         <view class="ec-sets-grid">
-          <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
+          <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
             <view class="ec-set-num {{item.isLatestAdded && s.id === item.latestSetId ? 'latest-set-num' : ''}}">{{index + 1}}</view>
-            <!-- 距离类: 距离必显, 时长可选 -->
+            <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
             <block wx:if="{{s.distance_km > 0}}">
               <view class="ec-set-val reps">{{s.distance_km}} <text class="ec-set-unit">{{t.KM}}</text></view>
               <view class="ec-set-sep" wx:if="{{s.duration_sec > 0}}">·</view>
               <view class="ec-set-val reps" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
             </block>
-            <!-- 计时类: 只显示秒数 -->
+            <!-- 计时类: 时长必显, 负重可选(手握哑铃的交叉跳跃 / 负重爬坡) -->
             <block wx:elif="{{s.duration_sec > 0}}">
               <view class="ec-set-val reps">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
             </block>
             <!-- 次数类: 重量 × 次数 -->
             <block wx:else>
@@ -176,8 +187,9 @@
   </view>
 
   <!-- Custom Date Picker Modal -->
-  <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker">
-    <view class="picker-modal" catchtap="onPickerModalTap">
+  <!-- catchtouchmove="noop": 只拦 tap 拦不住 touchmove —— 在弹层上滑动会带动背景页面滚动(滚动穿透) -->
+  <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker" catchtouchmove="noop">
+    <view class="picker-modal" catchtap="onPickerModalTap" catchtouchmove="noop">
       <!-- Month navigation -->
       <view class="picker-header">
         <view class="picker-nav" bindtap="prevMonth">
@@ -190,11 +202,11 @@
       </view>
       <!-- Day headers -->
       <view class="picker-day-headers">
-        <text class="picker-day-h" wx:for="{{dayNames}}" wx:key="index">{{item}}</text>
+        <text class="picker-day-h" wx:for="{{dayNames}}" wx:key="*this">{{item}}</text>
       </view>
       <!-- Days grid -->
       <view class="picker-days-grid">
-        <view wx:for="{{calendarDays}}" wx:key="index" class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}" bindtap="selectDay" data-day="{{item.day}}">{{item.day}}</view>
+        <view wx:for="{{pickerDays}}" wx:key="k" class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}" bindtap="selectDay" data-day="{{item.day}}">{{item.day}}</view>
       </view>
       <!-- Today shortcut -->
       <view class="picker-today-btn" bindtap="goToToday">{{t.TODAY}}</view>
@@ -202,7 +214,8 @@
   </view>
 
   <!-- Add Exercise Modal -->
-  <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" theme="{{theme}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
+  <!-- preselectedExercise: 从动作库带回来的预选动作(选完动作直接进第二步填计量值) -->
+  <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" preselectedExercise="{{preselectedExercise}}" theme="{{theme}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
 
   <!-- Edit Exercise Modal -->
   <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" locale="{{locale}}" theme="{{theme}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
@@ -211,7 +224,8 @@
   <session-detail-modal isOpen="{{showSessionDetailModal}}" session="{{viewingSession}}" sessionId="{{viewingSessionId}}" locale="{{locale}}" bind:close="onSessionDetailClose" />
 
   <!-- Workout Summary Modal -->
-  <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" exerciseList="{{workoutSummaryExercises}}" locale="{{locale}}" bind:close="onWorkoutSummaryClose" />
+  <!-- 组件自己从 session.exercises 取数据, 不需要再传一份 exerciseList(原来重复传同一数组, setData 载荷翻倍) -->
+  <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" locale="{{locale}}" bind:close="onWorkoutSummaryClose" />
 
   <!-- Custom End Confirm Modal -->
   <custom-end-confirm-modal isOpen="{{showEndConfirm}}" locale="{{locale}}" theme="{{theme}}" bind:confirm="stopWorkout" bind:cancel="onEndConfirmCancel" />

@@ -16,6 +16,7 @@ module.exports = {
   "SAVE_CHANGES": "SAVE CHANGES",
   "SET_DISTANCE": "SET DISTANCE & DURATION",
   "SET_DISTANCE_HINT": "Please enter distance",
+  "ACTION_SETUP": "ACTION SETUP",
   "SET_DURATION": "SET DURATION",
   "SET_DURATION_HINT": "Please set duration",
   "TIMER_OPTIONAL_HINT": "Duration optional",
@@ -148,4 +149,9 @@ module.exports = {
   "LOAD_FAILED": "Load failed",
   "SAVE_FAILED": "Save failed",
   "FINISH_FAILED": "Failed to finish workout",
+  "LOAD": "Load",
+  "LOAD_HINT": "Extra load such as dumbbells (optional)",
+  "RETRY": "Retry",
+  "LOAD_FAILED_HINT": "Failed to load — tap to retry",
+  "NO_DATA_HINT": "Try a different filter",
 };

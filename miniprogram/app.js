@@ -130,7 +130,24 @@ App({
     ]);
   },
 
-  async ensureRunningSession() {
+  /**
+   * 拿到 (或创建) running session。
+   *
+   * ⚠️ 必须做 **in-flight 去重**: 后端 session.create 是 check-then-insert
+   *    (SELECT 无 running → INSERT), 没有事务也没有唯一约束。
+   *    并发调两次 → 两条 status='active' 记录 → 用户的动作被拆到两条 session,
+   *    另一条永远不 finish, 长期以"训练中"状态存在。
+   *    触发路径: 用户连点悬浮球 / 页面 onShow 与 orb 点击同时进来。
+   */
+  ensureRunningSession() {
+    if (this._ensurePromise) return this._ensurePromise;
+    this._ensurePromise = this._ensureRunningSessionInner().finally(() => {
+      this._ensurePromise = null;
+    });
+    return this._ensurePromise;
+  },
+
+  async _ensureRunningSessionInner() {
     let session = null;
     try {
       const runRes = await api.call('session.getRunning');

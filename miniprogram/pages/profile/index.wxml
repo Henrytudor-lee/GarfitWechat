@@ -20,7 +20,7 @@
 
   <!-- Edit Nickname Modal -->
   <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="onNameMaskTap">
-    <view class="edit-modal-box" catchtap="">
+    <view class="edit-modal-box" catchtap="noop">
       <view class="edit-modal-title">{{t.EDIT_NICKNAME}}</view>
       <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{t.NICKNAME}}" maxlength="16" bindinput="onEditNameInput" />
       <view class="edit-modal-btns">
@@ -58,7 +58,7 @@
 
     <!-- Edit Body Data Modal -->
   <view class="edit-modal-mask" wx:if="{{showEditBodyModal}}" bindtap="onBodyMaskTap">
-    <view class="edit-modal-box" catchtap="">
+    <view class="edit-modal-box" catchtap="noop">
       <view class="edit-modal-title">{{t.EDIT_PERSONAL_INFO}}</view>
       <view class="body-field-row">
         <view class="body-field">
@@ -121,7 +121,7 @@
           </view>
           <view class="settings-texts">
             <text class="settings-title">{{t.PERSONAL_INFO}}</text>
-            <text class="settings-subtitle">{{bodyHeight || 170}}cm / {{bodyWeight || 60}}kg</text>
+            <text class="settings-subtitle">{{profileLoaded ? bodyHeight + 'cm / ' + bodyWeight + 'kg' : '—'}}</text>
           </view>
         </view>
         <text class="settings-arrow">›</text>

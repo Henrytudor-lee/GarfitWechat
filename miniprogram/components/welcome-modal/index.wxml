@@ -1,6 +1,9 @@
 <!-- components/welcome-modal/index.wxml -->
-<view class="modal-mask" bindtap="onMaskTap" hidden="{{!isOpen}}">
-  <view class="modal-sheet" catchtap="">
+<!-- ⚠️ 用 wx:if 而不是 hidden: .modal-mask 是 display:flex,
+     作者层的 display 会盖掉 UA 层的 [hidden]{display:none},
+     遮罩会留在布局里继续拦截点击 -->
+<view class="modal-mask" bindtap="onMaskTap" wx:if="{{isOpen}}">
+  <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Header: Logo + Welcome -->
     <view class="modal-header">
@@ -39,11 +42,11 @@
       <!-- Height & Weight -->
       <view class="form-row">
         <view class="form-item form-item-half">
-          <text class="field-label">{{currentLang === 'zh' ? '身高' : 'Height'}} (cm)</text>
+          <text class="field-label">{{heightLabel}} (cm)</text>
           <input class="name-input" type="number" value="{{heightStr}}" bindinput="onHeightInput" placeholder="170" />
         </view>
         <view class="form-item form-item-half">
-          <text class="field-label">{{currentLang === 'zh' ? '体重' : 'Weight'}} (kg)</text>
+          <text class="field-label">{{weightLabel}} (kg)</text>
           <input class="name-input" type="number" value="{{weightStr}}" bindinput="onWeightInput" placeholder="60" />
         </view>
       </view>
@@ -53,13 +56,13 @@
         <text class="field-label">{{genderLabel}}</text>
         <view class="gender-row">
           <view class="gender-btn {{gender === 'male' ? 'active' : ''}}" data-value="male" bindtap="onGenderChange">
-            <text class="gender-text">{{currentLang === 'zh' ? '男' : 'Male'}}</text>
+            <text class="gender-text">{{genderMale}}</text>
           </view>
           <view class="gender-btn {{gender === 'female' ? 'active' : ''}}" data-value="female" bindtap="onGenderChange">
-            <text class="gender-text">{{currentLang === 'zh' ? '女' : 'Female'}}</text>
+            <text class="gender-text">{{genderFemale}}</text>
           </view>
           <view class="gender-btn {{gender === 'other' ? 'active' : ''}}" data-value="other" bindtap="onGenderChange">
-            <text class="gender-text">{{currentLang === 'zh' ? '其他' : 'Other'}}</text>
+            <text class="gender-text">{{genderOther}}</text>
           </view>
         </view>
       </view>
@@ -92,7 +95,12 @@
     <!-- Footer Buttons -->
     <view class="modal-footer">
       <button class="btn-cancel" bindtap="onCancel">{{cancelText}}</button>
-      <button class="btn-confirm" bindtap="onConfirm">{{confirmText}}</button>
+      <!-- 头像上传中 / 提交中 → 禁用, 防止把本地临时路径写进后端 / 连点发两次请求 -->
+      <button
+        class="btn-confirm {{(submitting || uploading) ? 'disabled' : ''}}"
+        bindtap="onConfirm"
+        disabled="{{submitting || uploading}}"
+      >{{confirmText}}</button>
     </view>
 
   </view>

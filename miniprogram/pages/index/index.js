@@ -1,7 +1,7 @@
 // pages/index/index.js — garcia-fitness-new style with bento stats, date picker, rest timer
 const app = getApp();
 const api = require('../../utils/api.js');
-const { setVolume, formatCalories } = require('../../utils/unit.js');
+const { setVolume, formatCalories, toKg } = require('../../utils/unit.js');
 const { calcSetsCalories, rowVolumeKg } = require('../../utils/calories.js');
 
 const DAY_NAMES_EN = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -43,7 +43,9 @@ Page({
     pickerYear: new Date().getFullYear(),
     pickerMonth: new Date().getMonth(),  // 0-indexed
     pickerYearLabel: '',
-    calendarDays: [],
+    calendarDays: [],   // 迷你日历(结构含 worked/today/dateStr)
+    pickerDays: [],     // 日期选择器(结构含 empty/isSelected/isToday) —— 与迷你日历**必须分开**
+
     dayNames: DAY_NAMES_EN,
 
     // Calendar mini
@@ -75,10 +77,13 @@ Page({
     viewingSessionId: null,
     showWorkoutSummary: false,
     workoutSummarySession: null,
-    workoutSummaryExercises: [],
     currentSessionId: null,
     showAddModal: false,
+    preselectedExercise: null,   // 从动作库带回来的预选动作(打开添加弹框时带上)
     showWelcome: false,
+
+    // 加载失败态: 与"今天还没训练"区分开(否则用户看到的是一片空白 + 无提示)
+    loadError: false,
 
     // End confirm modal
     showEndConfirm: false,
@@ -128,19 +133,23 @@ Page({
       const openid = await app.whenAuthReady();
       if (this._unloaded) return;                 // 页面已卸载, 别再 setData
       if (!openid) {
-        // 登录失败: 保持空态但不要伪装成"没有训练数据"
+        // 登录失败: 显式进入错误态 —— 原来只写日志, 用户看到的是一片空白,
+        // 既不像"没有训练数据", 也没有任何重试入口。
         console.warn('[index] auth not ready');
         this._dataLoaded = false;
+        this.setData({ loadError: true });
         return;
       }
       await this._loadData();
       if (this._unloaded) return;
       this._dataLoaded = true;
+      this.setData({ loadError: false });
       // 鉴权就绪后再补一次日历圆点 (onLoad 时可能还没登录)
       this._initCalendar();
     } catch (err) {
       console.error('[index] _bootstrap failed:', err);
       this._dataLoaded = false;
+      this.setData({ loadError: true });
     } finally {
       this._booting = false;
     }
@@ -176,8 +185,13 @@ Page({
     }
 
     const chosen = getApp().globalData.chosenExercise;
-    if (chosen && this.data.runningSession) {
+    if (chosen) {
+      // 先消费掉, 避免脏值挂到下一次 onShow 才被误消费
       getApp().globalData.chosenExercise = null;
+      if (!this.data.runningSession) {
+        wx.showToast({ title: this._t('NO_SESSION_HINT') || '请先开始训练', icon: 'none' });
+        return;
+      }
       this.addExerciseToSession(chosen);
       return;
     }
@@ -205,7 +219,16 @@ Page({
     this._unloaded = true;
     // timer 句柄在实例属性上, 直接清; 不再走 setData
     this._stopTimers();
+    // 定时器也要清 —— 原来这两个 setTimeout 没清:
+    //   · onDayTap 的 400ms 脉冲清除 → 页面卸载后还在 setData
+    //   · onWelcomeClose 的 300ms 跳转 → 用户已经离开页面了还会把引导页弹出来
+    if (this._pulseTimer) { clearTimeout(this._pulseTimer); this._pulseTimer = null; }
+    if (this._guideTimer) { clearTimeout(this._guideTimer); this._guideTimer = null; }
   },
+
+  // No-op: 给 .picker-overlay 的 catchtouchmove 用 ——
+  // 光有 catchtap 拦不住 touchmove, 在弹层上滑动会带动背景页面滚动(滚动穿透)。
+  noop() {},
 
   async _loadData() {
     wx.showLoading({ title: 'LOADING...', mask: true });
@@ -258,8 +281,11 @@ Page({
         const sessions = recentRes.result.sessions.map(s => {
           const d = new Date(s.start_time);
           const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-          const mins = Math.floor((s.duration || 0) / 60);
-          return { ...s, dateStr, durationStr: `${mins} MIN` };
+          const secs = Number(s.duration) || 0;
+          // 不足 1 分钟原来显示 "0 MIN", 看着像没数据
+          const mins = Math.floor(secs / 60);
+          const durationStr = secs < 60 ? '<1 MIN' : `${mins} MIN`;
+          return { ...s, dateStr, durationStr };
         });
         this.setData({ recentSessions: sessions });
       }
@@ -279,8 +305,13 @@ Page({
   },
 
   async _loadMonthlyStats() {
-    const res = await api.callCloud('session.monthlyStats');
-    if (res.result && res.result.success) this._applyMonthlyStats(res.result);
+    try {
+      const res = await api.callCloud('session.monthlyStats');
+      if (res.result && res.result.success) this._applyMonthlyStats(res.result);
+    } catch (err) {
+      // 失败只记日志 —— 绝不能把异常抛给调用方(原来这里会变成 unhandled rejection)
+      console.warn('[index] _loadMonthlyStats failed:', err);
+    }
   },
 
   _applyMonthlyStats(stats) {
@@ -301,6 +332,10 @@ Page({
   },
 
   async _loadExerciseGroups(sessionId) {
+    // 请求序号守卫 —— 5 个调用点(切后台/外部建 session/弹框保存/加动作/库页选择)
+    // 可能并发, 旧响应后到会覆盖新数据(刚加的动作从列表里消失)。
+    const reqId = (this._groupsReqId || 0) + 1;
+    this._groupsReqId = reqId;
     let res;
     try {
       res = await api.callCloud('exercise.list', { session_id: sessionId });
@@ -309,6 +344,8 @@ Page({
       console.warn('[index] _loadExerciseGroups failed:', err);
       return;
     }
+    if (reqId !== this._groupsReqId) return;      // 已有更新的请求, 丢弃这次响应
+    if (this._unloaded) return;
     if (res.result && res.result.success) {
       if (this._exerciseOrderSessionId !== sessionId) {
         this._exerciseOrderSessionId = sessionId;
@@ -339,6 +376,10 @@ Page({
             id: ex.id,
             weight: ex.weight,
             weight_unit: ex.weight_unit,
+            // 该 set 记录的重量(kg, 已换算):
+            //   次数类 → 举起的重量
+            //   计时/距离类 → 额外负重(手握哑铃 / 背负重物) → 卡路里按等效体重折算
+            weightKg: toKg(ex.weight, ex.weight_unit),
             reps: ex.reps,
             duration_sec: isDurationSet ? Number(ex.duration_sec) : 0,
             distance_km: isDistanceSet ? Number(ex.distance_km) : 0,
@@ -350,16 +391,21 @@ Page({
         }
       }
       const userWeight = app.globalData.userWeight || 60;
-      const groups = Object.values(map).map(g => ({
-        ...g,
-        countMode: g.count_mode || 'weight_reps',
-        totalVolume: Math.round(g.totalVolume),
-        // 卡路里 v1: 按组的计量方式算, 不再是整个 session 一个公式
-        totalCalories: calcSetsCalories(g.sets, userWeight),
-        latestTime: g._latestTime || 0,  // 该组最后一次 set 的 create_time 戳
-        latestId: g._latestId,
-        latestSetId: g._latestSetId,
-      }));
+      const groups = Object.values(map).map((g) => {
+        // 剔除下划线开头的内部字段(_latestTime/_latestId/_latestSetId) ——
+        // 它们只是构造过程中的中间量, 留在 setData 载荷里纯属浪费(每个动作一份)。
+        const { _latestTime, _latestId, _latestSetId, ...rest } = g;
+        return {
+          ...rest,
+          countMode: g.count_mode || 'weight_reps',
+          totalVolume: Math.round(g.totalVolume),
+          // 卡路里 v1: 按组的计量方式算, 不再是整个 session 一个公式
+          totalCalories: calcSetsCalories(g.sets, userWeight),
+          latestTime: _latestTime || 0,  // 该组最后一次 set 的 create_time 戳
+          latestId: _latestId,
+          latestSetId: _latestSetId,
+        };
+      });
       const latestSetId = groups.reduce((latest, group) => Math.max(latest, group.latestSetId || 0), 0);
       groups.forEach(group => {
         group.isLatestAdded = latestSetId > 0 && group.latestSetId === latestSetId;
@@ -499,12 +545,15 @@ Page({
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const days = [];
-    for (let i = 0; i < firstDay; i++) days.push({ empty: true });
+    // k 是唯一 key —— 原来用 wx:key="index", 但 wx:for-item 里根本没有 index 字段
+    // (wx:for-item 改名后 index 不再自动注入), key 恒为 undefined → 微信告警。
+    for (let i = 0; i < firstDay; i++) days.push({ empty: true, k: `e${i}` });
     const today = localYmd(new Date());
     for (let i = 1; i <= daysInMonth; i++) {
       const dateStr = localYmd(new Date(year, month, i));
       days.push({
         day: i,
+        k: `d${i}`,
         empty: false,
         isSelected: dateStr === this.data.historyDate,
         isToday: dateStr === today,
@@ -517,13 +566,20 @@ Page({
     const { pickerYear, pickerMonth } = this.data;
     this.setData({
       showDatePicker: true,
-      calendarDays: this._getCalendarDays(pickerYear, pickerMonth),
+      pickerDays: this._getCalendarDays(pickerYear, pickerMonth),
       pickerYearLabel: this._getPickerYearLabel(pickerYear, pickerMonth),
     });
   },
 
   closeDatePicker() {
     this.setData({ showDatePicker: false });
+    // ★ 恢复迷你日历的数据结构。
+    //   之前两个组件共用 calendarDays 这个 key, 但结构完全不同:
+    //     迷你日历   需要 item.worked / item.today / item.dateStr
+    //     日期选择器 需要 item.empty / item.isSelected / item.isToday
+    //   打开一次选择器就把 calendarDays 换成了选择器结构 →
+    //   迷你日历的"练过"圆点全消失, 而且 onDayTap 因为 !dayObj.worked 直接 return → 点不动。
+    this._buildCalendarDays();
   },
 
   // No-op: 仅用于让 .picker-modal 上的 catchtap 注册成功,
@@ -538,7 +594,7 @@ Page({
     this.setData({
       pickerYear,
       pickerMonth,
-      calendarDays: this._getCalendarDays(pickerYear, pickerMonth),
+      pickerDays: this._getCalendarDays(pickerYear, pickerMonth),
       pickerYearLabel: this._getPickerYearLabel(pickerYear, pickerMonth),
     });
   },
@@ -550,7 +606,7 @@ Page({
     this.setData({
       pickerYear,
       pickerMonth,
-      calendarDays: this._getCalendarDays(pickerYear, pickerMonth),
+      pickerDays: this._getCalendarDays(pickerYear, pickerMonth),
       pickerYearLabel: this._getPickerYearLabel(pickerYear, pickerMonth),
     });
   },
@@ -565,7 +621,7 @@ Page({
       historyDate: iso,
       displayDate: this._formatDisplayDate(iso),
       showDatePicker: false,
-      calendarDays: this._getCalendarDays(pickerYear, pickerMonth),
+      pickerDays: this._getCalendarDays(pickerYear, pickerMonth),
     });
     this._loadHistorySessions();
   },
@@ -582,7 +638,7 @@ Page({
       pickerYear: year,
       pickerMonth: month,
       pickerYearLabel: this._getPickerYearLabel(year, month),
-      calendarDays: this._getCalendarDays(year, month),
+      pickerDays: this._getCalendarDays(year, month),
     });
     this._loadHistorySessions();
   },
@@ -599,8 +655,12 @@ Page({
   },
 
   async _loadCalendarMonth(year, month) {
+    // 请求序号守卫 —— 快速翻月时, 先发的请求后到会把圆点换成别的月份
+    const reqId = (this._calReqId || 0) + 1;
+    this._calReqId = reqId;
     try {
       const res = await api.callCloud('stats.monthDates', { year, month: month + 1 });
+      if (reqId !== this._calReqId) return;
       if (this._unloaded) return;
       if (res.result && res.result.dates && Array.isArray(res.result.dates)) {
         this.setData({ calendarWorkedDays: res.result.dates });
@@ -677,7 +737,10 @@ Page({
     });
     this._loadHistorySessions();
     // 400ms 后清掉, 让动画可以再次触发
-    setTimeout(() => {
+    if (this._pulseTimer) clearTimeout(this._pulseTimer);
+    this._pulseTimer = setTimeout(() => {
+      this._pulseTimer = null;
+      if (this._unloaded) return;
       this.setData({ tappedDayDateStr: '' });
     }, 400);
   },
@@ -685,15 +748,24 @@ Page({
   async _loadHistorySessions() {
     const { historyDate } = this.data;
     if (!historyDate) return;
+    // 请求序号守卫 —— 快速切日期时, 旧日期的响应后到会把列表覆盖成别的日期
+    const reqId = (this._historyReqId || 0) + 1;
+    this._historyReqId = reqId;
     try {
       // Fetch sessions for the given date
       const res = await api.callCloud('session.list', { date: historyDate });
+      if (reqId !== this._historyReqId) return;  // 已有更新的请求
+      if (this._unloaded) return;
       if (res.result && res.result.sessions) {
         const sessions = res.result.sessions.map(s => {
           const d = new Date(s.start_time);
           const timeStr = d.toLocaleTimeString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-          const mins = Math.floor((s.duration || 0) / 60);
-          const durationStr = this.data.locale === 'zh' ? `${mins}分钟` : `${mins} MIN`;
+          const secs = Number(s.duration) || 0;
+          // 不足 1 分钟的训练原来显示 "0 MIN" / "0分钟" —— 看起来像没数据
+          const mins = Math.floor(secs / 60);
+          const durationStr = this.data.locale === 'zh'
+            ? (secs < 60 ? '不足1分钟' : `${mins}分钟`)
+            : (secs < 60 ? '<1 MIN' : `${mins} MIN`);
           return { ...s, timeStr, durationStr };
         });
         this.setData({ historySessions: sessions });
@@ -752,6 +824,11 @@ Page({
   },
 
   async stopWorkout() {
+    // 防重复提交 —— 原来没有这个守卫, 在"结束训练"确认弹窗上快速双击"确认":
+    // 第二次调用时 sessionId 已经是 null → 后端抛"缺少 sessionId" →
+    // 用户明明已经成功结束训练,却又看到一个"结束失败"的提示。
+    if (this._finishing) return;
+    this._finishing = true;
     this.setData({ showEndConfirm: false });
     const sessionId = this.data.currentSessionId || (this.data.runningSession ? (this.data.runningSession._id || this.data.runningSession.id) : null);
     const locale = app.globalData.language || 'zh';
@@ -774,23 +851,28 @@ Page({
       return;
     } finally {
       wx.hideLoading();
+      this._finishing = false;
     }
 
     if (r.result && r.result.success) {
       app.setRunningSession(null);  // 关键: 清掉全局, 否则后续 orb tap 会拿到过期数据
       this._stopTimers();
-      // Show workout summary modal — duration in ms for _computeStats
+      // Show workout summary modal
+      // ⚠️ session.duration 的语义是**秒**(后端 TIMESTAMPDIFF(SECOND, ...)),
+      //    而 workout-summary-modal 内部也是按秒换算成分钟 —— 这里传秒, 别传毫秒。
       this.setData({
         showWorkoutSummary: true,
         workoutSummarySession: {
           ...this.data.runningSession,
-          duration: elapsedMs,
+          duration: Math.max(0, Math.round(elapsedMs / 1000)),
           totalVolume,
           exerciseCount,
           exercises: this.data.exerciseGroups,
           calories: r.result.calories || 0,
         },
-        workoutSummaryExercises: this.data.exerciseGroups,
+        // 只传一份 —— 原来同一个 exerciseGroups 数组同时塞进
+        // workoutSummarySession.exercises 和 workoutSummaryExercises, 载荷翻倍。
+        // 总结弹框自己从 session.exercises 取数据, 不需要第二个副本。
         runningSession: null,
         currentSessionId: null,
         exerciseGroups: [],
@@ -803,7 +885,9 @@ Page({
       // 刷新当日训练列表 + 月度统计 (DB 已写入 end_time/duration, 但内存 historySessions 还是旧的)
       // 否则点进 session-detail-modal 会看到 '--:--' 因为 session.duration/end_time 不存在
       this._loadHistorySessions();
-      this._loadMonthlyStats();
+      this._loadMonthlyStats().catch((err) => {
+        console.warn('[index] _loadMonthlyStats failed:', err);
+      });
     }
   },
 
@@ -852,7 +936,7 @@ Page({
   },
 
   onWorkoutSummaryClose() {
-    this.setData({ showWorkoutSummary: false, workoutSummarySession: null, workoutSummaryExercises: [] });
+    this.setData({ showWorkoutSummary: false, workoutSummarySession: null });
   },
 
   openAddModal() {
@@ -860,11 +944,11 @@ Page({
   },
 
   onAddModalClose() {
-    this.setData({ showAddModal: false });
+    this.setData({ showAddModal: false, preselectedExercise: null });
   },
 
   onAddModalExerciseAdded(e) {
-    this.setData({ showAddModal: false });
+    this.setData({ showAddModal: false, preselectedExercise: null });
     const addedExerciseId = e && e.detail && e.detail.addedExerciseId;
     if (addedExerciseId != null) this._pendingAddedExerciseId = addedExerciseId;
     const sessionId = this.data.currentSessionId || (this.data.runningSession && (this.data.runningSession._id || this.data.runningSession.id));
@@ -890,7 +974,10 @@ Page({
     }
     // 新用户: welcome 结束后进入 5 步引导页
     // (welcome 现在只对真正首次访问的用户弹, 所以这里的 close 一定是新用户)
-    setTimeout(() => {
+    if (this._guideTimer) clearTimeout(this._guideTimer);
+    this._guideTimer = setTimeout(() => {
+      this._guideTimer = null;
+      if (this._unloaded) return;   // 用户已经离开页面 → 不要再把引导页弹出来
       wx.navigateTo({ url: '/pages/guide/index' });
     }, 300);
   },
@@ -902,31 +989,24 @@ Page({
     }
   },
 
-  async addExerciseToSession(item) {
+  /**
+   * 从动作库选了一个动作 → 打开"添加动作"弹框(预选该动作), 让用户填计量值。
+   *
+   * ⚠️ 原来这里是直接 `exercise.add({weight:0, reps:0})` —— 而首页的显示过滤是
+   *    `weight>0 || reps>0 || duration>0 || distance>0`,
+   *    所以这条空 set **整组不显示** → 用户"选完动作什么都没发生"。
+   *    (不只计时/距离类, 次数类也一样: weight=0 reps=0 同样被过滤掉。)
+   *    而且更糟的是这条空记录已经写进库了, 训练量/卡路里口径也跟着脏。
+   *
+   *    现在改成走添加弹框: 预选该动作 → 用户填重量/次数/秒数/公里数 → 正常入库。
+   *    这与动作库页自己的"加入训练"按钮是同一条路径, 行为一致。
+   */
+  addExerciseToSession(item) {
+    if (!item) return;
     if (!this.data.runningSession) return;
-    const sessionId = this.data.currentSessionId || this.data.runningSession.id || this.data.runningSession._id;
-    wx.showLoading({ title: 'ADDING...', mask: true });
-    // try/finally: 失败也必须解除 mask
-    let res = null;
-    try {
-      res = await api.callCloud('exercise.add', { session_id: sessionId,
-          exercise_id: item._id || item.id,
-          name_zh: item.name_zh || item.name,
-          name_en: item.name || null,
-          image_name: item.image_name || null,
-          video_name: item.video_name || null,
-          weight: 0,
-          reps: 0 });
-    } catch (err) {
-      console.error('[index] addExerciseToSession failed:', err);
-      wx.showToast({ title: this._t('LOAD_FAILED') || 'Add failed', icon: 'none' });
-      return;
-    } finally {
-      wx.hideLoading();
-    }
-
-    if (res.result && res.result.success) {
-      this._loadExerciseGroups(sessionId);  // rest timer 会在 _loadExerciseGroups 内基于最新 create_time 设置
-    }
+    this.setData({
+      showAddModal: true,
+      preselectedExercise: item,
+    });
   },
 });

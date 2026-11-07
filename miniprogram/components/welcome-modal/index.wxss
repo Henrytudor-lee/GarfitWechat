@@ -292,8 +292,13 @@
 }
 
 .btn-confirm {
-  background: var(--primary);
+  background: var(--neon-green);
   color: #000;
+}
+
+/* 禁用态: 头像上传中 / 提交中 */
+.btn-confirm.disabled {
+  opacity: 0.5;
 }
 
 /* ========================

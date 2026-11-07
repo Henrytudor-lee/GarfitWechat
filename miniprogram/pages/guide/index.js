@@ -54,16 +54,18 @@ Page({
     backText: '← 返回',
     nextText: '下一步 →',
     doneText: '去训练 →',
-    // swipe state
-    _startX: 0,
-    _startY: 0,
-    _moved: false,
   },
 
   onLoad() {
     const locale = app.globalData.language || 'zh';
     const theme = app.globalData.theme || 'night';
     const imgPrefix = app.globalData.imagePrefix || '';
+
+    // 滑动状态放实例属性, 不放 data:
+    // 原来每次 touchmove 都 setData({_moved:true}) → 一次滑动几十次跨线程 IPC。
+    this._startX = 0;
+    this._startY = 0;
+    this._moved = false;
 
     // 根据语言选择文案
     const langText = locale === 'en' ? {
@@ -96,26 +98,27 @@ Page({
 
   onTouchStart(e) {
     const t = e.touches[0];
-    this.setData({
-      _startX: t.clientX,
-      _startY: t.clientY,
-      _moved: false,
-    });
+    this._startX = t.clientX;
+    this._startY = t.clientY;
+    this._moved = false;
   },
 
   onTouchMove(e) {
     const t = e.touches[0];
-    const dx = t.clientX - this.data._startX;
-    const dy = t.clientY - this.data._startY;
-    if (!this.data._moved && Math.hypot(dx, dy) < 10) return;
-    this.setData({ _moved: true });
+    const dx = t.clientX - this._startX;
+    const dy = t.clientY - this._startY;
+    if (!this._moved && Math.hypot(dx, dy) < 10) return;
+    // 只改实例属性, 不 setData (原来每次 touchmove 都发一次 setData)
+    this._moved = true;
   },
 
   onTouchEnd(e) {
-    if (!this.data._moved) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - this.data._startX;
-    const dy = t.clientY - this.data._startY;
+    if (!this._moved) return;
+    // touchcancel / 异常情况下 changedTouches 可能是空的 → 不能直接取 [0]
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - this._startX;
+    const dy = t.clientY - this._startY;
     // 水平滑动 > 垂直滑动 才切换
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
       if (dx < 0 && this.data.currentStep < this.data.cards.length - 1) {

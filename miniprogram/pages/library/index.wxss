@@ -927,3 +927,62 @@
 .filters-fixed {
   flex-shrink: 0;
 }
+
+/* ========================
+   Error State (加载失败)
+   ======================== */
+.page.theme-day .error-text {
+  color: #a1a1aa;
+}
+
+.page.theme-day .error-subtext {
+  color: #71717a;
+}
+
+.page.theme-night .error-text {
+  color: #52525b;
+}
+
+.page.theme-night .error-subtext {
+  color: #3f3f46;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.error-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.error-subtext {
+  font-size: 22rpx;
+}
+
+.error-retry-btn {
+  margin-top: 16rpx;
+  width: 240rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0;
+  font-size: 24rpx;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+  background: var(--primary, #ccf200);
+  border: none;
+  border-radius: 100rpx;
+}
+
+.error-retry-btn::after {
+  border: none;
+}

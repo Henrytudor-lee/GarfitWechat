@@ -1,5 +1,5 @@
 <!--components/custom-tabbar/index.wxml — garcia-fitness-new bottom nav-->
-<view class="tabbar-wrap {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+<view class="tabbar-wrap {{_theme === 'day' ? 'theme-day' : 'theme-night'}}">
   <!-- Bottom Nav -->
   <view class="tabbar">
     <view
@@ -14,7 +14,7 @@
         src="{{active === item.id ? item.iconActive : item.icon}}"
         class="tab-icon-img"
       />
-      <text class="tab-label">{{item.label}}</text>
+      <text class="tab-label">{{item.labelText}}</text>
     </view>
   </view>
 </view>

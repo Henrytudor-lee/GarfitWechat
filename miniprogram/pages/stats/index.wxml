@@ -147,10 +147,17 @@
   </view>
 
   <!-- No data state -->
-  <view wx:if="{{!hasData && !loading}}" class="empty-state">
+  <view wx:if="{{!hasData && !loading && !loadError}}" class="empty-state">
     <image class="empty-icon" src="{{imgPrefix}}/icons/icon-chart.png" mode="aspectFit" />
     <text class="empty-text">{{t.NO_TRAINING_DATA_YET}}</text>
     <text class="empty-subtext">{{t.START_A_WORKOUT_TO_SEE_YOUR_STATS}}</text>
+  </view>
+
+  <!-- Load error state (失败 ≠ 没有数据) -->
+  <view wx:if="{{loadError}}" class="error-state">
+    <text class="error-text">{{t.LOAD_FAILED || 'Load failed'}}</text>
+    <text class="error-subtext">{{locale === 'zh' ? '加载失败, 点击重试' : 'Failed to load, tap to retry'}}</text>
+    <button class="error-retry-btn" bindtap="onRetry">{{locale === 'zh' ? '重试' : 'RETRY'}}</button>
   </view>
 
   <!-- Max Record Cards -->

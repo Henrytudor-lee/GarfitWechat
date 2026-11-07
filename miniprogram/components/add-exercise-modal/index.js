@@ -4,6 +4,24 @@ const api = require('../../utils/api.js');
 const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
+/**
+ * 取 i18n 字典, 并补齐可能缺失的 key。
+ *
+ * ⚠️ i18n 字典是**启动时的快照**(app.onLaunch 里取的)——
+ *    开发者新增 key 后如果没重新编译就取不到, 标签会渲染成**空白**。
+ *    实测(2026-11-07): "负重"标签空白 → 那一列比旁边矮一截 →
+ *    被 .set-item 的 align-items:center 居中后, 时长组比负重组低 8px, 整行错位。
+ *    这里兜底成 WEIGHT, 至少不空白(重新编译后正常显示"负重")。
+ *
+ * 用模块级函数而不是实例方法 —— data 的初始值可能在 methods 挂载前求值。
+ */
+function pickDict() {
+  const dict = { ...(app.globalData.t || {}) };
+  if (!dict.LOAD) dict.LOAD = dict.WEIGHT;
+  return dict;
+}
+
+
 const EQUIPMENT_LIST = [
   { id: 1, icon: 'barbell.png' },
   { id: 2, icon: 'bodyweight.png' },
@@ -62,7 +80,11 @@ Component({
       value: false,
     },
     sessionId: {
-      type: String,
+      // ⚠️ 父组件传进来的是**数字**(session id 是 int 自增主键),
+      //    属性却声明成 String → 微信框架类型不匹配会报警告,
+      //    某些基础库版本会直接丢成默认值 null → session_id 传不上去。
+      //    两个类型都声明, 兼容数字和字符串。
+      type: [String, Number],
       value: null,
     },
     preselectedExercise: {
@@ -88,7 +110,7 @@ Component({
     loading: false,
     loadingMore: false,
     imgPrefix: '',
-    t: app.globalData.t,  // 注入 i18n 字典
+    t: pickDict(),  // 注入 i18n 字典(补齐可能缺失的 key)
     vidPrefix: '',
     equipmentList: EQUIPMENT_LIST,
     muscleList: MUSCLE_LIST,
@@ -98,6 +120,7 @@ Component({
     weight: 0,
     weightStr: '0',
     reps: 0,
+    repsStr: '0',        // 次数输入框字符串(用户清空时不能被回写成 0)
     weight_unit: 'kg',
     // ── 计量方式 ──
     // 数据源: exercises_library.exercise_type (这个字段本来就有)
@@ -137,7 +160,7 @@ Component({
             imgPrefix: imgPrefix || '',
             vidPrefix: vidPrefix || '',
             locale: app.globalData.language || 'zh',
-            t: app.globalData.t,
+            t: pickDict(),
           });
         }
         this._loadSavedFilters();
@@ -156,6 +179,7 @@ Component({
   },
 
   methods: {
+
     _reset(imgPrefix, vidPrefix) {
       if (this._searchTimer) {
         clearTimeout(this._searchTimer);
@@ -188,9 +212,10 @@ Component({
         weight: 0,
         weightStr: '0',
         reps: 0,
+        repsStr: '0',
         weight_unit: 'kg',
         countMode: 'weight_reps',
-        setTitle: (app.globalData.t || {}).SET_WEIGHT_REPS || '设置重量和次数',
+        setTitle: titleForMode(app.globalData.t || {}),
         historyMax: null,
         submitting: false,
         imgPrefix: imgPrefix || '',
@@ -248,9 +273,15 @@ Component({
       try {
         const res = await api.callCloud('exercise.getUserExercises');
         if (res.result && res.result.success) {
+          const favor = res.result.favor_exercises || [];
+          const practiced = res.result.practiced_exercises || [];
+          // ⚠️ 之前只写组件内的 data, app.globalData.favorExercises 还是旧值
+          //    → 两份状态分叉(本组件显示已收藏, 别的页面看不到, 重启后 storage 也是旧的)。
+          //    统一走 app.applyExerciseFlags → globalData + storage 一起更新。
+          app.applyExerciseFlags({ favor_exercises: favor, practiced_exercises: practiced });
           this.setData({
-            favorExercises: res.result.favor_exercises || [],
-            practicedExercises: res.result.practiced_exercises || [],
+            favorExercises: favor,
+            practicedExercises: practiced,
           });
         }
       } catch (err) {
@@ -289,11 +320,14 @@ Component({
     },
 
     goBack() {
+      // 作废在飞的历史请求: 用户已返回, 回包不能把上一个动作的数据写回来
+      this._historyReqId = null;
       this.setData({
         step: 'pick',
         selectedItem: null,
         weight: 0,
         reps: 0,
+        repsStr: '0',
         historyMax: null,
       });
       // step 切换后 step1 视图重新挂载, scroll-view 是新的, 滚动位置归零.
@@ -382,7 +416,17 @@ Component({
     },
 
     async loadList(reset = false) {
-      if (this.data.loading || this.data.loadingMore) return;
+      // ⚠️ 之前这里直接 return, 把所有过滤/搜索刷新全吞了:
+      //    刷新入口(selectMuscle/selectEquipment/onSearch/onFavorFilterTap …)
+      //    都会先 setData({list: []}) 再 loadList(true),
+      //    此刻若有请求在飞 → 新筛选条件永远发不到后端 → 网格显示旧筛选结果,
+      //    而筛选 chip 已经显示新条件; 更糟的是在飞请求返回时把 page 写成 page+1
+      //    → 之后 loadMore 拉的是新筛选的第 2 页, 新筛选第 1 页永远缺失。
+      //    改成"不丢弃请求": 记一个 pending, 等当前请求收尾后重跑一次。
+      if (this.data.loading || this.data.loadingMore) {
+        this._pendingReload = true;
+        return;
+      }
 
       const page = reset ? 1 : this.data.page;
       if (!reset && !this.data.hasMore) return;
@@ -397,45 +441,51 @@ Component({
 
       const { keyword, selectedEquipment, selectedMuscle, favorExercises, practicedExercises, filterFavor, filterPracticed } = this.data;
 
-      const res = await api.callCloud('library.list', { keyword,
-          equipmentId: selectedEquipment ? selectedEquipment : '',
-          bodyPart: selectedMuscle ? selectedMuscle : '',
-          page,
-          pageSize: this.data.pageSize,
-          isFavor: filterFavor,
-          isPracticed: filterPracticed,
-          favorExerIds: favorExercises,
-          practicedExerIds: practicedExercises });
+      try {
+        const res = await api.callCloud('library.list', { keyword,
+            equipmentId: selectedEquipment ? selectedEquipment : '',
+            bodyPart: selectedMuscle ? selectedMuscle : '',
+            page,
+            pageSize: this.data.pageSize,
+            isFavor: filterFavor,
+            isPracticed: filterPracticed,
+            favorExerIds: favorExercises,
+            practicedExerIds: practicedExercises });
 
-      this.setData({ loading: false, loadingMore: false });
+        if (res.result && res.result.success) {
+          const items = (res.result.list || []).map(item => {
+            const id = item.id;
+            return {
+              ...item,
+              equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
+              equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
+              muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
+              muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
+              muscle_name_zh: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP_ZH[id.trim()] || '').filter(Boolean).join(', '),
+              is_favorite: favorExercises.includes(id),
+              is_practiced: practicedExercises.includes(id),
+            };
+          });
 
-      if (res.result && res.result.success) {
-        const items = (res.result.list || []).map(item => {
-          const id = item.id;
-          return {
-            ...item,
-            equipment_name: EQUIP_MAP[String(item.equipment_id)] || 'Other',
-            equipment_icon: EQUIP_ICON_MAP[String(item.equipment_id)] || '',
-            muscle_name: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP[id.trim()] || '').filter(Boolean).join(', '),
-            muscle_icons: String(item.body_part_id || '').split(',').map(id => MUSCLE_ICON_MAP[id.trim()] || '').filter(Boolean).slice(0, 2),
-            muscle_name_zh: String(item.body_part_id || '').split(',').map(id => BODY_PART_MAP_ZH[id.trim()] || '').filter(Boolean).join(', '),
-            is_favorite: favorExercises.includes(id),
-            is_practiced: practicedExercises.includes(id),
-          };
-        });
+          // Sort: practiced first, then favorited, then rest
+          const sorted = sortByPracticedThenFavor(items);
 
-        // Sort: practiced first, then favorited, then rest
-        const sorted = items.sort((a, b) => {
-          if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
-          if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
-          return 0;
-        });
-
-        this.setData({
-          list: reset ? sorted : [...this.data.list, ...sorted],
-          hasMore: items.length >= this.data.pageSize,
-          page: page + 1,
-        });
+          this.setData({
+            list: reset ? sorted : [...this.data.list, ...sorted],
+            hasMore: items.length >= this.data.pageSize,
+            page: page + 1,
+          });
+        }
+      } catch (err) {
+        console.error('loadList failed', err);
+      } finally {
+        // 收尾: 先把 loading 落下, 再补跑挂起的刷新
+        // (递归前先清 pending 标志 → 不会无限递归)
+        this.setData({ loading: false, loadingMore: false });
+        if (this._pendingReload) {
+          this._pendingReload = false;
+          this.loadList(true);
+        }
       }
     },
 
@@ -450,14 +500,20 @@ Component({
 
     _selectExercise(item) {
       const mode = normalizeCountMode(item);
+      // 归属标记: 在飞的历史请求要跟这个 id 比对, 否则会写回上一个动作的数据
+      this._historyReqId = item && item.id != null ? item.id : null;
       this.setData({
         selectedItem: item,
         step: 'set',
         weight: 0,
         weightStr: '0',
         reps: 0,
+        repsStr: '0',
+        // ⚠️ 之前没重置 → 上一个动作的 LAST badge 会串到新动作上,
+        // 点一下就把上一个动作的重量写进新动作。
+        historyMax: null,
         countMode: mode,
-        setTitle: titleForMode(mode, app.globalData.t || {}),
+        setTitle: titleForMode(app.globalData.t || {}),
         isDuration: isDurationMode(mode),
         isDistance: isDistanceMode(mode),
         timerRequired: isDurationMode(mode),
@@ -473,8 +529,18 @@ Component({
       const userId = app.globalData.userId;
       if (!userId || !item) return;
 
+      // 记住这次请求属于哪个动作(用实例字段, 不读 this.data.selectedItem.id ——
+      // 那个值可能已经被下一次选择覆盖, 拿它比对会误判)
+      const reqId = item.id;
+
       try {
         const res = await api.callCloud('exercise.getMaxWeight', { exerciseId: item.id });
+
+        // 归属校验: 用户可能已经选了别的动作(或点了返回),
+        // 这时回包必须丢掉, 否则上一个动作的 historyMax/weight/reps 会被写回来
+        if (this._historyReqId == null || Number(this._historyReqId) !== Number(reqId)) return;
+        const cur = this.data.selectedItem;
+        if (!cur || Number(cur.id) !== Number(reqId)) return;
 
         if (res.result && res.result.success && res.result.data) {
           const d = res.result.data;
@@ -483,12 +549,19 @@ Component({
             weight: d.weight,
             weightStr: formatNumberForInput(d.weight),
             reps: d.reps || 0,
+            repsStr: String(d.reps || 0),
             weight_unit: d.weight_unit || 'kg',
           };
           // 计时类动作: 回填历史秒数(新字段, 老数据为 null → 保持 0)
           if (d.duration_sec != null) {
             patch.durationSec = d.duration_sec || 0;
             patch.historyMax = Object.assign({}, patch.historyMax, { duration_sec: d.duration_sec });
+          }
+          // 距离类动作: 回填历史公里数(新字段, 老数据为 null → 保持 0)
+          if (d.distance_km != null) {
+            patch.distanceKm = d.distance_km;
+            patch.distanceStr = formatNumberForInput(d.distance_km);
+            patch.historyMax = Object.assign({}, patch.historyMax, { distance_km: d.distance_km });
           }
           this.setData(patch);
           this._syncCanSubmit();
@@ -500,9 +573,39 @@ Component({
 
     applyHistory() {
       const h = this.data.historyMax;
-      if (h) {
-        this.setData({ weight: h.weight, weightStr: formatNumberForInput(h.weight), reps: h.reps });
+      if (!h) return;
+      const { isDuration, isDistance } = this.data;
+      if (isDuration) {
+        // 计时类: 回填秒数 + 负重(上次这个动作手握了多重的哑铃)
+        const patch = {};
+        if (h.duration_sec != null) patch.durationSec = h.duration_sec;
+        if (Number(h.weight) > 0) {
+          patch.weight = h.weight;
+          patch.weightStr = formatNumberForInput(h.weight);
+        }
+        this.setData(patch);
+      } else if (isDistance) {
+        // 距离类: 回填公里数 + 负重(时长可选, 不回填)
+        const patch = {};
+        if (h.distance_km != null) {
+          patch.distanceKm = h.distance_km;
+          patch.distanceStr = formatNumberForInput(h.distance_km);
+        }
+        if (Number(h.weight) > 0) {
+          patch.weight = h.weight;
+          patch.weightStr = formatNumberForInput(h.weight);
+        }
+        this.setData(patch);
+      } else {
+        // 重量次数类: 原逻辑
+        this.setData({
+          weight: h.weight,
+          weightStr: formatNumberForInput(h.weight),
+          reps: h.reps || 0,
+          repsStr: String(h.reps || 0),
+        });
       }
+      this._syncCanSubmit();
     },
 
     /**
@@ -563,7 +666,12 @@ Component({
     },
 
     onRepsInput(e) {
-      this.setData({ reps: Number(e.detail.value) || 0 });
+      // ⚠️ input.value 必须绑字符串字段: 用户全选删除时 e.detail.value = '',
+      //    直接 Number('')||0 → 0 → setData 把 0 写回输入框 → 框里立刻显示 "0",
+      //    还得再删一次; 而且"空串"被当成 0 提交。
+      const raw = e.detail.value;
+      const num = parseInt(raw, 10);
+      this.setData({ repsStr: raw, reps: isNaN(num) ? 0 : num });
       this._syncCanSubmit();
     },
 
@@ -580,12 +688,14 @@ Component({
     },
 
     incReps() {
-      this.setData({ reps: this.data.reps + 1 });
+      const v = (this.data.reps || 0) + 1;
+      this.setData({ reps: v, repsStr: String(v) });
       this._syncCanSubmit();
     },
 
     decReps() {
-      this.setData({ reps: Math.max(0, this.data.reps - 1) });
+      const v = Math.max(0, (this.data.reps || 0) - 1);
+      this.setData({ reps: v, repsStr: String(v) });
       this._syncCanSubmit();
     },
 
@@ -596,7 +706,8 @@ Component({
     },
 
     setReps(e) {
-      this.setData({ reps: Number(e.currentTarget.dataset.val) });
+      const v = Number(e.currentTarget.dataset.val) || 0;
+      this.setData({ reps: v, repsStr: String(v) });
       this._syncCanSubmit();
     },
 
@@ -609,6 +720,12 @@ Component({
     onTimerChange(e) {
       this.setData({ durationSec: e.detail.seconds || 0 });
       this._syncCanSubmit();
+    },
+
+    // set-timer 计到上限(3600 秒)会触发 finish 事件:
+    // 父组件原来只绑了 bindchange → 到上限静默停止, 用户毫无感知 → 弹个提示
+    onTimerFinish() {
+      wx.showToast({ title: '已达计时上限', icon: 'none' });
     },
 
     async confirmAdd() {
@@ -663,6 +780,12 @@ Component({
           name_en: selectedItem.name || null,
           image_name: selectedItem.image_name || null,
           video_name: selectedItem.video_name || null,
+          // ⚠️ 2026-11-07 修正: 原来对计时/距离类强制 weight = 0
+          //    ("不按重量计量")。但计时/距离类动作**可以是负重的**
+          //    (手握哑铃的交叉跳跃、负重爬坡步行) → 强制置 0 会把负重直接丢掉,
+          //    而 UI 上还留着重量输入框, 填了也存不进去。
+          //    现在三种模式都提交真实重量; 0 = 自重。
+          //    reps 仍然是次数类专属: 计时类按时长、距离类按距离, 次数存 0(不适用)。
           weight,
           reps: (isDuration || isDistance) ? 0 : reps,
           weight_unit: weight_unit,
@@ -704,6 +827,7 @@ Component({
       const isFav = favorExercises.includes(id);
 
       // Optimistic update
+      const oldFav = favorExercises;   // 回滚用快照
       const newFav = isFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
       this.setData({ favorExercises: newFav });
 
@@ -712,7 +836,7 @@ Component({
         if (item.id === id) return { ...item, is_favorite: !isFav };
         return item;
       });
-      this.setData({ list });
+      this.setData({ list: sortByPracticedThenFavor(list) });
 
       // Call cloud function
       api.callCloud('exercise.toggleFavorite', { exercise_id: id })
@@ -721,9 +845,28 @@ Component({
           if (Array.isArray(list)) {
             app.applyExerciseFlags({ favor_exercises: list });
             this.setData({ favorExercises: list });
+            // 服务端才是事实来源 → 用服务端列表重算 is_favorite 并重排
+            this.setData({ list: this._applyFavorFlagsToList(list) });
           }
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.error('toggleFavorite failed', err);
+          // ⚠️ 之前是 .catch(() => {}) → 服务器拒绝后心形一直保持翻转,
+          //    既不回滚也不提示 → 回滚 + 提示
+          this.setData({ favorExercises: oldFav });
+          this.setData({ list: this._applyFavorFlagsToList(oldFav) });
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
+    },
+
+    // 用给定的收藏 id 列表重算列表项的 is_favorite, 并按"已练过优先→已收藏优先"重排
+    _applyFavorFlagsToList(favIds) {
+      const favSet = new Set((favIds || []).map(x => Number(x)));
+      const items = (this.data.list || []).map(item => ({
+        ...item,
+        is_favorite: favSet.has(Number(item.id)),
+      }));
+      return sortByPracticedThenFavor(items);
     },
 
     // step 2 头部右侧的 favorite 按钮: 直接切换 selectedItem 的 is_favorite
@@ -732,9 +875,10 @@ Component({
       if (!item) return;
       const id = item.id;
       const wasFav = !!item.is_favorite;
+      const { favorExercises } = this.data;
+      const oldFav = favorExercises;   // 回滚用快照
       // optimistic update
       this.setData({ 'selectedItem.is_favorite': !wasFav });
-      const { favorExercises } = this.data;
       const newFav = wasFav
         ? favorExercises.filter(fid => fid !== id)
         : [...favorExercises, id];
@@ -742,7 +886,7 @@ Component({
       // 同步 list 里对应项 (如果 step=set 时 list 还在)
       if (this.data.list && this.data.list.length > 0) {
         const list = this.data.list.map(it => it.id === id ? { ...it, is_favorite: !wasFav } : it);
-        this.setData({ list });
+        this.setData({ list: sortByPracticedThenFavor(list) });
       }
       // cloud call
       api.callCloud('exercise.toggleFavorite', { exercise_id: id })
@@ -751,12 +895,35 @@ Component({
           if (Array.isArray(list)) {
             app.applyExerciseFlags({ favor_exercises: list });
             this.setData({ favorExercises: list });
+            // 服务端才是事实来源 → 用服务端列表纠正乐观值
+            this.setData({ 'selectedItem.is_favorite': list.includes(id) });
+            this.setData({ list: this._applyFavorFlagsToList(list) });
           }
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.error('toggleFavorite failed', err);
+          // 失败回滚 + 提示(心形不能一直保持翻转)
+          this.setData({ favorExercises: oldFav, 'selectedItem.is_favorite': wasFav });
+          this.setData({ list: this._applyFavorFlagsToList(oldFav) });
+          wx.showToast({ title: '操作失败', icon: 'none' });
+        });
     },
   },
 });
+
+/**
+ * 列表排序: 已练过优先 → 已收藏优先 → 其余保持原顺序。
+ *
+ * 提取成模块级函数, 让"收藏状态变化后重排"能复用同一套规则
+ * (列表加载 / 乐观更新回滚 / 服务端纠正 都要重排)。
+ */
+function sortByPracticedThenFavor(items) {
+  return items.sort((a, b) => {
+    if (b.is_practiced !== a.is_practiced) return b.is_practiced ? 1 : -1;
+    if (b.is_favorite !== a.is_favorite) return b.is_favorite ? 1 : -1;
+    return 0;
+  });
+}
 
 /**
  * 取动作的计量方式。
@@ -780,10 +947,14 @@ function normalizeCountMode(item) {
  * 之前无论什么动作都叫"设置重量和次数", 计时类动作(平板支撑)进去
  * 显示"设置重量和次数"但下面只有一个计时器, 文案对不上。
  */
-function titleForMode(mode, t) {
-  if (mode === 'duration') return t.SET_DURATION || '设置时长';
-  if (mode === 'distance_duration') return t.SET_DISTANCE || '设置距离和时长';
-  return t.SET_WEIGHT_REPS || '设置重量和次数';
+function titleForMode(t) {
+  // ⚠️ 2026-11-07 改: 原来按计量方式分三种标题
+  //    (设置时长 / 设置距离和时长 / 设置重量和次数),
+  //    但现在**三种模式都能设负重** —— 计时类动作标题写着"设置时长",
+  //    下面却有负重输入框, 文案和内容对不上。
+  //    统一改成"动作配置": 对三种模式都成立, 兼容性最高,
+  //    以后再加新的计量方式也不用改标题。
+  return t.ACTION_SETUP || '动作配置';
 }
 
 /**

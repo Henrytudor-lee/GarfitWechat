@@ -14,7 +14,11 @@ Component({
       value: null,
     },
     sessionId: {
-      type: String,
+      // ⚠️ 父组件传进来的是**数字**(session id 是 int 自增主键),
+      //    属性却声明成 String → 微信框架类型不匹配会报警告,
+      //    某些基础库版本会直接丢成默认值 null → session_id 传不上去。
+      //    两个类型都声明, 兼容数字和字符串。
+      type: [String, Number],
       value: null,
     },
     locale: {
@@ -46,6 +50,8 @@ Component({
           _locale: locale,
           _theme: theme,
           _dateStr: this._computeDateStr(),
+          // i18n 字典要从 app.globalData 重新取, 否则切换语言后弹框里还是旧语言
+          t: app.globalData.t || {},
         });
       }
     },
@@ -76,14 +82,20 @@ Component({
       }
     },
 
+    onSheetTap() {
+      // 空实现: catchtap 用来阻止点击冒泡到遮罩
+    },
+
     closeModal() {
       this.triggerEvent('close');
     },
 
     _computeStats(session) {
       const exerciseList = session.exercises || [];
-      const durationMs = session.duration || 0;
-      const totalMinutes = Math.round(durationMs / 60000);
+      // ⚠️ session.duration 的单位是**秒**(后端 TIMESTAMPDIFF(SECOND, ...)),
+      //    调用方负责传秒(客户端毫秒 / 1000), 这里按秒换算分钟, 不要按毫秒
+      const durationSec = Number(session.duration) || 0;
+      const totalMinutes = Math.round(durationSec / 60);
       const hours = Math.floor(totalMinutes / 60);
       const mins = totalMinutes % 60;
       const locale = app.globalData.language || 'zh';
@@ -97,7 +109,14 @@ Component({
       // 卡路里 v1: 按该组的计量方式算 —— 计时类走 MET 法, 距离类走距离法
       const groups = exerciseList.map((ex) => {
         const cal = calcSetsCalories(ex.sets || [], userWeight);
-        return { ...ex, totalCalories: cal };
+        return {
+          ...ex,
+          // sets 恒为数组, 否则 wxml 里 item.sets.length 会报错
+          sets: Array.isArray(ex.sets) ? ex.sets : [],
+          // id 用动作 id, 保证 wx:key 唯一
+          id: ex.exercise_id || ex.id,
+          totalCalories: cal,
+        };
       });
       // 如果没有已存储的 calories, 从各组的 calories 求和
       if (!totalCalories) {

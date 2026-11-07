@@ -4,6 +4,7 @@
       catchtouchstart="onTouchStart"
       catchtouchmove="onTouchMove"
       catchtouchend="onTouchEnd"
+      catchtouchcancel="onTouchEnd"
       hover-class="orb-tap">
   <!-- 旋转光圈 (loading 效果, 仅 running 时显示) -->
   <view wx:if="{{hasSession}}" class="orb-aura"></view>

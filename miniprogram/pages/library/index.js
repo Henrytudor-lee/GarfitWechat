@@ -2,6 +2,29 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 
+/**
+ * 归一化筛选 chip 的 id
+ *
+ * 本页的"全部" chip 用 data-id="{{null}}" 表示, 渲染出来是空串(或字符串 "null")。
+ * 具体动作的 chip 是数字 id, 但 dataset 取出来可能是字符串。
+ *
+ *   '' / 'null' / null / undefined → null   (表示"全部")
+ *   '0' / '2' / 2                → 数字    (具体的肌群/器械 id)
+ *
+ * 两个坑, 都踩过:
+ *   1. 不归一化 → 字符串 '0' 是 truthy, 前端 `selectedMuscle ? ... : ''` 判成"要筛选"
+ *      → 后端 FIND_IN_SET('0', body_part_id) → 动作列表全空
+ *   2. 直接 Number() → Number('') = 0, Number('null') = NaN,
+ *      而本页的高亮判断是 `=== null` → 点"全部"反而不高亮
+ */
+function normalizeFilterId(raw) {
+  if (raw === null || raw === undefined) return null;
+  const s = String(raw).trim();
+  if (s === '' || s === 'null') return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 const EQUIPMENT_LIST = [
   { id: 1,  name: 'Barbell',         name_zh: '杠铃',        icon: 'barbell.png' },
   { id: 2,  name: 'Body weight',     name_zh: '自重',        icon: 'bodyweight.png' },
@@ -108,6 +131,7 @@ Page({
     pageSize: 20,
     hasMore: false,
     loading: false,
+    loadError: false,   // 请求失败态: 与"真的没有动作"区分开
     imgPrefix: '',
     vidPrefix: '',
     selectedExercise: null,
@@ -151,6 +175,8 @@ Page({
     }
     // Refresh session orb (running session indicator)
     this._loadOrbSession();
+    // 收藏/练过标记: openid 可能在 onLoad 时还没就绪, 这里再兜一次
+    this._loadUserExercises();
   },
 
   async _loadOrbSession() {
@@ -169,10 +195,22 @@ Page({
   },
 
   async _loadUserExercises() {
-    if (!app.globalData.openid) return;
+    // 防止 onLoad/onShow 重复请求: 标记位比"数组非空"更准
+    // (用户真的一个收藏都没有时数组也是空, 用非空判断会每次 onShow 都再拉一次)
+    if (this._userExercisesFetched) return;
+    if (this.data.favorExercises.length > 0 || this.data.practicedExercises.length > 0) return;
+
+    // ⚠️ 原来直接读 app.globalData.openid 判断, 登录还没完成时就 return,
+    //    而 onLoad 之后没有再拉的机会 → 收藏/练过标记永远是空,
+    //    "♥ 收藏" / "☑ 已练过" 两个筛选恒返回空列表。
+    //    改成等鉴权就绪 (app.whenAuthReady 内部复用 onLaunch 的 loginPromise, 不会轮询)。
+    const openid = await app.whenAuthReady();
+    if (!openid) return;
+
     try {
       const res = await api.callCloud('exercise.getUserExercises');
       if (res.result && res.result.success) {
+        this._userExercisesFetched = true;
         this.setData({
           favorExercises: res.result.favor_exercises || [],
           practicedExercises: res.result.practiced_exercises || [],
@@ -189,10 +227,16 @@ Page({
     //    早到的旧响应被丢弃, 避免"选了新筛选却显示旧数据".
     // 2) loading 只用于挡住 loadMore 的重复触发; 筛选(reset=true)必须能打断正在飞的请求,
     //    否则入口处"先清空 list 再 loadList"会因为 loading 而被静默吞掉 → 白屏.
+    // ⚠️ 守卫必须在**序号自增之前**:
+    //   反过来的话, 被守卫挡掉的那次调用已经把序号顶掉了,
+    //   在途请求回来时 reqId !== this._listReqId → 结果被丢弃,
+    //   finally 里的 loading:false 也因同一判断不执行 → **loading 永久卡在 true**,
+    //   此后所有 loadMore 都被守卫挡掉 → 列表永远翻不到下一页。
+    if (!reset && this.data.loading) return;
     const reqId = (this._listReqId || 0) + 1;
     this._listReqId = reqId;
-    if (!reset && this.data.loading) return;  // 加载中重复触发 loadMore, 忽略
-    this.setData({ loading: true });
+    // 重试/新筛选开始 → 先把上一次的失败态清掉
+    this.setData({ loading: true, loadError: false });
 
     const page = reset ? 1 : this.data.page;
     const { keyword, selectedEquipment, selectedMuscle, filterFavor, filterPracticed, favorExercises, practicedExercises } = this.data;
@@ -253,6 +297,9 @@ Page({
         console.error('[library] loadList failed:', err);
         const dict = this.data.t || {};
         wx.showToast({ title: dict.LOAD_FAILED || 'Load failed', icon: 'none' });
+        // ⚠️ 失败 ≠ 空列表: 不置 loadError 的话, wxml 会显示"没有找到动作",
+        //    用户以为库里真没有这个动作, 而不是加载失败。
+        this.setData({ loadError: true });
       }
     } finally {
       if (reqId === this._listReqId) this.setData({ loading: false });
@@ -269,16 +316,14 @@ Page({
   },
 
   onEquipmentTap(e) {
-    const id = e.currentTarget.dataset.id;
+    const id = normalizeFilterId(e.currentTarget.dataset.id);
     if (id === this.data.selectedEquipment) return;
     this.setData({ selectedEquipment: id, page: 1, list: [] });
     this.loadList(true);
   },
 
   onMuscleTap(e) {
-    // ⚠️ 同 add-exercise-modal: dataset 是字符串, "0" 是 truthy,
-    //    不转数字会让"全部"变成 FIND_IN_SET('0', body_part_id) → 列表空
-    const id = Number(e.currentTarget.dataset.id);
+    const id = normalizeFilterId(e.currentTarget.dataset.id);
     if (id === this.data.selectedMuscle) return;
     this.setData({ selectedMuscle: id, page: 1, list: [] });
     this.loadList(true);
@@ -304,9 +349,10 @@ Page({
     const item = e.currentTarget.dataset.item;
     if (this.data.isSelectMode) {
       // Return selected exercise to previous page
-      const pages = getCurrentPages();
-      const prev = pages[pages.length - 2];
-      if (prev) prev.setData({ chosenExercise: item });
+      // ⚠️ 必须写 globalData —— 上一页(index)读的是 app.globalData.chosenExercise,
+      //    原来这里写的是 prev.setData({chosenExercise}), 两条通道从未对接上,
+      //    导致"从动作库选一个动作加进训练"完全失效(点了没反应)。
+      getApp().globalData.chosenExercise = item;
       this.setData({ selectedExercise: null }); // 清理，防止 navigateBack 失败时 sheet 卡住
       wx.navigateBack();
     } else {
@@ -326,6 +372,9 @@ Page({
     const { favorExercises } = this.data;
     const isFav = favorExercises.includes(id);
 
+    // 快照: 请求失败时要能把 UI 恢复成请求前的样子
+    const prevFavor = favorExercises;
+
     // Optimistic update
     const newFav = isFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
     this.setData({ favorExercises: newFav });
@@ -344,7 +393,17 @@ Page({
           this.setData({ favorExercises: list });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        // 乐观更新必须回滚: 否则心形变了但服务端没变, 下次进页面又跳回去
+        console.error('[library] toggleFavorite failed:', err);
+        this.setData({
+          favorExercises: prevFavor,
+          list: this.data.list.map(item => (
+            item.id === id ? { ...item, is_favorite: isFav } : item
+          )),
+        });
+        wx.showToast({ title: '操作失败', icon: 'none' });
+      });
   },
 
   onDetailFavTap() {
@@ -353,6 +412,10 @@ Page({
     const id = ex.id;
     const { favorExercises } = this.data;
     const wasFav = favorExercises.includes(id);
+
+    // 快照: 请求失败时要能把 UI + 全局状态恢复成请求前的样子
+    const prevFavor = favorExercises;
+    const prevSelected = ex;
 
     // Optimistic update: sync global + page state
     const newFav = wasFav ? favorExercises.filter(fid => fid !== id) : [...favorExercises, id];
@@ -387,7 +450,21 @@ Page({
           this.setData({ favorExercises: list });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        // 乐观更新必须回滚: 弹层心形 / 列表心形 / 全局收藏都要还原, 并给用户提示
+        console.error('[library] toggleFavorite failed:', err);
+        this.setData({
+          favorExercises: prevFavor,
+          selectedExercise: { ...prevSelected, is_favorite: wasFav },
+          list: this.data.list.map(item => (
+            item.id === id ? { ...item, is_favorite: wasFav } : item
+          )),
+        });
+        if (app.globalData) {
+          app.globalData.favorExercises = prevFavor;
+        }
+        wx.showToast({ title: '操作失败', icon: 'none' });
+      });
   },
 
   onVideoTap(e) {
@@ -395,14 +472,26 @@ Page({
     e.stopPropagation();
   },
 
+  // 空事件处理器: wxml 里 catchtouchmove="noop" / catchtap="noop" 需要它存在,
+  // 否则每次触摸遮罩都会抛 "noop is not a function"
+  noop() {},
+
   async addToWorkout(e) {
     const item = e.currentTarget.dataset.item;
-    this.setData({ selectedExercise: null });
-
-    const app = getApp();
-    if (!app.globalData.userId) return;
 
     if (this.data.addingToWorkout) return;  // 防重复点击
+
+    // ⚠️ 原来是"先关弹层, 再判断登录状态, 不满足就静默 return" ——
+    //    弹层消失后用户完全没有反馈, 也不知道点"加入训练"到底生效没有。
+    //    改成: 等鉴权就绪 → 不满足就提示并且**保留弹层**, 满足才关弹层。
+    const openid = await app.whenAuthReady();
+    if (!openid || !app.globalData.userId) {
+      wx.showToast({ title: '登录中，请稍后重试', icon: 'none' });
+      return;
+    }
+
+    this.setData({ selectedExercise: null });
+
     this.setData({ addingToWorkout: true });
     wx.showLoading({ title: 'LOADING...', mask: true });
 
@@ -456,9 +545,8 @@ Page({
 
   doSelect(e) {
     const item = e.currentTarget.dataset.item;
-    const pages = getCurrentPages();
-    const prev = pages[pages.length - 2];
-    if (prev) prev.setData({ chosenExercise: item });
+    // ⚠️ 同上: 读端是 app.globalData.chosenExercise, 写端必须一致
+    getApp().globalData.chosenExercise = item;
     this.setData({ selectedExercise: null });
     wx.navigateBack();
   },

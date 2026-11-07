@@ -207,6 +207,13 @@
   gap: 8rpx;
 }
 
+/* ⚠️ 同一行里的三个控件(± 按钮 / 输入框 / 单位切换)高度必须完全一致,
+   否则一行内参差不齐。
+   实测(2026-11-07, 用户截图 + 像素测量):
+     .field-btn   48rpx 固定
+     .field-input 没写 height → 被内容撑到 ~65rpx   ← 高出 17rpx
+     .unit-btn    由 padding 撑出 ~44rpx            ← 矮 4rpx
+   现在统一到 48rpx, 输入框用 line-height 让文字垂直居中。 */
 .field-btn {
   width: 48rpx;
   height: 48rpx;
@@ -222,6 +229,10 @@
 .field-input {
   flex: 1;
   min-width: 0;
+  height: 48rpx;
+  line-height: 48rpx;     /* 文字垂直居中 */
+  padding: 0 4rpx;        /* 上下 padding 去掉(高度已由 line-height 承担) */
+  box-sizing: border-box; /* border 算进 48rpx, 否则实际是 50 */
   text-align: center;
   font-size: 28rpx;
   font-weight: 700;
@@ -229,22 +240,28 @@
   background: transparent;
   border: 1rpx solid rgba(255, 255, 255, 0.1);
   border-radius: 12rpx;
-  padding: 8rpx 4rpx;
 }
 
 /* Unit toggle */
 .unit-toggle {
   display: flex;
+  height: 48rpx;
+  box-sizing: border-box;   /* border 算进 48rpx */
+  align-items: center;
   border-radius: 12rpx;
   overflow: hidden;
   border: 1rpx solid rgba(255, 255, 255, 0.1);
 }
 
 .unit-btn {
-  padding: 8rpx 16rpx;
+  height: 46rpx;            /* 48 - 上下 border 2rpx */
+  padding: 0 16rpx;
   font-size: 20rpx;
   font-weight: 700;
   color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s;
 }
 

@@ -8,6 +8,15 @@ const FAB_BOTTOM_RPX = 200;
 const FAB_SIZE_RPX = 112;
 const FAB_GAP_RPX = 20;  // orb 移到 fab 上方时, 留 20rpx 间距
 
+/**
+ * 判定"拖拽"而不是"点击"的位移阈值 (rpx)
+ *
+ * ⚠️ 原来只有 8rpx (375pt 宽机型上约 4px) —— 手指轻微抖一下就被判成拖拽:
+ *    点击被吞掉, 球还"啪"地吸到屏幕边缘。
+ *    提到 20rpx (约 10px), 正常点击不会误判, 但拖动仍然跟手。
+ */
+const DRAG_THRESHOLD_RPX = 20;
+
 // 屏宽高 (rpx)
 const sysInfo = wx.getSystemInfoSync();
 const SCREEN_WIDTH_RPX = 750;  // 设计稿基准
@@ -59,13 +68,10 @@ Component({
     _tickHandle: null,
     positionX: DEFAULT_X,
     positionY: IDLE_Y,
-    // drag state (全部 rpx)
+    // dragging 要参与渲染(样式), 放 data;
+    // 拖拽的中间量(_wasDragging / _dragStart* / _origin*)改放实例属性 ——
+    // 每次 touchmove 都 setData 会造成几十次逻辑层↔视图层 IPC。
     dragging: false,
-    _dragStartX: 0,
-    _dragStartY: 0,
-    _originX: 0,
-    _originY: 0,
-    _wasDragging: false,
   },
 
   observers: {
@@ -107,8 +113,11 @@ Component({
       } else {
         this._stopTick();
         this.setData({ durationDisplay: '00:00' });
-        // idle → 回到右下角默认位置
+        // idle → 回到右下角默认位置。
+        // ⚠️ 必须同步写回 storage —— 原来只改了内存位置,
+        //    结果是"结束训练瞬间球跳回右下角, 重启小程序后又回到拖拽前的旧位置"。
         this.setData({ positionX: DEFAULT_X, positionY: IDLE_Y });
+        wx.setStorageSync(STORAGE_KEY, { x: DEFAULT_X, y: IDLE_Y });
       }
     },
 
@@ -134,40 +143,41 @@ Component({
     },
 
     onTap() {
-      if (this.data._wasDragging) return;
+      if (this._wasDragging) return;
+      // ★ 只用 triggerEvent, **不要**再直接调 page.onOrbTap
+      //   四个页面都绑了 bind:orb-tap="onOrbTap", 事件本来就会触发;
+      //   之前那个"fallback"直调会让回调跑两遍 →
+      //   无进行中 session 时点一下悬浮球 → startWorkout() 两次 →
+      //   ensureRunningSession 并发 → 两次 session.create →
+      //   **数据库出现两个 running session**。
       this.triggerEvent('orb-tap', { hasSession: this.data.hasSession });
-      // fallback: 如果事件没穿透, 直接调页面方法
-      const pages = getCurrentPages();
-      const page = pages[pages.length - 1];
-      if (page && typeof page.onOrbTap === 'function') {
-        page.onOrbTap({ hasSession: this.data.hasSession });
-      }
     },
 
     onTouchStart(e) {
-      const t = e.touches[0];
-      this.setData({
-        _dragStartX: t.clientX * PX2RPX,
-        _dragStartY: t.clientY * PX2RPX,
-        _originX: this.data.positionX,
-        _originY: this.data.positionY,
-        _wasDragging: false,
-        dragging: true,
-      });
+      const t = e.touches && e.touches[0];
+      if (!t) return;
+      // 拖拽中间量放实例属性, 不进 data (避免每次 touchmove 都跨层通信)
+      this._dragStartX = t.clientX * PX2RPX;
+      this._dragStartY = t.clientY * PX2RPX;
+      this._originX = this.data.positionX;
+      this._originY = this.data.positionY;
+      this._wasDragging = false;
+      this.setData({ dragging: true });
     },
 
     onTouchMove(e) {
-      const t = e.touches[0];
+      const t = e.touches && e.touches[0];
+      if (!t) return;
       // 全部用 rpx 计算
       const currentX = t.clientX * PX2RPX;
       const currentY = t.clientY * PX2RPX;
-      const dx = currentX - this.data._dragStartX;
-      const dy = currentY - this.data._dragStartY;
-      // 阈值 8rpx (~4px) 才视为 drag
-      if (!this.data._wasDragging && Math.hypot(dx, dy) < 8) return;
-      this.setData({ _wasDragging: true });
-      const newX = this.data._originX + dx;
-      const newY = this.data._originY + dy;
+      const dx = currentX - this._dragStartX;
+      const dy = currentY - this._dragStartY;
+      // 阈值 20rpx (约 10px) 才视为 drag —— 8rpx 时手指轻微抖动就会吞掉点击
+      if (!this._wasDragging && Math.hypot(dx, dy) < DRAG_THRESHOLD_RPX) return;
+      this._wasDragging = true;
+      const newX = this._originX + dx;
+      const newY = this._originY + dy;
       // 边界限制: X 只能在 [margin, screenWidth - orbSize - margin] (左右两侧, 留边距)
       // Y 在 0 ~ maxY (上面)
       const minX = MARGIN_RPX;
@@ -181,7 +191,7 @@ Component({
 
     onTouchEnd() {
       this.setData({ dragging: false });
-      if (this.data._wasDragging) {
+      if (this._wasDragging) {
         // 吸附到最近的边 (X 方向, 留 24rpx 边距)
         const x = this.data.positionX;
         const halfScreen = SCREEN_WIDTH_RPX / 2;
@@ -196,7 +206,7 @@ Component({
         });
         // 屏蔽 tap 50ms
         setTimeout(() => {
-          this.setData({ _wasDragging: false });
+          this._wasDragging = false;
         }, 50);
       } else {
         // 没拖拽 — 视为 tap (不依赖 bindtap, 直接在 touchend 触发)

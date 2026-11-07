@@ -1,6 +1,6 @@
 <!--components/custom-end-confirm-modal/index.wxml-->
 <view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
-  <view class="modal-card" catchtap="">
+  <view class="modal-card" catchtap="onSheetTap">
 
     <!-- Background decoration -->
     <view class="card-bg"></view>
