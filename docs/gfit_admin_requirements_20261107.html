@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFit 后台管理项目 · 需求评估报告 · 2026-11-07</title>
+<style>
+:root{
+  --bg:#131313; --surface:#1c1c1c; --surface-low:#171717; --surface-high:#242424;
+  --card:#1a1a1a; --border:rgba(255,255,255,.09);
+  --primary:#ccf200; --primary-dim:#a8cc00; --primary-text:#3a4a00;
+  --text:#f2f2f2; --text2:#b9b9b9; --muted:#8a8a8a; --divider:rgba(255,255,255,.08);
+  --red:#ff6b6b; --amber:#ffb454; --green:#5ddc8a; --blue:#6bb8ff;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* header */
+.hero{padding:72px 0 40px;border-bottom:1px solid var(--divider);margin-bottom:44px}
+.kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:18px}
+h1{font-size:42px;line-height:1.18;font-weight:900;letter-spacing:-.02em;margin-bottom:20px}
+h1 .hl{color:var(--primary)}
+.lede{font-size:17px;color:var(--text2);max-width:760px}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.chip b{color:var(--primary);font-weight:700}
+
+/* section */
+section{margin:56px 0}
+h2{font-size:13px;letter-spacing:.26em;text-transform:uppercase;color:var(--primary);font-weight:800;
+  margin-bottom:26px;padding-bottom:12px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:12px}
+h2 .n{font-family:var(--mono);color:var(--muted);font-weight:600;letter-spacing:0}
+h3{font-size:20px;font-weight:800;margin:34px 0 12px;letter-spacing:-.01em}
+h3:first-of-type{margin-top:0}
+h4{font-size:15px;font-weight:700;margin:22px 0 9px;color:var(--text)}
+p{margin-bottom:14px;color:var(--text2)}
+p strong,li strong{color:var(--text);font-weight:700}
+ul,ol{margin:0 0 16px 22px;color:var(--text2)}
+li{margin-bottom:8px}
+code{font-family:var(--mono);font-size:.88em;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;color:var(--primary)}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* stat row */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:28px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+.stat .v{font-size:38px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.stat .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:9px;font-weight:700}
+.stat.ok .v{color:var(--primary)}
+.stat.warn .v{color:var(--amber)}
+.stat.red .v{color:var(--red)}
+.stat.blue .v{color:var(--blue)}
+
+/* callout */
+.callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);
+  border-radius:0 14px 14px 0;padding:22px 26px;margin:22px 0}
+.callout.red{border-left-color:var(--red)}
+.callout.amber{border-left-color:var(--amber)}
+.callout.blue{border-left-color:var(--blue)}
+.callout h4:first-child{margin-top:0}
+.callout p:last-child{margin-bottom:0}
+
+/* table */
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+th{text-align:left;padding:11px 14px;background:var(--surface-high);color:var(--muted);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--divider);color:var(--text2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+td strong{color:var(--text)}
+td .num{font-family:var(--mono);color:var(--primary);font-weight:700}
+td code{font-size:.82em}
+
+/* issue card */
+.issue{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px 28px;margin:20px 0}
+.issue-h{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.issue-h .badge{font-family:var(--mono);font-size:11px;font-weight:800;padding:5px 11px;border-radius:7px;
+  letter-spacing:.08em;flex-shrink:0;margin-top:2px}
+.badge.red{background:rgba(255,107,107,.14);color:var(--red);border:1px solid rgba(255,107,107,.3)}
+.badge.amber{background:rgba(255,180,84,.14);color:var(--amber);border:1px solid rgba(255,180,84,.3)}
+.badge.blue{background:rgba(107,184,255,.14);color:var(--blue);border:1px solid rgba(107,184,255,.3)}
+.badge.green{background:rgba(93,220,138,.14);color:var(--green);border:1px solid rgba(93,220,138,.3)}
+.issue-h h3{margin:0;font-size:18px}
+.issue p:last-child{margin-bottom:0}
+
+/* code block */
+pre{background:var(--surface-low);border:1px solid var(--border);border-radius:12px;padding:18px 20px;
+  overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--text2);margin:18px 0}
+pre .k{color:var(--primary)}
+pre .c{color:var(--muted)}
+pre .w{color:var(--blue)}
+
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:5px;
+  background:rgba(204,242,0,.1);color:var(--primary);border:1px solid rgba(204,242,0,.22);margin:2px 4px 2px 0}
+.tag.no{background:rgba(255,107,107,.1);color:var(--red);border-color:rgba(255,107,107,.25)}
+.tag.ok{background:rgba(93,220,138,.1);color:var(--green);border-color:rgba(93,220,138,.25)}
+
+.todo{list-style:none;margin-left:0}
+.todo li{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 20px;margin-bottom:10px}
+.todo li .q{color:var(--text);font-weight:700;display:block;margin-bottom:6px}
+.todo li .a{font-size:14px;color:var(--muted)}
+
+footer{margin-top:70px;padding-top:28px;border-top:1px solid var(--divider);color:var(--muted);font-size:13px}
+footer p{margin-bottom:8px;color:var(--muted)}
+@media(max-width:720px){
+  h1{font-size:30px} .hero{padding:44px 0 28px} .wrap{padding:0 18px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">Requirements Assessment</div>
+  <h1>GFit 后台管理项目<br><span class="hl">需求评估报告</span></h1>
+  <p class="lede">对 GFIT 动作库 / 用户 / 训练数据做后台管理与增删改查的可行性评估。结论基于对生产库、生产机文件系统、后端源码与小程序调用链的<strong>只读</strong>实测，非推测。</p>
+  <div class="meta">
+    <span class="chip">评估日期 <b>2026-11-07</b></span>
+    <span class="chip">动作库 <b>7,641</b> 条</span>
+    <span class="chip">用户 <b>37</b> 人</span>
+    <span class="chip">训练记录 <b>2,064</b> 条</span>
+    <span class="chip">素材 <b>11,578</b> 个文件</span>
+    <span class="chip">高危 <b>1</b> · 中危 <b>2</b></span>
+  </div>
+</div>
+
+<section>
+  <h2><span class="n">00</span> 结论速览</h2>
+  <div class="stats">
+    <div class="stat ok"><div class="v">高</div><div class="k">可行性</div></div>
+    <div class="stat red"><div class="v">1</div><div class="k">高危安全问题</div></div>
+    <div class="stat warn"><div class="v">2</div><div class="k">中危安全问题</div></div>
+    <div class="stat blue"><div class="v">~7</div><div class="k">预计工作量（人日）</div></div>
+  </div>
+
+  <div class="callout">
+    <h4>核心判断</h4>
+    <p>现有后端<strong>无任何动作库写接口</strong>，但基础设施（MySQL 连接、媒体存储、文件白名单、部署流水线）齐全。后台管理是<strong>增量开发</strong>而非重建，路径清晰。</p>
+    <p>但生产 3000 端口<strong>公网裸奔且无鉴权</strong>——若按常规方式把 admin 部署上去，会直接造出一个无鉴权的公网写接口。用户选择的「不用登录，仅本机本地运行」恰好是正确方向，需要落实为技术约束。</p>
+  </div>
+
+  <table>
+    <thead><tr><th>项目</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td>建议形态</td><td>独立前端仓库 <code>gfit-admin</code>（Vue3 + Element Plus），后端在 <code>gfit-backend</code> 新增 <code>admin</code> 模块</td></tr>
+      <tr><td>建议鉴权</td><td><strong>admin 服务不部署到生产</strong>，本机运行 + 共享密钥 + loopback 限定（§4.2）</td></tr>
+      <tr><td>建议首版范围</td><td>动作库 CRUD + 素材上传 + 用户/动作数据只读查看（用户原话三块）</td></tr>
+      <tr><td>可复用资产</td><td><code>TypingService</code> 批量改 type 引擎、<code>MysqlService</code>、<code>LocalStorageService</code> 路径防护、部署流水线、49 项安全回归测试</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">01</span> 现状盘点（实测）</h2>
+
+  <h3>1.1 数据规模</h3>
+  <table>
+    <thead><tr><th>表</th><th>行数</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>exercises_library</code></td><td class="num">7,641</td><td>动作库，唯一的"大表"</td></tr>
+      <tr><td><code>exercises</code></td><td class="num">2,064</td><td>训练动作明细</td></tr>
+      <tr><td><code>sessions</code></td><td class="num">231</td><td>训练场次</td></tr>
+      <tr><td><code>users</code></td><td class="num">37</td><td>注册用户（9 个有训练记录）</td></tr>
+      <tr><td><code>user_exercise_stats</code></td><td class="num">132</td><td>用户×动作关联表（Phase 3 已建）</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout amber">
+    <h4>第一个实现细节</h4>
+    <p><code>exercises_library.id</code> <strong>不是自增</strong>（<code>EXTRA=''</code>），最大 id 48277，实际只有 7641 行 —— 存在 <strong>40,636 个 id 空洞</strong>。新增动作必须显式分配 id。</p>
+  </div>
+
+  <h3>1.2 动作库字段</h3>
+<pre><span class="c">-- SHOW CREATE TABLE exercises_library</span>
+id            int <span class="k">NOT NULL</span> PRIMARY KEY     <span class="c">-- 非自增</span>
+name          varchar(128) <span class="k">NOT NULL</span>    <span class="c">-- 英文名</span>
+name_zh       varchar(64)  DEFAULT <span class="k">NULL</span>    <span class="c">-- 中文名</span>
+image_name    varchar(255) DEFAULT ''      <span class="c">-- 图片文件名（裸名，无目录）</span>
+video_name    varchar(512) DEFAULT <span class="k">NULL</span>    <span class="c">-- 视频文件名（裸名，无目录）</span>
+equipment_id  varchar(255) <span class="k">NOT NULL</span>    <span class="c">-- 器械，可为 "6,19" 多值</span>
+body_part_id  varchar(64)  DEFAULT ''      <span class="c">-- 部位，可为 "17,5" 多值</span>
+exercise_type varchar(32)  DEFAULT 'Strength'
+is_favorite   smallint     DEFAULT 0       <span class="c">-- 全局运营精选标记</span>
+created_at / updated_at</pre>
+
+  <h3>1.3 素材链路（已跑通，无需改造）</h3>
+<pre>DB 存裸文件名   <span class="k">"00251101-Barbell-Bench-Press_Chest-FIX_small.png"</span>
+      <span class="c">↓ 小程序拼 URL (app.js:11)</span>
+imgPrefix       <span class="k">https://gfit.l2ee.top</span>
+      <span class="c">↓ Nginx: location / { alias /media/gfit/; }</span>
+生产磁盘         /media/gfit/exer_images/   <span class="k">6852</span> 个 png (330M)
+                /media/gfit/exer_videos/   <span class="k">4726</span> 个 mp4 (1.9G)</pre>
+  <p>实测验证：<code>GET /exer_images/NULL</code> → <strong>404</strong>，正常文件名 → <strong>200</strong>。</p>
+
+  <table>
+    <thead><tr><th>素材交叉核对（DB 引用 ↔ 磁盘文件）</th><th>数量</th><th>样例</th></tr></thead>
+    <tbody>
+      <tr><td>图片引用但磁盘缺失</td><td class="num">2</td><td><code>66431201-Side-to-Side-Bicep-Curl-(female)_Plyometrics__GREEN.png</code></td></tr>
+      <tr><td>视频引用但磁盘缺失</td><td class="num">1</td><td><code>80021201-Resistance-Band-...(ma).mp4</code></td></tr>
+      <tr><td>磁盘有但无人引用</td><td class="num">2</td><td>同上（文件名尾部括号被截断，同一批导入问题）</td></tr>
+    </tbody>
+  </table>
+  <p>素材链路基本健康，损坏率约 <strong>0.03%</strong>，且损坏集中于文件名尾括号被截断这一类。</p>
+
+  <h3>1.4 现有后端 API 能力</h3>
+  <table>
+    <thead><tr><th>分类</th><th>现有 action</th><th>能否支撑后台</th></tr></thead>
+    <tbody>
+      <tr><td><code>library</code></td><td><code>list</code> / <code>detail</code> / <code>favorites</code> / <code>count</code></td><td>⚠️ 只读，不支持按 id 批量取、多值筛选无 total</td></tr>
+      <tr><td><code>library.typing</code></td><td><code>typingSuggestions</code> / <code>typingApply</code></td><td>✅ <strong>可直接复用</strong>做批量改 type（带 dryRun），但无鉴权</td></tr>
+      <tr><td><code>exercise</code></td><td><code>add</code> / <code>update</code> / <code>delete</code> / <code>toggleFavorite</code> …</td><td>⚠️ 全部绑定 <code>_openid</code>，是用户维度动作记录</td></tr>
+      <tr><td><code>upload</code></td><td><code>POST /upload</code> / <code>DELETE /upload</code></td><td>⚠️ 白名单齐全，但 objectName 强制 ownerHash、落 <code>media/</code> 前缀，与 <code>exer_images/</code> 约定冲突</td></tr>
+      <tr><td><code>stats</code></td><td><code>summary</code> / <code>exerciseList</code> / <code>leaderboard</code> …</td><td>✅ 大部分可复用做只读统计</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout red">
+    <h4>需求的真正根因</h4>
+    <p><strong>动作库的写接口（增/删/改）目前为零。</strong><code>exercises_library</code> 表只有 <code>list/detail/favorites/count</code> 四个只读方法，<code>toggleLibraryFavorite</code> 已下线。这正是「有些动作暂时不存在于动作库中」的根因。</p>
+  </div>
+
+  <h3>1.5 可直接继承的资产</h3>
+  <table>
+    <thead><tr><th>资产</th><th>位置</th><th>复用价值</th></tr></thead>
+    <tbody>
+      <tr><td><code>TypingService</code></td><td><code>src/modules/library/typing.service.ts</code></td><td>批量改 type 的建议引擎（关键词规则 + 同名组多数票 + 歧义不猜），后台「一键规范化」直接接上</td></tr>
+      <tr><td><code>MysqlService</code></td><td><code>src/infra/database/mysql.service.ts</code></td><td>连接池 + 时区自检</td></tr>
+      <tr><td><code>LocalStorageService</code></td><td><code>src/infra/storage/local-storage.service.ts</code></td><td>路径穿越防护（<code>../</code> 剥离 + <code>startsWith</code> 校验）</td></tr>
+      <tr><td>部署流水线</td><td><code>.github/workflows/deploy.yml</code> + <code>scripts/deploy.sh</code></td><td>push main 自动部署 + 两阶段 preflight + 备份</td></tr>
+      <tr><td>安全回归测试</td><td><code>scripts/security-regression*.test.js</code></td><td>49 项断言，可扩展覆盖 admin 模块</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">02</span> 需求拆解</h2>
+
+  <h3>A. 动作库 CRUD（核心，最高优先级）</h3>
+  <table>
+    <thead><tr><th>功能</th><th>细节</th><th>依赖的后端能力</th></tr></thead>
+    <tbody>
+      <tr><td>列表 + 筛选</td><td>按 name / name_zh 搜索，按 equipment / body_part / exercise_type 筛选，按 id 精确查询；分页；图片缩略图</td><td>新增 <code>admin.library.list</code>（<code>FIND_IN_SET</code> 多值匹配 + 排序白名单 + 返回 total）</td></tr>
+      <tr><td>详情</td><td>单条全字段 + 被引用次数（训练记录数 / 用户数 / 收藏数）</td><td>新增 <code>admin.library.detail</code></td></tr>
+      <tr><td><strong>新建</strong></td><td>name / name_zh / 器械 / 部位 / type，<strong>上传图片 + 演示视频</strong></td><td>新增 <code>admin.library.create</code> + <code>admin.upload</code></td></tr>
+      <tr><td><strong>编辑</strong></td><td>改任一字段；改图/改视频；素材替换；实时预览</td><td>新增 <code>admin.library.update</code></td></tr>
+      <tr><td><strong>删除</strong></td><td><strong>硬删除并同步清理训练记录引用</strong></td><td>新增 <code>admin.library.delete</code>（事务内级联清 <code>exercises</code> + <code>user_exercise_stats</code>）</td></tr>
+      <tr><td>批量操作</td><td>多选批量改 type / 部位 / 器械 / 批量删除</td><td>复用 <code>TypingService</code> + 新增批量接口</td></tr>
+      <tr><td>运营精选</td><td>开关 <code>is_favorite</code>（<code>favorites()</code> 读的那个全局字段）</td><td>新增 <code>admin.library.feature</code></td></tr>
+      <tr><td>字典管理</td><td>器械 / 部位 / 类型的可选值维护</td><td>新增字典表（§3.3）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>B. 素材上传</h3>
+  <table>
+    <thead><tr><th>功能</th><th>细节</th></tr></thead>
+    <tbody>
+      <tr><td>图片上传</td><td>png/jpg/webp → <code>/media/gfit/exer_images/</code>，返回裸文件名</td></tr>
+      <tr><td>视频上传</td><td>mp4 → <code>/media/gfit/exer_videos/</code>，返回裸文件名</td></tr>
+      <tr><td>大文件</td><td>现有 upload 限 5MB，生产视频最大 3.7MB 够用；后台可放宽到 20MB</td></tr>
+      <tr><td>文件名策略</td><td>沿用旧编码 <code>{序号}{部位码}{器械码}-{Name}_{部位}_small.png</code>，或新规则 —— 需确认（§6）</td></tr>
+      <tr><td>校验</td><td>复用现有 MIME 白名单 + 魔术字节 + <code>../</code> 路径防护</td></tr>
+    </tbody>
+  </table>
+
+  <h3>C. 用户数据查看（只读）</h3>
+  <ul>
+    <li>用户列表：昵称 / 性别 / 年龄 / 身高体重 / 目的 / 注册时间 / 训练场次 / 训练动作数</li>
+    <li>用户详情：训练历史（按 session 展开）、收藏动作、已练动作</li>
+    <li>敏感字段脱敏：<code>_openid</code> 只展示前 8 位、<code>phone</code> 中间四位打码</li>
+  </ul>
+
+  <h3>D. 动作数据查看（只读）</h3>
+  <ul>
+    <li>动作被使用排行：按训练次数 / 引用用户数排序（当前 Top1 = Bench Press，142 次）</li>
+    <li>孤立动作检测：从未被任何用户练过的动作（7641 个里绝大多数）</li>
+    <li>同名重复检测：<strong>993 组同名，2280 行</strong> —— 用于人工归并判断</li>
+    <li>资源缺失检测：素材为字面量 <code>"NULL"</code> 的动作（图片 426 个 / 视频 2674 个）</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">03</span> 关键设计决策</h2>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge blue">3.1</span><h3>硬删除的级联语义</h3></div>
+    <p>实测外键现状 —— <strong>两个引用方向都没有外键保护</strong>：</p>
+<pre>exercises.exercise_id          → exercises_library.id   <span class="c">❌ 无外键</span>
+user_exercise_stats.exercise_id → exercises_library.id  <span class="c">❌ 无外键</span>
+<span class="c">（两表只对 session_id / user_id 有 FK）</span></pre>
+    <p>无外键 = 删库行不会自动清引用，<strong>会产生孤儿记录</strong>（当前孤儿数 0，是项目一直维护的不变量）。后台删除必须显式在一个事务里做三件事：</p>
+<pre><span class="k">START TRANSACTION</span>;
+<span class="k">DELETE FROM exercises</span>            <span class="w">WHERE</span> exercise_id = ?;  <span class="c">-- 训练明细</span>
+<span class="k">DELETE FROM user_exercise_stats</span>  <span class="w">WHERE</span> exercise_id = ?;  <span class="c">-- 收藏/练过标记</span>
+<span class="k">DELETE FROM exercises_library</span>    <span class="w">WHERE</span> id = ?;           <span class="c">-- 库行本体</span>
+<span class="k">COMMIT</span>;</pre>
+    <div class="callout amber">
+      <p><strong>删除前必须提示影响面</strong>：当前被训练记录引用的动作共 107 个，Top1（Bench Press, id=2）牵涉 142 条训练记录。删除弹窗必须显示「将同时删除 N 条训练记录 / 影响 M 个用户」并二次确认。</p>
+      <p><strong>建议删除动作时不删物理文件</strong>。同一张图片可能被多个 id 复用（生产上 6853 个引用对 6852 个文件），物理文件先留着，后续用独立「素材体检」功能统一清理孤儿文件更安全。</p>
+    </div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge blue">3.2</span><h3>新增动作的 id 分配</h3></div>
+    <table>
+      <thead><tr><th>方案</th><th>做法</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>改表加 <code>AUTO_INCREMENT</code></td><td>⚠️ 会重排 id 语义，改动风险中等</td></tr>
+        <tr><td>B</td><td>应用层取 <code>MAX(id)+1</code>（事务内 <code>FOR UPDATE</code>）</td><td>✅ <strong>推荐</strong> —— 零 schema 改动，后台单人操作锁竞争可忽略</td></tr>
+        <tr><td>C</td><td>加 <code>seq_id AUTO_INCREMENT</code> 代理键</td><td>改动大，前端全部逻辑用 <code>id</code>，收益低</td></tr>
+      </tbody>
+    </table>
+    <p>推荐 B，并在应用层强制 <code>id</code> 唯一性校验。</p>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge amber">3.3</span><h3>字典体系 —— 发现一个现存缺口</h3></div>
+    <p><code>equipment_id</code> / <code>body_part_id</code> 是<strong>逗号分隔的多值字符串</strong>，字典散落在前端硬编码：</p>
+    <ul>
+      <li>小程序 <code>pages/library/index.js</code> 硬编码 28 个器械 + 16 个肌群</li>
+      <li>后端 <code>typing-rules.ts</code> 只有 <code>BODY_PART_LABEL</code>（20 项），<strong>没有 equipment 标签表</strong></li>
+    </ul>
+    <table>
+      <thead><tr><th>维度</th><th>库里实际用到的值</th><th>前端字典覆盖</th></tr></thead>
+      <tbody>
+        <tr><td>equipment_id</td><td>1–28 全覆盖，另有 19 条是多值（如 <code>"4,23"</code>）</td><td><span class="tag ok">28 项全覆盖</span></td></tr>
+        <tr><td>body_part_id</td><td>1–21（<strong>21 个值</strong>）</td><td><span class="tag no">只有 16 项，缺 11/13/14/15/16/21</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout amber">
+      <p><strong>缺口影响</strong>：库里有 <strong>945 个动作</strong>（body_part 命中 11/13/14/15/16/21）用到了前端没有的部位 id —— 这些动作在小程序里<strong>无法被部位筛选命中</strong>，用户按「爆发/功能」「杠铃力量」「瑜伽姿势」筛选时结果是空的。后台上线后应能把这类值可视化并批量校正。</p>
+    </div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge blue">3.4</span><h3>多值字段的筛选语义不一致</h3></div>
+    <p><code>body_part_id</code> 用 <code>FIND_IN_SET</code> 匹配（后端已这么做，正确）。但 <code>equipment_id</code> 后端用的是<strong>精确匹配</strong> <code>equipment_id = ?</code> —— 对那 19 条多值记录（<code>"4,23"</code>）永远匹配不到。</p>
+    <p>后台管理列表应统一用 <code>FIND_IN_SET</code> 语义，与小程序筛选行为对齐。</p>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge blue">3.5</span><h3>素材命名策略</h3></div>
+    <p>现有文件名形如 <code>00251101-Barbell-Bench-Press_Chest-FIX_small.png</code>，编码来源不明（<code>00251101</code> 疑似「素材序号+部位码+器械码」）。后台新建动作时：</p>
+    <ul>
+      <li><strong>选项 1</strong>：完全沿用旧编码规则 —— 规则不明，需逆向推导</li>
+      <li><strong>选项 2（推荐）</strong>：新规则 <code>{slug}_{timestamp}.{ext}</code>，只要求唯一 + 可读，不与旧规则混用</li>
+    </ul>
+    <p>旧规则已有 2 条因括号截断损坏，新规则能避免同类问题。</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">04</span> 安全评估（本次评估重点）</h2>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge red">高危</span><h3>生产 3000 端口公网裸奔</h3></div>
+<pre>$ ss -tlnp
+<span class="k">LISTEN</span> 0 511 <span class="w">0.0.0.0:3000</span>  users:(("node /opt/gfit-..."))
+$ iptables -L INPUT
+<span class="k">Chain INPUT (policy ACCEPT)</span>     <span class="c">← 无任何过滤规则</span>
+
+$ curl http://47.108.200.98:3000/health
+{"status":"ok","service":"gfit-backend",...}    <span class="c">← 从外网直接命中</span></pre>
+    <p>Nginx 虽然配了 <code>/api</code> 反代，但 <strong>3000 端口本身对外可达</strong>，绕过了 Nginx 的所有 location 配置。</p>
+    <div class="callout red">
+      <p><strong>这对后台管理是致命的</strong>：如果把 admin 模块按常规方式部署到生产，它会立即成为<strong>无鉴权的公网写接口</strong> —— 任何人都能改动作库、删训练记录。</p>
+      <p>用户已选择「不用登录，仅本机本地运行」，这恰好是正确方向，但需要落实为技术约束。</p>
+    </div>
+  </div>
+
+  <h3>鉴权方案落地（三层防护）</h3>
+  <table>
+    <thead><tr><th>层</th><th>措施</th><th>效果</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag ok">L1 网络</span></td><td>admin 服务<strong>不部署到生产</strong>，本机运行（<code>npm run start:dev</code> + <code>ADMIN_ENABLED=true</code>）</td><td>生产上根本没有 admin 路由可打</td></tr>
+      <tr><td><span class="tag ok">L2 传输</span></td><td>本机 → 生产库的写入走 SSH 隧道 + 只读账号；写操作单独走一个受限通道</td><td>数据库层面不暴露写权限</td></tr>
+      <tr><td><span class="tag ok">L3 应用</span></td><td>admin 路由<strong>双重校验</strong>：① 请求必须带仅存在于本机环境变量的共享密钥 ② 拒绝任何非 loopback 来源</td><td>即使密钥泄露，从公网也打不进来</td></tr>
+    </tbody>
+  </table>
+  <div class="callout blue">
+    <p><strong>额外必做</strong>：修复 3000 端口暴露 —— 生产 <code>main.ts</code> 改为 <code>app.listen(port, '127.0.0.1')</code>，让 Nginx 成为唯一入口。这一条独立于后台项目，但属同一批安全债，改动极小、收益极高。</p>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge amber">中危</span><h3><code>library.typingApply</code> 无角色校验</h3></div>
+<pre><span class="c">// rpc.controller.ts:86-91 —— 普通用户的 JWT 就能调用</span>
+<span class="k">case</span> 'library':
+  <span class="k">if</span> (sub.startsWith('typing')) {
+    <span class="k">return</span> <span class="w">this</span>.typing.handle(sub, openid, data);  <span class="c">// openid 只用于数据隔离</span>
+  }</pre>
+    <p><code>typingApply</code> 能<strong>批量修改全库 7641 个动作的 <code>exercise_type</code></strong>，却走的是普通用户鉴权路径 —— 任何登录用户理论上都能调。</p>
+    <p><strong>建议</strong>：把 <code>typingSuggestions</code> / <code>typingApply</code> 从 <code>/api</code> RPC 通道<strong>下线</strong>，只保留在 admin 模块下。这同时也是用户需求「批量修正动作类型」的一部分。</p>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="badge amber">中危</span><h3><code>upload</code> 的 ownerHash 机制与动作库素材冲突</h3></div>
+    <p>现有上传强制 objectName 形如 <code>{prefix}/{ownerHash}/{ts}-{rand}.{ext}</code>，用于归属校验（防删他人头像）。但动作库素材是<strong>全局共享</strong>的裸文件名（<code>exer_images/xxx.png</code>），两套约定不兼容。</p>
+    <p>admin 上传需单独实现：前缀白名单改为 <code>exer_images</code> / <code>exer_videos</code>；不带 ownerHash（全局资源无归属概念）；删除动作不删物理文件。</p>
+  </div>
+
+  <h3>现有防护可直接继承</h3>
+  <ul>
+    <li><code>FileTypeValidator</code> 魔术字节白名单（防存储型 XSS）</li>
+    <li><code>LocalStorageService</code> 路径穿越防护</li>
+    <li><code>AllExceptionsFilter</code> 生产环境错误泛化</li>
+    <li>分页参数钳制（防拉爆内存）</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">05</span> 架构方案</h2>
+
+  <h3>选型（已确认）</h3>
+<pre><span class="k">gfit-admin/</span>                    <span class="c">独立前端仓库 · Vue3 + Vite + Element Plus</span>
+   ├─ views/
+   │   ├─ library/     动作库列表 · 详情 · 编辑器
+   │   ├─ upload/      素材上传（拖拽 · 进度 · 预览）
+   │   ├─ users/       用户列表 · 用户详情
+   │   └─ analytics/   动作使用分析 · 数据质量体检
+   ├─ api/            admin.* 路由封装
+   └─ vite.config.ts  dev 代理 → http://127.0.0.1:3000
+
+<span class="k">gfit-backend/</span>                <span class="c">加一个 admin 模块</span>
+   src/modules/admin/
+   ├─ admin.controller.ts      <span class="c">REST 风格路由（不走 /api RPC 兼容层）</span>
+   ├─ admin.service.ts         <span class="c">动作库 CRUD · 批量操作 · 事务</span>
+   ├─ admin-upload.service.ts  <span class="c">动作库素材上传（exer_images / exer_videos）</span>
+   ├─ admin-metrics.service.ts <span class="c">用户/动作只读统计</span>
+   └─ admin-auth.guard.ts      <span class="c">§4.2 的 L3 校验</span></pre>
+
+  <h3>为什么 admin 不走 <code>/api</code> RPC 兼容层</h3>
+  <p>现有 <code>/api</code> 是给小程序 RPC 兼容用的，鉴权模型是「微信 openid + JWT」。后台管理的鉴权模型完全不同（共享密钥 + loopback 限定 + 操作审计）。</p>
+  <p>混在一个入口里会让<strong>鉴权分支越来越难审计</strong> —— 这正是历史上 <code>toggleLibraryFavorite</code> 越权和 <code>typingApply</code> 无角色校验的成因。独立 <code>/admin/*</code> 前缀 + 独立 Guard，能让「谁能改数据」这个问题一眼可查。</p>
+
+  <h3>写操作审计</h3>
+  <p>用户已选「不用登录」，但<strong>改生产库的动作必须有审计</strong>。建议建 <code>admin_operation_log</code>：</p>
+<pre>id, ts, op, target_table, target_ids, affected_rows, payload_snapshot, client_ip</pre>
+  <p>后台每次写操作记一行。理由很直接：37 个真实用户的数据，且历史上已有过「误写生产库 20 行」的记录。</p>
+</section>
+
+<section>
+  <h2><span class="n">06</span> 待确认事项</h2>
+  <ul class="todo">
+    <li><span class="q">1. 新建动作的素材文件名规则</span><span class="a">沿用旧编码 / 新规则 <code>{slug}_{ts}.{ext}</code>　→　建议新规则（旧编码规则不明且已损坏过）</span></li>
+    <li><span class="q">2. 后台是否需要「合并同名动作」</span><span class="a">需要 / 不需要　→　建议需要。993 组同名是最大的长期数据债，合并 = 改引用 + 删一行，正是后台该做的事</span></li>
+    <li><span class="q">3. 删除动作时是否保留媒体文件</span><span class="a">保留 / 一并删除　→　建议保留，孤儿文件用独立「素材体检」功能清理</span></li>
+    <li><span class="q">4. 是否同期修复 3000 端口暴露</span><span class="a">修 / 不修　→　建议修，改动 1 行，独立于本项目但同批安全债</span></li>
+    <li><span class="q">5. 是否同期下线 <code>typingApply</code> 的 RPC 暴露</span><span class="a">下线 / 保留　→　建议下线，迁移到 admin 模块</span></li>
+    <li><span class="q">6. 后台第一个可用版本的范围</span><span class="a">仅动作库 CRUD / 全量　→　建议动作库 CRUD + 素材上传 + 用户/动作只读查看（用户原话三块）</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">07</span> 建议实施顺序</h2>
+<pre><span class="k">第 1 步  安全底座</span>
+         ├─ 生产 3000 → 127.0.0.1 绑定
+         ├─ admin 模块骨架 + Guard + 操作审计表
+         └─ 确认 admin 路由不进生产
+
+<span class="k">第 2 步  动作库读 + 素材上传</span>
+         ├─ admin.library.list/detail（含多值筛选、总数）
+         ├─ admin.upload（exer_images / exer_videos）
+         └─ 前端：列表 + 详情 + 上传组件
+
+<span class="k">第 3 步  动作库写</span>
+         ├─ admin.library.create/update/delete（事务 + 级联）
+         ├─ 删除前影响面提示
+         ├─ 批量操作（复用 TypingService）
+         └─ 前端：编辑器 + 批量选择 + 删除确认
+
+<span class="k">第 4 步  只读数据视图</span>
+         ├─ 用户列表 / 详情（脱敏）
+         ├─ 动作使用分析
+         └─ 数据质量体检（同名 / 素材缺失 / 字典缺口 / 多值异常）
+
+<span class="k">第 5 步  收尾</span>
+         ├─ typingApply 从 RPC 下线
+         ├─ 扩展 security-regression 覆盖 admin
+         └─ 945 个字典缺口动作的批量校正（需用户确认改法）</pre>
+</section>
+
+<footer>
+  <p><strong>附录 · 本次评估的实测口径</strong></p>
+  <p>所有数字均来自 2026-11-07 对生产库 <code>47.108.200.98/gfit</code> 的<strong>只读</strong>查询（<code>SELECT</code> / <code>SHOW</code>），以及生产机 <code>/media/gfit</code> 的只读列目录、源码静态阅读。<strong>评估过程未对生产库做任何写操作。</strong></p>
+  <p>已核查项：五张表的表结构与行数 · <code>exercises_library</code> 全量 7641 行的素材/字典/名称字段分布 · DB 素材引用 ↔ 磁盘文件交叉核对 · 两处外键缺失情况 · 生产 Nginx 配置、端口监听、防火墙规则、<code>/health</code> 外网可达性 · 后端全部 <code>library</code>/<code>upload</code>/<code>auth</code>/<code>rpc</code> 路由的鉴权路径 · 小程序端 URL 拼接规则</p>
+</footer>
+
+</div>
+</body>
+</html>

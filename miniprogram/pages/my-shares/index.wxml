@@ -11,7 +11,9 @@
   </view>
 
   <view wx:else class="list">
-    <view class="item" wx:for="{{items}}" wx:key="token">
+    <!-- 整行可点 → 打开那次分享的详情页(分享出去后 B 看到的就是这个页面,
+         自己也能预览 —— 顺便验证分享效果) -->
+    <view class="item" wx:for="{{items}}" wx:key="token" bindtap="onItemTap" data-token="{{item.token}}">
       <view class="item-head">
         <view class="item-date">{{item.dateText || '—'}}</view>
         <view class="item-status item-status-{{item.status}}">
@@ -34,11 +36,18 @@
         {{locale === 'zh' ? '有效期至' : 'Valid until'}} {{item.expires_at}}
       </view>
 
-      <button class="revoke-btn" wx:if="{{item.status === 'ACTIVE'}}"
-              data-token="{{item.token}}" bindtap="onRevoke"
-              loading="{{revoking === item.token}}" disabled="{{revoking}}">
-        {{t.REVOKE_SHARE}}
-      </button>
+      <view class="item-foot">
+        <view class="item-preview">
+          {{locale === 'zh' ? '查看详情' : 'View details'}} ›
+        </view>
+        <!-- catchtap: 阻止冒泡, 别触发行上的"查看详情" -->
+        <button class="revoke-btn" wx:if="{{item.status === 'ACTIVE'}}"
+                catchtap="onRevoke"
+                data-token="{{item.token}}"
+                loading="{{revoking === item.token}}" disabled="{{revoking}}">
+          {{t.REVOKE_SHARE}}
+        </button>
+      </view>
     </view>
   </view>
 

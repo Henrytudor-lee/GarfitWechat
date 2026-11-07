@@ -81,6 +81,19 @@ Page({
     }
   },
 
+  /**
+   * 点整行 → 打开那次分享的详情页
+   *
+   * 分享出去后, 别人看到的就是 pages/share/index?token=xxx 这个页面。
+   * 分享者自己也能看 —— share.view 本来就是公开接口(凭 token 精确查),
+   * 只是之前没给入口。点开就能预览"对方看到的样子", 顺带验证分享效果。
+   */
+  onItemTap(e) {
+    const token = e.currentTarget.dataset.token;
+    if (!token) return;
+    wx.navigateTo({ url: `/pages/share/index?token=${token}` });
+  },
+
   onRevoke(e) {
     const token = e.currentTarget.dataset.token;
     if (!token) return;
