@@ -1,0 +1,156 @@
+<!--pages/share/index.wxml-->
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="state-box">
+    <view class="state-title">{{t.LOADING}}</view>
+  </view>
+
+  <!-- 失效 / 失败 -->
+  <view wx:elif="{{error}}" class="state-box">
+    <view class="state-icon">🔗</view>
+    <view class="state-title">{{error}}</view>
+    <view class="state-sub" wx:if="{{errorCode === 'LOAD_FAILED'}}">{{error}}</view>
+    <button class="state-btn" wx:if="{{errorCode === 'LOAD_FAILED'}}" bindtap="onRetry">{{t.RETRY}}</button>
+    <button class="state-btn" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
+  </view>
+
+  <!-- 正常内容 -->
+  <block wx:else>
+    <!-- 分享者 + 标题 -->
+    <view class="share-head">
+      <view class="owner">
+        <image wx:if="{{owner.avatar}}" class="owner-avatar" src="{{owner.avatar}}" mode="aspectFill" />
+        <view wx:else class="owner-avatar owner-avatar-placeholder">👤</view>
+        <view class="owner-info">
+          <view class="owner-name">{{owner.name || (locale === 'zh' ? 'GFIT 用户' : 'GFIT User')}}</view>
+          <view class="owner-label">{{t.SHARE_BY}} {{t.SHARE_TRAINING}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 训练摘要 -->
+    <view class="summary">
+      <view class="summary-card">
+        <view class="summary-val">{{training.durationStr}}</view>
+        <view class="summary-label">{{t.DURATION}}</view>
+      </view>
+      <view class="summary-card">
+        <view class="summary-val">{{training.exercise_count}}</view>
+        <view class="summary-label">{{t.EXERCISES}}</view>
+      </view>
+      <view class="summary-card">
+        <view class="summary-val">{{training.calories}}</view>
+        <view class="summary-label">{{t.CAL_UNIT}}</view>
+      </view>
+    </view>
+
+    <view class="date-line">{{training.dateText}}</view>
+
+    <!-- 动作列表 -->
+    <view class="groups">
+      <view class="group" wx:for="{{groups}}" wx:key="exercise_id">
+        <view class="group-head" bindtap="onExerciseTap" data-index="{{index}}">
+          <view class="group-img-wrap">
+            <image wx:if="{{item.image_name}}" class="group-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
+            <view wx:else class="group-img group-img-placeholder">🏋️</view>
+          </view>
+          <view class="group-info">
+            <view class="group-name">{{locale === 'zh' ? item.name_zh : item.name_en}}</view>
+            <view class="group-sub">
+              {{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}
+              <text class="group-dot">·</text>
+              {{item.modeLabel}}
+            </view>
+          </view>
+          <view class="group-right">
+            <view class="group-cal">{{item.totalCalories}} {{t.CAL_UNIT_SHORT}}</view>
+            <view class="group-detail-hint">{{t.VIEW_EXERCISE_DETAIL}}</view>
+          </view>
+        </view>
+
+        <view class="sets-grid">
+          <view class="set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
+            <view class="set-num">{{index + 1}}</view>
+            <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
+            <block wx:if="{{s.distanceKm > 0}}">
+              <view class="set-val reps">{{s.distanceKm}} <text class="set-unit">{{t.KM}}</text></view>
+              <view class="set-sep" wx:if="{{s.durationSec > 0}}">·</view>
+              <view class="set-val reps" wx:if="{{s.durationSec > 0}}">{{s.durationSec}} <text class="set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="set-unit">{{s.weightUnit || 'kg'}}</text></view>
+            </block>
+            <!-- 计时类: 时长必显, 负重可选 -->
+            <block wx:elif="{{s.durationSec > 0}}">
+              <view class="set-val reps">{{s.durationSec}} <text class="set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="set-unit">{{s.weightUnit || 'kg'}}</text></view>
+            </block>
+            <!-- 次数类: 重量 × 次数 -->
+            <block wx:else>
+              <view class="set-val">{{s.weight}} <text class="set-unit">{{s.weightUnit || 'kg'}}</text></view>
+              <view class="set-sep">×</view>
+              <view class="set-val reps">{{s.reps}} <text class="set-unit">{{t.REPS}}</text></view>
+            </block>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部: 去练自己的 -->
+    <view class="foot">
+      <button class="foot-btn" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
+    </view>
+
+    <!-- 动作详情弹层 -->
+    <view wx:if="{{detailOpen && detail}}" class="sheet-mask" bindtap="onDetailMaskTap" catchtouchmove="noop">
+      <view class="sheet" catchtap="onDetailSheetTap">
+        <scroll-view class="sheet-scroll" scroll-y>
+          <view class="sheet-media">
+            <video wx:if="{{detail.video_name}}" class="sheet-video"
+                   src="{{vidPrefix}}/exer_videos/{{detail.video_name}}"
+                   mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture />
+            <image wx:elif="{{detail.image_name}}" class="sheet-video"
+                   src="{{imgPrefix}}/exer_images/{{detail.image_name}}" mode="aspectFill" />
+            <view wx:else class="sheet-video sheet-video-placeholder">🏋️</view>
+          </view>
+
+          <view class="sheet-body">
+            <view class="sheet-title">{{detail.nameText}}</view>
+            <view wx:if="{{detail.name_en}}" class="sheet-en">{{detail.name_en}}</view>
+
+            <view class="sheet-tags">
+              <text wx:for="{{detail.equipmentNames}}" wx:key="*this" class="chip chip-neutral">{{item}}</text>
+              <text wx:for="{{detail.muscleNames}}" wx:key="*this" class="chip">{{item}}</text>
+              <text class="chip chip-neutral">{{detail.modeLabel}}</text>
+            </view>
+
+            <view class="sheet-sets">
+              <view class="sheet-sets-title">{{t.SETS}}</view>
+              <view class="sheet-set-row" wx:for="{{detail.sets}}" wx:for-item="s" wx:key="id">
+                <text class="sheet-set-num">{{index + 1}}</text>
+                <block wx:if="{{s.distanceKm > 0}}">
+                  <text>{{s.distanceKm}} {{t.KM}}</text>
+                  <text wx:if="{{s.durationSec > 0}}"> · {{s.durationSec}} {{t.DURATION_UNIT}}</text>
+                  <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
+                </block>
+                <block wx:elif="{{s.durationSec > 0}}">
+                  <text>{{s.durationSec}} {{t.DURATION_UNIT}}</text>
+                  <text wx:if="{{s.weight > 0}}"> · {{s.weight}} {{s.weightUnit || 'kg'}}</text>
+                </block>
+                <block wx:else>
+                  <text>{{s.weight}} {{s.weightUnit || 'kg'}} × {{s.reps}} {{t.REPS}}</text>
+                </block>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+
+        <view class="sheet-foot">
+          <view class="sheet-close" bindtap="closeDetail">✕</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+</view>

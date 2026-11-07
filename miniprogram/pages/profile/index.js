@@ -419,6 +419,11 @@ Page({
     wx.navigateTo({ url: '/pages/guide/index' });
   },
 
+  // 我的分享: 管理已分享的训练链接(可撤销)
+  onMySharesTap() {
+    wx.navigateTo({ url: '/pages/my-shares/index' });
+  },
+
   // 空事件处理器: wxml 里 catchtap="noop" 需要它存在, 否则会抛 "noop is not a function"
   noop() {},
 });

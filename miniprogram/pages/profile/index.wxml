@@ -127,6 +127,20 @@
         <text class="settings-arrow">›</text>
       </view>
 
+      <!-- My Shares (管理已分享的训练链接 / 撤销) -->
+      <view class="settings-item" bindtap="onMySharesTap" hover-class="item-hover">
+        <view class="settings-left">
+          <view class="settings-icon-wrap">
+            <text class="settings-icon-text">🔗</text>
+          </view>
+          <view class="settings-texts">
+            <text class="settings-title">{{t.MY_SHARES}}</text>
+            <text class="settings-subtitle">{{t.SHARE_REVOKE_CONFIRM}}</text>
+          </view>
+        </view>
+        <text class="settings-arrow">›</text>
+      </view>
+
     </view>
 
     <!-- Help Guide -->

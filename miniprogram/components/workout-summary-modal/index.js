@@ -33,6 +33,9 @@ Component({
     _locale: 'en',
     _dateStr: '',
     t: app.globalData.t,  // 注入 i18n 字典
+    // 分享 token —— 必须在**点分享之前**就准备好(见 onShareAppMessage 的注释)
+    _shareToken: '',
+    _shareFailed: false,
     _stats: {
       exerciseCount: 0,
       durationStr: '0 min',
@@ -58,6 +61,8 @@ Component({
     'isOpen, session': function(isOpen, session) {
       if (isOpen && session) {
         this._computeStats(session);
+        // 预取分享 token
+        this._prepareShareToken(session);
       }
     },
   },
@@ -140,14 +145,51 @@ Component({
       const yyyy = now.getFullYear();
       return `${yyyy}-${mm}-${dd}`;
     },
+
+    /**
+     * 预取分享 token。
+     *
+     * ⚠️ **必须提前取**, 因为 onShareAppMessage 是**同步**回调 ——
+     *    微信要求它同步返回 {title, path, imageUrl}, 没有 await 的余地。
+     *    分享按钮又是 open-type="share"(点一下直接调起分享面板), 点完再取来不及。
+     *    所以在弹框打开时就先把 token 备好。
+     */
+    async _prepareShareToken(session) {
+      const sessionId = Number(session && (session.id || session._id)) || Number(this.data.sessionId) || 0;
+      if (!sessionId) return;
+      this.setData({ _shareToken: '', _shareFailed: false });
+      try {
+        const api = require('../../utils/api.js');
+        const res = await api.callCloud('share.create', { session_id: sessionId });
+        const token = res && res.result && res.result.share && res.result.share.token;
+        if (token) {
+          this.setData({ _shareToken: token });
+        } else {
+          this.setData({ _shareFailed: true });
+        }
+      } catch (err) {
+        console.warn('[summary] 分享链接预取失败:', err);
+        this.setData({ _shareFailed: true });
+      }
+    },
+
     onShareAppMessage() {
-      const {_stats} = this.data;
-      return {
-        title: app.globalData.language === 'zh'
-          ? `刚完成了 ${_stats.exerciseCount} 个动作，训练 ${_stats.durationStr}，消耗 ${_stats.totalCalories} 大卡 💪`
-          : `Just finished ${_stats.exerciseCount} exercises, ${_stats.durationStr} workout, ${_stats.totalCalories} kcal 💪`,
-        path: '/pages/index/index',
-      };
+      const {_stats, _shareToken} = this.data;
+      const isZh = app.globalData.language === 'zh';
+      const title = isZh
+        ? `刚完成了 ${_stats.exerciseCount} 个动作，训练 ${_stats.durationStr}，消耗 ${_stats.totalCalories} 大卡 💪`
+        : `Just finished ${_stats.exerciseCount} exercises, ${_stats.durationStr} workout, ${_stats.totalCalories} kcal 💪`;
+      // 拿到 token → 分享卡片直接进分享页(B 点开就能看到这场训练)
+      // 没拿到 → 降级回首页, 并提示用户(不能静默发一个看不到内容的卡片)
+      if (_shareToken) {
+        return {
+          title,
+          path: `/pages/share/index?token=${_shareToken}`,
+          imageUrl: '',
+        };
+      }
+      wx.showToast({ title: isZh ? '分享链接生成失败' : 'Failed to create share link', icon: 'none' });
+      return { title, path: '/pages/index/index' };
     },
   },
 });

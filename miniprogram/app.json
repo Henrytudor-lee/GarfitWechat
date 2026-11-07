@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/share/index",
+    "pages/my-shares/index",
     "pages/library/index",
     "pages/stats/index",
     "pages/profile/index",
