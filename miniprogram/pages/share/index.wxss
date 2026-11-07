@@ -1,0 +1,418 @@
+/* pages/share/index.wxss — 训练分享页
+   视觉语言跟首页/会话详情一致(深色 + 荧光绿主色), 但用的是独立页而不是弹框。 */
+
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 40rpx 28rpx 200rpx;
+  box-sizing: border-box;
+}
+
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ── 状态区(加载中 / 失效) ── */
+.state-box {
+  padding: 160rpx 40rpx;
+  text-align: center;
+}
+.state-icon {
+  font-size: 72rpx;
+  margin-bottom: 24rpx;
+}
+.state-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 12rpx;
+}
+.theme-day .state-title { color: #1a1a1a; }
+.state-sub {
+  font-size: 24rpx;
+  color: #8a8a8a;
+  margin-bottom: 30rpx;
+}
+.state-btn {
+  display: inline-block;
+  margin: 0 12rpx;
+  padding: 22rpx 48rpx;
+  border-radius: 999rpx;
+  background: #ccf200;
+  color: #000;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+/* ── 分享者 ── */
+.share-head {
+  margin-bottom: 28rpx;
+}
+.owner {
+  display: flex;
+  align-items: center;
+}
+.owner-avatar {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.owner-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+.owner-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 6rpx;
+}
+.theme-day .owner-name { color: #1a1a1a; }
+.owner-label {
+  font-size: 22rpx;
+  color: #8a8a8a;
+}
+
+/* ── 训练摘要 ── */
+.summary {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+.summary-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.07);
+  border-radius: 20rpx;
+  padding: 26rpx 16rpx;
+  text-align: center;
+  box-sizing: border-box;
+}
+.theme-day .summary-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.summary-val {
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ccf200;
+  line-height: 1.1;
+  margin-bottom: 10rpx;
+}
+.summary-label {
+  font-size: 20rpx;
+  color: #8a8a8a;
+  letter-spacing: 0.08em;
+}
+
+.date-line {
+  font-size: 22rpx;
+  color: #8a8a8a;
+  margin-bottom: 24rpx;
+  font-family: 'SF Mono', Menlo, monospace;
+}
+
+/* ── 动作分组 ── */
+.group {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.07);
+  border-radius: 22rpx;
+  padding: 22rpx;
+  margin-bottom: 18rpx;
+}
+.theme-day .group {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+}
+.group-img-wrap {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.group-img {
+  width: 100%;
+  height: 100%;
+}
+.group-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+.group-info {
+  flex: 1;
+  min-width: 0;
+}
+.group-name {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-day .group-name { color: #1a1a1a; }
+.group-sub {
+  font-size: 22rpx;
+  color: #8a8a8a;
+}
+.group-dot {
+  margin: 0 8rpx;
+}
+.group-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.group-cal {
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #ccf200;
+}
+.group-detail-hint {
+  font-size: 19rpx;
+  color: #6a6a6a;
+  margin-top: 6rpx;
+}
+
+/* ── sets ── */
+.sets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+.set-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 16rpx;
+  border-radius: 12rpx;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 24rpx;
+  color: #d8d8d8;
+}
+.theme-day .set-item {
+  background: rgba(0, 0, 0, 0.04);
+  color: #333;
+}
+.set-num {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #000;
+  font-size: 17rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.set-val { font-weight: 700; }
+.set-val.reps { color: #fff; }
+.theme-day .set-val.reps { color: #1a1a1a; }
+.set-unit {
+  font-size: 19rpx;
+  color: #8a8a8a;
+  font-weight: 600;
+}
+.set-sep {
+  color: #555;
+  margin: 0 2rpx;
+}
+
+/* ── 底部按钮 ── */
+.foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx 28rpx calc(24rpx + env(safe-area-inset-bottom, 0px));
+  background: rgba(19, 19, 19, 0.92);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+.theme-day .foot {
+  background: rgba(245, 245, 245, 0.94);
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+.foot-btn {
+  width: 100%;
+  height: 92rpx;
+  border-radius: 999rpx;
+  background: #ccf200;
+  color: #000;
+  font-size: 30rpx;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 动作详情弹层 ── */
+.sheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9000;
+  display: flex;
+  align-items: flex-end;
+}
+.sheet {
+  width: 100%;
+  max-height: 78vh;
+  background: #1a1a1a;
+  border-radius: 32rpx 32rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sheet-scroll {
+  flex: 1;
+  min-height: 0;
+}
+.sheet-media {
+  width: 100%;
+  height: 380rpx;
+  background: #000;
+}
+.sheet-video {
+  width: 100%;
+  height: 380rpx;
+  display: block;
+}
+.sheet-video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+}
+.sheet-body {
+  padding: 28rpx 32rpx 40rpx;
+}
+.sheet-title {
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #f2f2f2;
+  margin-bottom: 8rpx;
+}
+.sheet-en {
+  font-size: 22rpx;
+  color: #8a8a8a;
+  margin-bottom: 18rpx;
+}
+.sheet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 28rpx;
+}
+.chip {
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(204, 242, 0, 0.14);
+  color: #ccf200;
+}
+.chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #b9b9b9;
+}
+.sheet-sets-title {
+  font-size: 22rpx;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6a6a6a;
+  margin-bottom: 14rpx;
+}
+/* 组列表: 一行两条 */
+.sheet-sets-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.sheet-set-row {
+  width: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 14rpx 16rpx 14rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.07);
+  font-size: 24rpx;
+  color: #e0e0e0;
+}
+/* 奇数条 → 最后一条独占整行, 不留半格空白 */
+.sheet-set-row.wide {
+  width: 100%;
+  padding-right: 0;
+}
+.sheet-set-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+.sheet-set-num {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  font-size: 17rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sheet-foot {
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom, 0px));
+  border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 收藏按钮 —— 与动作库页同款(心形图标, 已收藏时高亮) */
+.sheet-fav-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sheet-fav-btn.active {
+  background: rgba(204, 242, 0, 0.18);
+}
+.sheet-fav-btn image {
+  width: 38rpx;
+  height: 38rpx;
+}
+.sheet-close {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

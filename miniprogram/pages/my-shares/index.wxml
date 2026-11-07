@@ -1,0 +1,54 @@
+<!--pages/my-shares/index.wxml-->
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+
+  <view wx:if="{{loading}}" class="state-box">
+    <view class="state-title">{{t.LOADING}}</view>
+  </view>
+
+  <view wx:elif="{{items.length === 0}}" class="state-box">
+    <view class="state-icon">🔗</view>
+    <view class="state-title">{{t.NO_SHARES_YET}}</view>
+  </view>
+
+  <view wx:else class="list">
+    <!-- 整行可点 → 打开那次分享的详情页(分享出去后 B 看到的就是这个页面,
+         自己也能预览 —— 顺便验证分享效果) -->
+    <view class="item" wx:for="{{items}}" wx:key="token" bindtap="onItemTap" data-token="{{item.token}}">
+      <view class="item-head">
+        <view class="item-date">{{item.dateText || '—'}}</view>
+        <view class="item-status item-status-{{item.status}}">
+          {{item.status === 'ACTIVE' ? (locale === 'zh' ? '有效' : 'Active')
+            : item.status === 'REVOKED' ? (locale === 'zh' ? '已取消' : 'Revoked')
+            : item.status === 'EXPIRED' ? (locale === 'zh' ? '已过期' : 'Expired')
+            : (locale === 'zh' ? '训练已删除' : 'Deleted')}}
+        </view>
+      </view>
+
+      <view class="item-stats">
+        <text class="item-stat">{{item.durationStr}}</text>
+        <text class="item-dot">·</text>
+        <text class="item-stat">{{item.exercise_count}} {{t.EXERCISES}}</text>
+        <text class="item-dot">·</text>
+        <text class="item-stat">{{item.calories}} {{t.CAL_UNIT_SHORT}}</text>
+      </view>
+
+      <view class="item-expire" wx:if="{{item.status === 'ACTIVE' && item.expires_at}}">
+        {{locale === 'zh' ? '有效期至' : 'Valid until'}} {{item.expires_at}}
+      </view>
+
+      <view class="item-foot">
+        <view class="item-preview">
+          {{locale === 'zh' ? '查看详情' : 'View details'}} ›
+        </view>
+        <!-- catchtap: 阻止冒泡, 别触发行上的"查看详情" -->
+        <button class="revoke-btn" wx:if="{{item.status === 'ACTIVE'}}"
+                catchtap="onRevoke"
+                data-token="{{item.token}}"
+                loading="{{revoking === item.token}}" disabled="{{revoking}}">
+          {{t.REVOKE_SHARE}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+</view>

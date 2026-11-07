@@ -1,37 +1,41 @@
 <!--pages/index/index.wxml—garcia-fitness-new style with bento stats, date picker, rest timer-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Top App Bar -->
-  <appbar />
+  <appbar theme="{{theme}}" />
+
+  <!-- 加载失败态: 与"今天还没训练"区分开, 并给一个重试入口。
+       原来登录失败/超时只是 console.warn, 用户看到的是一片空白, 无提示无重试。 -->
+  <view class="load-error-banner" wx:if="{{loadError}}" bindtap="_bootstrap">
+    <text class="load-error-text">{{t.LOAD_FAILED_HINT}}</text>
+    <text class="load-error-btn">{{t.RETRY}}</text>
+  </view>
 
   <!-- Hero Timer Card -->
   <view class="timer-card">
-    <view class="timer-label">DURATION</view>
+    <view class="timer-label">{{t.DURATION}}</view>
     <view class="timer-display">{{elapsedTime}}</view>
     <view class="timer-stats-row">
       <view class="timer-stat">
-        <view class="stat-val">{{totalVolume}}</view>
-        <view class="stat-key">VOLUME (KG)</view>
+        <view class="stat-val">{{totalCaloriesStr}}</view>
+        <view class="stat-key">{{t.CALORIES_LABEL}}</view>
       </view>
       <view class="stat-divider"></view>
       <view class="timer-stat">
         <view class="stat-val">{{exerciseCount}}</view>
-        <view class="stat-key">EXERCISES</view>
+        <view class="stat-key">{{t.EXERCISES}}</view>
       </view>
       <view class="stat-divider"></view>
       <view class="timer-stat">
         <view class="stat-val text-primary">{{restTime}}</view>
-        <view class="stat-key">REST</view>
+        <view class="stat-key">{{t.REST}}</view>
       </view>
     </view>
   </view>
 
   <!-- Quick Start / End Training -->
-  <button
-    class="start-btn {{runningSession ? 'stop' : 'start'}}"
-    bindtap="{{runningSession ? 'stopWorkout' : 'startWorkout'}}"
-  >
-    {{runningSession ? 'END TRAINING' : 'QUICK START'}}
+  <button class="start-btn {{runningSession ? 'stop' : 'start'}}" bindtap="{{runningSession ? 'requestStopWorkout' : 'startWorkout'}}">
+    {{runningSession ? t.END_TRAINING : t.QUICK_START}}
   </button>
 
   <!-- Floating FAB - Add Exercise -->
@@ -39,114 +43,153 @@
     <text class="fab-icon">+</text>
   </view>
 
-  <!-- Current Workout -->
-  <view class="section">
+  <!-- Current Workout (only show during active session) -->
+  <view wx:if="{{runningSession}}" class="section">
     <view class="section-header">
-      <text class="section-title">CURRENT WORKOUT</text>
-      <text class="section-badge {{runningSession ? 'active' : ''}}">{{runningSession ? 'IN PROGRESS' : 'READY'}}</text>
+      <text class="section-title">{{t.CURRENT_WORKOUT}}</text>
+      <text class="section-badge active">{{t.IN_PROGRESS}}</text>
     </view>
 
     <view wx:if="{{exerciseGroups.length > 0}}" class="exercise-list">
-      <view
-        class="exercise-card"
-        wx:for="{{exerciseGroups}}"
-        wx:key="exercise_id"
-        data-item="{{item}}"
-        bindtap="onExerciseTap"
-      >
+      <view class="exercise-card-track {{item.isLatestAdded ? 'latest-added' : ''}}" wx:for="{{exerciseGroups}}" wx:key="exercise_id">
+        <view class="exercise-card" data-item="{{item}}" bindtap="onExerciseTap">
         <!-- Header: image + name/sets + volume -->
         <view class="ec-header">
           <view class="ec-img-wrap">
-            <image wx:if="{{item.image_name}}" class="ec-img" src="{{imgPrefix}}/{{item.image_name}}" mode="aspectFill" />
+            <image wx:if="{{item.image_name}}" class="ec-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
             <view wx:else class="ec-img-placeholder">🏋️</view>
           </view>
           <view class="ec-info">
-            <view class="ec-name">{{item.name_zh || item.name}}</view>
-            <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? 'set' : 'sets'}}</view>
+            <view class="ec-name">{{locale === 'en' ? item.name_en : item.name_zh}}</view>
+            <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
           </view>
           <view class="ec-volume">
-            <view class="ec-vol-num">{{item.totalVolume}} kg</view>
-            <view class="ec-vol-label">TOTAL VOLUME</view>
+            <view class="ec-vol-num">{{item.totalCalories}} {{t.CAL_UNIT_SHORT}}</view>
+            <view class="ec-vol-label">{{t.CAL_UNIT}}</view>
           </view>
         </view>
         <!-- Sets grid: 2 columns -->
         <view class="ec-sets-grid">
-          <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
-            <view class="ec-set-num">{{index + 1}}</view>
-            <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
-            <view class="ec-set-sep">×</view>
-            <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">reps</text></view>
+          <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
+            <view class="ec-set-num {{item.isLatestAdded && s.id === item.latestSetId ? 'latest-set-num' : ''}}">{{index + 1}}</view>
+            <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
+            <block wx:if="{{s.distance_km > 0}}">
+              <view class="ec-set-val reps">{{s.distance_km}} <text class="ec-set-unit">{{t.KM}}</text></view>
+              <view class="ec-set-sep" wx:if="{{s.duration_sec > 0}}">·</view>
+              <view class="ec-set-val reps" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
+            </block>
+            <!-- 计时类: 时长必显, 负重可选(手握哑铃的交叉跳跃 / 负重爬坡) -->
+            <block wx:elif="{{s.duration_sec > 0}}">
+              <view class="ec-set-val reps">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+              <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+              <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
+            </block>
+            <!-- 次数类: 重量 × 次数 -->
+            <block wx:else>
+              <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit}}</text></view>
+              <view class="ec-set-sep">×</view>
+              <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS_UNIT}}</text></view>
+            </block>
           </view>
+        </view>
         </view>
       </view>
     </view>
 
-    <view wx:elif="{{runningSession}}" class="empty-card" bindtap="goToLibrary">
-      <text class="empty-hint">TAP + TO ADD EXERCISES</text>
+    <view wx:else class="empty-card empty-add" bindtap="openAddModal">
+      <view class="empty-mini-fab">+</view>
+      <text class="empty-hint">{{t.TAP_PLUS_TO_ADD_EXERCISES}}</text>
     </view>
-
-    <view wx:else class="empty-card">
-      <text class="empty-hint">START TRAINING TO ADD EXERCISES</text>
+  </view>
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">{{t.FITNESS_CALENDAR}}</text>
+    </view>
+    <!-- Calendar Mini -->
+    <view class="calendar-card">
+      <view class="cal-header">
+        <text class="cal-nav" bindtap="_prevMonth">‹</text>
+        <text class="cal-month-label">{{locale === 'en' ? calMonthLabelEN : calMonthLabelZH}}</text>
+        <text class="cal-nav" bindtap="_nextMonth">›</text>
+      </view>
+      <view class="cal-weekdays">
+        <text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="cal-days">
+        <text wx:for="{{calendarDays}}" wx:key="dateStr" class="{{item.worked ? 'day-worked' : ''}} {{item.today ? 'day-today' : ''}} {{item.dateStr === tappedDayDateStr ? 'day-tapped' : ''}}" bindtap="onDayTap" data-day="{{item}}">{{item.day}}</text>
+      </view>
     </view>
   </view>
 
-  <!-- History Bento Section -->
+  <!-- History Section -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">HISTORY</text>
-      <view
-        class="date-picker-btn"
-        bindtap="openDatePicker"
-      >{{displayDate}}</view>
+      <text class="section-title">{{t.HISTORY}}</text>
+      <view class="date-picker-btn" bindtap="openDatePicker">{{displayDate}}</view>
     </view>
 
     <!-- Sessions for selected date -->
     <view wx:if="{{historySessions.length > 0}}" class="history-session-list">
-      <view
-        class="history-session-item"
-        wx:for="{{historySessions}}"
-        wx:key="id"
-        data-session="{{item}}"
-        bindtap="onHistorySessionTap"
-      >
+      <view class="history-session-item" wx:for="{{historySessions}}" wx:key="id" data-session="{{item}}" bindtap="onHistorySessionTap">
         <view class="history-session-time">{{item.timeStr}}</view>
         <view class="history-session-info">
           <text class="history-session-stat">{{item.durationStr}}</text>
-          <text class="history-session-stat">{{item.exerciseCount || 0}} EXERCISES</text>
+          <text class="history-session-stat">{{item.exerciseCount || 0}} {{t.EXERCISES}}</text>
         </view>
       </view>
     </view>
 
-    <!-- Bento Grid (shown when no sessions for selected date) -->
-    <view wx:else class="bento-grid">
+    <!-- Empty state when no sessions for selected date -->
+    <view wx:else class="history-empty">
+      <text class="history-empty-hint">{{t.NO_SESSIONS_FOR_DATE}}</text>
+    </view>
+  </view>
+
+  <!-- Bento Grid (always shown) -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">{{t.BENTO_TITLE}}</text>
+    </view>
+    <view class="bento-grid">
       <view class="bento-card bento-today">
-        <view class="bento-label">TODAY</view>
+        <view class="bento-label">{{t.TODAY}}</view>
         <view class="bento-day">{{todayDay}}</view>
         <view class="bento-month text-primary">{{todayMonth}}</view>
+        <view class="bento-volume {{todayVolume > 0 ? 'has-volume' : 'muted'}}">
+          <text class="bento-volume-num">{{todayCaloriesStr}}</text>
+          <text class="bento-volume-unit">{{t.CAL_UNIT_SHORT}}</text>
+        </view>
         <view class="bento-progress-bar">
           <view class="bento-progress-fill" style="width: {{todayProgress}}%"></view>
         </view>
       </view>
       <view class="bento-card bento-yesterday">
-        <view class="bento-label">YESTERDAY</view>
+        <view class="bento-label">{{t.YESTERDAY}}</view>
         <view class="bento-day">{{yesterdayDay}}</view>
         <view class="bento-month text-muted">{{yesterdayMonth}}</view>
+        <view class="bento-volume {{yesterdayVolume > 0 ? 'has-volume' : 'muted'}}">
+          <text class="bento-volume-num">{{yesterdayCaloriesStr}}</text>
+          <text class="bento-volume-unit">{{t.CAL_UNIT_SHORT}}</text>
+        </view>
         <view class="bento-progress-bar">
-          <view class="bento-progress-fill muted" style="width: 0%"></view>
+          <view class="bento-progress-fill muted" style="width: {{yesterdayProgress}}%"></view>
         </view>
       </view>
       <view class="bento-card bento-monthly">
-        <view class="bento-label">MONTHLY VOL</view>
-        <view class="bento-big-num text-primary">0 KG</view>
-        <view class="bento-hint text-primary">START TRACKING</view>
+        <view class="bento-label">{{t.MONTHLY_VOL}}</view>
+        <view class="bento-big-num text-primary">{{monthlyCaloriesStr}} {{t.CAL_UNIT_SHORT}}</view>
+        <view class="bento-hint text-muted">{{t.MONTHLY_VOL_HINT}}</view>
         <view class="bento-bg-icon">📊</view>
       </view>
     </view>
   </view>
 
   <!-- Custom Date Picker Modal -->
-  <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker">
-    <view class="picker-modal" catchtap="noop">
+  <!-- catchtouchmove="noop": 只拦 tap 拦不住 touchmove —— 在弹层上滑动会带动背景页面滚动(滚动穿透) -->
+  <view class="picker-overlay {{showDatePicker ? 'show' : ''}}" bindtap="closeDatePicker" catchtouchmove="noop">
+    <view class="picker-modal" catchtap="onPickerModalTap" catchtouchmove="noop">
       <!-- Month navigation -->
       <view class="picker-header">
         <view class="picker-nav" bindtap="prevMonth">
@@ -159,57 +202,41 @@
       </view>
       <!-- Day headers -->
       <view class="picker-day-headers">
-        <text class="picker-day-h" wx:for="{{dayNames}}" wx:key="index">{{item}}</text>
+        <text class="picker-day-h" wx:for="{{dayNames}}" wx:key="*this">{{item}}</text>
       </view>
       <!-- Days grid -->
       <view class="picker-days-grid">
-        <view
-          wx:for="{{calendarDays}}"
-          wx:key="index"
-          class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}"
-          bindtap="selectDay"
-          data-day="{{item.day}}"
-        >{{item.day}}</view>
+        <view wx:for="{{pickerDays}}" wx:key="k" class="picker-day-cell {{item.empty ? 'empty' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isToday ? 'today' : ''}}" bindtap="selectDay" data-day="{{item.day}}">{{item.day}}</view>
       </view>
       <!-- Today shortcut -->
-      <view class="picker-today-btn" bindtap="goToToday">TODAY</view>
+      <view class="picker-today-btn" bindtap="goToToday">{{t.TODAY}}</view>
     </view>
   </view>
 
   <!-- Add Exercise Modal -->
-  <add-exercise-modal
-    isOpen="{{showAddModal}}"
-    sessionId="{{currentSessionId}}"
-    bind:close="onAddModalClose"
-    bind:exerciseadded="onAddModalExerciseAdded"
-  />
+  <!-- preselectedExercise: 从动作库带回来的预选动作(选完动作直接进第二步填计量值) -->
+  <add-exercise-modal isOpen="{{showAddModal}}" sessionId="{{currentSessionId}}" preselectedExercise="{{preselectedExercise}}" theme="{{theme}}" bind:close="onAddModalClose" bind:exerciseadded="onAddModalExerciseAdded" />
 
   <!-- Edit Exercise Modal -->
-  <edit-exercise-modal
-    isOpen="{{showEditModal}}"
-    group="{{editingGroup}}"
-    sessionId="{{currentSessionId}}"
-    bind:close="onEditModalClose"
-    bind:saved="onEditModalSaved"
-  />
+  <edit-exercise-modal isOpen="{{showEditModal}}" group="{{editingGroup}}" sessionId="{{currentSessionId}}" locale="{{locale}}" theme="{{theme}}" bind:close="onEditModalClose" bind:saved="onEditModalSaved" />
 
   <!-- Session Detail Modal -->
-  <session-detail-modal
-    isOpen="{{showSessionDetailModal}}"
-    session="{{viewingSession}}"
-    sessionId="{{viewingSessionId}}"
-    bind:close="onSessionDetailClose"
-  />
+  <session-detail-modal isOpen="{{showSessionDetailModal}}" session="{{viewingSession}}" sessionId="{{viewingSessionId}}" locale="{{locale}}" bind:close="onSessionDetailClose" />
 
   <!-- Workout Summary Modal -->
-  <workout-summary-modal
-    isOpen="{{showWorkoutSummary}}"
-    session="{{workoutSummarySession}}"
-    exerciseList="{{workoutSummaryExercises}}"
-    bind:close="onWorkoutSummaryClose"
-  />
+  <!-- 组件自己从 session.exercises 取数据, 不需要再传一份 exerciseList(原来重复传同一数组, setData 载荷翻倍) -->
+  <workout-summary-modal isOpen="{{showWorkoutSummary}}" session="{{workoutSummarySession}}" locale="{{locale}}" bind:close="onWorkoutSummaryClose" />
+
+  <!-- Custom End Confirm Modal -->
+  <custom-end-confirm-modal isOpen="{{showEndConfirm}}" locale="{{locale}}" theme="{{theme}}" bind:confirm="stopWorkout" bind:cancel="onEndConfirmCancel" />
+
+  <!-- Welcome Modal -->
+  <welcome-modal isOpen="{{showWelcome}}" bind:close="onWelcomeClose" />
+
+  <!-- Session Orb (悬浮圆球, 显示 running session 状态) -->
+  <session-orb session="{{runningSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 
   <!-- Custom Tab Bar -->
-  <custom-tabbar active="training" />
+  <custom-tabbar active="training" theme="{{theme}}" />
 
 </view>

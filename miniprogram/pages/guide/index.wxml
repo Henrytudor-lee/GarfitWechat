@@ -1,0 +1,52 @@
+<!-- pages/guide/index.wxml -->
+<view class="guide-page page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+  <!-- Status bar placeholder -->
+  <view class="status-bar-top"></view>
+
+  <!-- Header: skip left -->
+  <view class="guide-header">
+    <view class="skip-btn" bindtap="onSkip">{{skipText}}</view>
+    <view class="header-spacer"></view>
+  </view>
+
+  <!-- Cards container with swipe support -->
+  <view class="guide-container"
+        catchtouchstart="onTouchStart"
+        catchtouchmove="onTouchMove"
+        catchtouchend="onTouchEnd">
+    <view class="guide-track" style="transform:translateX(-{{currentStep * 100}}%);">
+      <block wx:for="{{cards}}" wx:key="imageName">
+        <view class="guide-card">
+          <view class="card-illustration">
+            <block wx:if="{{item.imageName && imgPrefix}}">
+              <image class="card-gif" src="{{imgPrefix}}/guide/{{item.imageName}}" mode="aspectFit" />
+            </block>
+            <block wx:else>
+              <view class="glow-ring">
+                <view class="icon-circle accent">{{item.icon}}</view>
+              </view>
+            </block>
+          </view>
+          <view class="card-step">{{'Step ' + (index + 1) + '/' + cards.length}}</view>
+          <view class="card-title">{{item.title}}</view>
+          <view class="card-desc">{{item.desc}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- Bottom: progress dots + controls -->
+  <view class="guide-bottom">
+    <view class="progress-dots">
+      <block wx:for="{{cards}}" wx:key="imageName">
+        <view class="dot {{currentStep === index ? 'active' : ''}}"></view>
+      </block>
+    </view>
+    <view class="guide-footer">
+      <button wx:if="{{currentStep > 0}}" class="btn-ghost" bindtap="onPrev">{{backText}}</button>
+      <button class="btn-primary" bindtap="onNext">
+        {{currentStep < cards.length - 1 ? nextText : doneText}}
+      </button>
+    </view>
+  </view>
+</view>

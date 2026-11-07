@@ -56,7 +56,7 @@
 }
 
 .stat-val.text-primary {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .stat-key {
@@ -91,7 +91,7 @@
 }
 .start-btn::after { border: none; }
 .start-btn.start {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   box-shadow: 0 0 40rpx rgba(204, 242, 0, 0.35);
 }
@@ -105,10 +105,10 @@
 .fab {
   position: fixed;
   bottom: 200rpx;
-  right: 32rpx;
+  right: 16rpx;
   width: 112rpx;
   height: 112rpx;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -153,14 +153,14 @@
   text-transform: uppercase;
 }
 .section-badge.active {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .section-link {
   font-family: 'Lexend Deca', sans-serif;
   font-size: 22rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -172,10 +172,45 @@
   gap: 12rpx;
 }
 
+.exercise-card-track {
+  position: relative;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.exercise-card-track.latest-added {
+  padding: 1rpx;
+  box-shadow: 0 4rpx 16rpx rgba(200, 255, 0, 0.08);
+}
+
+.exercise-card-track.latest-added::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 280%;
+  height: 280%;
+  background: linear-gradient(
+    to bottom,
+    var(--primary) 0%,
+    #ffffff 100%
+  );
+  transform: translate(-50%, -50%);
+  animation: exercise-card-track-rotate 1.8s linear infinite;
+}
+
+.exercise-card-track.latest-added .exercise-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border-color: transparent;
+}
+
 .exercise-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20rpx;
+  border-radius: 18rpx;
   overflow: hidden;
 }
 
@@ -239,7 +274,7 @@
 .ec-vol-num {
   font-size: 24rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .ec-vol-label {
@@ -270,14 +305,22 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #131313;
   font-size: 20rpx;
   font-weight: 700;
+  line-height: 36rpx;
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.ec-set-num.latest-set-num {
+  background: #ff4b3e;
+  color: #fff;
+  box-shadow: 0 0 0 2rpx rgba(255, 75, 62, 0.25);
 }
 
 .ec-set-val {
@@ -320,6 +363,31 @@
   color: #3f3f46;
   letter-spacing: 0.15em;
   text-transform: uppercase;
+}
+
+/* 缩小版 + 按钮 (在 empty-card 里, 仿右下 fab) */
+.empty-add {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 32rpx 40rpx;
+}
+.empty-mini-fab {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #000;
+  font-size: 32rpx;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16rpx rgba(204, 242, 0, 0.3);
+  flex-shrink: 0;
 }
 
 /* Recent Sessions */
@@ -380,7 +448,7 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 24rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .history-session-info {
@@ -439,7 +507,7 @@
   text-transform: uppercase;
 }
 
-.bento-month.text-primary { color: #ccf200; }
+.bento-month.text-primary { color: var(--primary-text); }
 .bento-month.text-muted { color: rgba(255, 255, 255, 0.25); }
 
 .bento-progress-bar {
@@ -453,13 +521,38 @@
 
 .bento-progress-fill {
   height: 100%;
-  background: #ccf200;
+  background: var(--primary);
   border-radius: 100rpx;
 }
 
 .bento-progress-fill.muted {
   background: rgba(255, 255, 255, 0.2);
-  width: 0% !important;
+}
+
+.bento-volume {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  margin-top: 20rpx;
+  min-height: 56rpx;
+  font-family: 'Lexend Deca', sans-serif;
+  line-height: 1;
+}
+.bento-volume.has-volume {
+  color: var(--primary-text);
+}
+.bento-volume.muted {
+  color: rgba(255, 255, 255, 0.20);
+}
+.bento-volume-num {
+  font-size: 44rpx;
+  font-weight: 900;
+}
+.bento-volume-unit {
+  font-size: 18rpx;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
 }
 
 .bento-monthly {
@@ -471,7 +564,7 @@
   font-family: 'Lexend Deca', sans-serif;
   font-size: 72rpx;
   font-weight: 900;
-  color: #ccf200;
+  color: var(--primary-text);
   line-height: 1;
   margin: 8rpx 0 4rpx;
 }
@@ -492,7 +585,7 @@
   opacity: 0.05;
 }
 
-.text-primary { color: #ccf200; }
+.text-primary { color: var(--primary-text); }
 
 /* Date Picker Button */
 .date-picker-btn {
@@ -620,7 +713,7 @@
 }
 
 .picker-day-cell.selected {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-weight: 800;
 }
@@ -633,7 +726,7 @@
   border-radius: 16rpx;
   font-size: 22rpx;
   font-weight: 800;
-  color: #ccf200;
+  color: var(--primary-text);
   text-align: center;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -641,4 +734,451 @@
 
 .picker-today-btn:active {
   background: rgba(204, 242, 0, 0.20);
+}
+
+/* ========================
+   日间主题覆盖（day mode overrides）
+   ======================== */
+.page.theme-day {
+  background: #f5f5f5;
+  /* 兜底: WeChat 自定义组件/页面 CSS 变量传递不可靠, 在 page 自己的作用域内再定义一次 */
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.page.theme-night {
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}
+
+.page.theme-day .today-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .timer-card {
+  background: rgba(0, 0, 0, 0.10);
+  border: 1rpx solid rgba(0, 0, 0, 0.12);
+}
+
+.page.theme-day .timer-label {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.page.theme-day .timer-display {
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+.page.theme-day .stat-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .stat-key {
+  color: rgba(0, 0, 0, 0.40);
+}
+
+.page.theme-day .stat-divider {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .section-title {
+  color: #1a1a1a;
+}
+
+.page.theme-day .section-badge {
+  color: #a1a1aa;
+}
+
+.page.theme-day .section-badge.active {
+  color: var(--primary-text);
+}
+
+.page.theme-day .section-link {
+  color: #1a1a1a;
+}
+
+.page.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+@keyframes exercise-card-track-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.page.theme-day .exercise-card-track.latest-added {
+  box-shadow: 0 4rpx 16rpx rgba(120, 160, 0, 0.08);
+}
+
+.page.theme-day .ec-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .ec-img-wrap {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-name {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-sets-count {
+  color: #71717a;
+}
+
+.page.theme-day .ec-vol-num {
+  color: var(--primary-text);
+}
+
+.page.theme-day .ec-vol-label {
+  color: #71717a;
+}
+
+.page.theme-day .ec-set-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.page.theme-day .ec-set-val {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-unit {
+  color: #1a1a1a;
+}
+
+.page.theme-day .ec-set-sep {
+  color: #1a1a1a;
+}
+
+.page.theme-day .empty-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .empty-hint {
+  color: #a1a1aa;
+}
+
+.page.theme-day .recent-item {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.page.theme-day .recent-date {
+  color: #1a1a1a;
+}
+
+.page.theme-day .recent-stat {
+  color: #71717a;
+}
+
+.page.theme-day .history-session-item {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .history-session-time {
+  color: #3ab24e;
+}
+
+.page.theme-day .history-session-stat {
+  color: #71717a;
+}
+
+.page.theme-day .bento-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-label {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.page.theme-day .bento-day {
+  color: #1a1a1a;
+}
+
+.page.theme-day .bento-month {
+  color: #71717a;
+}
+
+.page.theme-day .bento-month.text-primary {
+  color: var(--primary-text);
+}
+
+.page.theme-day .bento-month.text-muted {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.page.theme-day .bento-progress-bar {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-progress-fill {
+  background: var(--primary);
+}
+
+.page.theme-day .bento-progress-fill.muted {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .bento-big-num {
+  color: var(--primary-text);
+}
+
+.page.theme-day .bento-hint {
+  color: rgba(0, 0, 0, 0.40);
+}
+
+.page.theme-day .date-picker-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.page.theme-day .picker-modal {
+  background: rgba(245, 245, 245, 0.98);
+  border: 1rpx solid rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .picker-nav {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .picker-nav-arrow {
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-month-label {
+  color: #1a1a1a;
+}
+
+.page.theme-day .picker-day-h {
+  color: rgba(0, 0, 0, 0.30);
+}
+
+.page.theme-day .picker-day-cell {
+  color: rgba(0, 0, 0, 0.50);
+}
+
+.page.theme-day .picker-day-cell.today {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.page.theme-day .picker-day-cell.selected {
+  background: var(--primary);
+  color: #000;
+}
+
+.page.theme-day .picker-today-btn {
+  background: rgba(204, 242, 0, 0.10);
+  color: var(--primary-text);
+}
+
+.page.theme-day .picker-today-btn:active {
+  background: rgba(204, 242, 0, 0.20);
+}
+
+/* ====== Calendar Mini ====== */
+.calendar-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-top: 24rpx;
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.cal-nav {
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+.cal-nav:active {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.cal-month-label {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8rpx;
+}
+
+.cal-weekdays text {
+  text-align: center;
+  font-size: 18rpx;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.30);
+  padding: 6rpx 0;
+}
+
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4rpx;
+}
+
+.cal-days text {
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.50);
+  border-radius: 16rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 1) tap 时的脉冲高亮 (一次性, ~300ms) */
+@keyframes day-tap-pulse {
+  0%   { transform: scale(1);    background: transparent; }
+  30%  { transform: scale(0.85); background: var(--primary); }
+  60%  { transform: scale(1.15); background: var(--primary); }
+  100% { transform: scale(1);    background: transparent; }
+}
+.day-tapped {
+  animation: day-tap-pulse 0.3s ease-out !important;
+  color: #000 !important;
+}
+.day-tapped.day-worked {
+  color: #000 !important;
+}
+
+.day-worked {
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  border: 3rpx solid var(--primary);
+}
+
+.day-today {
+  background: var(--primary);
+  color: #000 !important;
+  font-weight: 900 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(200, 230, 0, 0.30);
+  position: relative;
+}
+
+.day-worked.day-today {
+  background: var(--primary);
+  color: #000 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(200, 230, 0, 0.30);
+}
+
+.history-empty {
+  padding: 40rpx 24rpx;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1rpx dashed rgba(255, 255, 255, 0.08);
+  border-radius: 16rpx;
+}
+.history-empty-hint {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #3f3f46;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Day theme overrides */
+.page.theme-day .calendar-card {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+
+.page.theme-day .cal-nav {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.page.theme-day .cal-nav:active {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .cal-month-label {
+  color: #1a1a1a;
+}
+
+.page.theme-day .cal-weekdays text {
+  color: rgba(0, 0, 0, 0.30);
+}
+
+.page.theme-day .cal-days text {
+  color: rgba(0, 0, 0, 0.50);
+}
+
+.page.theme-day .day-today {
+  background: var(--primary);
+  color: #000 !important;
+  border: 2rpx solid var(--primary);
+  box-shadow: 0 0 0 4rpx rgba(0, 0, 0, 0.10);
+}
+
+.page.theme-day .day-worked {
+  border-color: #9cb02c;
+  background-color: var(--primary);
+}
+
+.page.theme-night .day-worked {
+  border-color: var(--primary);
+}
+
+/* 加载失败横幅 —— 原来登录失败/超时只是 console.warn, 用户看到的是一片空白 */
+.load-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin: 16rpx 0 8rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 84, 84, 0.12);
+  border: 1px solid rgba(255, 84, 84, 0.35);
+}
+
+.load-error-text {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #ff8a8a;
+}
+
+.load-error-btn {
+  flex-shrink: 0;
+  padding: 10rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(255, 84, 84, 0.55);
 }

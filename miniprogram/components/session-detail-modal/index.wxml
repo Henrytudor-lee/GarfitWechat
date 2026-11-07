@@ -1,74 +1,97 @@
 <!--components/session-detail-modal/index.wxml-->
 <view class="modal-mask" wx:if="{{isOpen && session}}" bindtap="onMaskTap">
-  <view class="modal-sheet" catchtap="">
+  <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Header -->
     <view class="modal-header">
       <view class="header-left">
         <view class="header-btn" bindtap="closeModal">✕</view>
       </view>
-      <view class="header-title">SESSION DETAIL</view>
+      <view class="header-title">{{t.SESSION_DETAIL}}</view>
       <view class="header-right"></view>
     </view>
 
     <!-- Session Info -->
     <view class="session-info">
-      <view class="session-date">{{session.dateStr || session.start_time}}</view>
+      <view class="session-date">{{_dateDisplay || session.start_time}}</view>
       <view class="session-stats">
-        <view class="stat-item">
-          <view class="stat-val">{{session.duration_formatted || '--:--'}}</view>
-          <view class="stat-label">DURATION</view>
+        <view class="stat-card">
+          <view class="stat-val">{{_durationDisplay}}</view>
+          <view class="stat-label">{{t.DURATION}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
+        <view class="stat-card">
           <view class="stat-val">{{exerciseList.length}}</view>
-          <view class="stat-label">EXERCISES</view>
+          <view class="stat-label">{{t.EXERCISES}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
-          <view class="stat-val">{{getTotalSets(exerciseList)}}</view>
-          <view class="stat-label">SETS</view>
+        <view class="stat-card">
+          <view class="stat-val">{{totalSets}}</view>
+          <view class="stat-label">{{t.SETS}}</view>
+          <view class="stat-accent-bar"></view>
+        </view>
+        <view class="stat-card">
+          <view class="stat-val">{{_calories}}</view>
+          <view class="stat-label">{{t.CAL_UNIT}}</view>
+          <view class="stat-accent-bar"></view>
         </view>
       </view>
     </view>
 
     <!-- Exercises List -->
     <scroll-view class="exercise-list" scroll-y>
-      <view wx:if="{{loading}}" class="loading-state">LOADING...</view>
-      <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">NO EXERCISES RECORDED</view>
+      <view class="exercise-list-inner">
+        <view wx:if="{{loading}}" class="loading-state">{{t.LOADING}}</view>
+        <view wx:elif="{{exerciseList.length === 0}}" class="empty-state">{{t.NO_EXERCISES_RECORDED}}</view>
 
-      <view wx:else class="exercise-groups">
-        <view class="group-card" wx:for="{{exerciseList}}" wx:key="id">
-          <view class="group-header">
-            <image
-              wx:if="{{item.image_name}}"
-              class="group-img"
-              src="{{imgPrefix}}/{{item.image_name}}"
-              mode="aspectFill"
-            />
-            <view wx:else class="group-img group-img-placeholder">🏋️</view>
-            <view class="group-info">
-              <view class="group-name">{{item.name_zh || item.name}}</view>
-              <view class="group-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? 'SET' : 'SETS'}}</view>
+        <view wx:else class="exercise-groups">
+          <view class="ec-card" wx:for="{{exerciseList}}" wx:key="id">
+            <!-- ec-header: image + name + sets + volume -->
+            <view class="ec-header">
+              <view class="ec-img-wrap">
+                <image wx:if="{{item.image_name}}" class="ec-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
+                <view wx:else class="ec-img-placeholder">🏋️</view>
+              </view>
+              <view class="ec-info">
+                <view class="ec-name">{{locale === 'zh' ? item.name_zh : item.name_en}}</view>
+                <view class="ec-sets-count">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
+              </view>
+              <view class="ec-volume">
+                <view class="ec-vol-num">{{item.totalCalories || '—'}} {{t.CAL_UNIT_SHORT}}</view>
+                <view class="ec-vol-label">{{t.CAL_UNIT}}</view>
+              </view>
             </view>
-          </view>
-
-          <!-- Sets Table -->
-          <view class="sets-table">
-            <view class="sets-header-row">
-              <view class="col-set">SET</view>
-              <view class="col-weight">WEIGHT</view>
-              <view class="col-reps">REPS</view>
-            </view>
-            <view
-              wx:for="{{item.sets}}"
-              wx:for-item="s"
-              wx:key="id"
-              class="sets-data-row"
-            >
-              <view class="col-set">{{index + 1}}</view>
-              <view class="col-weight">{{s.weight}} {{s.weight_unit || 'kg'}}</view>
-              <view class="col-reps">{{s.reps}}</view>
+            <!-- ec-sets-grid: 2 columns -->
+            <view class="ec-sets-grid">
+              <view class="ec-set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
+                <view class="ec-set-num">{{index + 1}}</view>
+                <!-- ⚠️ 三个分支必须用**相邻的 block + if/elif/else**,
+                     不能写成 "if / if / if / elif / if / if / else" ——
+                     那样 wx:elif 会配到紧邻的上一个 if(wx:else 同理),
+                     结果 duration 类会同时渲染"时长·负重"**和** else 分支的
+                     "重量 × 0 reps"(2026-11-07 用户截图)。
+                     下面的写法与 pages/index/index.wxml 一致(那边已验证正确)。 -->
+                <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
+                <block wx:if="{{s.distance_km > 0}}">
+                  <view class="ec-set-val reps">{{s.distance_km}} <text class="ec-set-unit">{{t.KM}}</text></view>
+                  <view class="ec-set-sep" wx:if="{{s.duration_sec > 0}}">·</view>
+                  <view class="ec-set-val reps" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+                  <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+                  <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
+                </block>
+                <!-- 计时类: 时长必显, 负重可选 -->
+                <block wx:elif="{{s.duration_sec > 0}}">
+                  <view class="ec-set-val reps">{{s.duration_sec}} <text class="ec-set-unit">{{t.DURATION_UNIT}}</text></view>
+                  <view class="ec-set-sep" wx:if="{{s.weight > 0}}">·</view>
+                  <view class="ec-set-val" wx:if="{{s.weight > 0}}">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
+                </block>
+                <!-- 次数类: 重量 × 次数 -->
+                <block wx:else>
+                  <view class="ec-set-val">{{s.weight}} <text class="ec-set-unit">{{s.weight_unit || 'kg'}}</text></view>
+                  <view class="ec-set-sep">×</view>
+                  <view class="ec-set-val reps">{{s.reps}} <text class="ec-set-unit">{{t.REPS}}</text></view>
+                </block>
+              </view>
             </view>
           </view>
         </view>

@@ -5,6 +5,7 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "appbar": "/components/appbar/index",
-    "custom-tabbar": "/components/custom-tabbar/index"
+    "custom-tabbar": "/components/custom-tabbar/index",
+    "session-orb": "/components/session-orb/index"
   }
 }

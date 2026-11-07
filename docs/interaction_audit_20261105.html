@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFIT 全盘交互审查报告 · 2026-11-05</title>
+<style>
+:root{
+  --bg:#131313; --surface:#1c1c1c; --surface-low:#171717; --surface-high:#242424;
+  --card:#1a1a1a; --border:rgba(255,255,255,.09);
+  --primary:#ccf200; --primary-dim:#a8cc00; --primary-text:#3a4a00;
+  --text:#f2f2f2; --text2:#b9b9b9; --muted:#8a8a8a; --divider:rgba(255,255,255,.08);
+  --red:#ff6b6b; --amber:#ffb454; --green:#5ddc8a; --blue:#6bb8ff;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* header */
+.hero{padding:72px 0 40px;border-bottom:1px solid var(--divider);margin-bottom:44px}
+.kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:18px}
+h1{font-size:42px;line-height:1.18;font-weight:900;letter-spacing:-.02em;margin-bottom:20px}
+h1 .hl{color:var(--primary)}
+.lede{font-size:17px;color:var(--text2);max-width:760px}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:999px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.chip b{color:var(--primary);font-weight:700}
+
+/* section */
+section{margin:56px 0}
+h2{font-size:13px;letter-spacing:.26em;text-transform:uppercase;color:var(--primary);font-weight:800;
+  margin-bottom:26px;padding-bottom:12px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:12px}
+h2 .n{font-family:var(--mono);color:var(--muted);font-weight:600;letter-spacing:0}
+h3{font-size:20px;font-weight:800;margin:34px 0 12px;letter-spacing:-.01em}
+h3:first-of-type{margin-top:0}
+h4{font-size:15px;font-weight:700;margin:22px 0 9px;color:var(--text)}
+p{margin-bottom:14px;color:var(--text2)}
+p strong,li strong{color:var(--text);font-weight:700}
+ul,ol{margin:0 0 16px 22px;color:var(--text2)}
+li{margin-bottom:8px}
+code{font-family:var(--mono);font-size:.88em;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;color:var(--primary)}
+
+/* stat row */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:28px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+.stat .v{font-size:38px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.stat .k{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:9px;font-weight:700}
+.stat.ok .v{color:var(--primary)}
+.stat.warn .v{color:var(--amber)}
+.stat.red .v{color:var(--red)}
+
+/* callout */
+.callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);
+  border-radius:0 14px 14px 0;padding:22px 26px;margin:22px 0}
+.callout.red{border-left-color:var(--red)}
+.callout.amber{border-left-color:var(--amber)}
+.callout.blue{border-left-color:var(--blue)}
+.callout .t{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:9px}
+.callout p:last-child{margin-bottom:0}
+
+/* table */
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+th{text-align:left;padding:12px 14px;background:var(--surface-high);color:var(--muted);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;border-bottom:1px solid var(--border)}
+td{padding:13px 14px;border-bottom:1px solid var(--divider);color:var(--text2);vertical-align:top}
+td:first-child{color:var(--text);font-weight:700}
+tr:hover td{background:rgba(255,255,255,.022)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:5px;font-weight:700;white-space:nowrap}
+.tag.s{background:rgba(255,107,107,.16);color:var(--red)}
+.tag.m{background:rgba(255,180,84,.16);color:var(--amber)}
+.tag.l{background:rgba(139,139,255,.16);color:#9a9aff}
+.tag.f{background:rgba(92,220,138,.16);color:var(--green)}
+
+/* pre */
+pre{background:#0d0d0d;border:1px solid var(--border);border-radius:12px;padding:18px 20px;
+  overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.65;margin:16px 0;color:#cfcfcf}
+pre .add{color:var(--green)}
+pre .del{color:var(--red)}
+pre .cmt{color:#6a6a6a}
+
+/* issue card */
+.issue{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 26px;margin:18px 0}
+.issue-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.issue-h .ttl{font-size:16.5px;font-weight:800;line-height:1.45}
+.loc{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:12px;word-break:break-all}
+.loc b{color:var(--blue);font-weight:400}
+.issue .row{display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:10px;font-size:14px}
+.issue .row .lb{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding-top:3px}
+.issue .row .vl{color:var(--text2)}
+
+/* checklist */
+.checks{list-style:none;margin-left:0}
+.checks li{padding-left:30px;position:relative;margin-bottom:9px}
+.checks li::before{content:'✓';position:absolute;left:0;top:0;color:var(--primary);font-weight:900}
+.checks.no li::before{content:'✕';color:var(--red)}
+.checks.warn li::before{content:'!';color:var(--amber)}
+
+/* todo */
+.todo{display:flex;gap:14px;align-items:flex-start;padding:18px 22px;background:var(--card);
+  border:1px solid var(--border);border-radius:14px;margin-bottom:12px}
+.todo .pri{flex-shrink:0;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  font-weight:900;font-size:15px;font-family:var(--mono)}
+.pri.r{background:rgba(255,107,107,.16);color:var(--red)}
+.pri.y{background:rgba(255,180,84,.16);color:var(--amber)}
+.pri.g{background:rgba(92,220,138,.16);color:var(--green)}
+.todo .bd{flex:1}
+.todo .bd .ti{font-weight:800;font-size:15px;margin-bottom:4px}
+.todo .bd .de{font-size:13.5px;color:var(--text2)}
+
+/* grid cards */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}h1{font-size:30px}.wrap{padding:0 18px}
+  .issue .row{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+.card .ct{font-size:15px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.card .cb{font-size:13.5px;color:var(--text2)}
+.num{width:26px;height:26px;border-radius:8px;background:rgba(204,242,0,.14);color:var(--primary);
+  display:grid;place-items:center;font-size:13px;font-weight:900;flex-shrink:0}
+
+footer{margin-top:70px;padding-top:26px;border-top:1px solid var(--divider);
+  font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">Interaction Audit · 2026-11-05</div>
+  <h1>GFIT 全盘<span class="hl">交互审查</span>报告</h1>
+  <p class="lede">
+    三路子代理并行只读审查(页面层 / 组件层 / 全局契约层) → 逐条复核 → 落地修复 → 写验证脚本实跑。
+    覆盖「计时/距离/卡路里」三轮需求落地后的<strong>全部</strong>交互面。
+  </p>
+  <div class="meta">
+    <span class="chip">范围 <b>fitness_wechat</b> + <b>gfit-backend</b></span>
+    <span class="chip">前端 <b>36</b> 文件 <b>+1245/−356</b></span>
+    <span class="chip">后端 <b>14</b> 改 <b>5</b> 新增 <b>+360/−95</b></span>
+    <span class="chip">新增验证脚本 <b>4</b> 个</span>
+  </div>
+</header>
+
+<!-- ═══════════ 1 ═══════════ -->
+<section>
+  <h2><span class="n">01</span>结论速览</h2>
+  <div class="stats">
+    <div class="stat red"><div class="v">15</div><div class="k">严重 · 已修 15</div></div>
+    <div class="stat warn"><div class="v">51</div><div class="k">中等 · 已修 48</div></div>
+    <div class="stat"><div class="v">36</div><div class="k">轻微 · 已修 31</div></div>
+    <div class="stat ok"><div class="v">90</div><div class="k">合计发现</div></div>
+    <div class="stat ok"><div class="v">96</div><div class="k">实际落地修复</div></div>
+  </div>
+
+  <div class="callout red">
+    <div class="t">最严重的一条 · 静默损坏训练数据</div>
+    <p><strong><code>exercise.update</code> 会把没传的字段写成 NULL。</strong>
+    后端无条件把 <code>duration_sec</code> / <code>distance_km</code> 拼进 SET 子句,没传的 <code>push(null)</code>。
+    改个重量就能把已有的秒数抹掉,改个秒数就能把公里数抹掉 —— 而且前端注释里写的"不会误清已有值"和后端实现<strong>正好相反</strong>。</p>
+  </div>
+
+  <div class="callout">
+    <div class="t">第二条 · 主流程从未通过</div>
+    <p><strong>动作库选动作 → 训练页加入,这条链路从来没通。</strong>
+    写端写的是上一页的 <code>data</code>,读端读的是 <code>globalData</code>,两条通道从未对接。
+    更糟的是:即使接上,原实现直接落库 <code>weight:0, reps:0</code>,而首页显示过滤是
+    <code>weight&gt;0||reps&gt;0||duration&gt;0||distance&gt;0</code> → <strong>所有类型</strong>的动作加进去都不显示(不只是计时/距离类)。</p>
+  </div>
+
+  <div class="callout amber">
+    <div class="t">第三条 · 时间正确性靠运气</div>
+    <p><strong>Node 进程时区从未被约束。</strong> mysql2 默认 <code>timezone='local'</code>(按 Node 进程所在主机的时区解析 DATETIME),
+    而线上 MySQL 是 UTC+8。两边不一致时<strong>全部时间字段整体偏移 8 小时</strong> —— 训练页计时器算出负数、连续打卡错、月度统计错、日历圆点错位。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 2 ═══════════ -->
+<section>
+  <h2><span class="n">02</span>严重问题 · 13 项全部修复</h2>
+
+  <h3>后端 4 项</h3>
+
+  <div class="issue">
+    <div class="issue-h"><span class="tag s">B1</span><div class="ttl">exercise.update 把未传字段写成 NULL —— 数据损坏</div></div>
+    <div class="loc"><b>src/modules/exercises/exercises.service.ts:152-187</b></div>
+    <div class="row"><div class="lb">症状</div><div class="vl">次数类动作改重量 → 已有 <code>duration_sec</code> 被清空;距离类动作改重量 → <code>distance_km</code> 被清空</div></div>
+    <div class="row"><div class="lb">修法</div><div class="vl">只在 payload <strong>显式带</strong>该字段时才加进 SET 子句;显式传 <code>null</code> 仍表示"清空"。用 <code>hasOwnProperty</code> 区分"没传"和"显式 null"(用 <code>??</code> 区分不了 —— 它会把两者混成 undefined)</div></div>
+    <div class="row"><div class="lb">验证</div><div class="vl"><code>scripts/verify-update-semantics.ts</code> —— 12/12 通过</div></div>
+<pre><span class="cmt">- const setClause = ['weight = ?', 'reps = ?', 'weight_unit = ?', ...extraCols.map(c =&gt; `${c} = ?`)].join(', ');</span>
+<span class="add">+ const setClause = ['weight = ?', 'reps = ?', 'weight_unit = ?'];</span>
+<span class="add">+ if (hasDuration) {</span>
+<span class="add">+   const raw = pickExplicit(payload, 'duration_sec', 'durationSec');</span>
+<span class="add">+   if (raw.provided) { setClause.push('duration_sec = ?'); params.push(...); }</span>
+<span class="add">+ }</span></pre>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="tag s">B2</span><div class="ttl">Node 时区未约束 —— 全部时间字段可能偏移 8 小时</div></div>
+    <div class="loc"><b>src/infra/database/mysql.service.ts</b> · <b>src/main.ts</b> · <b>src/app.controller.ts</b></div>
+    <div class="row"><div class="lb">事实</div><div class="vl">线上 MySQL <code>@@system_time_zone=CST</code>(实测 <code>NOW()</code> 22:50 / <code>UTC_TIMESTAMP()</code> 14:50),但 mysql2 默认按 <strong>Node 进程所在主机</strong>的时区解析 DATETIME。部署脚本 / Dockerfile 都没约束 <code>TZ</code></div></div>
+    <div class="row"><div class="lb">修法</div><div class="vl">① 连接池显式 <code>timezone:'+08:00'</code>(可用 <code>MYSQL_TIMEZONE</code> 覆盖)→ 不再依赖服务器默认;② 启动自检 <code>verifyTimezone()</code>,不一致打 <strong>ERROR 日志但不阻断启动</strong>(服务起不来比偏移更糟);③ <code>/health</code> 暴露实测偏移</div></div>
+    <div class="row"><div class="lb">实测</div><div class="vl"><code>MySQL=2026-11-05 22:50:05 (UTC+8), 客户端=+08:00</code> ✅</div></div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="tag s">B3</span><div class="ttl">"连续训练天数"两个接口算法不一致 —— 同指标显示不同数字</div></div>
+    <div class="loc"><b>src/modules/users/users.service.ts</b> · <b>src/modules/stats/stats.service.ts</b> · <b>★src/common/utils/streak.util.ts</b></div>
+    <div class="row"><div class="lb">症状</div><div class="vl">users 版用 <code>new Date().toISOString().slice(0,10)</code>(UTC 日期)对比 mysql2 的本地午夜 → 差 8 小时 → <strong>昨天练过时 users 返回 0、stats 返回 1</strong>。回溯窗口也不同(30 天 vs 60 天)</div></div>
+    <div class="row"><div class="lb">修法</div><div class="vl">抽单一实现;日期一律由 MySQL 出(<code>DATE(start_time)</code> 与 <code>CURDATE()</code> 同属会话时区),SQL 里用 <code>DATE_FORMAT</code> + <code>DATEDIFF</code>,JS 侧只做 <code>Date.UTC</code> 基准的纯字符串序号换算</div></div>
+    <div class="row"><div class="lb">验证</div><div class="vl"><code>scripts/verify-streak.ts</code> —— 10/10 通过(37 个用户交叉校验 0 处不一致)</div></div>
+    <div class="callout red" style="margin-bottom:0">
+      <div class="t">这里踩到一个真坑</div>
+      <p>第一版 SQL 写成 <code>SELECT DATE_FORMAT(DATE(start_time), ...) ... GROUP BY DATE(start_time)</code>,
+      <strong>线上 MySQL 开了 <code>only_full_group_by</code> → 直接 1055 报错</strong>,
+      <code>profile.getProfile</code> 和 <code>stats.summary</code> 会全挂。
+      是验证脚本在生产库上跑出来的,改成 <code>MIN(DATE(start_time))</code> 后解决。<strong>这是本轮最惊险的一处。</strong></p>
+    </div>
+  </div>
+
+  <div class="issue">
+    <div class="issue-h"><span class="tag s">B4</span><div class="ttl">裸 Error 全部变 500 —— 监控分不清"参数错"和"服务端炸了"</div></div>
+    <div class="loc"><b>src/common/filters/all-exceptions.filter.ts</b></div>
+    <div class="row"><div class="lb">修法</div><div class="vl">
+      <code>constructor === Error</code> <strong>且不带 error code</strong> → 业务错误 → <strong>400 + 回显真实中文原因</strong>;<br>
+      带 code(<code>ER_*</code> / <code>PROTOCOL_*</code> / <code>ECONN*</code> / <code>GFIT_TIMEOUT</code>)→ 系统故障 → <strong>500 + 不泄露表名列名</strong>;<br>
+      <code>TypeError</code> / <code>ReferenceError</code> 这类真 bug → 仍然 500
+    </div></div>
+    <div class="row"><div class="lb">连带修</div><div class="vl">响应体里 payload 的展开顺序原来会覆盖 <code>error</code> 字段 → <code>Bad Request</code> 盖掉真实原因,前端永远看不到;连接池超时原本是裸 Error(没 code)→ 会被误判成 400,已打上 <code>GFIT_TIMEOUT</code></div></div>
+    <div class="row"><div class="lb">验证</div><div class="vl"><code>scripts/verify-exception-filter.ts</code> —— 12/12 通过</div></div>
+  </div>
+
+  <h3>前端 9 项</h3>
+  <table>
+    <thead><tr><th style="width:52px">#</th><th style="width:38%">问题</th><th>位置</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td>F1</td><td>动作库选动作 → 首页加入,<strong>链路从未对接</strong></td><td><code>library:309,461</code> 写<br><code>index:178</code> 读</td><td>统一走 <code>app.globalData.chosenExercise</code>,读端先消费再判断</td></tr>
+      <tr><td>F2</td><td>同 F1 但更严重:直接落库 <code>weight:0,reps:0</code>,<strong>所有类型</strong>的动作加进去都不显示</td><td><code>index/index.js:919</code></td><td>改为打开添加弹框(预选该动作)让用户填秒数/公里数/重量次数</td></tr>
+      <tr><td>F3</td><td>编辑计时类动作<strong>秒数根本存不进库</strong></td><td><code>edit-exercise-modal:300</code></td><td>保存判定补 <code>durChanged</code>/<code>distChanged</code></td></tr>
+      <tr><td>F4</td><td>新增 set 用 100 秒时间戳判定 → 停留超 100s 后新增的组被<strong>静默丢弃</strong></td><td><code>edit-exercise-modal:168,312,328</code></td><td>改用 <code>isNew</code> 标志;未入库的组永远不发 delete</td></tr>
+      <tr><td>F5</td><td>悬浮球一次点击触发两次回调 → <strong>可能创建两个 running session</strong></td><td><code>session-orb:136-144</code></td><td>删掉 <code>triggerEvent</code> 之后的直调 fallback</td></tr>
+      <tr><td>F6</td><td>后端 <code>session.create</code> 是 check-then-insert,并发会插两条</td><td><code>app.js:133</code></td><td><code>ensureRunningSession</code> 加 in-flight Promise 去重</td></tr>
+      <tr><td>F7</td><td><code>calendarDays</code> 被日历和选择器共用一个 key → <strong>打开一次选择器后迷你日历圆点全消失且点不动</strong></td><td><code>index/index.js</code></td><td>拆成 <code>calendarDays</code> / <code>pickerDays</code> 两个 key</td></tr>
+      <tr><td>F8</td><td>未登录态"登录/注册"绑了不存在的 <code>goToLogin</code> → <strong>完全无反应</strong></td><td><code>profile/index.js</code></td><td>补 <code>goToLogin</code></td></tr>
+      <tr><td>F9</td><td>计时器 <code>bindblur</code> 与 <code>bindinput</code> 同 handler → 点"停止"变"重新开始",已计秒数被清零</td><td><code>set-timer/index.wxml:25</code></td><td>删 <code>bindblur</code> + <code>running</code> 时忽略手动输入</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ 3 ═══════════ -->
+<section>
+  <h2><span class="n">03</span>中等问题 · 38 项已修</h2>
+
+  <h3>3.1 竞态类 · 旧响应覆盖新数据(8 项)</h3>
+  <table>
+    <thead><tr><th style="width:34%">问题</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td><code>library.loadList</code> 守卫在 reqId 自增<strong>之后</strong> → 在途响应被丢弃且 <code>loading</code> <strong>永久卡死</strong>,列表再也翻不了页</td><td>守卫前置到 reqId 自增之前</td></tr>
+      <tr><td><code>add-exercise-modal.loadList</code> 的"进行中直接 return"守卫<strong>吞掉所有筛选/搜索刷新</strong>,且在飞请求把 page 写成 page+1 → <strong>新筛选第 1 页永远缺失</strong></td><td>改 <code>_pendingReload</code> 标志 + 收尾补跑(带 try/catch/finally 防死锁)</td></tr>
+      <tr><td><code>index._loadHistorySessions</code> 无序号 → 快速切日期时旧日期响应覆盖新日期</td><td>加 reqId 守卫</td></tr>
+      <tr><td><code>index._loadExerciseGroups</code> 无序号(5 个调用点)→ 刚加的动作从列表消失</td><td>加 reqId 守卫</td></tr>
+      <tr><td><code>index._loadCalendarMonth</code> 无序号 → 连点翻月时圆点是别的月份</td><td>加 reqId 守卫</td></tr>
+      <tr><td><code>stats._loadLeaderboard</code> / <code>_loadExerciseData</code> 无序号 + 裸调用 → 榜单和选中项对不上 + unhandled rejection</td><td>加 reqId + try/catch</td></tr>
+      <tr><td><code>stats._loadAll</code> 无并发守卫 + 全局 <code>showLoading</code> 遮罩互相干扰 → 遮罩忽隐忽现、空态闪现</td><td><code>_loadingAll</code> 守卫 + finally 复位</td></tr>
+      <tr><td><code>session-detail-modal._loadExercises</code> 无竞态保护 → 快速切会话显示上一个会话的数据</td><td>reqId + <code>isOpen</code> 双检</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 "失败 ≠ 空态"(4 项)</h3>
+  <p>断网时用户看到的不是"加载失败",而是<strong>结论性的错误空态</strong>:</p>
+  <ul>
+    <li><code>library</code>:"请求失败"显示成"没有找到动作" → 加 <code>loadError</code> + 错误态 + 重试按钮</li>
+    <li><code>stats</code>:"请求失败"显示成"还没有训练数据"(还同时弹 toast,自相矛盾)→ 同上</li>
+    <li><code>index</code>:登录失败/超时只有 <code>console.warn</code> → 用户看到一片空白,<strong>无提示无重试</strong> → 加 <code>loadError</code> 横幅 + 点击重试</li>
+    <li><code>profile</code>:<code>Promise.all</code> 无 catch → 任一接口失败就中断 onShow 链,orb 不刷新 + unhandled rejection → <code>allSettled</code> + try/catch</li>
+  </ul>
+
+  <h3>3.3 乐观更新失败不回滚(6 处入口)</h3>
+  <p><code>library.onFavoriteTap</code> / <code>onDetailFavTap</code> / <code>add.onFavoriteTap</code> / <code>add.onSelectedFavoriteTap</code> / <code>edit.onFavoriteTap</code> —— 全部 <code>.catch(() =&gt; {})</code>,既不回滚也不提示 → 心形翻转了但服务端没变。</p>
+  <p>统一改成:请求前存快照 → 失败回滚 UI + 全局 + storage + <code>toast('操作失败')</code>。顺带修了两处<strong>状态分叉</strong>:add 的 <code>_loadUserExercises</code> 从不调 <code>app.applyExerciseFlags</code>;edit 直接写 <code>app.globalData.favorExercises</code> 绕过了它(storage 没写 → 重启收藏丢失)。</p>
+
+  <h3>3.4 数据被静默清空 / 写错(5 项)</h3>
+  <table>
+    <thead><tr><th style="width:48%">问题</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td><code>profile</code> 身高体重弹层用未加载的默认值 → <strong>一次保存就把真实身高体重覆盖成 170/60</strong></td><td>优先读 <code>app.globalData</code>;加 <code>profileLoaded</code>,未加载完不许开弹层</td></tr>
+      <tr><td><code>profile</code> 头像上传失败不回滚 UI、不清 <code>avatarTemp</code>,还把 <strong>HTTP 状态码暴露给用户</strong></td><td>统一回滚 + 状态码只进 console</td></tr>
+      <tr><td><code>add</code> 的 <code>applyHistory</code> 对计时/距离类完全无效(没有重量次数输入框)</td><td>按模式分派回填秒数/公里数</td></tr>
+      <tr><td><code>add._selectExercise</code> 不清 <code>historyMax</code> → <strong>上一个动作的历史串到下一个动作</strong>,点"LAST"把上个动作的重量写进新记录</td><td>清 <code>historyMax</code> + 归属校验(实例字段记请求归属)</td></tr>
+      <tr><td><code>add</code> 历史 badge 单位字段名写错(<code>historyMax.unit</code> vs <code>weight_unit</code>)→ 显示成 "50 × 8"</td><td>改字段名</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.5 交互细节(11 项)</h3>
+  <ul>
+    <li><strong>次数框受控绑定数字</strong> → 清空瞬间被回写成 "0",光标跳位 → 改 <code>repsStr</code> 字符串字段(<code>numberInput.js</code> 早就写明这个约定,唯独次数框没遵守)</li>
+    <li><strong>重量框 <code>type="number"</code></strong> → 手机上根本打不出小数(代码明确要支持 3 位小数)→ 改 <code>type="digit"</code></li>
+    <li><strong>次数"−"下限钉死为 1</strong> → reps=0 的组按"−"反而变 1 → 改 <code>Math.max(0, …)</code></li>
+    <li><strong><code>welcome-modal</code> 用 <code>hidden</code> + <code>.modal-mask{display:flex}</code></strong> → 遮罩可能留在布局里继续拦截点击 → 改 <code>wx:if</code>(与其余 8 个弹框一致)</li>
+    <li><strong>头像还在上传就能点"确认"</strong> → 本地临时路径 <code>wxfile://tmp_xxx</code> 被写进 profile,头像永久失效 → <code>uploading</code> 标志 + payload 只写服务器地址</li>
+    <li><strong><code>custom-tabbar</code> 在 <code>attached</code> 里 setData 覆盖 <code>theme</code> property</strong> → 父页面传的主题被无视 → 改用 <code>_theme</code></li>
+    <li><strong>总结/详情弹框的 i18n 字典不刷新</strong> → 切语言后仍是旧语言 → observer 补 <code>t: app.globalData.t</code></li>
+    <li><strong><code>workout-summary-modal</code> 把 <code>session.duration</code> 当毫秒</strong> → 与 session-detail-modal 相反(后端语义是<strong>秒</strong>)→ 统一为秒,调用方改传秒</li>
+    <li><strong>日期选择器遮罩没 <code>catchtouchmove</code></strong> → 在弹层上滑动会带动背景页面滚动 → 补 <code>catchtouchmove="noop"</code></li>
+    <li><strong><code>profile.handleLogout</code> 用 <code>wx.clearStorageSync()</code></strong> → 退出登录会静默重置用户的语言和主题 → 改白名单清除</li>
+    <li><strong><code>library.addToWorkout</code> 在 userId 未就绪时静默返回</strong> → 弹层关了、什么都没发生 → 先等鉴权,未就绪则 toast 且<strong>保留弹层</strong></li>
+  </ul>
+</section>
+
+<!-- ═══════════ 4 ═══════════ -->
+<section>
+  <h2><span class="n">04</span>轻微问题 · 31 项已修</h2>
+  <table>
+    <thead><tr><th style="width:16%">类别</th><th style="width:44%">问题</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag l">wx:key</span></td><td>5 处 <code>wx:key</code> 失效(<code>idx</code> / <code>index</code> / 对象数组)</td><td>换成真实业务字段(<code>id</code> / <code>imageName</code> / <code>*this</code>)</td></tr>
+      <tr><td><span class="tag l">空handler</span></td><td>6 处 <code>catchtap=""</code> → 运行时报 <code>does not have a method ""</code></td><td>全改 <code>catchtap="noop"</code> / <code>onSheetTap</code> + 补空方法</td></tr>
+      <tr><td><span class="tag l">i18n</span></td><td><code>welcome-modal</code> 读 <code>t.cancel</code>/<code>t.confirm</code> 但字典里是大写 <code>CANCEL</code>/<code>CONFIRM</code> → 英文界面漏中文</td><td>改大写 key + 删 fallback</td></tr>
+      <tr><td><span class="tag l">i18n</span></td><td><code>welcome-modal</code> 整套文案 / <code>custom-tabbar</code> 两个标签 / <code>add</code> 的"肌群"硬编码中文</td><td>换字典 key(共 11 个)</td></tr>
+      <tr><td><span class="tag l">i18n</span></td><td>新增 <code>RETRY</code> / <code>LOAD_FAILED_HINT</code> / <code>NO_DATA_HINT</code></td><td>补进 zh.js + en.js(两份 key 数一致)</td></tr>
+      <tr><td><span class="tag l">定时器</span></td><td><code>index</code> 的 2 个 <code>setTimeout</code> 未在 <code>onUnload</code> 清 → 卸载后还 setData;<code>onWelcomeClose</code> 的 300ms 跳转 → <strong>用户已离开页面还会把引导页弹出来</strong></td><td>句柄存实例属性 + onUnload 清理</td></tr>
+      <tr><td><span class="tag l">setData频次</span></td><td><code>guide.onTouchMove</code> 每次都 setData → 一次滑动几十次 IPC</td><td>滑动状态移出 data 到实例属性</td></tr>
+      <tr><td><span class="tag l">setData频次</span></td><td><code>session-orb</code> 每个 touchmove 都 setData</td><td>拖拽中间量移出 data</td></tr>
+      <tr><td><span class="tag l">setData载荷</span></td><td><code>index</code> 同一数组同时塞进 <code>workoutSummarySession.exercises</code> 和 <code>workoutSummaryExercises</code> → 载荷翻倍</td><td>只传一份;组件未声明的 <code>exerciseList</code> property 一并去掉</td></tr>
+      <tr><td><span class="tag l">setData载荷</span></td><td><code>index.exerciseGroups</code> 带着 <code>_latestTime</code>/<code>_latestId</code>/<code>_latestSetId</code> 内部字段</td><td>构造时剔除</td></tr>
+      <tr><td><span class="tag l">手势阈值</span></td><td>悬浮球拖拽阈值只有 8rpx(≈4px)→ 手指轻微抖动就吞掉点击 + 球吸到边缘</td><td>提到 20rpx</td></tr>
+      <tr><td><span class="tag l">手势中断</span></td><td><code>session-orb</code> 缺 <code>catchtouchcancel</code> → 触摸被打断时 <code>dragging</code> 卡在 true</td><td>补 <code>catchtouchcancel</code></td></tr>
+      <tr><td><span class="tag l">状态不一致</span></td><td><code>session-orb</code> 会话结束时位置重置但 storage 没同步 → <strong>结束瞬间球跳回右下角,重启后又回到旧位置</strong></td><td>重置时同步写 storage</td></tr>
+      <tr><td><span class="tag l">显示</span></td><td>不足 60 秒的训练显示 "0 MIN" / "0分钟" → 看着像没数据</td><td>改 "&lt;1 MIN" / "不足1分钟"</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>edit</code> 的 <code>group.sets.find</code> 无防御 → 后端返回无 sets 时抛 TypeError 被 catch 成 "SAVE FAILED"</td><td><code>(group.sets \|\| [])</code></td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>add</code> 计时/距离模式仍提交 <code>payload.weight</code>(还可能是上个动作残留的历史重量)</td><td>非次数类一律提交 0</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>set-timer</code> 清空输入框后,大号显示还停在 00:45,父组件 durationSec 也还是 45 → <strong>可以提交"看起来是空的"45 秒</strong></td><td><code>secondsStr</code> 字符串字段 + 清空即归零并 emit</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>welcome</code> 点遮罩 → <code>resetForm</code> 把用户填了一半的整张表清空</td><td>遮罩点击改为 no-op</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>welcome.onConfirm</code> 无 submitting 守卫 → 连点发两次请求</td><td><code>_submitting</code> 标志 + finally 复位</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>stats</code> 肌肉图只渲染一次 → 第二次起 canvas 已被 image 替换掉,图表<strong>永远停在第一次的数据</strong></td><td>渲染前先清 <code>muscleChartImage</code>(对齐体重图写法)</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>guide</code> 日间主题整页仍是深色(根 class 是 <code>day</code>/<code>night</code>,而生效的选择器是 <code>.page.theme-day</code>)</td><td>根 class 修正 + 补日间变量块</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>session-detail</code> 的 <code>wx:key="id"</code> 但分组对象只有 <code>_id</code>/<code>exercise_id</code></td><td>补 <code>id</code> 字段</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td>两个弹框 <code>item.sets.length</code> 在 sets 缺失时组数显示缺失</td><td>JS 侧归一化 sets 恒为数组</td></tr>
+      <tr><td><span class="tag l">边界</span></td><td><code>sessionId</code> property 声明成 <code>String</code>,父组件传的是数字 → 框架类型不匹配告警,某些基础库会丢成 null</td><td>改成 <code>[String, Number]</code></td></tr>
+      <tr><td><span class="tag l">口径</span></td><td><code>markPracticed</code> 返回旧 CSV 口径而 <code>toggleFavorite</code> 返回新表口径 → 前端"整体覆盖"缓存,谁最后调用谁说了算 → <strong>标记忽隐忽现</strong></td><td>统一走新表口径</td></tr>
+      <tr><td><span class="tag l">口径</span></td><td><code>getUserExercises</code> 在新表无标记时回退旧列 → 旧列是只增不减的,用户取消的收藏会复活</td><td>新表在就是唯一事实来源</td></tr>
+      <tr><td><span class="tag l">口径</span></td><td><code>writeCsvFlag</code> 缺 <code>CSV_MAX_LEN</code> 检查 → 超长直接拖挂整个 markPracticed</td><td>补长度检查</td></tr>
+      <tr><td><span class="tag l">口径</span></td><td><code>monthlyStats</code> 训练量未做 lb→kg 换算 → 用 lb 记录的用户"本月训练量"大 2.2 倍</td><td>统一用 <code>WEIGHT_KG_SQL</code></td></tr>
+      <tr><td><span class="tag l">探测</span></td><td><code>schema-probe</code> 缓存<strong>永久不过期</strong>且 clear 函数无调用者 → 迁移后常驻进程仍认为列不存在,<strong>静默丢弃新列的值</strong></td><td>加 5 分钟 TTL + cache key 带上列集合</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ 5 ═══════════ -->
+<section>
+  <h2><span class="n">05</span>经复核判定"不该改"的 8 项</h2>
+  <div class="callout blue">
+    <div class="t">审查报告不是圣旨</div>
+    <p>以下 8 条经我<strong>实测复核</strong>后判定为误报或无需改,没有为了凑数去动代码。</p>
+  </div>
+  <table>
+    <thead><tr><th style="width:32%">报告结论</th><th style="width:40%">实测复核</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td><code>index.wxml</code> 历史列表 <code>wx:key="id"</code> 失效,"后端主键是 <code>_id</code> 没有 <code>id</code>"</td><td><strong>直接查生产库</strong>:<code>SHOW COLUMNS FROM sessions</code> → 主键列就是 <code>id</code>(<code>id, user_id, start_time, end_time, duration, status, is_done, created_at, updated_at, _openid, calories</code>)</td><td><span class="tag f">报告说错了</span> <code>wx:key="id"</code> 是对的,不改</td></tr>
+      <tr><td>计时器输入框绑 <code>bindblur</code> 是本轮已修项</td><td>实际工作区里 <code>bindblur</code> 已不在(子代理按简报基线补齐)</td><td><span class="tag f">已修</span></td></tr>
+      <tr><td><code>welcome-modal</code> 的 <code>hidden</code> 优先级"不确定是否真会崩"</td><td>改成 <code>wx:if</code> 后与全项目 8/9 个弹框一致</td><td><span class="tag f">消除不一致</span>(不是断言崩了)</td></tr>
+      <tr><td><code>stats</code> 嵌套 scroll-view 内层滚到底不接力</td><td>属纯手感优化,不动结构也能用</td><td><span class="tag m">记入待办</span></td></tr>
+      <tr><td><code>custom-tabbar.onFabTap</code> 是死代码</td><td>确认无 FAB 节点</td><td><span class="tag m">保留</span>(可能被后续功能用)</td></tr>
+      <tr><td><code>UserExerciseFlagsService.filterByFlag</code> 是死代码</td><td>确认为死代码,但它是未来服务端筛选的预留</td><td><span class="tag m">保留</span></td></tr>
+      <tr><td><code>globalData.userInfo</code> 字段名与声明不一致且无人读取</td><td>确认为死字段</td><td><span class="tag m">保留</span>(清理收益低、风险不为零)</td></tr>
+      <tr><td><code>app.wxss</code> 的 <code>page.theme-day</code> 是死选择器</td><td>确认小程序无法给 page 元素加 class,该块永不匹配</td><td><span class="tag m">保留</span>(各页 wxss 已有自己的 <code>.page.theme-day</code> 块)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ 6 ═══════════ -->
+<section>
+  <h2><span class="n">06</span>验证结果</h2>
+
+  <h3>后端</h3>
+  <table>
+    <thead><tr><th style="width:30%">脚本</th><th style="width:16%">结果</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>npx tsc --noEmit</code></td><td><span class="tag f">0 错误</span></td><td></td></tr>
+      <tr><td><code>scripts/caloriecheck.js</code></td><td><span class="tag f">一致</span></td><td>400 条逐 set 前后端一致 / 0 差异;汇总 8154 = 8154;<strong>weight_reps 路径与旧公式完全一致(397 条)</strong> → 历史数据不变</td></tr>
+      <tr><td><code>scripts/verify-update-semantics.ts</code> <b>新</b></td><td><span class="tag f">12/12</span></td><td>update 只写显式字段</td></tr>
+      <tr><td><code>scripts/verify-streak.ts</code> <b>新</b></td><td><span class="tag f">10/10</span></td><td>连续打卡统一 + 时区自检;37 用户交叉校验 0 不一致</td></tr>
+      <tr><td><code>scripts/verify-exception-filter.ts</code> <b>新</b></td><td><span class="tag f">12/12</span></td><td>400/500 分流</td></tr>
+      <tr><td><code>scripts/api-auth-test.js</code></td><td><span class="tag f">15/15</span></td><td>401 静默登录重试 / 403 不清 token</td></tr>
+      <tr><td><code>scripts/verify-migration.js</code></td><td><span class="tag f">通过</span></td><td>关联表 127 行 / 孤儿 0 / 重复 0 / 9 个用户 CSV 与新表完全一致</td></tr>
+      <tr><td><code>scripts/liblist-check.js</code></td><td><span class="tag f">通过</span></td><td>筛选口径正常</td></tr>
+      <tr><td><code>scripts/verify-edit-duration.js</code></td><td><span class="tag m">13/15</span></td><td><strong>2 项失败是预期的</strong>:这两条断言编码的是<strong>新</strong>语义(未传字段不被抹掉),而它打的是<strong>尚未部署的旧后端</strong> → 重新部署后自动转绿</td></tr>
+    </tbody>
+  </table>
+
+  <h3>前端</h3>
+  <table>
+    <thead><tr><th style="width:52%">检查</th><th>结果</th></tr></thead>
+    <tbody>
+      <tr><td>全部 17 个改动 JS 的 <code>node --check</code></td><td><span class="tag f">全通过</span></td></tr>
+      <tr><td>残留 <code>catchtap=""</code> / <code>wx:key="index"</code> / <code>hidden="{{!isOpen}}"</code> / <code>data._wasDragging</code> 引用</td><td><span class="tag f">全部 0</span></td></tr>
+      <tr><td><code>chosenExercise</code> 写端/读端一致性</td><td><span class="tag f">两端都是 <code>app.globalData</code></span></td></tr>
+      <tr><td><code>session.duration</code> 单位</td><td><span class="tag f">组件与调用方统一为秒</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout amber">
+    <div class="t">诚实说明</div>
+    <p>未做真机 / 微信开发者工具渲染验证(本环境无开发者工具)。以上是<strong>静态检查 + 单元验证 + 生产库只读实测</strong>,不是端到端 UI 验证。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 7 ═══════════ -->
+<section>
+  <h2><span class="n">07</span>还需要你决策 / 动手的事</h2>
+  <div class="todo"><div class="pri r">P0</div><div class="bd">
+    <div class="ti">重新部署后端</div>
+    <div class="de"><code>exercise.update</code> 的 NULL 清空修复、时区钉死、连续打卡统一、异常状态码分流都在后端 —— 不部署则前端的所有修复都只是"改了一半"。</div>
+  </div></div>
+  <div class="todo"><div class="pri r">P0</div><div class="bd">
+    <div class="ti">确认服务器 Node 进程时区</div>
+    <div class="de">代码侧已经钉死 <code>+08:00</code> 不再依赖它,但建议你上服务器跑一次 <code>date</code> / <code>timedatectl</code> 确认宿主机时区(如果宿主机是 UTC,那之前的时间字段可能已经错了一阵)。</div>
+  </div></div>
+  <div class="todo"><div class="pri y">P1</div><div class="bd">
+    <div class="ti">小程序发版</div>
+    <div class="de">前端 36 个文件的改动已全部落地但<strong>未提交未推送</strong>,发版仍需你在微信开发者工具上传。</div>
+  </div></div>
+  <div class="todo"><div class="pri y">P1</div><div class="bd">
+    <div class="ti">动作标注</div>
+    <div class="de">用 <code>library.typingApply</code>:先改 A 档 3 条(零风险),58 组平票人工裁决,B 档 1218 条抽检后分批改。</div>
+  </div></div>
+  <div class="todo"><div class="pri y">P1</div><div class="bd">
+    <div class="ti">卡路里按动作类型优化</div>
+    <div class="de">MET 表 + 距离系数分档(你之前明确说后续再做)。</div>
+  </div></div>
+  <div class="todo"><div class="pri g">P2</div><div class="bd">
+    <div class="ti">待办(本轮判定不改)</div>
+    <div class="de">stats 嵌套滚动接力手感、<code>app.wxss</code> 死选择器清理。</div>
+  </div></div>
+</section>
+
+<!-- ═══════════ 8 ═══════════ -->
+<section>
+  <h2><span class="n">08</span>改动文件清单</h2>
+
+  <h3>后端 <code>gfit-backend</code> · 10 改 + 4 新增</h3>
+<pre><span class="add">★ src/common/utils/streak.util.ts              新增  连续打卡唯一实现</span>
+  src/common/utils/schema-probe.ts             改    缓存 TTL + key 带列集合 + 缺列告警
+  src/common/filters/all-exceptions.filter.ts  改    400/500 分流 + 消息不被覆盖
+  src/infra/database/mysql.service.ts         改    timezone 钉死 + verifyTimezone + 超时打码
+  src/app.controller.ts                        改    /health 暴露时区自检
+  src/main.ts                                  改    启动时区自检
+  src/modules/exercises/exercises.service.ts  改    update 只写显式字段 + 标记口径统一
+  src/modules/sessions/sessions.service.ts     改    monthlyStats lb→kg
+  src/modules/stats/stats.service.ts           改    streak 走公共实现
+  src/modules/users/users.service.ts           改    streak 走公共实现
+<span class="add">★ scripts/verify-update-semantics.ts       新增</span>
+<span class="add">★ scripts/verify-streak.ts                 新增</span>
+<span class="add">★ scripts/verify-exception-filter.ts       新增</span>
+  scripts/verify-edit-duration.js              改    断言改成新语义</pre>
+
+  <h3>前端 <code>fitness_wechat</code> · 36 文件</h3>
+<pre>  app.js                                    ensureRunningSession 去重
+  components/add-exercise-modal/{js,wxml}    13 项
+  components/edit-exercise-modal/{js,wxml}    6 项
+  components/set-timer/{js,wxml}             输入框清空归零 + 删 bindblur
+  components/session-orb/{js,wxml}           拖拽阈值/实例字段/touchcancel/位置持久化
+  components/welcome-modal/{js,wxml,wxss}    wx:if / 上传守卫 / i18n / 遮罩不清表
+  components/custom-tabbar/{js,wxml}         _theme 不覆盖 property
+  components/workout-summary-modal/{js,wxml} duration 统一为秒 + i18n 刷新
+  components/session-detail-modal/{js,wxml}   竞态保护 + sets 归一化
+  components/custom-end-confirm-modal/{js,wxml} 空 catchtap
+  pages/index/{js,wxml,wxss}                竞态守卫 ×3 + loadError + 防重 + 滚动穿透 + 选中动作链路
+  pages/library/{js,wxml,wxss}              收藏回滚 + 鉴权等待 + 错误态
+  pages/stats/{js,wxml,wxss}                竞态守卫 ×3 + 肌肉图重置 + 错误态
+  pages/profile/{js,wxml}                   allSettled + 身高体重守卫 + 头像回滚 + goToLogin
+  pages/guide/{js,wxml,wxss}                日间主题 + 滑动状态移出 data
+  locales/{zh,en}.js                        补 RETRY / LOAD_FAILED_HINT / NO_DATA_HINT</pre>
+</section>
+
+<!-- ═══════════ 9 ═══════════ -->
+<section>
+  <h2><span class="n">09</span>追加 · 部署后实测新发现的问题(2026-11-06)</h2>
+  <div class="callout red">
+    <div class="t">这一批不在原始审查范围内</div>
+    <p>是后端部署完成后, 用生产库只读查询做验收时发现的。它直接对应用户最早报的那个症状
+    —— "切出微信再切回来, 之前的训练动作都没了, 变成初始化状态"。</p>
+  </div>
+
+  <h3>9.1 严重 · F10: 残留的"僵尸 active session"</h3>
+  <p><strong>实测证据</strong>(生产库只读):</p>
+<pre>部署前: sessions 里残留 11 条 status='active', 其中:
+  id=197 user=16  10/11 21:51  动作数=0
+  id=166 user=17   9/2 19:12  动作数=0
+  id=140 user=18   8/30 13:06  动作数=0
+  id=141 user=23   8/30 13:06  动作数=0
+  id=142 user=24   8/30 13:06  动作数=0
+  id=145 user=28   8/31 13:36  动作数=31   ← 唯一有动作的
+  id=163 user=38   9/1 21:23  动作数=0
+  id=164 user=38   9/1 21:23  动作数=0    ← 与上一条 start_time 完全相同
+  id=167 user=39   9/2 19:12  动作数=0
+  id=168 user=39   9/2 19:12  动作数=0    ← 与上一条 start_time 完全相同
+  id=226 user=47  11/1 16:19  动作数=0</pre>
+  <p><strong>两个用户各 2 条、且 <code>start_time</code> 完全相同</strong> —— 这是
+  <code>session.create</code> 被并发调用两次的指纹(SELECT 无 running → INSERT, 没有事务也没有唯一约束)。
+  正是审查报告 F5/F6 说的那个 bug 的历史产物。</p>
+
+  <div class="grid2">
+    <div class="card"><div class="ct"><span class="num">1</span>resume 到陈旧会话</div>
+      <div class="cb"><code>session.create</code> 看到 active 就 resume → 用户点"开始训练", 接续的是<strong>几周前的一条空会话</strong> → 计时器显示两个月前的时间、历史里一条真实训练都看不到 → <strong>"动作全没了、变成初始化状态"</strong></div></div>
+    <div class="card"><div class="ct"><span class="num">2</span>返回哪条不确定</div>
+      <div class="cb"><code>session.getRunning</code> 是 <code>LIMIT 1</code> 且<strong>无 ORDER BY</strong> → 有多条 active 时返回哪条不确定 → 用户的动作在两次刷新之间忽隐忽现</div></div>
+    <div class="card"><div class="ct"><span class="num">3</span>悬浮球常驻"训练中"</div>
+      <div class="cb">用户永远开不了新训练</div></div>
+    <div class="card"><div class="ct"><span class="num">4</span>id=145 的 31 条动作</div>
+      <div class="cb">全部写在 <code>21:37:09 → 21:37:40</code>(<strong>31 秒内</strong>), 名字是"动作1/动作2"这种占位名 → 早期调试留下的<strong>测试数据</strong>, 本就不该进统计</div></div>
+  </div>
+
+  <h3>9.2 后端加固(已上线)</h3>
+  <table>
+    <thead><tr><th style="width:8%">#</th><th style="width:42%">问题</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td>F10</td><td>僵尸 session 的产生与残留</td><td>① 新增 <code>closeEmptyShells()</code>: 关闭"空壳 session"(一条 exercises 都没有)。<code>create</code> 时只回收超过 6 小时的(刚建的那条还可能被并发用到), <code>finish</code> 时不限时长全收(结束训练后残留的空壳一定是并发产生的重复会话)。<strong>只关空壳, 有动作的一律不动</strong>。② 置为 <code>abandoned</code> 而不是删 —— 统计口径一律是 <code>status='finished'</code>, <code>abandoned</code> 天然被排除 → <strong>对所有统计零影响</strong>, 行与 exercises 全保留, 便于审计</td></tr>
+      <tr><td>M44</td><td><code>getRunning</code> 的 <code>LIMIT 1</code> 无 <code>ORDER BY</code> → 返回哪条不确定</td><td>补 <code>ORDER BY id DESC</code>(取最新那条)</td></tr>
+      <tr><td>M45</td><td><code>create</code> 会 resume 任意一条 active(不看是否空壳、不看是否陈旧)</td><td>先 <code>closeEmptyShells()</code>, 再按"最新"取</td></tr>
+      <tr><td>M46</td><td><code>session.list</code> 不过滤 abandoned → 历史列表出现 0 分钟幽灵条目</td><td>加 <code>AND status &lt;&gt; 'abandoned'</code></td></tr>
+      <tr><td>M47</td><td><code>/health</code> 没有版本标识 → 部署验证不可靠</td><td>暴露构建 commit SHA。<strong>踩坑实录</strong>: 第一轮部署后我用 <code>/health</code> 有没有 <code>timezone</code> 字段来判断是否部署成功, 但第二轮部署的响应形状没变 → 探测"秒过", 实测的却还是旧代码, 白测一轮。加了 commit SHA 后一次 curl 就能确认"线上跑的是哪次提交"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.3 数据清理(已执行)</h3>
+<pre>✅ 已备份到 sessions_zombie_bak_20261106 (10 行, 可回滚)
+✅ 已置为 abandoned: 10 行
+   · 剩余 active/running: 0 条
+   · 这些 session 下的 exercises 全部保留: 31 条 (未删任何训练记录)
+   · finished 总数: 217 (未变, 统计口径不受影响)</pre>
+
+  <h3>9.4 部署后生产验收(全部实跑)</h3>
+  <table>
+    <thead><tr><th style="width:42%">项</th><th>结果</th></tr></thead>
+    <tbody>
+      <tr><td><code>verify-edit-duration.js</code></td><td><span class="tag f">15/15</span> 修前是 13/15 —— 那 2 条失败正是"未传字段被抹掉", 部署后自动转绿</td></tr>
+      <tr><td><code>post-deploy-verify.js</code></td><td><span class="tag f">23/23</span></td></tr>
+      <tr><td><code>api-auth-test.js</code></td><td><span class="tag f">15/15</span></td></tr>
+      <tr><td><code>verify-session-lifecycle.ts</code> <b>新</b></td><td><span class="tag f">11/11</span> 空壳回收阈值 / getRunning 取最新 / create 复用 / finish 顺带收残留 / list 不返回 abandoned</td></tr>
+      <tr><td>生产冒烟(400 分流 + streak 一致 + 无残留 active)</td><td><span class="tag f">8/8</span> 含 37 个用户的 profile/stats streak 全一致</td></tr>
+      <tr><td><code>/health</code></td><td><code>build=bd2147d55851</code>, <code>timezone.ok=true</code>, MySQL 偏移 +480 = 客户端 +480</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.5 部署记录</h3>
+  <table>
+    <thead><tr><th style="width:18%">commit</th><th style="width:46%">内容</th><th>线上验证</th></tr></thead>
+    <tbody>
+      <tr><td><code>6eb84e8</code></td><td>update 只写显式字段 / 时区钉死 / 连续打卡统一 / 400 分流</td><td><span class="tag f">通过</span></td></tr>
+      <tr><td><code>5e87d33</code></td><td>preflight 修 library 分类漏检 + 3 个验证脚本</td><td><span class="tag f">通过</span></td></tr>
+      <tr><td><code>c5251e8</code></td><td>空壳 session 回收 + active 取最新 + list 排除 abandoned</td><td><span class="tag f">行为实测确认</span></td></tr>
+      <tr><td><code>909614c</code></td><td><code>/health</code> 暴露构建 commit SHA</td><td><span class="tag f">通过</span></td></tr>
+      <tr><td><code>bd2147d</code></td><td>僵尸 session 清理脚本 + 执行</td><td><span class="tag f">active 归零</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ 10 ═══════════ -->
+<section>
+  <h2><span class="n">10</span>追加 · 负重支持 + 计时类 UI 的条件配对 bug(2026-11-07)</h2>
+  <p>用户在看编辑弹框截图时指出两件事, 都是真问题:
+  「duration 就该只有时长+重量, 其余才是次数+重量」, 以及
+  「duration 之前只统计时长, 但交叉跳跃可以手握两个哑铃, 爬坡步行也可以负重」。</p>
+
+  <h3>10.1 严重 · W11: 计时类动作显示成四段 —— WXML 条件配对写错</h3>
+  <div class="callout red">
+    <div class="t">根因不是设计问题, 是 wx:else 配对错了</div>
+    <pre>  &lt;view class="set-field" wx:if="{{item.countMode === 'duration'}}"&gt;        ← 时长
+  &lt;view class="set-field" wx:if="{{item.countMode === 'distance_duration'}}"&gt; ← 距离
+  &lt;block wx:else&gt;                                                          ← 重量 + 单位 + 次数</pre>
+    <p>WXML 的 <code>wx:else</code> 配对的是<strong>紧邻的上一个 if/elif</strong> —— 也就是 distance 那个, 不是 duration。
+    于是 duration 模式下「距离 if 为 false → 走 else」→ <strong>重量/单位/次数被一起渲染</strong>, 计时类动作显示成四段(用户截图)。</p>
+    <p>同一个文件里 <code>add-exercise-modal</code> 的结构是对的, 但它的 JS 又把重量<strong>强制写成 0</strong>
+    (<code>weight: (isDuration || isDistance) ? 0 : weight</code>) → 负重被直接丢弃。两个弹框既不一致, 也都表达不了负重。</p>
+  </div>
+
+  <h3>10.2 三种模式的字段分配(新口径)</h3>
+  <table>
+    <thead><tr><th>模式</th><th>主计量</th><th>重量</th><th>次数</th><th>时长</th><th>距离</th></tr></thead>
+    <tbody>
+      <tr><td><code>weight_reps</code></td><td>次数</td><td>✅ 重量</td><td>✅ 次数</td><td>—</td><td>—</td></tr>
+      <tr><td><code>duration</code></td><td>时长</td><td>✅ <strong>负重</strong></td><td>—</td><td>✅ 时长</td><td>—</td></tr>
+      <tr><td><code>distance_duration</code></td><td>距离</td><td>✅ <strong>负重</strong></td><td>—</td><td>可选</td><td>✅ 距离</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <div class="t">为什么重量对三类都成立</div>
+    <p>计时/距离类动作也可能是负重的 —— 手握两个哑铃的交叉跳跃、负重爬坡步行、背负装备的登山。
+    所以对这三类, 重量不是「次数类专属字段」, 而是「这个 set 额外承受的负重」, <strong>0 = 自重</strong>。</p>
+  </div>
+  <p>配套改动: add 弹框重量区不再对计时/距离类隐藏、提交不再强制置 0、标签改「负重/LOAD」并加提示;
+  edit 弹框 <code>buildSets</code> 补 <code>isDuration/isDistance/isRepsMode</code> 标记、条件改成互斥的 <code>wx:if</code>;
+  「LAST」badge 对计时/距离类也显示(内容按模式不同, 点它回填上次的秒数/公里数<strong>和负重</strong>);
+  展示层三处(首页/会话详情/训练总结)让计时/距离类显示出负重, 如「45秒 · 10kg」; i18n 新增 <code>LOAD</code>/<code>LOAD_HINT</code>。</p>
+
+  <div class="callout blue">
+    <div class="t">新增回归防线 · tools/check-count-mode-ui.js</div>
+    <p>把 WXML 解析成树, 按<strong>真实的 if/elif/else 链规则</strong>求值(祖先可见性 + 兄弟链配对),
+    断言三种模式各显示哪几段。<strong>已用 HEAD 旧版反证</strong>: 换成有 bug 的那版 → 4 条断言失败; 修复版 → 12/12 全绿。</p>
+  </div>
+
+  <h3>10.3 卡路里 v2 · 负重要参与计算(等效体重法)</h3>
+  <p>用户拍板: 参与计算, 用等效体重法。</p>
+<pre>等效体重 = 用户体重(kg) + 额外负重(kg) × loadFactor
+
+duration           kcal = MET × 等效体重 × 时长(小时)
+distance_duration  kcal = 等效体重 × 距离(km) × 0.9
+weight_reps        kcal = 训练量 × 体重 × 0.0011    ← 不动</pre>
+  <div class="callout amber">
+    <div class="t">loadFactor = 0.5 是经验系数, 不是文献定值</div>
+    <p>公开文献里没有公认的「哑铃负重 → 等效体重」折算比例。0.5 的含义: 举起哑铃时大约一半的外部负荷
+    真正转化为代谢负担, 其余是举起动作的机械功和动量传递损耗。文件头已写明, 后续做按动作类型的 MET 表时
+    这一档应该被按具体负重强度替换掉。</p>
+  </div>
+  <p><strong>历史数据不变性(已实测)</strong>: 2026-11-07 之前计时/距离类的 weight 被前端强制写成 0 → 负重恒为 0
+  → 等效体重 = 用户体重 → <strong>旧记录算出来和现在完全一样</strong>。<code>caloriecheck.js</code> 新增了这条不变性检查(3 条样本全部一致)。</p>
+  <p><strong>生产端到端实测</strong>(600 秒): 不负重 50 kcal / 负重 10kg 54.1667 kcal / 合计 <strong>104</strong> ✅ 与手算一致。
+  已固化为 <code>scripts/verify-load-calories.js</code>。</p>
+
+  <h3>10.4 严重 · W12: 「push 了但线上跑的还是旧代码」</h3>
+  <p>排查负重 e2e 时发现的部署可靠性问题, 与算法本身无关。
+  症状: <code>cf3327e</code> 推送后 <code>/health</code> 的 build 字段变成新 SHA(看着像部署成功), 但负重 e2e 算出来是 100(旧算法)而不是 104。</p>
+  <div class="grid2">
+    <div class="card"><div class="ct"><span class="num">1</span>SHA 判据本身不可靠</div>
+      <div class="cb"><code>/health</code> 的 build 读的是 <code>.git/HEAD</code> —— 只反映 <strong>git 仓库</strong>状态, 不反映<strong>实际运行的程序</strong>。
+      部署是 reset → npm ci → build → pm2 restart, 任何一步失败(<code>set -e</code>)都会中止, <strong>但 .git/HEAD 在中止前就更新了</strong> → 光看 SHA 会误判成「已部署」。</div></div>
+    <div class="card"><div class="ct"><span class="num">2</span>连着 push 会并发部署</div>
+      <div class="cb">一个在 <code>npm ci</code>(删 node_modules 重装), 另一个同时在 <code>npm run build</code> → 编译中途 node_modules 被抽走 → build 失败 → 线上跑的还是旧 dist。</div></div>
+  </div>
+  <table>
+    <thead><tr><th style="width:14%">层</th><th>改动</th></tr></thead>
+    <tbody>
+      <tr><td>判据</td><td><code>/health</code> 增加 <code>distBuiltAt</code>(dist/main.js 的编译时间) + <code>calorieAlgo</code>(<strong>编译进 dist</strong> 的算法版本常量)。后者骗不了 —— 它反映的就是真正在跑的代码</td></tr>
+      <tr><td>workflow</td><td>加 <code>concurrency</code> 组, <code>cancel-in-progress: false</code> → 不打断进行中的部署, 新 push <strong>排队等前一个跑完</strong>, 部署永不并发。timeout 10→15 分钟</td></tr>
+      <tr><td>deploy.sh</td><td>build 之后比对 <code>dist</code> 的版本常量与源码, 不一致就中止(不让编译不完整的 dist 被 pm2 加载); pm2 restart 之后比对 <code>/health</code> 的 <code>calorieAlgo</code>, 对不上就中止并打 pm2 日志(旧进程照样能返回 /health 200, 只看 200 不够)</td></tr>
+      <tr><td>测试</td><td>验证脚本一律用<strong>专用测试账号</strong>, 不用 <code>users</code> 表第一个(id=1 正好是用户自己的账号)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.5 我的失误: 测试脚本用了你的账号</h3>
+  <div class="callout amber">
+    <div class="t">verify-session-lifecycle 原来取 users 表第一个当测试账号</div>
+    <p>那正好是用户自己的账号(id=1)。当时用户正在训练(有一条真实的 active session), 于是:
+    ① 断言「该用户无 active 残留」必然失败(实际 active=1, 那条正是用户的训练);
+    ② 更糟: 测试脚本会在真实账号上建 session / 调 <code>session.create</code>(<strong>会 resume!</strong>) / 调 <code>session.finish</code> —— 有干扰真实训练数据的风险。</p>
+    <p>已改成专用测试账号 <code>__test_session_lifecycle__</code>, 跑完连用户一起删。
+    <strong>已核实用户那条训练(session 264, 交叉跳跃 2 秒)全程未被破坏。</strong></p>
+  </div>
+
+  <h3>10.6 本轮提交</h3>
+  <table>
+    <thead><tr><th style="width:18%">commit</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>cf3327e</code></td><td>卡路里 v2: 负重按等效体重折算(后端)</td></tr>
+      <tr><td><code>ce3312d</code></td><td><code>/health</code> 加 <code>distBuiltAt</code> + <code>calorieAlgo</code> 探针</td></tr>
+      <tr><td><code>969011d</code></td><td><code>deploy.sh</code> 加两道自检</td></tr>
+      <tr><td><code>a560cf5</code></td><td>workflow 加并发锁</td></tr>
+      <tr><td><code>13c1092</code></td><td>固化负重 e2e 验证脚本</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════ 11 ═══════════ -->
+<section>
+  <h2><span class="n">11</span>追加 · 表单控件高度不齐(2026-11-07)</h2>
+  <p>用户看了计时类动作的编辑弹框截图后指出: <strong>表单输入组件高度没有齐平</strong>。</p>
+
+  <h3>11.1 根因(像素实测, 不是目测)</h3>
+  <p>对用户截图逐列做亮度剖面, 量出三个控件的真实高度:</p>
+  <table>
+    <thead><tr><th>控件</th><th>实测高度</th><th>CSS 现状</th></tr></thead>
+    <tbody>
+      <tr><td>± 按钮</td><td><strong>47rpx</strong></td><td><code>height: 48rpx</code> 固定 ✓</td></tr>
+      <tr><td>输入框</td><td><strong>63–65rpx</strong></td><td><strong>没写 height</strong> → 被内容(28rpx 字号 + input 默认行高)撑开, 再加 padding 8rpx×2 + border</td></tr>
+      <tr><td>KG/LB 切换</td><td><strong>44rpx</strong></td><td>由 <code>padding: 8rpx</code> + 20rpx 字号撑开</td></tr>
+    </tbody>
+  </table>
+  <div class="callout red">
+    <div class="t">三个控件三个高度, 最大差 21rpx(≈11px)</div>
+    <p><strong>而且整行还错位 8px</strong>: 时长组的控件比负重组低 8px。原因不是 flex,
+    而是<strong>负重那列的标签是空的</strong> —— <code>t.LOAD</code> 是当天新加的 i18n key,
+    而字典是 <code>app.onLaunch</code> 时的<strong>快照</strong>, 没重新编译就取不到 →
+    标签渲染成空 → 那一列矮了 ~20rpx → 被 <code>.set-item</code> 的 <code>align-items: center</code> 居中后整行错开。</p>
+    <p>(截图放大后逐段扫描确认: 标签行里只有「设置时长」和「单位」, 中间那列确实空白。)</p>
+  </div>
+
+  <h3>11.2 修法</h3>
+  <table>
+    <thead><tr><th style="width:34%">问题</th><th>修法</th></tr></thead>
+    <tbody>
+      <tr><td>三个控件高度不一</td><td>统一到 48rpx(edit 弹框)/ 80rpx(add 弹框): 输入框补 <code>height</code> + <code>line-height</code>(文字垂直居中) + 去掉上下 padding; 单位切换补 <code>height</code> + <code>box-sizing: border-box</code></td></tr>
+      <tr><td>content-box 导致 border 溢出</td><td>凡是带 border 的控件都补 <code>box-sizing: border-box</code> —— 小程序默认是 content-box, 1rpx border 会让实际高度多 2rpx(实测 add 弹框的 <code>.input-btn</code>/<code>.unit-btn</code> 因此比输入框高 2rpx)</td></tr>
+      <tr><td>负重标签空白</td><td>新增模块级 <code>pickDict()</code>: 取字典时若缺 <code>LOAD</code> 则兜底成 <code>WEIGHT</code>(不空白)。重新编译后会正常显示「负重」</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.3 验证: 不止看代码, 渲染出来量</h3>
+  <p>用 headless Chrome 渲染等价的 HTML(375px 屏 = 750rpx, 1rpx = 0.5px), 再做像素测量:</p>
+  <table>
+    <thead><tr><th>弹框</th><th>± 按钮</th><th>输入框</th><th>单位切换</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td>edit</td><td>24px = 48rpx</td><td>24px = 48rpx</td><td>24px = 48rpx</td><td><span class="tag f">完全一致</span></td></tr>
+      <tr><td>add</td><td>40px = 80rpx</td><td>40px = 80rpx</td><td>40px = 80rpx</td><td><span class="tag f">完全一致</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.4 新增回归断言</h3>
+  <p><code>tools/check-count-mode-ui.js</code> 增加两节:
+  <strong>控件高度一致性</strong>(解析 wxss, 断言三个控件都写了显式 height 且三者相等)、
+  <strong>border 必须配 box-sizing</strong>(断言带 border 的控件都声明了 <code>box-sizing: border-box</code>)。</p>
+  <p>第二条能抓到刚才那个 2rpx 的漏网 —— <strong>光比对声明的 height 是抓不到的</strong>。
+  现共 <strong>22 项断言全绿</strong>(字段分配 12 + 高度一致性 6 + box-sizing 4)。</p>
+</section>
+
+<!-- ═══════════ 12 ═══════════ -->
+<section>
+  <h2><span class="n">12</span>追加 · 添加弹框的标题与滚动遮挡(2026-11-07)</h2>
+  <p>用户在看添加弹框截图时指出两件事: <strong>标题不要叫「设置时长」</strong>(现在都能设负重了)、
+  <strong>底部时间配置下面的内容滚不到底</strong>。</p>
+
+  <h3>12.1 M49 · 标题按计量方式分三种 → 统一成「动作配置」</h3>
+<pre>  function titleForMode(mode, t) {
+    if (mode === 'duration') return t.SET_DURATION || '设置时长';
+    if (mode === 'distance_duration') return t.SET_DISTANCE || '设置距离和时长';
+    return t.SET_WEIGHT_REPS || '设置重量和次数';
+  }</pre>
+  <div class="callout amber">
+    <div class="t">问题</div>
+    <p>上一轮加了负重之后, <strong>三种模式都能设负重</strong> —— 计时类动作标题写着「设置时长」,
+    下面却有负重输入框, 文案和内容对不上。而且按计量方式分标题意味着以后每加一种计量方式就要改一次。</p>
+  </div>
+  <p><strong>改法</strong>: 新增 i18n key <code>ACTION_SETUP</code>(中: 动作配置 / 英: ACTION SETUP), 标题统一返回它。
+  <code>SET_DURATION</code> 仍保留 —— 它现在用作<strong>计时器那个字段的标签</strong>, 那里是对的。</p>
+
+  <h3>12.2 M50 · 底部按钮绝对定位 → 滚到底也看不到最后一段</h3>
+<pre>  .modal-footer { position: absolute; bottom: 0; left: 0; right: 0; }   ← 脱离文档流
+  .step2-wrap  { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .step2-scroll{ flex: 1; min-height: 0; }</pre>
+  <div class="callout red">
+    <div class="t">根因</div>
+    <p>footer 是<strong>绝对定位</strong> → 不占高度 → <code>.step2-wrap</code>(flex:1)的可用高度 = 整个 sheet 高度
+    → 滚动区一直延伸到按钮底下 → <strong>最后一段被按钮盖住, 滚到底也看不到</strong>。
+    计时器正好在最下面, 所以计时类动作必中。</p>
+  </div>
+  <p><strong>改法</strong>: 改成普通流内的 flex 子项(<code>flex-shrink: 0</code>), 去掉 absolute。
+  <code>.modal-sheet</code> 本身就是 <code>display:flex; flex-direction:column; height:85vh</code>,
+  <code>.step2-wrap</code>(flex:1) 会自动收缩给 footer 让出高度 —— 和 <code>edit-exercise-modal</code> 的写法一致。</p>
+
+  <p><strong>验证(headless Chrome 复现等价布局, 375×667)</strong>:</p>
+  <table>
+    <thead><tr><th></th><th>滚动区</th><th>计时器(滚到底后)</th><th>底部按钮</th><th>结论</th></tr></thead>
+    <tbody>
+      <tr><td>修复前</td><td>154..580</td><td>352..<strong>504</strong></td><td>499..580</td><td><span class="tag s">被盖住 5px</span></td></tr>
+      <tr><td>修复后</td><td>154..499</td><td>271..<strong>423</strong></td><td>499..580</td><td><span class="tag f">完整可见</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.3 附带</h3>
+  <ul>
+    <li>i18n 两份字典 key 数保持一致(155 / 155)</li>
+    <li>旧的 <code>SET_WEIGHT_REPS</code> / <code>SET_DISTANCE</code> 已无引用, 字典里保留备用</li>
+  </ul>
+</section>
+
+<!-- ═══════════ 13 ═══════════ -->
+<section>
+  <h2><span class="n">13</span>追加 · 训练总结里 duration 类显示成「60秒 20kg 20kg × 0 reps」</h2>
+  <p>用户看训练完成弹框的截图指出: duration 类动作的数据不对, <strong>怎么有两个 20kg 重量显示</strong>。</p>
+
+  <h3>13.1 根因: 我上一轮引入的 wx:if / wx:elif 配对错</h3>
+  <pre>  &lt;text wx:if="{{s.duration_sec &gt; 0}}"&gt;时长&lt;/text&gt;
+  &lt;text wx:if="{{s.duration_sec &gt; 0 &amp;&amp; s.weight &gt; 0}}"&gt;·&lt;/text&gt;
+  &lt;text wx:if="{{s.duration_sec &gt; 0 &amp;&amp; s.weight &gt; 0}}"&gt;负重&lt;/text&gt;
+  &lt;text wx:elif="{{s.distance_km &gt; 0}}"&gt;距离&lt;/text&gt;   ← elif 配对的是**上一个 if**(负重那个)
+  &lt;text wx:if="{{s.distance_km &gt; 0 &amp;&amp; s.weight &gt; 0}}"&gt;·&lt;/text&gt;
+  &lt;text wx:if="{{s.distance_km &gt; 0 &amp;&amp; s.weight &gt; 0}}"&gt;负重&lt;/text&gt;
+  &lt;block wx:else&gt;重量 × 次数&lt;/block&gt;             ← else 配对的是**最后一个 if&gt;</pre>
+  <div class="callout red">
+    <div class="t">WXML 的配对规则</div>
+    <p><code>wx:elif</code> 配对<strong>紧邻的上一个 <code>wx:if</code></strong>, <code>wx:else</code> 配对<strong>最后那个 <code>wx:if</code></strong>。
+    于是 duration 形态下: 时长分支成立 → 紧邻的 if(负重)也成立 → <strong>elif 不生效</strong>;
+    而 else 配对的最后那个 if(distance 条件)为 false → <strong>else 照样渲染</strong> → "20kg × 0 reps"。</p>
+  </div>
+  <p><strong>修法</strong>: 三个分支改成<strong>相邻的 block + if/elif/else</strong>(和 <code>pages/index</code> 已验证正确的写法一致):
+  <code>workout-summary-modal</code> 与 <code>session-detail-modal</code> 两处都改了(<code>pages/index</code> 本来就是对的)。</p>
+
+  <h3>13.2 这已经是同类 bug 第二次</h3>
+  <table>
+    <thead><tr><th style="width:14%">次数</th><th style="width:34%">位置</th><th>表现</th></tr></thead>
+    <tbody>
+      <tr><td>第 1 次</td><td><code>edit-exercise-modal</code> 的 set 行</td><td>duration 显示成四段(时长+重量+单位+次数)</td></tr>
+      <tr><td>第 2 次</td><td><code>workout-summary-modal</code> / <code>session-detail-modal</code> 的 set 展示</td><td>duration 显示成「60秒 20kg 20kg × 0 reps」</td></tr>
+    </tbody>
+  </table>
+  <div class="callout amber">
+    <div class="t">根因都是同一个</div>
+    <p>WXML 的 <code>wx:if</code> / <code>wx:elif</code> / <code>wx:else</code> 配对规则被想当然地理解错了。</p>
+  </div>
+
+  <h3>13.3 补上自动化防线</h3>
+  <p><code>tools/check-count-mode-ui.js</code> 从 22 项扩到 <strong>31 项</strong>, 新增第 4 节「set 展示的互斥分支」:
+  覆盖三个展示点(训练总结 / 会话详情 / 首页训练列表)、三种 set 形态(duration+负重 / distance+负重 / 次数类)各求值一次,
+  断言 <strong>「次数(reps)」与「时长/距离」在同一模式下不得同时出现</strong>。</p>
+  <p><strong>已反证</strong>: 把总结弹框换回那个错误版本 → 立刻报
+  <code>❌ 训练总结弹框 / duration+负重: 可见语义: duration,reps</code>; 修复版 → 31/31 全绿。</p>
+  <p>顺带修掉了检查器自身的三个 bug(否则断言会空转):</p>
+  <ol>
+    <li>属性解析不支持<strong>无值</strong>的布尔属性 <code>wx:else</code> → else 分支被当成普通节点判为可见</li>
+    <li>叶子收集只看直接子元素 → 漏掉 <code>&lt;block&gt;</code> 里的真实节点; 且把 <code>unit</code> 当装饰排掉 → 恰恰把唯一有语义的叶子排了</li>
+    <li>语义判定靠 class → 但首页/session-detail 里 <code>class="ec-set-val reps"</code> 是「主要数值」的意思(时长也用它)→ 改成纯文本判定</li>
+  </ol>
+</section>
+
+<footer>
+  GFIT 全盘交互审查 · 2026-11-05 · 三路并行审查 → 逐条复核 → 落地修复 → 脚本实跑验证<br>
+  后端已推 main 并自动部署完成 · 前端 36 文件仍未提交, 等你测完再提
+</footer>
+
+</div>
+</body>
+</html>

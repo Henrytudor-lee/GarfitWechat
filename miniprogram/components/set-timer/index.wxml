@@ -1,0 +1,44 @@
+<!--components/set-timer/index.wxml-->
+<view class="set-timer">
+  <!-- 主显示区 -->
+  <view class="st-display-wrap">
+    <text class="st-display {{running ? 'running' : ''}}">{{display}}</text>
+    <text class="st-hint" wx:if="{{running}}">{{_t.TIMER_RUNNING_HINT || '计时中…'}}</text>
+    <text class="st-hint" wx:elif="{{seconds > 0}}">{{_t.TIMER_PAUSED_HINT || '已暂停 · 点击开始继续'}}</text>
+  </view>
+
+  <!-- 控制按钮 -->
+  <view class="st-controls">
+    <view class="st-btn st-btn-main {{running ? 'stop' : ''}}" bindtap="onToggle">
+      {{running ? (_t.TIMER_STOP || '停止') : (seconds > 0 ? (_t.TIMER_RESUME || '继续') : (_t.TIMER_START || '开始'))}}
+    </view>
+    <view class="st-btn st-btn-reset {{seconds === 0 ? 'disabled' : ''}}" bindtap="onReset">{{_t.TIMER_RESET || '重置'}}</view>
+  </view>
+
+  <!-- 手动输入秒数: 结构与上方的重量/次数输入行一致(− 输入框 +) -->
+  <view class="st-input-row">
+    <view class="st-input-btn" bindtap="onDec">−</view>
+    <input
+      class="st-input"
+      type="number"
+      value="{{secondsStr}}"
+      bindinput="onManualInput"
+      placeholder="0"
+      disabled="{{running}}"
+    />
+    <view class="st-input-btn" bindtap="onInc">+</view>
+    <text class="st-input-unit">{{_t.DURATION_UNIT || '秒'}}</text>
+  </view>
+
+  <!-- 快速时长 -->
+  <view class="st-quick-row">
+    <view
+      wx:for="{{quickSeconds}}"
+      wx:key="*this"
+      class="st-chip {{seconds === item ? 'active' : ''}}"
+      bindtap="onQuickTap"
+      data-val="{{item}}"
+    >{{item}}s</view>
+  </view>
+
+</view>

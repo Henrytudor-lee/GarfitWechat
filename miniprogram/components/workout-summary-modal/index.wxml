@@ -1,6 +1,6 @@
 <!--components/workout-summary-modal/index.wxml-->
-<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
-  <view class="modal-card" catchtap="">
+<view class="modal-mask {{_theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
+  <view class="modal-card" catchtap="onSheetTap">
 
     <!-- Background decoration -->
     <view class="card-bg"></view>
@@ -9,28 +9,31 @@
 
     <!-- Header -->
     <view class="card-header">
-      <view class="brand">GFIT</view>
+      <view class="brand-row">
+        <image class="brand-logo" src="/images/logo.png" mode="aspectFit" />
+        <view class="brand">GFIT</view>
+      </view>
       <view class="check-circle">
         <text class="check-icon">✓</text>
       </view>
-      <view class="complete-label">Workout Complete</view>
+      <view class="complete-label {{_theme === 'day' ? 'theme-day' : ''}}">{{t.WORKOUT_COMPLETE}}</view>
     </view>
 
     <!-- Stats Row -->
     <view class="stats-row">
       <view class="stat-item">
         <view class="stat-val">{{_stats.exerciseCount}}</view>
-        <view class="stat-lbl">Exercises</view>
+        <view class="stat-lbl">{{t.EXERCISES}}</view>
       </view>
       <view class="stat-sep"></view>
-      <view class="stat-item">
+      <view class="stat-item stat-duration">
         <view class="stat-val">{{_stats.durationStr}}</view>
-        <view class="stat-lbl">Duration</view>
+        <view class="stat-lbl">{{t.DURATION}}</view>
       </view>
       <view class="stat-sep"></view>
       <view class="stat-item">
-        <view class="stat-val">{{_stats.totalVolume}} kg</view>
-        <view class="stat-lbl">Volume</view>
+        <view class="stat-val">{{_stats.totalCalories}} <text class="stat-unit">{{t.CAL_UNIT_SHORT}}</text></view>
+        <view class="stat-lbl">{{t.CAL_UNIT}}</view>
       </view>
     </view>
 
@@ -38,7 +41,7 @@
     <view class="divider"></view>
 
     <!-- Exercise Breakdown -->
-    <view class="breakdown-title">Exercise Summary</view>
+    <view class="breakdown-title">{{t.EXERCISE_SUMMARY}}</view>
     <scroll-view class="breakdown-scroll" scroll-y>
       <view class="breakdown-list">
         <view class="breakdown-item" wx:for="{{exerciseList}}" wx:key="id">
@@ -46,26 +49,50 @@
             <image
               wx:if="{{item.image_name}}"
               class="item-img"
-              src="{{imgPrefix}}/{{item.image_name}}"
+              src="{{imgPrefix}}/exer_images/{{item.image_name}}"
               mode="aspectFill"
             />
             <view wx:else class="item-img item-img-placeholder">🏋️</view>
             <view class="item-info">
-              <view class="item-name">{{item.name_zh || item.name}}</view>
-              <view class="item-sets">{{item.sets.length}} sets</view>
+              <view class="item-name">{{_locale === 'zh' ? (item.name_zh || item.name) : (item.name || item.name_zh)}}</view>
+              <view class="item-sets">{{item.sets.length}} {{item.sets.length === 1 ? t.SET : t.SETS}}</view>
             </view>
             <view class="item-vol">
-              <text class="vol-num">{{getGroupVolume(item)}}</text>
-              <text class="vol-unit">kg</text>
+              <text class="vol-num">{{item.totalCalories}}</text>
+              <text class="vol-unit">{{t.CAL_UNIT_SHORT}}</text>
             </view>
           </view>
           <!-- Sets grid: 2 columns -->
           <view class="sets-grid">
             <view class="set-chip" wx:for="{{item.sets}}" wx:for-item="s" wx:key="idx">
               <text class="set-num">{{index + 1}}</text>
-              <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
-              <text class="set-sep">×</text>
-              <text class="set-reps">{{s.reps}} reps</text>
+              <!-- ⚠️ 三个分支必须用**相邻的 block + if/elif/else**,
+                   不能写成 "if / if / if / elif / if / if / else" ——
+                   那样 wx:elif 会配到紧邻的上一个 if(wx:else 同理),
+                   结果 duration 类会同时渲染"时长·负重"**和** else 分支的
+                   "重量 × 0 reps"(2026-11-07 用户截图: 交叉跳跃显示成
+                   "60秒 20kg 20kg × 0 reps")。
+                   下面的写法与 pages/index/index.wxml 一致(那边已验证正确)。 -->
+              <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
+              <block wx:if="{{s.distance_km > 0}}">
+                <text class="set-val">{{s.distance_km}} {{t.KM}}</text>
+                <text class="set-sep" wx:if="{{s.duration_sec > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.duration_sec > 0}}">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
+                <text class="set-sep" wx:if="{{s.weight > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+              </block>
+              <!-- 计时类: 时长必显, 负重可选 -->
+              <block wx:elif="{{s.duration_sec > 0}}">
+                <text class="set-val">{{s.duration_sec}} {{t.DURATION_UNIT}}</text>
+                <text class="set-sep" wx:if="{{s.weight > 0}}">·</text>
+                <text class="set-val" wx:if="{{s.weight > 0}}">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+              </block>
+              <!-- 次数类: 重量 × 次数 -->
+              <block wx:else>
+                <text class="set-val">{{s.weight}} {{s.weight_unit || 'kg'}}</text>
+                <text class="set-sep">×</text>
+                <text class="set-reps">{{s.reps}} reps</text>
+              </block>
             </view>
           </view>
         </view>
@@ -73,12 +100,12 @@
     </scroll-view>
 
     <!-- Date Footer -->
-    <view class="date-footer">{{getDateStr()}}</view>
+    <view class="date-footer">{{_dateStr}}</view>
 
     <!-- Action Buttons -->
     <view class="card-footer">
-      <button class="btn-secondary" bindtap="closeModal">VIEW HISTORY</button>
-      <button class="btn-primary" bindtap="closeModal">DONE</button>
+      <button class="btn-secondary" bindtap="closeModal">{{t.DONE}}</button>
+      <button class="btn-share" open-type="share">{{t.SHARE}}</button>
     </view>
 
   </view>

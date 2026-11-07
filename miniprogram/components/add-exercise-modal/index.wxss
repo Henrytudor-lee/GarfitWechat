@@ -61,7 +61,7 @@
 
 .header-btn {
   font-size: 26rpx;
-  color: #ccf200;
+  color: var(--primary-text);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -73,14 +73,42 @@
   height: 36rpx;
 }
 
+.header-btn-fav {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.header-btn-fav:active {
+  transform: scale(0.9);
+}
+.header-btn-fav.is-fav {
+  background: rgba(204, 242, 0, 0.18);
+}
+.header-btn-fav-icon {
+  width: 40rpx;
+  height: 40rpx;
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.45;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.header-btn-fav.is-fav .header-btn-fav-icon {
+  filter: none;
+  opacity: 1;
+}
+
 .header-btn-text {
   font-size: 26rpx;
-  color: #ccf200;
+  color: var(--primary-text);
   font-weight: 600;
 }
 
 .back-btn {
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 /* Muscle Sidebar */
@@ -119,7 +147,7 @@
 
 .muscle-item.active {
   background: rgba(204, 242, 0, 0.15);
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 .muscle-item.active .muscle-icon {
@@ -223,9 +251,9 @@
 }
 
 .filter-chip.active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
-  border-color: #ccf200;
+  border-color: var(--primary);
 }
 
 .filter-chip .equip-name {
@@ -264,7 +292,7 @@
 
 .load-more {
   text-align: center;
-  color: #ccf200;
+  color: var(--primary-text);
   font-size: 24rpx;
   padding: 24rpx 0;
 }
@@ -274,6 +302,47 @@
   color: #444;
   font-size: 22rpx;
   padding: 24rpx 0;
+}
+
+/* Scroll-to-top FAB
+   位置: session-orb (active) 底部在屏底往上 ~332rpx 处,
+   故此按钮贴在屏底往上 ~220rpx (top ~300rpx),
+   与 orb 底部留 ~32rpx 视觉间距, 形成 "右上叠两个圆按钮" 的层级 */
+.scroll-top-fab {
+  position: absolute;
+  right: 24rpx;
+  bottom: 220rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.35),
+              0 0 24rpx rgba(204, 242, 0, 0.35);
+  z-index: 50;
+  opacity: 0;
+  transform: translateY(20rpx) scale(0.85);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.scroll-top-fab.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.scroll-top-fab-hover {
+  transform: translateY(0) scale(0.92) !important;
+  opacity: 0.85 !important;
+}
+.scroll-top-fab-arrow {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #0a0a0a;
+  /* 微调让箭头视觉居中 (Unicode 字符 baseline 偏高) */
+  margin-top: -4rpx;
 }
 
 .grid-inner {
@@ -324,7 +393,7 @@
   position: absolute;
   top: 8rpx;
   left: 8rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 18rpx;
   font-weight: 700;
@@ -441,7 +510,7 @@
 .tag {
   font-size: 20rpx;
   padding: 4rpx 12rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   border-radius: 10rpx;
   font-weight: 700;
@@ -474,7 +543,7 @@
 .history-badge-val {
   font-size: 18rpx;
   font-weight: 700;
-  color: #ccf200;
+  color: var(--primary-text);
 }
 
 /* Input Section */
@@ -519,6 +588,9 @@
 .input-btn {
   width: 80rpx;
   height: 80rpx;
+  /* ⚠️ 必须 border-box: 小程序默认是 content-box,
+     带 1rpx border 时实际高度会变成 82rpx, 比输入框高 2rpx → 一行里不齐平 */
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16rpx;
   display: flex;
@@ -532,6 +604,9 @@
 .input-field {
   flex: 1;
   height: 80rpx;
+  line-height: 80rpx;     /* 文字垂直居中 */
+  padding: 0 8rpx;        /* 上下 padding 去掉(高度已由 line-height 承担) */
+  box-sizing: border-box; /* border 算进 80rpx */
   background: rgba(255, 255, 255, 0.05);
   border: 1rpx solid rgba(255, 255, 255, 0.1);
   border-radius: 16rpx;
@@ -550,9 +625,12 @@
   z-index: 1;
 }
 
+/* ⚠️ 必须和 .input-btn / .input-field 同高(80rpx) —— 原来这里是 64rpx,
+   一行里三个控件参差不齐。 */
 .unit-btn {
   flex: 1;
-  height: 64rpx;
+  height: 80rpx;
+  box-sizing: border-box;  /* 同 .input-btn: border 算进高度, 否则多 2rpx */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16rpx;
   display: flex;
@@ -565,17 +643,22 @@
 }
 
 .unit-btn.active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
-  border-color: #ccf200;
+  border-color: var(--primary);
 }
 
 /* Modal Footer */
 .modal-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  /* ⚠️ 2026-11-07 修: 原来是 position:absolute; bottom:0 —— 绝对定位**脱离文档流**,
+     于是 .step2-wrap(flex:1) 的可用高度 = 整个 sheet 高度, 滚动区一直延伸到
+     按钮底下 → 最后一段内容被按钮盖住, **滚到底也看不到**
+     (计时器正好在最下面, 计时类动作最容易中招)。
+
+     改成普通流内的 flex 子项(和 edit-exercise-modal 一致):
+     .modal-sheet 本身是 display:flex; flex-direction:column,
+     .step2-wrap(flex:1) 会自动收缩, 给 footer 让出高度。 */
+  flex-shrink: 0;
   padding: 32rpx;
   padding-bottom: calc(32rpx + env(safe-area-inset-bottom, 0px));
   background: rgba(0, 0, 0, 0.9);
@@ -585,7 +668,7 @@
 .confirm-btn {
   width: 100%;
   height: 96rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   border-radius: 48rpx;
   font-size: 30rpx;
@@ -638,15 +721,35 @@
   border-radius: 16rpx;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
+  border: 1rpx dashed rgba(255, 255, 255, 0.15);
   height: 320rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12rpx;
+  padding: 0 32rpx;
+}
+
+.video-placeholder-icon {
+  font-size: 80rpx;
+  opacity: 0.4;
+  line-height: 1;
 }
 
 .video-placeholder-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 28rpx;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.video-placeholder-sub {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  letter-spacing: 0.05em;
 }
 
 /* Quick chips */
@@ -686,6 +789,195 @@
 
 .chip.active {
   background: rgba(204, 242, 0, 0.15);
-  border-color: #ccf200;
-  color: #ccf200;
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+/* ========================
+   Day Theme
+   ========================
+   兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+   这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+.modal-mask.theme-day {
+  --primary: #ccf200;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-day .modal-sheet {
+  background: #ffffff;
+}
+.modal-mask.theme-day .drag-handle {
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal-mask.theme-day .modal-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .header-title {
+  color: #000;
+}
+.modal-mask.theme-day .header-btn-fav {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .header-btn-fav.is-fav {
+  background: rgba(58, 74, 0, 0.15);
+}
+.modal-mask.theme-day .muscle-sidebar {
+  background: #f5f5f5;
+  border-right: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .muscle-item {
+  color: #666;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .muscle-item.active {
+  background: rgba(58, 74, 0, 0.15);
+  color: var(--primary-text);
+}
+.modal-mask.theme-day .search-bar {
+  background: #ffffff;
+}
+.modal-mask.theme-day .search-input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .search-placeholder {
+  color: #999;
+}
+.modal-mask.theme-day .filter-icon-btn {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.4);
+}
+.modal-mask.theme-day .filter-chip {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .filter-chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
+.modal-mask.theme-day .filter-chip .equip-name {
+  color: #666;
+}
+.modal-mask.theme-day .loading-state,
+.modal-mask.theme-day .empty-state {
+  color: #999;
+}
+.modal-mask.theme-day .no-more {
+  color: #999;
+}
+.modal-mask.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .card-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .card-gradient {
+  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+}
+.modal-mask.theme-day .fav-icon-wrap {
+  background: rgba(255, 255, 255, 0.8);
+}
+.modal-mask.theme-day .fav-icon-wrap.active {
+  background: rgba(58, 74, 0, 0.3);
+}
+.modal-mask.theme-day .card-name {
+  color: #000;
+}
+.modal-mask.theme-day .card-muscle-icon,
+.modal-mask.theme-day .card-equip-icon {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .selected-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-name {
+  color: #000;
+}
+.modal-mask.theme-day .tag-neutral {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+}
+.modal-mask.theme-day .input-label {
+  color: #666;
+}
+.modal-mask.theme-day .input-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .input-field {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .unit-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .unit-btn.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
+.modal-mask.theme-day .modal-footer {
+  background: #ffffff;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .video-placeholder {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1rpx dashed rgba(0, 0, 0, 0.2);
+}
+.modal-mask.theme-day .video-placeholder-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+.modal-mask.theme-day .video-placeholder-sub {
+  color: rgba(0, 0, 0, 0.45);
+}
+.modal-mask.theme-day .quick-chips-label {
+  color: #999;
+}
+.modal-mask.theme-day .chip {
+  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
+
+/* ========================
+   Night Theme (fallback)
+   ======================== */
+.modal-mask.theme-night {
+  --primary: #ccf200;
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}
+
+/* Timer section hint (duration 类动作的时长区) */
+.timer-unit-hint {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  line-height: 64rpx;
+}
+
+/* 负重提示 —— 计时/距离类动作也可以负重(手握哑铃的交叉跳跃 / 负重爬坡步行),
+   说明这个重量是"额外负重", 0 = 自重 */
+.load-hint {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  opacity: 0.75;
+  margin-top: 8rpx;
 }

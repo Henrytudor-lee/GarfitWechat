@@ -1,9 +1,29 @@
 // pages/stats/index.js — garcia-fitness-new style with F2 charts
 const app = getApp();
+const api = require('../../utils/api.js');
+const { setVolume, volumeToCalories, formatCalories, formatLargeNum } = require('../../utils/unit.js');
+
+// Compute ISO yrweek key e.g. 202621 for 2026-W21
+function toYrweek(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const dayNum = d.getDay();
+  const MonToSun = dayNum === 0 ? 6 : dayNum - 1;
+  d.setDate(d.getDate() - MonToSun);
+  const thu = new Date(d);
+  thu.setDate(d.getDate() + 4);
+  const isoYear = thu.getFullYear();
+  const jan1 = new Date(isoYear, 0, 1);
+  const days = Math.floor((thu - jan1) / 86400000);
+  const week = Math.ceil((days + 1) / 7);
+  return String(isoYear) + String(week).padStart(2, '0');
+}
 
 Page({
   data: {
     imgPrefix: '',
+    locale: 'en',
+    theme: 'night',
     // Summary
     totalSessions: 0,
     currentStreak: 0,
@@ -13,37 +33,91 @@ Page({
     exerciseList: [],
     selectedExerciseId: null,
     selectedExerciseName: '',
+    selectedExerciseImage: '',
     // Max record
     maxRecord: null,
     // Chart data
     weeklyVolume: [],   // [{label, volume, percent}]
     muscleDistribution: [],
-    mostTrained: [],
+    mostTrained: [],          // 可见子集 (懒加载)
+    mostTrainedAll: [],       // 完整排序后列表
+    mostTrainedLoaded: 0,     // 已加载条目数
     // Weight records for selected exercise
     weightRecords: [],
+    // Chart images (canvas → image to avoid native layer overlap)
+    muscleChartImage: '',
+    weightChartImage: '',
+    // Leaderboard
+    leaderboard: [],
+    lbType: 'calories',  // 'calories' | 'volume'
+    lbPeriod: 'year',    // 'year' | 'month' | 'day'
     // UI state
     loading: false,
     hasData: false,
+    loadError: false,   // 请求失败态: 与"还没有训练数据"区分开
+    orbSession: null,
   },
 
   onLoad() {
-    this.setData({ imgPrefix: app.globalData.imagePrefix });
+    const app = getApp();
+    this.setData({
+      imgPrefix: app.globalData.imagePrefix,
+      locale: app.globalData.language,
+      theme: app.globalData.theme,
+      t: app.globalData.t,  // 注入 i18n 字典
+    });
   },
 
   async onShow() {
+    const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
+    const locale = app.globalData.language || 'zh';
+    if (this.data.theme !== theme || this.data.locale !== locale) {
+      this.setData({ theme, locale });
+    }
     await this._loadAll();
+    // Refresh session orb
+    const orbSession = await app.loadRunningSession();
+    this.setData({ orbSession });
   },
 
   async _loadAll() {
-    wx.showLoading({ title: 'LOADING...', mask: true });
-    this.setData({ loading: true });
+    // 并发守卫: 快速来回切 tab 时, 全局 showLoading/hideLoading 遮罩(全局单例)会互相干扰 ——
+    // 先完成的那次会提前撤掉另一次仍在飞的遮罩, loading 布尔值也会提前置 false → 空态闪现。
+    if (this._loadingAll) return;
+    this._loadingAll = true;
+    try {
+      await this._loadAllInner();
+    } finally {
+      this._loadingAll = false;
+    }
+  },
 
-    const [statsRes] = await Promise.all([
-      wx.cloud.callFunction({ name: 'stats', data: { action: 'summary', openid: app.globalData.openid } }),
-    ]);
+  async _loadAllInner() {
+    const dict = this.data.t || {};
+    const loadingText = dict.LOADING || 'LOADING...';
+    wx.showLoading({ title: loadingText, mask: true });
+    this.setData({ loading: true, loadError: false });
 
-    wx.hideLoading();
-    this.setData({ loading: false });
+    // try/finally: 任一接口失败也必须走到 hideLoading, 否则全屏 mask 永久锁死
+    let statsRes = null;
+    try {
+      [statsRes] = await Promise.all([
+        api.callCloud('stats.summary'),
+      ]);
+    } catch (err) {
+      console.error('Stats load failed:', err);
+      wx.showToast({ title: dict.LOAD_FAILED || 'Load failed', icon: 'none' });
+      // ⚠️ 失败 ≠ 没数据: 不置 loadError 的话, wxml 会同时显示
+      //    toast"加载失败" 和 "还没有训练数据", 自相矛盾。
+      this.setData({ loadError: true });
+      return;
+    } finally {
+      wx.hideLoading();
+      this.setData({ loading: false });
+    }
+
+    // Leaderboard — load with default type/period
+    this._loadLeaderboard().catch(() => {});
 
     if (!statsRes.result || !statsRes.result.success) {
       console.error('Stats load failed:', statsRes.result);
@@ -54,11 +128,15 @@ Page({
     const historyExercises = d.historyExercises || [];
 
     // Build weekly volume — last 8 weeks
+    // 卡路里 v1: 直接用后端给的 session 级卡路里, 不再从体积反推
     const weekMap = {};
+    const weekCalMap = {};
     (d.weeklyVolume || []).forEach(v => {
       const key = v.yrweek;
       if (!weekMap[key]) weekMap[key] = 0;
       weekMap[key] += Number(v.volume);
+      if (!weekCalMap[key]) weekCalMap[key] = 0;
+      weekCalMap[key] += Number(v.calories || 0);
     });
 
     const now = new Date();
@@ -66,60 +144,221 @@ Page({
     for (let i = 7; i >= 0; i--) {
       const wd = new Date(now);
       wd.setDate(now.getDate() - i * 7);
-      const iso = wd.toISOString().slice(0, 10);
-      const label = wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      weeklyVolume.push({ label, volume: weekMap[iso] || 0, iso });
+      const yrweek = toYrweek(wd);
+      const label = (this.data.locale || 'zh') === 'zh'
+        ? wd.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+        : wd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const vol = weekMap[yrweek] || 0;
+      const cal = weekCalMap[yrweek] || 0;
+      weeklyVolume.push({ label, volume: cal, volumeDisplay: formatCalories(cal), yrweek });
     }
 
     // Percent relative to max
     const maxVol = Math.max(...weeklyVolume.map(w => w.volume), 1);
     weeklyVolume.forEach(w => { w.percent = Math.round((w.volume / maxVol) * 100); });
 
-    // Muscle distribution (derived from exercise names)
+    // Muscle distribution (derived from body_part_id, locale-aware)
     const muscleMap = {};
+    const { BODY_PART_MAP, BODY_PART_MAP_ZH } = require('../../utils/maps.js');
     historyExercises.forEach(ex => {
-      const total = ex.records.reduce((s, r) => s + (r.weight || 0) * (r.reps || 0), 0);
+      const total = ex.records.reduce((s, r) => s + setVolume(r), 0);
       if (total === 0) return;
-      const name = (ex.name || '').toLowerCase();
-      let muscle = 'Other';
-      if (name.includes('chest') || name.includes('bench') || name.includes('fly')) muscle = 'Chest';
-      else if (name.includes('back') || name.includes('row') || name.includes('lat')) muscle = 'Back';
-      else if (name.includes('squat') || name.includes('leg') || name.includes('quad') || name.includes('ham') || name.includes('calf')) muscle = 'Legs';
-      else if (name.includes('shoulder') || name.includes('press') || name.includes('lateral')) muscle = 'Shoulders';
-      else if (name.includes('bicep') || name.includes('curl') || name.includes('tricep')) muscle = 'Arms';
-      else if (name.includes('core') || name.includes('plank') || name.includes('ab')) muscle = 'Core';
-      muscleMap[muscle] = (muscleMap[muscle] || 0) + total;
+      const partIds = String(ex.body_part_ids || '').split(',').map(id => id.trim()).filter(Boolean);
+      partIds.forEach(partId => {
+        const name = (this.data.locale || 'zh') === 'zh'
+          ? (BODY_PART_MAP_ZH[partId] || '其他')
+          : (BODY_PART_MAP[partId] || 'Other');
+        muscleMap[name] = (muscleMap[name] || 0) + total;
+      });
     });
+    // 肌肉分布图: 输入是**按部位分摊的训练量**, 这里换算成卡路里做展示。
+    // ⚠️ v1 已知局限: 计时类/距离类动作的 volume=0, 不会出现在这张分布图里。
+    //    后续按动作类型优化卡路里算法时, 这里要改成按各动作的真实卡路里分摊。
     const muscleDistribution = Object.entries(muscleMap)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name, value: volumeToCalories(value), valueDisplay: formatCalories(volumeToCalories(value)) }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
-    // Most trained exercises
-    const mostTrained = historyExercises
-      .map(ex => ({ name: ex.name, count: ex.records.length }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
+    // Assign colors to muscle groups
+    const MUSCLE_COLORS = ['#ccf200', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8'];
+    muscleDistribution.forEach((m, i) => { m.color = MUSCLE_COLORS[i % MUSCLE_COLORS.length]; });
 
-    // Exercise list for selector
+    // Most trained exercises — locale-aware name + image + lazy-load
+    const mostTrainedAll = historyExercises
+      .map(ex => ({
+        exercise_id: ex.exercise_id,
+        name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
+        image_name: ex.image_name || '',
+        count: ex.records.length,
+      }))
+      .sort((a, b) => b.count - a.count);
+    const MOST_TRAINED_PAGE = 10;
+    const mostTrained = mostTrainedAll.slice(0, MOST_TRAINED_PAGE);
+
+    // Exercise list for selector — locale-aware name + image
     const exerciseList = historyExercises.map(ex => ({
       id: ex.exercise_id,
-      name: ex.name,
+      name: (this.data.locale || 'zh') === 'zh' ? (ex.name_zh || ex.name) : (ex.name_en || ex.name),
+      image_name: ex.image_name || '',
     }));
 
     const hasData = historyExercises.length > 0 || d.totalSessions > 0;
 
+    // 卡路里 v1: 用后端聚合好的真实值(不���从体积反推)
+    const totalCal = d.totalCalories || 0;
     this.setData({
       totalSessions: d.totalSessions || 0,
       currentStreak: d.currentStreak || 0,
       weekWorkouts: d.weekWorkouts || 0,
-      totalVolume: d.totalVolume || 0,
+      totalVolume: totalCal,
+      totalVolumeDisplay: formatCalories(totalCal),
       exerciseList,
       weeklyVolume,
       muscleDistribution,
       mostTrained,
+      mostTrainedAll,
+      mostTrainedLoaded: mostTrained.length,
       hasData,
     });
+
+    // Auto-select first exercise and load its max record
+    if (exerciseList.length > 0) {
+      const first = exerciseList[0];
+      this.setData({
+        selectedExerciseId: first.id,
+        selectedExerciseName: first.name,
+        selectedExerciseImage: first.image_name,
+      });
+      this._loadExerciseData(first.id).catch(() => {});
+    }
+
+    // Render muscle pie chart after data is set
+    if (muscleDistribution.length > 0) {
+      // ⚠️ 先清掉旧图, 让 <canvas id="muscleChart"> 重新挂载到 DOM,
+      // 否则 _renderMuscleChart 里 select('#muscleChart').node() 拿不到节点,
+      // 曲线/饼图就一直是第一次的数据 (同体重图的处理)。
+      this.setData({ muscleChartImage: '' });
+      setTimeout(() => this._renderMuscleChart(), 300);
+    }
+  },
+
+  // 错误态的"重试"按钮
+  onRetry() {
+    this._loadAll().catch(() => {});
+  },
+
+  _onMostTrainedScrollLower() {
+    const all = this.data.mostTrainedAll || [];
+    const loaded = this.data.mostTrainedLoaded || 0;
+    if (loaded >= all.length) return;
+    const next = all.slice(0, loaded + 10);
+    this.setData({ mostTrained: next, mostTrainedLoaded: next.length });
+  },
+
+  async _loadLeaderboard() {
+    // 请求序号: 连续切 type/period 时, 只有最后一次请求的结果会被采纳,
+    // 否则旧参数的响应会覆盖新参数的列表, 顶部 tab 高亮与列表内容对不上。
+    const reqId = (this._lbReqId || 0) + 1;
+    this._lbReqId = reqId;
+
+    const { lbType, lbPeriod } = this.data;
+    try {
+      const res = await api.callCloud('stats.leaderboard', { type: lbType, period: lbPeriod });
+      if (reqId !== this._lbReqId) return;  // 有更新的请求在飞 → 本次结果作废
+      if (res.result && res.result.success && res.result.leaderboard) {
+        const isVolume = lbType === 'volume';
+        const vals = res.result.leaderboard.map(u => u.total_metric || 0);
+        const maxVal = Math.max(...vals, 1);
+        const leaderboard = res.result.leaderboard.map((u, i) => ({
+          rank: i + 1,
+          name: u.name || '—',
+          avatar: u.avatar || '',
+          value: u.total_metric || 0,
+          valueDisplay: isVolume ? formatLargeNum(u.total_metric || 0) : formatCalories(u.total_metric || 0),
+          percent: Math.round(((u.total_metric || 0) / maxVal) * 100),
+        }));
+        this.setData({ leaderboard });
+      } else {
+        this.setData({ leaderboard: [] });
+      }
+    } catch (err) {
+      if (reqId !== this._lbReqId) return;
+      console.error('[stats] _loadLeaderboard failed:', err);
+      this.setData({ leaderboard: [] });
+    }
+  },
+
+  onLbTypeTap(e) {
+    const type = e.currentTarget.dataset.type;
+    if (type === this.data.lbType) return;
+    this.setData({ lbType: type });
+    this._loadLeaderboard().catch(() => {});
+  },
+
+  onLbPeriodTap(e) {
+    const period = e.currentTarget.dataset.period;
+    if (period === this.data.lbPeriod) return;
+    this.setData({ lbPeriod: period });
+    this._loadLeaderboard().catch(() => {});
+  },
+
+  async _loadExerciseData(exerciseId) {
+    // 请求序号: 快速在"最大纪录"picker 里切动作时, 曲/maxRecord 必须是最后一个动作的
+    const reqId = (this._exReqId || 0) + 1;
+    this._exReqId = reqId;
+
+    const dict = this.data.t || {};
+    wx.showLoading({ title: dict.LOADING || 'LOADING...', mask: true });
+
+    // try/finally: 两个接口任意一个失败都不能让 mask 卡住
+    // 用 allSettled 而非 all, 避免"取极值成功但历史记录失败"时数据全丢
+    let recRes, recordsRes;
+    try {
+      [recRes, recordsRes] = await Promise.allSettled([
+        api.callCloud('stats.exerciseMax', { exercise_id: exerciseId }),
+        api.callCloud('stats.exerciseRecords', { exercise_id: exerciseId }),
+      ]);
+    } catch (err) {
+      console.error('[stats] _loadExerciseData failed:', err);
+    } finally {
+      // 只有最新一次请求才能撤遮罩, 否则旧请求会把新请求的遮罩提前撤掉
+      if (reqId === this._exReqId) wx.hideLoading();
+    }
+
+    // 有更新的请求在飞 → 本次结果作废
+    if (reqId !== this._exReqId) return;
+
+    if (recRes && recRes.status === 'fulfilled') {
+      const body = recRes.value && recRes.value.result;
+      if (body && body.success) {
+        this.setData({ maxRecord: body.maxRecord || null });
+      }
+    } else {
+      console.error('[stats] exerciseMax failed:', recRes && recRes.reason);
+    }
+
+    if (recordsRes && recordsRes.status === 'fulfilled') {
+      const body = recordsRes.value && recordsRes.value.result;
+      if (body && body.success) {
+        const records = body.records || [];
+        // 先清掉旧图, 让 <canvas id="weightChart"> 重新挂载到 DOM,
+        // 否则 _renderWeightChart 里 select('#weightChart').node() 拿不到节点, 曲线就一直是切换前的
+        this.setData({ weightRecords: records, weightChartImage: '' });
+        setTimeout(() => this._renderWeightChart(records), 300);
+      }
+    } else {
+      console.error('[stats] exerciseRecords failed:', recordsRes && recordsRes.reason);
+    }
+  },
+
+  async onOrbTap() {
+    // 无 session: 先创建一个, 再跳到 training 页
+    if (!this.data.orbSession) {
+      const session = await app.ensureRunningSession();
+      if (!session) return;
+      this.setData({ orbSession: session });  // orb 立即变 active
+    }
+    wx.switchTab({ url: '/pages/index/index' });
   },
 
   async onExerciseChange(e) {
@@ -131,30 +370,10 @@ Page({
     this.setData({
       selectedExerciseId: exercise.id,
       selectedExerciseName: exercise.name,
+      selectedExerciseImage: exercise.image_name || '',
     });
 
-    wx.showLoading({ title: 'LOADING...', mask: true });
-    const [recRes, recordsRes] = await Promise.all([
-      wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseMax', exercise_id: exercise.id, openid: app.globalData.openid },
-      }),
-      wx.cloud.callFunction({
-        name: 'stats',
-        data: { action: 'exerciseRecords', exercise_id: exercise.id, openid: app.globalData.openid },
-      }),
-    ]);
-    wx.hideLoading();
-
-    if (recRes.result && recRes.result.success) {
-      this.setData({ maxRecord: recRes.result.maxRecord || null });
-    }
-
-    if (recordsRes.result && recordsRes.result.success) {
-      const records = recordsRes.result.records || [];
-      this.setData({ weightRecords: records });
-      this._renderWeightChart(records);
-    }
+    this._loadExerciseData(exercise.id).catch(() => {});
   },
 
   _renderWeightChart(records) {
@@ -169,84 +388,192 @@ Page({
       reps: Number(r.reps) || 0,
     }));
 
-    // Use F2 canvas chart via wx-charts compatible approach
-    const query = wx.createSelectorQuery().in(this);
-    query.select('#weightChart').node((res) => {
-      const canvas = res.node;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      const dpr = wx.getSystemInfoSync().pixelRatio;
-      canvas.width = res.width * dpr;
-      canvas.height = res.height * dpr;
-      ctx.scale(dpr, dpr);
-
-      // Draw a simple bar chart manually on canvas
-      this._drawBarChart(ctx, chartData, res.width, res.height);
-    }).exec();
+    const theme = this.data.theme || 'night';
+    const page = this;
+    const drawChart = () => {
+      const query = wx.createSelectorQuery().in(page);
+      query.select('#weightChart').node((res) => {
+        if (!res || !res.node) return;
+        const canvas = res.node;
+        const ctx = canvas.getContext('2d');
+        const dpr = wx.getWindowInfo().pixelRatio || wx.getSystemInfoSync().pixelRatio;
+        const w = 320;
+        const h = 200;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.scale(dpr, dpr);
+        page._drawCurveChart(ctx, chartData, w, h, theme);
+        // Convert canvas to image so it stays in WebView layer
+        wx.canvasToTempFilePath({
+          canvas,
+          success: (imgRes) => {
+            page.setData({ weightChartImage: imgRes.tempFilePath });
+          },
+        });
+      }).exec();
+    };
+    drawChart();
+    setTimeout(drawChart, 300);
   },
 
-  _drawBarChart(ctx, data, width, height) {
+  _drawCurveChart(ctx, data, width, height, theme) {
     if (!data || data.length === 0) return;
+    if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) return;
 
-    const padding = { top: 16, right: 16, bottom: 32, left: 40 };
-    const chartW = width - padding.left - padding.right;
-    const chartH = height - padding.top - padding.bottom;
+    const isDay = theme === 'day';
+    const pad = { t: 12, r: 12, b: 28, l: 28 };
+    const W = width - pad.l - pad.r;
+    const H = height - pad.t - pad.b;
+    if (W <= 0 || H <= 0) return;
 
-    const maxWeight = Math.max(...data.map(d => d.weight), 1);
+    const maxW = Math.max(...data.map(d => d.weight || 0), 1);
+    const lineColor = '#ccf200';
+    const dimColor = isDay ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)';
+    const labelColor = isDay ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
 
     // Background
-    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.fillStyle = isDay ? '#f5f5f5' : 'rgba(0,0,0,0)';
     ctx.fillRect(0, 0, width, height);
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    // Grid — horizontal lines only, subtle
+    ctx.strokeStyle = dimColor;
     ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    for (let i = 0; i <= 4; i++) {
-      const y = padding.top + (chartH / 4) * i;
+    for (let i = 0; i <= 3; i++) {
+      const y = pad.t + (H / 3) * i;
+      if (!isFinite(y)) continue;
       ctx.beginPath();
-      ctx.moveTo(padding.left, y);
-      ctx.lineTo(width - padding.right, y);
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(pad.l + W, y);
       ctx.stroke();
     }
-    ctx.setLineDash([]);
 
-    // Y axis labels
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.font = '9px sans-serif';
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= 4; i++) {
-      const val = Math.round(maxWeight * (1 - i / 4));
-      const y = padding.top + (chartH / 4) * i + 4;
-      ctx.fillText(`${val}kg`, padding.left - 4, y);
+    // Y axis — left side, weight values in kg
+    ctx.fillStyle = labelColor;
+    ctx.font = '8px sans-serif';
+    ctx.textAlign = 'left';
+    for (let i = 0; i <= 3; i++) {
+      const val = Math.round(maxW * (1 - i / 3));
+      const y = pad.t + (H / 3) * i + 4;
+      if (!isFinite(y)) continue;
+      ctx.fillText(`${val}kg`, 0, y);
     }
 
-    // X axis labels
+    // Compute points
+    const pts = data.map((d, i) => {
+      const x = pad.l + (W / Math.max(data.length - 1, 1)) * i;
+      const y = pad.t + H - (d.weight / maxW) * H;
+      return { x: isFinite(x) ? x : pad.l, y: isFinite(y) ? y : pad.t + H, weight: d.weight };
+    });
+
+    // Filled area under the curve
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + H);
+    pts.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else {
+        const prev = pts[i - 1];
+        const mx = (prev.x + p.x) / 2;
+        ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
+      }
+    });
+    ctx.lineTo(pts[pts.length - 1].x, pad.t + H);
+    ctx.lineTo(pad.l, pad.t + H);
+    ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + H);
+    grad.addColorStop(0, 'rgba(204,242,0,0.15)');
+    grad.addColorStop(1, 'rgba(204,242,0,0.02)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Stroke the line
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t + H);
+    pts.forEach((p, i) => {
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else {
+        const prev = pts[i - 1];
+        const mx = (prev.x + p.x) / 2;
+        ctx.quadraticCurveTo(prev.x, prev.y, mx, (prev.y + p.y) / 2);
+        ctx.quadraticCurveTo(mx, (prev.y + p.y) / 2, p.x, p.y);
+      }
+    });
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // X axis labels — record indices (1, 2, 3...)
+    ctx.fillStyle = labelColor;
+    ctx.font = '8px sans-serif';
     ctx.textAlign = 'center';
-    const barWidth = Math.max(4, Math.min(20, chartW / data.length - 4));
-    data.forEach((d, i) => {
-      const x = padding.left + (chartW / data.length) * i + (chartW / data.length - barWidth) / 2;
-      const barH = (d.weight / maxWeight) * chartH;
-      const y = padding.top + chartH - barH;
-
-      // Bar gradient
-      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-      grad.addColorStop(0, '#ccf200');
-      grad.addColorStop(1, 'rgba(204,242,0,0.3)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barH, [3, 3, 0, 0]);
-      ctx.fill();
-
-      // Label
-      ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = '8px sans-serif';
-      ctx.fillText(`#${d.index}`, x + barWidth / 2, height - padding.bottom + 12);
+    pts.forEach((p, i) => {
+      if (!isFinite(p.x)) return;
+      ctx.fillText(`${i + 1}`, p.x, pad.t + H + 14);
     });
   },
 
   _hideChart() {
     this.setData({ weightRecords: [] });
+  },
+
+  _renderMuscleChart() {
+    const muscleDistribution = this.data.muscleDistribution;
+    if (!muscleDistribution || muscleDistribution.length === 0) return;
+
+    const page = this;
+    const drawChart = () => {
+      const query = wx.createSelectorQuery().in(page);
+      query.select('#muscleChart').node((res) => {
+        if (!res || !res.node) return;
+        const canvas = res.node;
+        const ctx = canvas.getContext('2d');
+        const dpr = wx.getWindowInfo().pixelRatio || wx.getSystemInfoSync().pixelRatio;
+        const size = 120;
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        ctx.scale(dpr, dpr);
+        page._drawPieChart(ctx, muscleDistribution, size, size);
+        // Convert canvas to image so it stays in WebView layer
+        wx.canvasToTempFilePath({
+          canvas,
+          success: (imgRes) => {
+            page.setData({ muscleChartImage: imgRes.tempFilePath });
+          },
+        });
+      }).exec();
+    };
+    drawChart();
+    setTimeout(drawChart, 300);
+  },
+
+  _drawPieChart(ctx, data, width, height) {
+    if (!isFinite(width) || !isFinite(height) || width <= 0 || height <= 0) return;
+    const cx = width / 2;
+    const cy = height / 2;
+    const outerR = width / 2 - 2;
+    const innerR = outerR * 0.55; // donut hole
+
+    const total = data.reduce((s, d) => s + d.value, 0);
+    if (total === 0) return;
+
+    let startAngle = -Math.PI / 2; // start at top
+    data.forEach((d) => {
+      if (!isFinite(d.value) || d.value < 0) { startAngle = startAngle; return; }
+      const ratio = d.value / total;
+      const endAngle = startAngle + ratio * 2 * Math.PI;
+      if (!isFinite(startAngle) || !isFinite(endAngle)) return;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, startAngle, endAngle);
+      ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+      ctx.closePath();
+      ctx.fillStyle = d.color || '#ccf200';
+      ctx.fill();
+
+      startAngle = endAngle;
+    });
   },
 });

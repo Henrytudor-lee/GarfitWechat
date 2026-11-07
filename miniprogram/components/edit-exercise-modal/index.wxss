@@ -92,7 +92,7 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 36rpx;
   font-weight: 700;
@@ -111,6 +111,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.action-btn-fav {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.action-btn-fav:active {
+  transform: scale(0.9);
+}
+.action-btn-fav.is-fav {
+  background: rgba(204, 242, 0, 0.18);
+}
+.action-btn-fav-icon {
+  width: 40rpx;
+  height: 40rpx;
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.45;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.action-btn-fav.is-fav .action-btn-fav-icon {
+  filter: none;
+  opacity: 1;
 }
 
 /* Sets list — scrollable */
@@ -142,7 +170,7 @@
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 20rpx;
   font-weight: 700;
@@ -179,6 +207,13 @@
   gap: 8rpx;
 }
 
+/* ⚠️ 同一行里的三个控件(± 按钮 / 输入框 / 单位切换)高度必须完全一致,
+   否则一行内参差不齐。
+   实测(2026-11-07, 用户截图 + 像素测量):
+     .field-btn   48rpx 固定
+     .field-input 没写 height → 被内容撑到 ~65rpx   ← 高出 17rpx
+     .unit-btn    由 padding 撑出 ~44rpx            ← 矮 4rpx
+   现在统一到 48rpx, 输入框用 line-height 让文字垂直居中。 */
 .field-btn {
   width: 48rpx;
   height: 48rpx;
@@ -194,6 +229,10 @@
 .field-input {
   flex: 1;
   min-width: 0;
+  height: 48rpx;
+  line-height: 48rpx;     /* 文字垂直居中 */
+  padding: 0 4rpx;        /* 上下 padding 去掉(高度已由 line-height 承担) */
+  box-sizing: border-box; /* border 算进 48rpx, 否则实际是 50 */
   text-align: center;
   font-size: 28rpx;
   font-weight: 700;
@@ -201,27 +240,33 @@
   background: transparent;
   border: 1rpx solid rgba(255, 255, 255, 0.1);
   border-radius: 12rpx;
-  padding: 8rpx 4rpx;
 }
 
 /* Unit toggle */
 .unit-toggle {
   display: flex;
+  height: 48rpx;
+  box-sizing: border-box;   /* border 算进 48rpx */
+  align-items: center;
   border-radius: 12rpx;
   overflow: hidden;
   border: 1rpx solid rgba(255, 255, 255, 0.1);
 }
 
 .unit-btn {
-  padding: 8rpx 16rpx;
+  height: 46rpx;            /* 48 - 上下 border 2rpx */
+  padding: 0 16rpx;
   font-size: 20rpx;
   font-weight: 700;
   color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s;
 }
 
 .unit-btn.active {
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
 }
 
@@ -247,7 +292,7 @@
 .save-btn {
   width: 100%;
   height: 96rpx;
-  background: #ccf200;
+  background: var(--primary);
   color: #000;
   font-size: 28rpx;
   font-weight: 700;
@@ -264,3 +309,79 @@
 }
 
 .save-btn::after { border: none; }
+
+/* ========================
+   Day Theme
+   ========================
+   兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+   这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+.modal-mask.theme-day {
+  --primary: #ccf200;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-day .modal-sheet {
+  background: #ffffff;
+}
+.modal-mask.theme-day .modal-sheet::before {
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal-mask.theme-day .modal-header {
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.08);
+}
+.modal-mask.theme-day .header-img {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .header-name {
+  color: #000;
+}
+.modal-mask.theme-day .header-sets {
+  color: #666;
+}
+.modal-mask.theme-day .action-btn-close {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+.modal-mask.theme-day .action-btn-fav {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .action-btn-fav.is-fav {
+  background: rgba(58, 74, 0, 0.15);
+}
+.modal-mask.theme-day .set-item {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .field-label {
+  color: #666;
+}
+.modal-mask.theme-day .field-btn {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000;
+}
+.modal-mask.theme-day .field-input {
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.modal-mask.theme-day .unit-toggle {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.modal-mask.theme-day .unit-btn {
+  color: #666;
+}
+.modal-mask.theme-day .unit-btn.active {
+  color: #000;
+  background: var(--primary);
+}
+.modal-mask.theme-day .delete-btn {
+  color: #999;
+}
+
+/* ========================
+   Night Theme (fallback)
+   ======================== */
+.modal-mask.theme-night {
+  --primary: #ccf200;
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}

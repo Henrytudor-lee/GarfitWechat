@@ -1,0 +1,24 @@
+<!--components/session-orb/index.wxml-->
+<view class="session-orb {{hasSession ? 'active' : 'idle'}} {{dragging ? 'dragging' : ''}}"
+      style="left:{{positionX}}rpx;top:{{positionY}}rpx;"
+      catchtouchstart="onTouchStart"
+      catchtouchmove="onTouchMove"
+      catchtouchend="onTouchEnd"
+      catchtouchcancel="onTouchEnd"
+      hover-class="orb-tap">
+  <!-- 旋转光圈 (loading 效果, 仅 running 时显示) -->
+  <view wx:if="{{hasSession}}" class="orb-aura"></view>
+
+  <!-- 内容 -->
+  <block wx:if="{{hasSession}}">
+    <view class="orb-content">
+      <image class="orb-logo" src="/images/logo.png" mode="aspectFit" />
+      <text class="orb-time">{{durationDisplay}}</text>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="orb-content">
+      <image class="orb-logo orb-logo-idle" src="/images/logo.png" mode="aspectFit" />
+    </view>
+  </block>
+</view>

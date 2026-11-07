@@ -1,5 +1,5 @@
 <!--components/add-exercise-modal/index.wxml-->
-<view class="modal-mask" wx:if="{{isOpen}}" bindtap="onMaskTap">
+<view class="modal-mask {{theme === 'day' ? 'theme-day' : 'theme-night'}}" wx:if="{{isOpen}}" bindtap="onMaskTap">
   <view class="modal-sheet" catchtap="onSheetTap">
 
     <!-- Drag Handle -->
@@ -9,51 +9,41 @@
     <view class="modal-header">
       <view class="header-left">
         <view wx:if="{{step === 'pick' && selectedMuscleOpen}}" class="header-btn" bindtap="closeMuscleMenu">
-          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_{{theme === 'day' ? 'dark' : 'light'}}.png" mode="aspectFit" />
         </view>
         <block wx:elif="{{step === 'pick'}}">
           <view class="header-btn" bindtap="toggleMuscleMenu">
-            <image
-              class="header-btn-icon"
-              src="{{muscleIcon || (imgPrefix + '/icons/all.png')}}"
-              mode="aspectFit"
-            />
+            <image class="header-btn-icon" src="{{muscleIcon || (imgPrefix + '/icons/all.png')}}" mode="aspectFit" />
             <text class="header-btn-text">{{muscleLabel}}</text>
           </view>
         </block>
         <block wx:else>
           <view class="header-btn back-btn" bindtap="goBack">
-            <image class="header-btn-icon" src="{{imgPrefix}}/icons/icon-back.svg" mode="aspectFit" />
-            Back
+            <image class="header-btn-icon" src="{{imgPrefix}}/icons/icon-back.png" mode="aspectFit" />
+            <text>{{t.BACK}}</text>
           </view>
         </block>
       </view>
 
-      <view class="header-title">{{step === 'pick' ? 'ADD EXERCISE' : 'SET WEIGHT & REPS'}}</view>
+      <view class="header-title">{{step === 'pick' ? t.ADD_EXERCISE : setTitle}}</view>
 
       <view class="header-right">
+        <!-- step 2: favorite toggle -->
+        <view wx:if="{{step === 'set' && selectedItem}}" class="header-btn-fav {{selectedItem.is_favorite ? 'is-fav' : ''}}" catchtap="onSelectedFavoriteTap">
+          <image class="header-btn-fav-icon" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
+        </view>
         <view class="header-btn" bindtap="closeModal">
-          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_light.png" mode="aspectFit" />
+          <image class="header-btn-icon" src="{{imgPrefix}}/icons/close_icon_{{theme === 'day' ? 'dark' : 'light'}}.png" mode="aspectFit" />
         </view>
       </view>
     </view>
 
     <!-- Muscle Sidebar -->
     <view wx:if="{{selectedMuscleOpen && step === 'pick'}}" class="muscle-sidebar">
-      <view
-        class="muscle-item {{selectedMuscle === 0 ? 'active' : ''}}"
-        bindtap="selectMuscle"
-        data-id="0"
-      >All Muscles</view>
-      <view
-        wx:for="{{muscleList}}"
-        wx:key="id"
-        class="muscle-item {{selectedMuscle === item.id ? 'active' : ''}}"
-        bindtap="selectMuscle"
-        data-id="{{item.id}}"
-      >
+      <view class="muscle-item {{selectedMuscle === 0 ? 'active' : ''}}" bindtap="selectMuscle" data-id="0">{{t.ALL_MUSCLES}}</view>
+      <view wx:for="{{muscleListWithName}}" wx:key="id" class="muscle-item {{selectedMuscle === item.id ? 'active' : ''}}" bindtap="selectMuscle" data-id="{{item.id}}">
         <image wx:if="{{item.icon}}" class="muscle-icon" src="{{imgPrefix}}/body-icons/{{item.icon}}" mode="aspectFit" />
-        <text class="muscle-item-name">{{item.name}}</text>
+        <text class="muscle-item-name">{{item._name}}</text>
       </view>
     </view>
 
@@ -61,18 +51,11 @@
     <view class="modal-content">
 
       <!-- STEP 1: Pick Exercise -->
-      <view wx:if="{{step === 'pick'}}" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+      <view wx:if="{{step === 'pick'}}" style="flex:1;display:flex;flex-direction:column;min-height:0;position:relative;">
 
         <!-- Search -->
         <view class="search-bar">
-          <input
-            class="search-input"
-            placeholder="SEARCH EXERCISES..."
-            placeholder-class="search-placeholder"
-            value="{{keyword}}"
-            bindinput="onSearchInput"
-            bindconfirm="onSearch"
-          />
+          <input class="search-input" placeholder="{{t.SEARCH_EXERCISES_MODAL}}" placeholder-class="search-placeholder" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
           <view class="filter-icons-wrap">
             <text class="filter-icon-btn {{filterFavor ? 'active' : ''}}" bindtap="onFavorFilterTap">♥</text>
             <text class="filter-icon-btn {{filterPracticed ? 'active' : ''}}" bindtap="onPracticedFilterTap">☑</text>
@@ -83,49 +66,28 @@
         <view class="filter-section">
           <scroll-view class="filter-scroll" scroll-x>
             <view class="filter-row">
-              <view
-                class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}"
-                bindtap="selectEquipment"
-                data-id="0"
-              >ALL <text wx:if="{{selectedEquipment === 0}}" class="equip-name">Equips</text></view>
-              <view
-                wx:for="{{equipmentList}}"
-                wx:key="id"
-                class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}"
-                bindtap="selectEquipment"
-                data-id="{{item.id}}"
-              >
+              <view class="filter-chip {{selectedEquipment === 0 ? 'active' : ''}}" bindtap="selectEquipment" data-id="0">{{t.ALL}} <text wx:if="{{selectedEquipment === 0}}" class="equip-name">{{t.EQUIPS}}</text></view>
+              <view wx:for="{{equipmentListWithName}}" wx:key="id" class="filter-chip {{selectedEquipment === item.id ? 'active' : ''}}" bindtap="selectEquipment" data-id="{{item.id}}">
                 <image wx:if="{{item.icon}}" class="equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.icon}}" mode="aspectFit" />
-                <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item.name}}</text>
+                <text wx:if="{{selectedEquipment === item.id}}" class="equip-name">{{item._name}}</text>
               </view>
             </view>
           </scroll-view>
         </view>
 
         <!-- Exercise Grid - NOW SCROLLABLE -->
-        <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore">
-          <view wx:if="{{loading && list.length === 0}}" class="loading-state">LOADING...</view>
-          <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">NO EXERCISES FOUND</view>
+        <scroll-view class="exercise-grid" scroll-y bindscrolltolower="loadMore" scroll-top="{{pickScrollTop}}" bindscroll="onPickScroll">
+          <view wx:if="{{loading && list.length === 0}}" class="loading-state">{{t.LOADING}}</view>
+          <view wx:elif="{{list.length === 0 && !loading}}" class="empty-state">{{t.NO_EXERCISES_FOUND}}</view>
 
           <view wx:else class="grid-inner">
-            <view
-              wx:for="{{list}}"
-              wx:key="id"
-              class="exercise-card"
-              data-item="{{item}}"
-              bindtap="onExerciseTap"
-            >
+            <view wx:for="{{list}}" wx:key="id" class="exercise-card" data-item="{{item}}" bindtap="onExerciseTap">
               <view class="card-img-wrap">
-                <image
-                  wx:if="{{item.image_name}}"
-                  class="card-img"
-                  src="{{imgPrefix}}/{{item.image_name}}"
-                  mode="aspectFill"
-                />
+                <image wx:if="{{item.image_name}}" class="card-img" src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
                 <view wx:else class="card-img-placeholder">🏋️</view>
                 <view class="card-gradient"></view>
                 <!-- Top-left: DONE badge if practiced -->
-                <view wx:if="{{item.is_practiced}}" class="done-badge">DONE</view>
+                <view wx:if="{{item.is_practiced}}" class="done-badge">{{t.DONE}}</view>
                 <!-- Bottom-left: heart/favorite icon (catchtap stops event bubbling) -->
                 <view class="fav-icon-wrap" catchtap="onFavoriteTap" data-id="{{item.id}}">
                   <image wx:if="{{item.is_favorite}}" src="{{imgPrefix}}/icons/heart_filled.png" mode="aspectFit" />
@@ -133,9 +95,9 @@
                 </view>
               </view>
               <view class="card-footer">
-                <view class="card-name">{{item.name}}</view>
+                <view class="card-name">{{locale === 'zh' ? item.name_zh : item.name}}</view>
                 <view class="card-icons">
-                  <block wx:for="{{item.muscle_icons}}" wx:key="index">
+                  <block wx:for="{{item.muscle_icons}}" wx:key="*this">
                     <image class="card-muscle-icon" src="{{imgPrefix}}/body-icons/{{item}}" mode="aspectFit" />
                   </block>
                   <image wx:if="{{item.equipment_icon}}" class="card-equip-icon" src="{{imgPrefix}}/equipment_icons/{{item.equipment_icon}}" mode="aspectFit" />
@@ -144,9 +106,14 @@
             </view>
           </view>
 
-          <view wx:if="{{loadingMore}}" class="load-more">LOADING MORE...</view>
+          <view wx:if="{{loadingMore}}" class="load-more">{{t.LOADING_MORE}}</view>
           <view wx:if="{{!hasMore && list.length > 0}}" class="no-more">— ALL —</view>
         </scroll-view>
+
+        <!-- Scroll-to-top FAB: 列表往下滚超过 300px 时浮现, 点击回顶 -->
+        <view class="scroll-top-fab {{showScrollTopBtn ? 'visible' : ''}}" catchtap="scrollToTop" hover-class="scroll-top-fab-hover" wx:if="{{step === 'pick'}}">
+          <text class="scroll-top-fab-arrow">↑</text>
+        </view>
       </view>
 
       <!-- STEP 2: Set Weight/Reps -->
@@ -154,98 +121,111 @@
 
         <scroll-view scroll-y class="step2-scroll">
 
-        <!-- Selected Exercise Card -->
-        <view class="selected-exercise-card">
-          <image
-            wx:if="{{selectedItem.image_name}}"
-            class="selected-img"
-            src="{{imgPrefix}}/{{selectedItem.image_name}}"
-            mode="aspectFill"
-          />
-          <view wx:else class="selected-img selected-img-placeholder">🏋️</view>
-          <view class="selected-info">
-            <view class="selected-name">{{selectedItem.name_zh || selectedItem.name}}</view>
-            <view class="selected-tags">
-              <text class="tag">{{selectedItem.equipment_name || 'OTHER'}}</text>
-              <text class="tag tag-neutral">{{selectedItem.muscle_name || ''}}</text>
+          <!-- Selected Exercise Card -->
+          <view class="selected-exercise-card">
+            <image wx:if="{{selectedItem.image_name}}" class="selected-img" src="{{imgPrefix}}/exer_images/{{selectedItem.image_name}}" mode="aspectFill" />
+            <view wx:else class="selected-img selected-img-placeholder">🏋️</view>
+            <view class="selected-info">
+              <view class="selected-name">{{locale === 'zh' ? selectedItem.name_zh : selectedItem.name}}</view>
+              <view class="selected-tags">
+                <text class="tag">{{locale === 'zh' ? (selectedItem.equipment_name || '其他') : (selectedItem.equipment_name || 'OTHER')}}</text>
+                <text class="tag tag-neutral">{{locale === 'zh' ? (selectedItem.muscle_name_zh || '') : (selectedItem.muscle_name || '')}}</text>
+              </view>
+            </view>
+            <!-- LAST badge: 回填"上次这个动作的记录"
+                 ⚠️ 2026-11-07: 原来只有重量次数类才显示(计时/距离类整个隐藏)。
+                 现在计时/距离类也显示 —— 但内容按模式不同:
+                   次数类 → "50kg × 8"
+                   计时类 → "45秒" (+ 负重时 "45秒 · 10kg")
+                   距离类 → "5km"  (+ 负重时 "5km · 10kg") -->
+            <view wx:if="{{historyMax}}" class="history-badge" bindtap="applyHistory">
+              <text class="history-badge-label">{{t.LAST}}</text>
+              <text class="history-badge-val" wx:if="{{!isDuration && !isDistance}}">{{historyMax.weight}}{{historyMax.weight_unit}} × {{historyMax.reps}}</text>
+              <text class="history-badge-val" wx:if="{{isDuration}}">{{historyMax.duration_sec != null ? historyMax.duration_sec : 0}}{{t.DURATION_UNIT}}<text wx:if="{{historyMax.weight > 0}}"> · {{historyMax.weight}}{{historyMax.weight_unit}}</text></text>
+              <text class="history-badge-val" wx:if="{{isDistance}}">{{historyMax.distance_km != null ? historyMax.distance_km : 0}}{{t.KM}}<text wx:if="{{historyMax.weight > 0}}"> · {{historyMax.weight}}{{historyMax.weight_unit}}</text></text>
             </view>
           </view>
-          <view wx:if="{{historyMax}}" class="history-badge" bindtap="applyHistory">
-            <text class="history-badge-label">Last</text>
-            <text class="history-badge-val">{{historyMax.weight}}{{historyMax.unit}} × {{historyMax.reps}}</text>
+
+          <!-- Video -->
+          <view wx:if="{{selectedItem.video_name}}" class="video-wrap">
+            <video class="step2-video" src="{{vidPrefix}}/exer_videos/{{selectedItem.video_name}}" mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture></video>
           </view>
-        </view>
+          <view wx:else class="video-placeholder">
+            <view class="video-placeholder-icon">🎬</view>
+            <text class="video-placeholder-text">{{t.NO_DEMO_VIDEO_HINT}}</text>
+            <text class="video-placeholder-sub">{{t.NO_DEMO_VIDEO_CONTACT}}</text>
+          </view>
 
-        <!-- Video -->
-        <view wx:if="{{selectedItem.video_name}}" class="video-wrap">
-          <video
-            class="step2-video"
-            src="{{vidPrefix}}/{{selectedItem.video_name}}"
-            mode="aspectFill"
-            show-center-play-btn
-            show-play-btn
-            enable-progress-gesture
-          ></video>
-        </view>
-        <view wx:elif="{{selectedItem.image_name}}" class="video-placeholder">
-          <text class="video-placeholder-text">该动作暂无演示视频</text>
-        </view>
+          <!-- Weight Input —— 三种模式都显示。
+               ⚠️ 2026-11-07 修正: 原来这里对计时/距离类是 `wx:if="{{!isDuration && !isDistance}}"`
+               (整个隐藏), 而且 JS 里还把 weight 强制写成 0 → 负重被直接丢弃。
+               但计时/距离类动作**也可能是负重的**:
+               手握两个哑铃的交叉跳跃、负重爬坡步行、背负装备的登山 …
+               所以重量对这三类都成立, 含义是"这个 set 额外承受的负重", 0 = 自重。
+               次数才是"次数类专属" —— 计时类按时长、距离类按距离。 -->
+          <view class="input-section">
+            <view class="input-label-row">
+              <view class="input-label">{{(isDuration || isDistance) ? t.LOAD : t.WEIGHT}} ({{weight_unit}})</view>
+              <view class="quick-chips-row">
+                <view wx:for="{{weightChips}}" wx:key="*this" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
+              </view>
+            </view>
+            <view class="input-row">
+              <view class="input-btn" bindtap="decWeight">−</view>
+              <input class="input-field" type="digit" value="{{weightStr}}" bindinput="onWeightInput" placeholder="0" />
+              <view class="input-btn" bindtap="incWeight">+</view>
+            </view>
+            <view class="load-hint" wx:if="{{isDuration || isDistance}}">{{t.LOAD_HINT}}</view>
+          </view>
 
-        <!-- Weight Input -->
-        <view class="input-section">
-          <view class="input-label-row">
-            <view class="input-label">WEIGHT ({{weight_unit}})</view>
-            <view class="quick-chips-row">
-              <view wx:for="{{weightChips}}" wx:key="index" class="chip {{weight == item ? 'active' : ''}}" bindtap="setWeight" data-val="{{item}}">{{item}}</view>
+          <!-- Unit Toggle -->
+          <view class="unit-toggle">
+            <view class="unit-btn {{weight_unit === 'kg' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="kg">KG</view>
+            <view class="unit-btn {{weight_unit === 'lb' ? 'active' : ''}}" bindtap="setUnit" data-weight-unit="lb">LB</view>
+          </view>
+
+          <!-- Reps Input (只有次数类动作才有"次数") -->
+          <view class="input-section" wx:if="{{!isDuration && !isDistance}}">
+            <view class="input-label-row">
+              <view class="input-label">{{t.REPS}}</view>
+              <view class="quick-chips-row">
+                <view wx:for="{{repsChips}}" wx:key="*this" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
+              </view>
+            </view>
+            <view class="input-row">
+              <view class="input-btn" bindtap="decReps">−</view>
+              <input class="input-field" type="number" value="{{repsStr}}" bindinput="onRepsInput" placeholder="0" />
+              <view class="input-btn" bindtap="incReps">+</view>
             </view>
           </view>
-          <view class="input-row">
-            <view class="input-btn" bindtap="decWeight">−</view>
-            <input
-              class="input-field"
-              type="digit"
-              value="{{weight}}"
-              bindinput="onWeightInput"
-              placeholder="0"
-            />
-            <view class="input-btn" bindtap="incWeight">+</view>
-          </view>
-        </view>
 
-        <!-- Unit Toggle -->
-        <view class="unit-toggle">
-          <view
-            class="unit-btn {{weight_unit === 'kg' ? 'active' : ''}}"
-            bindtap="setUnit"
-            data-weight-unit="kg"
-          >KG</view>
-          <view
-            class="unit-btn {{weight_unit === 'lb' ? 'active' : ''}}"
-            bindtap="setUnit"
-            data-weight-unit="lb"
-          >LB</view>
-        </view>
-
-        <!-- Reps Input -->
-        <view class="input-section">
-          <view class="input-label-row">
-            <view class="input-label">REPS</view>
-            <view class="quick-chips-row">
-              <view wx:for="{{repsChips}}" wx:key="index" class="chip {{reps == item ? 'active' : ''}}" bindtap="setReps" data-val="{{item}}">{{item}}</view>
+          <!-- Distance Input (距离类动作: 跑步 / 骑行 / 划船 / 椭圆机 …) -->
+          <view class="input-section" wx:if="{{isDistance}}">
+            <view class="input-label-row">
+              <view class="input-label">{{t.DISTANCE}}</view>
+              <view class="quick-chips-row">
+                <text class="timer-unit-hint">{{t.KM}}</text>
+              </view>
+            </view>
+            <view class="input-row">
+              <view class="input-btn" bindtap="decDistance">−</view>
+              <input class="input-field" type="digit" value="{{distanceStr}}" bindinput="onDistanceInput" placeholder="0.00" />
+              <view class="input-btn" bindtap="incDistance">+</view>
             </view>
           </view>
-          <view class="input-row">
-            <view class="input-btn" bindtap="decReps">−</view>
-            <input
-              class="input-field"
-              type="number"
-              value="{{reps}}"
-              bindinput="onRepsInput"
-              placeholder="0"
-            />
-            <view class="input-btn" bindtap="incReps">+</view>
+
+          <!-- Duration Timer —— 只给计时类动作(平板支撑 / 波比跳 / 开合跳 …)
+               距离类按需求"只录入距离", 不显示计时器 -->
+          <view class="input-section" wx:if="{{isDuration}}">
+            <view class="input-label-row">
+              <view class="input-label">{{t.SET_DURATION}}</view>
+              <view class="quick-chips-row">
+                <text class="timer-unit-hint" wx:if="{{!timerRequired}}">{{t.TIMER_OPTIONAL_HINT}}</text>
+                <text class="timer-unit-hint" wx:else>{{t.DURATION_UNIT}}</text>
+              </view>
+            </view>
+            <set-timer value="{{durationSec}}" t="{{t}}" bindchange="onTimerChange" bindfinish="onTimerFinish" />
           </view>
-        </view>
 
         </scroll-view>
 
@@ -254,11 +234,7 @@
 
     <!-- Bottom Confirm Button (Step 2 only) -->
     <view wx:if="{{step === 'set'}}" class="modal-footer">
-      <button
-        class="confirm-btn {{(weight < 0 || reps <= 0 || submitting) ? 'disabled' : ''}}"
-        bindtap="confirmAdd"
-        disabled="{{weight < 0 || reps <= 0 || submitting}}"
-      >{{submitting ? 'ADDING...' : 'ADD TO WORKOUT'}}</button>
+      <button class="confirm-btn {{canSubmit ? '' : 'disabled'}}" bindtap="confirmAdd" disabled="{{!canSubmit}}">{{submitting ? t.ADDING : t.ADD_TO_WORKOUT}}</button>
     </view>
 
   </view>

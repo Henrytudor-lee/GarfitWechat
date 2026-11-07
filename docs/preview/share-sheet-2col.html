@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分享页 · 动作详情弹层 · 组列表排版预览</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0d0d0d; color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  }
+  /* 小程序语义: view = block, text = inline */
+  view { display: block; }
+  text { display: inline; }
+  .page { max-width: 375px; margin: 0 auto; padding: 16px 0 40px; }
+  .page-head { padding: 0 16px 18px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 8px; }
+  .page-head h1 { font-size: 15px; margin: 0 0 6px; color: #f2f2f2; }
+  .page-head p { font-size: 12px; line-height: 1.7; color: #8a8a8a; margin: 0; }
+  .case { margin: 18px 0 0; }
+  .case h3 { font-size: 12px; color: #8a8a8a; margin: 0 0 6px 16px; font-weight: 600; }
+  .case h3 em { font-style: normal; color: #666; margin-left: 6px; }
+  .sheet {
+    width: 100%; background: #1a1a1a; border-radius: 16px 16px 0 0;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .sheet-scroll { flex: 1; min-height: 0; }
+  /* ── 以下为 miniprogram/pages/share/index.wxss 的真实内容 (rpx 已按 375 折算) ── */
+/* pages/share/index.wxss — 训练分享页
+   视觉语言跟首页/会话详情一致(深色 + 荧光绿主色), 但用的是独立页而不是弹框。 */
+
+.page {
+  min-height: 100vh;
+  background: #131313;
+  padding: 20px 14px 100px;
+  box-sizing: border-box;
+}
+
+.page.theme-day {
+  background: #f5f5f5;
+}
+
+/* ── 状态区(加载中 / 失效) ── */
+.state-box {
+  padding: 80px 20px;
+  text-align: center;
+}
+.state-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+.state-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 6px;
+}
+.theme-day .state-title { color: #1a1a1a; }
+.state-sub {
+  font-size: 12px;
+  color: #8a8a8a;
+  margin-bottom: 15px;
+}
+.state-btn {
+  display: inline-block;
+  margin: 0 6px;
+  padding: 11px 24px;
+  border-radius: 499.5px;
+  background: #ccf200;
+  color: #000;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ── 分享者 ── */
+.share-head {
+  margin-bottom: 14px;
+}
+.owner {
+  display: flex;
+  align-items: center;
+}
+.owner-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.owner-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.owner-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 3px;
+}
+.theme-day .owner-name { color: #1a1a1a; }
+.owner-label {
+  font-size: 11px;
+  color: #8a8a8a;
+}
+
+/* ── 训练摘要 ── */
+.summary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.summary-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 13px 8px;
+  text-align: center;
+  box-sizing: border-box;
+}
+.theme-day .summary-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.summary-val {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ccf200;
+  line-height: 1.1;
+  margin-bottom: 5px;
+}
+.summary-label {
+  font-size: 10px;
+  color: #8a8a8a;
+  letter-spacing: 0.08em;
+}
+
+.date-line {
+  font-size: 11px;
+  color: #8a8a8a;
+  margin-bottom: 12px;
+  font-family: 'SF Mono', Menlo, monospace;
+}
+
+/* ── 动作分组 ── */
+.group {
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-radius: 11px;
+  padding: 11px;
+  margin-bottom: 9px;
+}
+.theme-day .group {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+}
+.group-img-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.group-img {
+  width: 100%;
+  height: 100%;
+}
+.group-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.group-info {
+  flex: 1;
+  min-width: 0;
+}
+.group-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f2f2f2;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-day .group-name { color: #1a1a1a; }
+.group-sub {
+  font-size: 11px;
+  color: #8a8a8a;
+}
+.group-dot {
+  margin: 0 4px;
+}
+.group-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+.group-cal {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ccf200;
+}
+.group-detail-hint {
+  font-size: 9.5px;
+  color: #6a6a6a;
+  margin-top: 3px;
+}
+
+/* ── sets ── */
+.sets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.set-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: #d8d8d8;
+}
+.theme-day .set-item {
+  background: rgba(0, 0, 0, 0.04);
+  color: #333;
+}
+.set-num {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ccf200;
+  color: #000;
+  font-size: 8.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.set-val { font-weight: 700; }
+.set-val.reps { color: #fff; }
+.theme-day .set-val.reps { color: #1a1a1a; }
+.set-unit {
+  font-size: 9.5px;
+  color: #8a8a8a;
+  font-weight: 600;
+}
+.set-sep {
+  color: #555;
+  margin: 0 1px;
+}
+
+/* ── 底部按钮 ── */
+.foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: rgba(19, 19, 19, 0.92);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+.theme-day .foot {
+  background: rgba(245, 245, 245, 0.94);
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+.foot-btn {
+  width: 100%;
+  height: 46px;
+  border-radius: 499.5px;
+  background: #ccf200;
+  color: #000;
+  font-size: 15px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 动作详情弹层 ── */
+.sheet-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9000;
+  display: flex;
+  align-items: flex-end;
+}
+.sheet {
+  width: 100%;
+  max-height: 78vh;
+  background: #1a1a1a;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sheet-scroll {
+  flex: 1;
+  min-height: 0;
+}
+.sheet-media {
+  width: 100%;
+  height: 190px;
+  background: #000;
+}
+.sheet-video {
+  width: 100%;
+  height: 190px;
+  display: block;
+}
+.sheet-video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+.sheet-body {
+  padding: 14px 16px 20px;
+}
+.sheet-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: #f2f2f2;
+  margin-bottom: 4px;
+}
+.sheet-en {
+  font-size: 11px;
+  color: #8a8a8a;
+  margin-bottom: 9px;
+}
+.sheet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 499.5px;
+  background: rgba(204, 242, 0, 0.14);
+  color: #ccf200;
+}
+.chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #b9b9b9;
+}
+.sheet-sets-title {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6a6a6a;
+  margin-bottom: 7px;
+}
+/* 组列表: 一行两条 */
+.sheet-sets-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.sheet-set-row {
+  width: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 8px 7px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+  font-size: 12px;
+  color: #e0e0e0;
+}
+/* 奇数条 → 最后一条独占整行, 不留半格空白 */
+.sheet-set-row.wide {
+  width: 100%;
+  padding-right: 0;
+}
+.sheet-set-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+.sheet-set-num {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  font-size: 8.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sheet-foot {
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 0.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 收藏按钮 —— 与动作库页同款(心形图标, 已收藏时高亮) */
+.sheet-fav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sheet-fav-btn.active {
+  background: rgba(204, 242, 0, 0.18);
+}
+.sheet-fav-btn image {
+  width: 19px;
+  height: 19px;
+}
+.sheet-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>分享页 · 动作详情弹层 · 组列表排版预览</h1>
+    <p>
+      组列表改为<b>一行两条</b>; 奇数条时最后一条独占整行, 不留半格空白。<br>
+      样式直接内联自 <code>miniprogram/pages/share/index.wxss</code>(真实文件, 非手抄)。<br>
+      ⚠️ rpx 按 375px 宽折算 → 请用 375px 宽的窗口看, 1:1 还原真机。<br>
+      本页是<b>快照</b>: 改完 wxss 后跑 <code>node tools/preview-share-sheet.js</code> 重新生成。
+    </p>
+  </div>
+<section class="case">
+    <h3>A · 奇数 3 条 <em>首行 2 条, 最后一条独占整行(不留半格空白)</em></h3>
+    <view class="sheet">
+      <view class="sheet-body">
+        <view class="sheet-title">PVC过顶深蹲</view>
+        <view class="sheet-en">PVC Overhead Squat</view>
+        <view class="sheet-tags">
+          <text class="chip chip-neutral">自重</text><text class="chip">股四头肌</text>
+          <text class="chip">大腿</text><text class="chip chip-neutral">次数</text>
+        </view>
+        <view class="sheet-sets">
+          <view class="sheet-sets-title">组</view>
+          <view class="sheet-sets-grid">
+<view class="sheet-set-row">
+      <text class="sheet-set-num">1</text>
+      <view class="sheet-set-text"><text>20 kg × 12 次数</text></view>
+    </view>
+<view class="sheet-set-row">
+      <text class="sheet-set-num">2</text>
+      <view class="sheet-set-text"><text>20 kg × 12 次数</text></view>
+    </view>
+<view class="sheet-set-row wide">
+      <text class="sheet-set-num">3</text>
+      <view class="sheet-set-text"><text>20 kg × 12 次数</text></view>
+    </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </section>
+<section class="case">
+    <h3>B · 偶数 4 条 <em>标准 2 × 2</em></h3>
+    <view class="sheet">
+      <view class="sheet-body">
+        <view class="sheet-title">PVC过顶深蹲</view>
+        <view class="sheet-en">PVC Overhead Squat</view>
+        <view class="sheet-tags">
+          <text class="chip chip-neutral">自重</text><text class="chip">股四头肌</text>
+          <text class="chip">大腿</text><text class="chip chip-neutral">次数</text>
+        </view>
+        <view class="sheet-sets">
+          <view class="sheet-sets-title">组</view>
+          <view class="sheet-sets-grid">
+<view class="sheet-set-row">
+      <text class="sheet-set-num">1</text>
+      <view class="sheet-set-text"><text>20 kg × 12 次数</text></view>
+    </view>
+<view class="sheet-set-row">
+      <text class="sheet-set-num">2</text>
+      <view class="sheet-set-text"><text>25 kg × 10 次数</text></view>
+    </view>
+<view class="sheet-set-row">
+      <text class="sheet-set-num">3</text>
+      <view class="sheet-set-text"><text>25 kg × 8 次数</text></view>
+    </view>
+<view class="sheet-set-row">
+      <text class="sheet-set-num">4</text>
+      <view class="sheet-set-text"><text>20 kg × 6 次数</text></view>
+    </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </section>
+<section class="case">
+    <h3>C · 只有 1 条 <em>单条独占整行</em></h3>
+    <view class="sheet">
+      <view class="sheet-body">
+        <view class="sheet-title">PVC过顶深蹲</view>
+        <view class="sheet-en">PVC Overhead Squat</view>
+        <view class="sheet-tags">
+          <text class="chip chip-neutral">自重</text><text class="chip">股四头肌</text>
+          <text class="chip">大腿</text><text class="chip chip-neutral">次数</text>
+        </view>
+        <view class="sheet-sets">
+          <view class="sheet-sets-title">组</view>
+          <view class="sheet-sets-grid">
+<view class="sheet-set-row wide">
+      <text class="sheet-set-num">1</text>
+      <view class="sheet-set-text"><text>20 kg × 12 次数</text></view>
+    </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </section>
+<section class="case">
+    <h3>D · 长内容(距离 + 时长 + 负重) <em>最长的一组文案, 验证不会横向溢出</em></h3>
+    <view class="sheet">
+      <view class="sheet-body">
+        <view class="sheet-title">PVC过顶深蹲</view>
+        <view class="sheet-en">PVC Overhead Squat</view>
+        <view class="sheet-tags">
+          <text class="chip chip-neutral">自重</text><text class="chip">股四头肌</text>
+          <text class="chip">大腿</text><text class="chip chip-neutral">次数</text>
+        </view>
+        <view class="sheet-sets">
+          <view class="sheet-sets-title">组</view>
+          <view class="sheet-sets-grid">
+<view class="sheet-set-row">
+      <text class="sheet-set-num">1</text>
+      <view class="sheet-set-text"><text>5.2 公里</text><text> · 3600 秒</text><text> · 12 kg</text></view>
+    </view>
+<view class="sheet-set-row">
+      <text class="sheet-set-num">2</text>
+      <view class="sheet-set-text"><text>90 秒</text><text> · 12 kg</text></view>
+    </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,147 @@
+/* components/set-timer/index.wxss */
+/* 紧凑版: 计时器总高 ~360rpx(180pt), 原来 526rpx(263pt) */
+
+.set-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 0 4rpx;
+}
+
+/* ── 显示区 ── */
+.st-display-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.st-display {
+  font-size: 72rpx;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2rpx;
+}
+
+.st-display.running {
+  color: var(--primary-text);
+}
+
+.st-hint {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+/* ── 控制按钮 ── */
+.st-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.st-btn {
+  min-width: 160rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  text-align: center;
+  border-radius: 38rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.st-btn-main {
+  background: var(--primary);
+  color: #131313;
+}
+
+.st-btn-main.stop {
+  background: var(--red);
+  color: #ffffff;
+}
+
+.st-btn-reset {
+  background: var(--card-bg);
+  border: 1rpx solid var(--card-border);
+  color: var(--text-secondary);
+}
+
+.st-btn-reset.disabled {
+  opacity: 0.4;
+}
+
+/* ── 输入行(与上方重量/次数输入行保持一致的结构) ── */
+.st-input-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+  width: 100%;
+}
+
+.st-input-btn {
+  flex: 0 0 88rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  text-align: center;
+  border-radius: 16rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  border: 1rpx solid var(--card-border);
+}
+
+.st-input {
+  flex: 1;
+  height: 76rpx;
+  line-height: 76rpx;
+  padding: 0 20rpx;
+  text-align: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1rpx solid var(--card-border);
+  border-radius: 16rpx;
+}
+
+.st-input-unit {
+  flex: 0 0 auto;
+  margin-left: 4rpx;
+  font-size: 26rpx;
+  color: var(--text-muted);
+}
+
+/* ── 快速时长 chips ── */
+.st-quick-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.st-chip {
+  min-width: 100rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: var(--card-bg);
+  border: 1rpx solid var(--card-border);
+  color: var(--text-secondary);
+}
+
+.st-chip.active {
+  background: var(--primary-bg-soft);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}

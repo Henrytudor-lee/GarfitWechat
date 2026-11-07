@@ -1,5 +1,10 @@
 // components/appbar/index.js
 Component({
-  properties: {},
+  properties: {
+    theme: {
+      type: String,
+      value: 'night',
+    },
+  },
   data: {},
 });

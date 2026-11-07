@@ -1,5 +1,5 @@
 <!--pages/profile/index.wxml—garcia-fitness-new style-->
-<view class="page">
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
 
   <!-- Profile Hero with Avatar -->
   <view class="profile-hero" wx:if="{{isLoggedIn}}">
@@ -12,15 +12,30 @@
       </button>
     </view>
     <!-- Nickname -->
-    <view class="profile-name">{{userInfo.nickname || 'FITNESS USER'}}</view>
+    <view class="profile-name-wrap">
+      <view class="profile-name">{{userInfo.nickname || '微信用户'}}</view>
+      <image class="settings-edit-icon" bindtap="onEditName" src="{{imgPrefix}}/icons/icon-edit.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <!-- Edit Nickname Modal -->
+  <view class="edit-modal-mask" wx:if="{{showEditNameModal}}" bindtap="onNameMaskTap">
+    <view class="edit-modal-box" catchtap="noop">
+      <view class="edit-modal-title">{{t.EDIT_NICKNAME}}</view>
+      <input class="edit-modal-input" value="{{editNameValue}}" placeholder="{{t.NICKNAME}}" maxlength="16" bindinput="onEditNameInput" />
+      <view class="edit-modal-btns">
+        <button class="edit-modal-cancel" bindtap="cancelEditName">{{t.CANCEL}}</button>
+        <button class="edit-modal-confirm" bindtap="confirmEditName">{{t.CONFIRM}}</button>
+      </view>
+    </view>
   </view>
 
   <!-- Not Logged In State -->
   <view class="not-logged-in" wx:if="{{!isLoggedIn}}">
     <view class="not-logged-icon">✦</view>
-    <view class="not-logged-title">{{locale === 'en' ? 'NOT LOGGED IN' : '未登录'}}</view>
-    <view class="not-logged-hint">{{locale === 'en' ? 'Sign in to track your fitness journey' : '登录以开始健身之旅'}}</view>
-    <button class="login-btn" bindtap="goToLogin">{{locale === 'en' ? 'LOGIN / REGISTER' : '登录 / 注册'}}</button>
+    <view class="not-logged-title">{{t.NOT_LOGGED_IN}}</view>
+    <view class="not-logged-hint">{{t.SIGN_IN_TO_TRACK_YOUR_FITNESS_JOURNEY}}</view>
+    <button class="login-btn" bindtap="goToLogin">{{t.LOGIN_REGISTER}}</button>
   </view>
 
   <!-- Logged In Content -->
@@ -29,30 +44,50 @@
     <view class="stats-grid">
       <!-- Streak Card -->
       <view class="stat-card">
-        <text class="stat-icon {{flameColor}}">🜂</text>
-        <view class="stat-label">{{locale === 'en' ? 'ACTIVE STREAK' : '连续训练'}}</view>
-        <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{locale === 'en' ? ' days' : ' 天'}}</text></view>
+        <image class="stat-icon" src="{{imgPrefix}}/icons/icon-sign.png" mode="aspectFit" />
+        <view class="stat-label">{{t.ACTIVE_STREAK}}</view>
+        <view class="stat-value">{{streak || 0}}<text class="stat-unit">{{t.DAYS}}</text></view>
       </view>
       <!-- Level Card -->
       <view class="stat-card">
-        <text class="stat-icon {{trophyColor}}">🏆</text>
-        <view class="stat-label">{{locale === 'en' ? 'LEVEL' : '等级'}}</view>
-        <view class="stat-value-lg">{{levelInfo.label || 'ROOKIE'}}</view>
-        <view class="stat-sub">{{levelInfo.lv || 1}}</view>
+        <image class="stat-icon" src="{{imgPrefix}}/icons/icon-crawn.png" mode="aspectFit" />
+        <view class="stat-label">{{t.LEVEL}}{{levelInfo.lv || 1}}</view>
+        <view class="stat-value-lg">{{locale === 'en' ? levelInfo.label : (levelInfo.label_zh || levelInfo.label)}}</view>
       </view>
     </view>
 
-    <!-- Settings List -->
+    <!-- Edit Body Data Modal -->
+  <view class="edit-modal-mask" wx:if="{{showEditBodyModal}}" bindtap="onBodyMaskTap">
+    <view class="edit-modal-box" catchtap="noop">
+      <view class="edit-modal-title">{{t.EDIT_PERSONAL_INFO}}</view>
+      <view class="body-field-row">
+        <view class="body-field">
+          <text class="body-field-label">{{t.HEIGHT}} (cm)</text>
+          <input class="edit-modal-input body-input" type="number" value="{{editHeightStr}}" bindinput="onHeightInput" placeholder="170" />
+        </view>
+        <view class="body-field">
+          <text class="body-field-label">{{t.WEIGHT_BODY}} (kg)</text>
+          <input class="edit-modal-input body-input" type="number" value="{{editWeightStr}}" bindinput="onWeightInput" placeholder="60" />
+        </view>
+      </view>
+      <view class="edit-modal-btns">
+        <button class="edit-modal-cancel" bindtap="cancelEditBody">{{t.CANCEL}}</button>
+        <button class="edit-modal-confirm" bindtap="confirmEditBody">{{t.CONFIRM}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Settings List -->
     <view class="settings-list">
       <!-- Language Toggle -->
       <view class="settings-item" bindtap="toggleLanguage">
         <view class="settings-left">
           <view class="settings-icon-wrap lang-icon">
-            <text class="settings-icon-text">EN/CN</text>
+            <image class="settings-lang-icon" src="{{imgPrefix}}/icons/icon-lang.png" mode="aspectFit" />
           </view>
           <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'LANGUAGE' : '语言'}}</text>
-            <text class="settings-subtitle">{{locale === 'en' ? 'English (US)' : '中文'}}</text>
+            <text class="settings-title">{{t.LANGUAGE}}</text>
+            <text class="settings-subtitle">{{t.ENGLISH_US}}</text>
           </view>
         </view>
         <view class="toggle-pills">
@@ -65,59 +100,72 @@
       <view class="settings-item" bindtap="toggleTheme">
         <view class="settings-left">
           <view class="settings-icon-wrap theme-icon">
-            <text class="settings-icon-text">{{theme === 'dark' ? '◐' : '◑'}}</text>
+            <text class="settings-icon-text">{{theme === 'day' ? '◐' : '◑'}}</text>
           </view>
           <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'THEME' : '主题'}}</text>
-            <text class="settings-subtitle">{{theme === 'dark' ? (locale === 'en' ? 'Dark' : '深色') : (locale === 'en' ? 'Light' : '浅色')}}</text>
+            <text class="settings-title">{{t.THEME}}</text>
+            <text class="settings-subtitle">{{theme === 'day' ? t.DAY : t.NIGHT}}</text>
           </view>
         </view>
         <view class="toggle-pills">
-          <text class="pill {{theme === 'dark' ? 'pill-active dark' : ''}}">{{locale === 'en' ? 'Dark' : '深色'}}</text>
-          <text class="pill {{theme === 'light' ? 'pill-active light' : ''}}">{{locale === 'en' ? 'Light' : '浅色'}}</text>
+          <text class="pill {{theme === 'day' ? 'pill-active day' : ''}}">{{t.DAY}}</text>
+          <text class="pill {{theme === 'night' ? 'pill-active' : ''}}">{{t.NIGHT}}</text>
         </view>
       </view>
 
-      <!-- AI Coach (locked) -->
-      <view class="settings-item locked">
+      <!-- Personal Info -->
+      <view class="settings-item" bindtap="onPersonalInfoTap" hover-class="item-hover">
         <view class="settings-left">
-          <view class="settings-icon-wrap lock-icon">
-            <text class="settings-icon-text">⚙</text>
+          <view class="settings-icon-wrap body-icon">
+            <text class="settings-icon-text">⚖</text>
           </view>
           <view class="settings-texts">
-            <text class="settings-title locked-text">{{locale === 'en' ? 'AI COACH' : 'AI 教练'}}</text>
-            <text class="settings-subtitle locked-text">{{locale === 'en' ? 'COMING SOON' : '即将推出'}}</text>
+            <text class="settings-title">{{t.PERSONAL_INFO}}</text>
+            <text class="settings-subtitle">{{profileLoaded ? bodyHeight + 'cm / ' + bodyWeight + 'kg' : '—'}}</text>
           </view>
         </view>
-        <text class="lock-icon-right">🔒</text>
+        <text class="settings-arrow">›</text>
       </view>
 
-      <!-- Settings (placeholder) -->
-      <view class="settings-item">
+      <!-- My Shares (管理已分享的训练链接 / 撤销) -->
+      <view class="settings-item" bindtap="onMySharesTap" hover-class="item-hover">
         <view class="settings-left">
           <view class="settings-icon-wrap">
-            <text class="settings-icon-text">⚙</text>
+            <text class="settings-icon-text">🔗</text>
           </view>
           <view class="settings-texts">
-            <text class="settings-title">{{locale === 'en' ? 'SETTINGS' : '设置'}}</text>
-            <text class="settings-subtitle">{{locale === 'en' ? 'APP PREFERENCES' : '应用偏好'}}</text>
+            <text class="settings-title">{{t.MY_SHARES}}</text>
+            <text class="settings-subtitle">{{t.SHARE_REVOKE_CONFIRM}}</text>
           </view>
         </view>
-        <text class="chevron">›</text>
+        <text class="settings-arrow">›</text>
       </view>
+
     </view>
 
-    <!-- Logout Button -->
-    <button class="logout-btn" bindtap="handleLogout">
-      <text class="logout-icon">↩</text>
-      <text class="logout-text">{{locale === 'en' ? 'LOG OUT' : '退出登录'}}</text>
-    </button>
+    <!-- Help Guide -->
+    <view class="settings-item" bindtap="onHelpTap" hover-class="item-hover">
+      <view class="settings-left">
+        <view class="settings-icon-wrap">
+          <text class="settings-icon-text">📖</text>
+        </view>
+        <view class="settings-texts">
+          <text class="settings-title">{{t.HELP_GUIDE}}</text>
+          <text class="settings-subtitle">{{t.HELP_GUIDE_SUB}}</text>
+        </view>
+      </view>
+      <text class="settings-arrow">›</text>
+    </view>
+
 
     <!-- Version -->
-    <view class="version-text">{{locale === 'en' ? 'GARCIAL FITNESS V1.0.2 - STABLE' : 'GARCIAL FITNESS V1.0.2 - 稳定版'}}</view>
+    <view class="version-text">{{t.GARCIA_FITNESS_V106_STABLE}}</view>
   </block>
 
   <!-- Custom Tab Bar -->
-  <custom-tabbar active="profile" />
+  <custom-tabbar active="profile" theme="{{theme}}" />
+
+  <!-- Session Orb -->
+  <session-orb session="{{orbSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 
 </view>

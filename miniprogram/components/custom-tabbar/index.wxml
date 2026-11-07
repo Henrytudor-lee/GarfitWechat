@@ -1,22 +1,20 @@
-<!--components/custom-tabbar/index.wxml—garcia-fitness-new bottom nav-->
-<view class="tabbar-wrap">
+<!--components/custom-tabbar/index.wxml — garcia-fitness-new bottom nav-->
+<view class="tabbar-wrap {{_theme === 'day' ? 'theme-day' : 'theme-night'}}">
   <!-- Bottom Nav -->
   <view class="tabbar">
     <view
       wx:for="{{tabs}}"
       wx:key="id"
       class="tab-item {{active === item.id ? 'active' : ''}}"
-      catchtap="switchTab"
+      bindtap="switchTab"
       data-id="{{item.id}}"
       data-url="{{item.url}}"
     >
-      <view class="tab-icon-wrap">
-        <image
-          src="{{active === item.id ? item.iconActive : item.icon}}"
-          class="tab-icon-img"
-        />
-      </view>
-      <text class="tab-label">{{item.label}}</text>
+      <image
+        src="{{active === item.id ? item.iconActive : item.icon}}"
+        class="tab-icon-img"
+      />
+      <text class="tab-label">{{item.labelText}}</text>
     </view>
   </view>
 </view>
