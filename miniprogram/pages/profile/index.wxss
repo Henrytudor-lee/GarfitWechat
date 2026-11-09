@@ -584,29 +584,4 @@
   color: #000;
 }
 
-/* Body data edit modal */
-.body-field-row {
-  display: flex;
-  gap: 20rpx;
-  margin-bottom: 32rpx;
-}
-
-.body-field {
-  flex: 1;
-}
-
-.body-field-label {
-  display: block;
-  font-size: 22rpx;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 12rpx;
-}
-.page.theme-day .body-field-label { color: #71717a; }
-.page.theme-night .body-field-label { color: #a1a1aa; }
-
-.body-input {
-  text-align: center;
-  margin-bottom: 0;
-}
+/* 身体数据编辑已并入 profile-modal 组件, 这里不再需要单独的字段样式 */

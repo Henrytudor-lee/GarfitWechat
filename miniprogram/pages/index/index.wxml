@@ -230,9 +230,6 @@
   <!-- Custom End Confirm Modal -->
   <custom-end-confirm-modal isOpen="{{showEndConfirm}}" locale="{{locale}}" theme="{{theme}}" bind:confirm="stopWorkout" bind:cancel="onEndConfirmCancel" />
 
-  <!-- Welcome Modal -->
-  <welcome-modal isOpen="{{showWelcome}}" bind:close="onWelcomeClose" />
-
   <!-- Session Orb (悬浮圆球, 显示 running session 状态) -->
   <session-orb session="{{runningSession}}" theme="{{theme}}" bind:orb-tap="onOrbTap" />
 

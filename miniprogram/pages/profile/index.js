@@ -3,7 +3,6 @@ const { normalizeAvatar } = require('../../utils/avatar.js');
 const { compressToLimit } = require('../../utils/image.js');
 const app = getApp();
 const api = require('../../utils/api.js');
-const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
 
 // Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
 function getFlameColor(streak) {
@@ -40,11 +39,9 @@ Page({
     orbSession: null,
     showEditNameModal: false,
     editNameValue: '',
-    showEditBodyModal: false,
-    editHeight: 170,
-    editHeightStr: '170',
-    editWeight: 60,
-    editWeightStr: '60',
+    // 个人资料编辑器(profile-modal)
+    showProfileModal: false,
+    profileForm: {},
     // 资料(身高/体重)是否已从服务端加载完成: 未完成前不允许保存, 否则会拿默认值覆盖真实数据
     profileLoaded: false,
   },
@@ -114,10 +111,18 @@ Page({
       wx.setStorageSync('userHeight', height);
       this.setData({
         userInfo: { nickname: profileData.name, avatarUrl: normalizeAvatar(profileData.avatar, app.globalData.imagePrefix) },
-        editHeight: height,
-        editWeight: weight,
         bodyHeight: height,
         bodyWeight: weight,
+        // 资料编辑器的初始值 —— 打开弹框时回填用户当前的值
+        profileForm: {
+          name: profileData.name || '',
+          avatar: normalizeAvatar(profileData.avatar, app.globalData.imagePrefix) || '',
+          height,
+          weight,
+          gender: profileData.gender || '',
+          birthday: profileData.birthday || '',
+          purpose: profileData.purpose || 0,
+        },
         // 资料加载完成: 之前不允许打开身高/体重弹层 (见 onPersonalInfoTap)
         profileLoaded: true,
       });
@@ -340,79 +345,34 @@ Page({
     wx.showToast({ title: next === 'day' ? 'Theme: Day' : 'Theme: Night', icon: 'none' });
   },
 
-  // ---- Personal Info (body data) ----
+  // ---- Personal Info (个人资料) ----
+  //
+  // ⚠️ 2026-11-09: 原来是本页自己实现的一个"身高/体重"小弹框。
+  //    现在首次进入已经不再强制收集个人信息(见 app.seedDefaultProfile),
+  //    用户改资料统一走 profile-modal —— 性别/生日/运动目标以前只有 welcome-modal 能改,
+  //    那个框去掉后如果不做这一步, 这几个字段就永远没人能改了。
   onPersonalInfoTap() {
     // ⚠️ 资料还没加载完 → 不允许打开弹层。
-    //    原来直接用 this.data.bodyHeight/bodyWeight, 但这两个字段只在 loadData 成功时才存在,
+    //    弹框是用 this.data.profileForm 回填的, 那是 loadData 成功后才有的值;
     //    loadData 失败(或用户手速够快)时拿到的是默认值 170/60,
     //    点一次"确认"就把真实的 178/72 覆盖成 170/60。
     if (!this.data.profileLoaded) {
       wx.showToast({ title: this.data.locale === 'en' ? 'Loading...' : '加载中', icon: 'none' });
       return;
     }
-    // 优先用页面上的真实值, 其次用全局(storage 恢复过的)值, 最后才用默认值
-    const h = this.data.bodyHeight || app.globalData.userHeight || 170;
-    const w = this.data.bodyWeight || app.globalData.userWeight || 60;
-    this.setData({
-      showEditBodyModal: true,
-      editHeight: h,
-      editHeightStr: formatNumberForInput(h),
-      editWeight: w,
-      editWeightStr: formatNumberForInput(w),
+    this.setData({ showProfileModal: true });
+  },
+
+  // 资料编辑器关闭(取消 / 保存成功)
+  onProfileModalClose() {
+    this.setData({ showProfileModal: false });
+  },
+
+  // 资料编辑器保存成功 → 重新拉一次, 让页面显示最新值
+  onProfileSaved() {
+    this.loadData().catch((err) => {
+      console.error('[profile] reload after save failed', err);
     });
-  },
-
-  onHeightInput(e) {
-    const patch = syncDecimalValue('editHeight', e.detail.value);
-    if (patch) this.setData(patch);
-  },
-
-  onWeightInput(e) {
-    const patch = syncDecimalValue('editWeight', e.detail.value);
-    if (patch) this.setData(patch);
-  },
-
-  onBodyMaskTap(e) {
-    if (e.target !== e.currentTarget) return;
-    this.setData({ showEditBodyModal: false });
-  },
-
-  cancelEditBody() {
-    this.setData({ showEditBodyModal: false });
-  },
-
-  async confirmEditBody() {
-    // 资料没加载完 → 不允许写回 (否则会把默认值 170/60 写到服务端)
-    if (!this.data.profileLoaded) {
-      wx.showToast({ title: this.data.locale === 'en' ? 'Loading...' : '加载中', icon: 'none' });
-      return;
-    }
-    const height = this.data.editHeight;
-    const weight = this.data.editWeight;
-    if (height < 50 || height > 250 || weight < 20 || weight > 300) {
-      wx.showToast({ title: this.data.locale === 'en' ? 'Invalid values' : '数值不合法', icon: 'none' });
-      return;
-    }
-    try {
-      const res = await api.callCloud('profile.updateFull', { height, weight });
-      if (res.result && res.result.success) {
-        app.globalData.userWeight = weight;
-        app.globalData.userHeight = height;
-        wx.setStorageSync('userWeight', weight);
-        wx.setStorageSync('userHeight', height);
-        this.setData({
-          bodyHeight: height,
-          bodyWeight: weight,
-          showEditBodyModal: false,
-        });
-        wx.showToast({ title: this.data.locale === 'en' ? 'Updated' : '已更新', icon: 'success' });
-      } else {
-        wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
-      }
-    } catch (err) {
-      console.error('[profile] update body failed', err);
-      wx.showToast({ title: this.data.locale === 'en' ? 'Update failed' : '更新失败', icon: 'none' });
-    }
   },
 
   onHelpTap() {

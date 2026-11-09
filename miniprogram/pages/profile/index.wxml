@@ -56,26 +56,13 @@
       </view>
     </view>
 
-    <!-- Edit Body Data Modal -->
-  <view class="edit-modal-mask" wx:if="{{showEditBodyModal}}" bindtap="onBodyMaskTap">
-    <view class="edit-modal-box" catchtap="noop">
-      <view class="edit-modal-title">{{t.EDIT_PERSONAL_INFO}}</view>
-      <view class="body-field-row">
-        <view class="body-field">
-          <text class="body-field-label">{{t.HEIGHT}} (cm)</text>
-          <input class="edit-modal-input body-input" type="number" value="{{editHeightStr}}" bindinput="onHeightInput" placeholder="170" />
-        </view>
-        <view class="body-field">
-          <text class="body-field-label">{{t.WEIGHT_BODY}} (kg)</text>
-          <input class="edit-modal-input body-input" type="number" value="{{editWeightStr}}" bindinput="onWeightInput" placeholder="60" />
-        </view>
-      </view>
-      <view class="edit-modal-btns">
-        <button class="edit-modal-cancel" bindtap="cancelEditBody">{{t.CANCEL}}</button>
-        <button class="edit-modal-confirm" bindtap="confirmEditBody">{{t.CONFIRM}}</button>
-      </view>
-    </view>
-  </view>
+    <!-- 个人资料编辑器: 姓名 / 头像 / 身高 / 体重 / 性别 / 生日 / 运动目标 -->
+  <profile-modal
+    isOpen="{{showProfileModal}}"
+    profile="{{profileForm}}"
+    bind:close="onProfileModalClose"
+    bind:saved="onProfileSaved"
+  />
 
   <!-- Settings List -->
     <view class="settings-list">

@@ -1,11 +1,11 @@
-<!-- components/welcome-modal/index.wxml -->
+<!-- components/profile-modal/index.wxml -->
 <!-- ⚠️ 用 wx:if 而不是 hidden: .modal-mask 是 display:flex,
      作者层的 display 会盖掉 UA 层的 [hidden]{display:none},
      遮罩会留在布局里继续拦截点击 -->
 <view class="modal-mask" bindtap="onMaskTap" wx:if="{{isOpen}}">
   <view class="modal-sheet" catchtap="onSheetTap">
 
-    <!-- Header: Logo + Welcome -->
+    <!-- Header: 语言切换 + 标题 -->
     <view class="modal-header">
       <view class="header-top">
         <view class="lang-btn" bindtap="switchLanguage">
@@ -15,8 +15,8 @@
         </view>
       </view>
       <view class="header-brand">
-        <text class="brand-title">{{welcomeText}}</text>
-        <text class="brand-subtitle">{{welcomeSubText}}</text>
+        <text class="brand-title">{{titleText}}</text>
+        <text class="brand-subtitle">{{subtitleText}}</text>
       </view>
     </view>
 

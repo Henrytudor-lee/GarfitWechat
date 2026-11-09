@@ -80,7 +80,6 @@ Page({
     currentSessionId: null,
     showAddModal: false,
     preselectedExercise: null,   // 从动作库带回来的预选动作(打开添加弹框时带上)
-    showWelcome: false,
 
     // 加载失败态: 与"今天还没训练"区分开(否则用户看到的是一片空白 + 无提示)
     loadError: false,
@@ -146,6 +145,9 @@ Page({
       this.setData({ loadError: false });
       // 鉴权就绪后再补一次日历圆点 (onLoad 时可能还没登录)
       this._initCalendar();
+      // 新用户 → 展示一次 5 步引导页(纯教程, 可跳过)
+      // is_new 的判断在 app 层(app.openGuideOnce), 首页不碰这个字段
+      app.openGuideOnce();
     } catch (err) {
       console.error('[index] _bootstrap failed:', err);
       this._dataLoaded = false;
@@ -161,12 +163,6 @@ Page({
   },
 
   onShow() {
-    // Show welcome modal for new users — ALWAYS check first (before _dataLoaded guard)
-    if (app.globalData.showWelcome && !this.data.showWelcome) {
-      this.setData({ showWelcome: true });
-      // Don't return — still allow chosenExercise and other logic below
-    }
-
     // Refresh theme and locale from global app state
     const theme = app.getTheme ? app.getTheme() : (app.globalData.theme || 'night');
     const locale = app.globalData.language || 'zh';
@@ -219,11 +215,9 @@ Page({
     this._unloaded = true;
     // timer 句柄在实例属性上, 直接清; 不再走 setData
     this._stopTimers();
-    // 定时器也要清 —— 原来这两个 setTimeout 没清:
+    // 定时器也要清 —— 原来这个 setTimeout 没清:
     //   · onDayTap 的 400ms 脉冲清除 → 页面卸载后还在 setData
-    //   · onWelcomeClose 的 300ms 跳转 → 用户已经离开页面了还会把引导页弹出来
     if (this._pulseTimer) { clearTimeout(this._pulseTimer); this._pulseTimer = null; }
-    if (this._guideTimer) { clearTimeout(this._guideTimer); this._guideTimer = null; }
   },
 
   // No-op: 给 .picker-overlay 的 catchtouchmove 用 ——
@@ -964,28 +958,6 @@ Page({
     } else {
       // 无 session, 启动
       this.startWorkout();
-    }
-  },
-
-  onWelcomeClose() {
-    this.setData({ showWelcome: false });
-    if (app.closeWelcomeModal) {
-      app.closeWelcomeModal();
-    }
-    // 新用户: welcome 结束后进入 5 步引导页
-    // (welcome 现在只对真正首次访问的用户弹, 所以这里的 close 一定是新用户)
-    if (this._guideTimer) clearTimeout(this._guideTimer);
-    this._guideTimer = setTimeout(() => {
-      this._guideTimer = null;
-      if (this._unloaded) return;   // 用户已经离开页面 → 不要再把引导页弹出来
-      wx.navigateTo({ url: '/pages/guide/index' });
-    }, 300);
-  },
-
-  // Called by app.doSilentLogin when login completes — check showWelcome
-  onWelcomeLoginReady() {
-    if (app.globalData.showWelcome && !this.data.showWelcome) {
-      this.setData({ showWelcome: true });
     }
   },
 

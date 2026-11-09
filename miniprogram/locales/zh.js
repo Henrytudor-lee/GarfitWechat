@@ -140,6 +140,8 @@ module.exports = {
   "WEIGHT_BODY": "体重",
   "PERSONAL_INFO": "个人信息",
   "EDIT_PERSONAL_INFO": "编辑个人信息",
+  "EDIT_PROFILE_HINT": "随时更新身体数据,卡路里会算得更准",
+  "INVALID_BODY_DATA": "数值不合法",
   "CM": "厘米",
   "KG_BODY": "公斤",
   "WELCOME_TO_GFIT": "欢迎来到 G-FIT",

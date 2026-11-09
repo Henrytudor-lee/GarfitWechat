@@ -1,4 +1,17 @@
-// components/welcome-modal/index.js
+// components/profile-modal/index.js
+//
+// 个人资料编辑器。
+//
+// ⚠️ 2026-11-09 改造说明:
+//    这个组件原来叫 welcome-modal, 是"新用户首次进入强制收集个人信息"的弹框
+//    (姓名 / 头像 / 身高 / 体重 / 生日 / 性别 / 运动目的)
+//    → 属于微信小程序审核明令不通过的场景(首次进入强制收集个人信息)。
+//
+//    现在的分工:
+//      · 首次进入: 不弹这个框, 新用户直接用默认资料 (app.globalData.defaultProfile)
+//      · 这个组件: 改成 profile 页里的"资料编辑器", 用户想改随时打开
+//
+//    所以标题从"欢迎来到 G-FIT"改成了"编辑个人信息", 表单回填用户当前的值。
 const app = getApp();
 const i18n = require('../../utils/i18n.js');
 const { compressToLimit } = require('../../utils/image.js');
@@ -8,11 +21,31 @@ const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberIn
 // 初始文案(attached 时会按当前语言再刷新一次) —— 全部取自 locales 字典
 const t0 = i18n.getTranslations();
 
+// 身高/体重合法区间 —— 和 profile 页原来的"个人资料"弹框保持一致
+const HEIGHT_MIN = 50;
+const HEIGHT_MAX = 250;
+const WEIGHT_MIN = 20;
+const WEIGHT_MAX = 300;
+
+// 后端 birthday 是 timestamp, picker 需要 'YYYY-MM-DD'
+function normalizeDate(raw) {
+  if (!raw) return '';
+  const matched = String(raw).match(/^(\d{4}-\d{2}-\d{2})/);
+  return matched ? matched[1] : '';
+}
+
 Component({
   properties: {
     isOpen: {
       type: Boolean,
       value: false,
+    },
+    // 打开时回填用的当前资料:
+    // { name, avatar, height, weight, gender, birthday, purpose }
+    // avatar 传"可直接显示的完整 URL"(调用方用 normalizeAvatar 处理过)
+    profile: {
+      type: Object,
+      value: null,
     },
   },
 
@@ -23,13 +56,13 @@ Component({
     imgPrefix: '',
 
     // 表单数据
-    name: 'GFit用户',
-    avatarPath: '',   // 预览用(本地临时路径 或 上传后的服务器地址)
-    avatarUrl: '',    // 上传成功后的服务器地址 —— 只有它才会写进后端
+    name: '',
+    avatarPath: '',   // 预览用(本地临时路径 或 已有的服务器地址)
+    avatarUrl: '',    // 新上传成功的服务器地址 —— 只有它才会写进后端
     uploading: false, // 头像上传中: 禁用"确认", 防止把本地临时路径提交上去
     submitting: false,// 提交中: 防连点
     birthday: '',
-    gender: '',  // '' | 'male' | 'female'
+    gender: '',  // '' | 'male' | 'female' | 'other'
     purpose: 0,  // 0 | 1 | 2 | 3
     height: 170,
     heightStr: '170',
@@ -37,10 +70,11 @@ Component({
     weightStr: '60',
 
     // 翻译文本(全部来自 locales 字典)
-    welcomeText: t0.WELCOME_TO_GFIT,
-    welcomeSubText: t0.START_YOUR_FITNESS_JOURNEY,
+    titleText: t0.EDIT_PERSONAL_INFO,
+    subtitleText: t0.EDIT_PROFILE_HINT,
     cancelText: t0.CANCEL,
     confirmText: t0.CONFIRM,
+    invalidText: t0.INVALID_BODY_DATA,
     namePlaceholder: t0.NAME_OPTIONAL,
     heightLabel: t0.HEIGHT,
     weightLabel: t0.WEIGHT_BODY,
@@ -74,6 +108,8 @@ Component({
           t: app.globalData.t || {},
         });
         this._initLang();
+        // 每次打开都按当前资料回填 —— 用户改过什么, 下次打开还是那个值
+        this._prefill();
       }
     },
   },
@@ -92,10 +128,11 @@ Component({
 
       this.setData({
         t,
-        welcomeText: t.WELCOME_TO_GFIT,
-        welcomeSubText: t.START_YOUR_FITNESS_JOURNEY,
+        titleText: t.EDIT_PERSONAL_INFO,
+        subtitleText: t.EDIT_PROFILE_HINT,
         cancelText: t.CANCEL,
         confirmText: t.CONFIRM,
+        invalidText: t.INVALID_BODY_DATA,
         namePlaceholder: t.NAME_OPTIONAL,
         heightLabel: t.HEIGHT,
         weightLabel: t.WEIGHT_BODY,
@@ -109,9 +146,39 @@ Component({
       });
     },
 
+    /**
+     * 回填当前资料。
+     *
+     * 缺值时退回 app.globalData.defaultProfile —— 和新用户首次进入看到的默认值一致,
+     * 不会出现"编辑器里是 170/60, 但用户实际是别的数"的错位。
+     */
+    _prefill() {
+      const p = this.data.profile || {};
+      const d = (app.globalData && app.globalData.defaultProfile) || { height: 170, weight: 60 };
+      const height = Number(p.height) || app.globalData.userHeight || d.height;
+      const weight = Number(p.weight) || app.globalData.userWeight || d.weight;
+
+      this.setData({
+        name: p.name || '',
+        // avatarPath 只用于显示; avatarUrl 故意留空 ——
+        // 只有用户重新选了头像, 才把新地址写回后端, 不动用户已有的那一个
+        avatarPath: p.avatar || '',
+        avatarUrl: '',
+        uploading: false,
+        submitting: false,
+        birthday: normalizeDate(p.birthday),
+        gender: p.gender || '',
+        purpose: Number(p.purpose) || 0,
+        height,
+        heightStr: formatNumberForInput(height),
+        weight,
+        weightStr: formatNumberForInput(weight),
+      });
+    },
+
     onMaskTap() {
-      // 欢迎弹框是"填资料"表单: 误点遮罩不应该把用户填了一半的内容清空
-      // → 遮罩点击什么都不做, 只有点"取消"或提交成功才会关闭并 resetForm
+      // 资料弹框是"填资料"表单: 误点遮罩不应该把用户填了一半的内容清空
+      // → 遮罩点击什么都不做, 只有点"取消"或提交成功才会关闭
     },
 
     onSheetTap() {
@@ -119,25 +186,7 @@ Component({
     },
 
     closeModal() {
-      this.resetForm();
       this.triggerEvent('close');
-    },
-
-    resetForm() {
-      this.setData({
-        name: 'GFit用户',
-        avatarPath: '',
-        avatarUrl: '',
-        uploading: false,
-        submitting: false,
-        birthday: '',
-        gender: '',
-        purpose: 0,
-        height: 170,
-        heightStr: '170',
-        weight: 60,
-        weightStr: '60',
-      });
     },
 
     // 切换语言
@@ -186,7 +235,7 @@ Component({
           try {
             uploadPath = await compressToLimit(tempFilePath);
           } catch (e) {
-            console.warn('[welcome] compress failed, use original', e);
+            console.warn('[profile-modal] compress failed, use original', e);
           }
           wx.uploadFile({
             url: `${api.BASE_URL}/upload`,
@@ -263,6 +312,12 @@ Component({
         wx.showToast({ title: this.data.uploadAvatarText, icon: 'none' });
         return;
       }
+      // 身高/体重区间校验 —— 和 profile 页原来的"个人资料"弹框一致
+      const { height, weight } = this.data;
+      if (height < HEIGHT_MIN || height > HEIGHT_MAX || weight < WEIGHT_MIN || weight > WEIGHT_MAX) {
+        wx.showToast({ title: this.data.invalidText, icon: 'none' });
+        return;
+      }
       // 防连点: 上一次提交还没回来就不要再发一次
       if (this._submitting) return;
       this._submitting = true;
@@ -291,6 +346,8 @@ Component({
             title: this.data.confirmText + ' ✓',
             icon: 'success',
           });
+          // 通知外层刷新展示(头像/身高/体重等)
+          this.triggerEvent('saved', payload);
           this.closeModal();
         }
       }).catch((err) => {

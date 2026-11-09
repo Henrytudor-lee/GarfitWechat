@@ -140,6 +140,8 @@ module.exports = {
   "WEIGHT_BODY": "Body Weight",
   "PERSONAL_INFO": "Personal Info",
   "EDIT_PERSONAL_INFO": "Edit Personal Info",
+  "EDIT_PROFILE_HINT": "Keep your body data up to date for accurate calories",
+  "INVALID_BODY_DATA": "Invalid values",
   "CM": "cm",
   "KG_BODY": "kg",
   "WELCOME_TO_GFIT": "Welcome to G-FIT",
