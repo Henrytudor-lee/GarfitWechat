@@ -6,28 +6,9 @@
 //  只有 token 这一条路能读。)
 const app = getApp();
 const api = require('../../utils/api.js');
-const {
-  BODY_PART_MAP, BODY_PART_MAP_ZH, EQUIP_MAP, EQUIP_MAP_ZH,
-} = require('../../utils/maps.js');
-
-/** 计量方式 → 展示标签(与动作库页 buildModeLabel 同一口径) */
-function modeLabel(exerciseType, t) {
-  const raw = (exerciseType || 'weight_reps');
-  if (raw === 'duration') return t.MODE_TIMED || 'TIMED';
-  if (raw === 'distance_duration') return t.MODE_DISTANCE || 'DISTANCE';
-  return t.REPS || 'REPS';
-}
-
-/** 逗号分隔的 id 串 → 名称数组(肌群是 "19,1" 这种多值) */
-function idsToNames(raw, map, mapZh, isZh) {
-  if (!raw) return [];
-  return String(raw)
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((id) => (isZh ? (mapZh[id] || map[id]) : (map[id] || mapZh[id])))
-    .filter(Boolean);
-}
+// 动作元信息的口径统一收口到 utils/exerciseMeta.js
+// (动作库页 / 训练分享页 / 动作分享页三处共用, 别再各写一份)
+const { modeLabel } = require('../../utils/exerciseMeta.js');
 
 /** 时长(秒) → "H:MM" / "M:SS"(与会话详情弹框同一口径) */
 function formatDuration(sec) {
@@ -148,8 +129,6 @@ Page({
         //    前端要是自己用 app.globalData.userWeight 算, 算的是**浏览者 B**的体重,
         //    每组卡路里会跟总卡路里对不上。所以这里直接用后端给的, 不重算。
         modeLabel: modeLabel(g.exercise_type, t),
-        muscleNames: idsToNames(g.body_part_id, BODY_PART_MAP, BODY_PART_MAP_ZH, isZh),
-        equipmentNames: idsToNames(g.equipment_id, EQUIP_MAP, EQUIP_MAP_ZH, isZh),
       }));
 
       this.setData({
@@ -195,16 +174,13 @@ Page({
     const index = Number(e.currentTarget.dataset.index);
     const g = this.data.groups[index];
     if (!g) return;
-    const isZh = (this.data.locale || 'zh') === 'zh';
+    // 标题/英文名/器械/肌群/计量方式都由 exercise-detail 组件按统一口径算,
+    // 这里只补上组件算不了的: 收藏态 + 组列表
     this.setData({
       detailOpen: true,
       detail: {
         ...g,
         is_favorite: this._isFav(g.exercise_id),
-        nameText: isZh ? (g.name_zh || g.name_en) : (g.name_en || g.name_zh),
-        muscleNames: idsToNames(g.body_part_id, BODY_PART_MAP, BODY_PART_MAP_ZH, isZh),
-        equipmentNames: idsToNames(g.equipment_id, EQUIP_MAP, EQUIP_MAP_ZH, isZh),
-        modeLabel: modeLabel(g.exercise_type, this.data.t || {}),
       },
     });
   },

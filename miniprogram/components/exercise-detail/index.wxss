@@ -1,0 +1,179 @@
+/* components/exercise-detail/index.wxss */
+
+/* ── 骨架(两个 variant 共用) ── */
+.exd {
+  width: 100%;
+}
+
+.exd-media {
+  width: 100%;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.exd-video,
+.exd-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.exd-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 视频缺失提示: 叠在图片/占位符底部 */
+.exd-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx 24rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 60%);
+  pointer-events: none;
+}
+
+.exd-tip-icon {
+  font-size: 28rpx;
+  margin-bottom: 2rpx;
+}
+
+.exd-tip-text {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.exd-tip-sub {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.exd-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.exd-chip {
+  display: inline-block;
+  font-weight: 800;
+}
+
+/* ════════════════════════════════════════════
+   compact —— 动作库详情弹层
+   媒体 16/9 固定在滚动区外, 标签是小号方角 chip
+   ════════════════════════════════════════════ */
+.exd-compact .exd-media {
+  aspect-ratio: 16 / 9;
+  background: var(--surface-low, #181818);
+}
+
+/* 动作库弹层里媒体是固定在滚动区外的 —— 根节点不能被 flex 压扁 */
+.exd-compact {
+  flex-shrink: 0;
+}
+
+.exd-compact .exd-img {
+  background: var(--surface-low, #181818);
+}
+
+.exd-compact .exd-placeholder-icon {
+  font-size: 96rpx;
+  opacity: 0.4;
+}
+
+.exd-compact .exd-en {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16rpx;
+}
+
+.exd-compact .exd-tags {
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+}
+
+.exd-compact .exd-chip {
+  padding: 3rpx 10rpx;
+  background: rgba(204, 242, 0, 0.15);
+  color: var(--primary-text, #ccf200);
+  border-radius: 6rpx;
+  font-size: 16rpx;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* 中性 chip 要跟主题走 —— 浅底 + 灰字, 深底也要换底色 */
+.exd-compact.exd-day .exd-chip-neutral {
+  background: rgba(0, 0, 0, 0.08);
+  color: #71717a;
+}
+
+.exd-compact.exd-night .exd-chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #71717a;
+}
+
+/* ════════════════════════════════════════════
+   pill —— 分享类页面(训练分享 / 动作分享)
+   固定高媒体 + 药丸 chip
+   ════════════════════════════════════════════ */
+.exd-pill .exd-media {
+  height: 380rpx;
+  background: #000;
+}
+
+.exd-pill .exd-placeholder {
+  background: #000;
+}
+
+.exd-pill .exd-placeholder-icon {
+  font-size: 80rpx;
+}
+
+.exd-pill .exd-body {
+  padding: 28rpx 32rpx 40rpx;
+}
+
+.exd-pill .exd-title {
+  font-size: 34rpx;
+  font-weight: 900;
+  color: #f2f2f2;
+  margin-bottom: 8rpx;
+}
+
+.exd-pill .exd-en {
+  color: #8a8a8a;
+  margin-bottom: 18rpx;
+}
+
+.exd-pill .exd-tags {
+  gap: 12rpx;
+  margin-bottom: 28rpx;
+}
+
+.exd-pill .exd-chip {
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(204, 242, 0, 0.14);
+  color: #ccf200;
+}
+
+.exd-pill .exd-chip-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: #b9b9b9;
+}

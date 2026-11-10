@@ -1,0 +1,52 @@
+<!--pages/exercise-share/index.wxml-->
+<view class="page {{theme === 'day' ? 'theme-day' : 'theme-night'}}">
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="state-box">
+    <view class="state-title">{{t.LOADING}}</view>
+  </view>
+
+  <!-- 失效 / 失败 -->
+  <view wx:elif="{{error}}" class="state-box">
+    <view class="state-icon">🔗</view>
+    <view class="state-title">{{error}}</view>
+    <button class="state-btn" wx:if="{{errorCode === 'LOAD_FAILED'}}" bindtap="onRetry">{{t.RETRY}}</button>
+    <button class="state-btn" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
+  </view>
+
+  <!-- 正常内容 -->
+  <block wx:else>
+    <!-- 分享者 -->
+    <view class="share-head">
+      <view class="owner">
+        <image wx:if="{{owner.avatar}}" class="owner-avatar" src="{{owner.avatar}}" mode="aspectFill" />
+        <view wx:else class="owner-avatar owner-avatar-placeholder">👤</view>
+        <view class="owner-info">
+          <view class="owner-name">{{owner.name || (locale === 'zh' ? 'GFIT 用户' : 'GFIT User')}}</view>
+          <view class="owner-label">{{t.SHARE_BY}} {{t.SHARE_EXERCISE}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 动作卡片: 复用训练分享页的动作详情组件 -->
+    <view class="ex-card">
+      <exercise-detail
+        variant="pill"
+        exercise="{{exercise}}"
+        locale="{{locale}}"
+        theme="{{theme}}"
+        imgPrefix="{{imgPrefix}}"
+        vidPrefix="{{vidPrefix}}"
+      />
+    </view>
+
+    <!-- 底部: 收藏 + 去练自己的 -->
+    <view class="foot">
+      <view class="fav-btn {{isFavorite ? 'active' : ''}}" bindtap="onToggleFavorite" hover-class="tap-active">
+        <image src="{{imgPrefix}}/icons/heart{{isFavorite ? '_filled' : ''}}.png" mode="aspectFit" />
+      </view>
+      <button class="foot-btn" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
+    </view>
+  </block>
+
+</view>

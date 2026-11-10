@@ -7,6 +7,7 @@
     "appbar": "/components/appbar/index",
     "custom-tabbar": "/components/custom-tabbar/index",
     "session-orb": "/components/session-orb/index",
-    "add-exercise-modal": "/components/add-exercise-modal/index"
+    "add-exercise-modal": "/components/add-exercise-modal/index",
+    "exercise-detail": "/components/exercise-detail/index"
   }
 }

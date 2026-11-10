@@ -1,0 +1,47 @@
+<!--components/exercise-detail/index.wxml-->
+<view class="exd exd-{{variant}} exd-{{theme}}">
+
+  <!-- 媒体: 视频优先, 没视频退图片, 再没有就占位符 -->
+  <view class="exd-media" wx:if="{{showMedia}}">
+    <video
+      wx:if="{{exercise.video_name}}"
+      class="exd-video"
+      src="{{vidPrefix}}/exer_videos/{{exercise.video_name}}"
+      mode="aspectFill"
+      controls
+      show-center-play-btn
+      enable-play-gesture
+    />
+    <image
+      wx:elif="{{exercise.image_name}}"
+      class="exd-img"
+      src="{{imgPrefix}}/exer_images/{{exercise.image_name}}"
+      mode="aspectFill"
+    />
+    <view wx:else class="exd-img exd-placeholder">
+      <text class="exd-placeholder-icon">🏋️</text>
+    </view>
+
+    <!-- 视频缺失提示: 叠在图片/占位符底部 -->
+    <view wx:if="{{showVideoTip && !exercise.video_name}}" class="exd-tip">
+      <text class="exd-tip-icon">🎬</text>
+      <text class="exd-tip-text">{{tipText}}</text>
+      <text wx:if="{{exercise.image_name}}" class="exd-tip-sub">{{tipSubText}}</text>
+    </view>
+  </view>
+
+  <!-- 内容: 标题 + 英文名 + 标签 + slot(调用方塞额外内容, 比如组列表) -->
+  <view class="exd-body" wx:if="{{showBody}}">
+    <view wx:if="{{showTitle && title}}" class="exd-title">{{title}}</view>
+    <view wx:if="{{enName}}" class="exd-en">{{enName}}</view>
+    <view class="exd-tags">
+      <text
+        wx:for="{{tags}}"
+        wx:key="key"
+        class="exd-chip {{item.kind === 'accent' ? 'exd-chip-accent' : 'exd-chip-neutral'}}"
+      >{{item.text}}</text>
+    </view>
+    <slot />
+  </view>
+
+</view>

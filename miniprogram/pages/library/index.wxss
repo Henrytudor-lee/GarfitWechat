@@ -895,6 +895,34 @@
 }
 .sheet-btn::after { border: none; }
 
+/* 分享按钮: 次要样式 —— 别抢"加入训练"主按钮的视觉 */
+.sheet-share-btn {
+  height: 96rpx;
+  flex-shrink: 0;
+  padding: 0 28rpx;
+  border-radius: 100rpx;
+  background: transparent;
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  color: #b9b9b9;
+  font-size: 24rpx;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sheet-share-btn::after { border: none; }
+
+/* 分享链接预取失败 → 按钮置灰(点的时候会提示, 关掉弹层重开可重试) */
+.sheet-share-btn.failed {
+  opacity: 0.45;
+}
+
+.page.theme-day .sheet-share-btn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #52525b;
+}
+
 /* ========================
    Appended — Library Fixes
    ======================== */

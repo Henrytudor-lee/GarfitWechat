@@ -106,25 +106,15 @@
     <view wx:if="{{detailOpen && detail}}" class="sheet-mask" bindtap="onDetailMaskTap" catchtouchmove="noop">
       <view class="sheet" catchtap="onDetailSheetTap">
         <scroll-view class="sheet-scroll" scroll-y>
-          <view class="sheet-media">
-            <video wx:if="{{detail.video_name}}" class="sheet-video"
-                   src="{{vidPrefix}}/exer_videos/{{detail.video_name}}"
-                   mode="aspectFill" show-center-play-btn show-play-btn enable-progress-gesture />
-            <image wx:elif="{{detail.image_name}}" class="sheet-video"
-                   src="{{imgPrefix}}/exer_images/{{detail.image_name}}" mode="aspectFill" />
-            <view wx:else class="sheet-video sheet-video-placeholder">🏋️</view>
-          </view>
-
-          <view class="sheet-body">
-            <view class="sheet-title">{{detail.nameText}}</view>
-            <view wx:if="{{detail.name_en}}" class="sheet-en">{{detail.name_en}}</view>
-
-            <view class="sheet-tags">
-              <text wx:for="{{detail.equipmentNames}}" wx:key="*this" class="chip chip-neutral">{{item}}</text>
-              <text wx:for="{{detail.muscleNames}}" wx:key="*this" class="chip">{{item}}</text>
-              <text class="chip chip-neutral">{{detail.modeLabel}}</text>
-            </view>
-
+          <!-- 动作详情组件: 动作库页 / 训练分享页 / 动作分享页共用同一套结构与口径 -->
+          <exercise-detail
+            variant="pill"
+            exercise="{{detail}}"
+            locale="{{locale}}"
+            theme="{{theme}}"
+            imgPrefix="{{imgPrefix}}"
+            vidPrefix="{{vidPrefix}}"
+          >
             <view class="sheet-sets">
               <view class="sheet-sets-title">{{t.SETS}}</view>
               <!-- 一行两条: 一条一行显得太空; 奇数条时最后一条独占整行 -->
@@ -149,7 +139,7 @@
                 </view>
               </view>
             </view>
-          </view>
+          </exercise-detail>
         </scroll-view>
 
         <view class="sheet-foot">

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "GFIT",
+  "navigationBarBackgroundColor": "#000000",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "exercise-detail": "/components/exercise-detail/index"
+  }
+}

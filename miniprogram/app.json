@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/share/index",
+    "pages/exercise-share/index",
     "pages/my-shares/index",
     "pages/library/index",
     "pages/stats/index",

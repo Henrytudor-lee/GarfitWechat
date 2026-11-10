@@ -135,8 +135,10 @@ Page({
     imgPrefix: '',
     vidPrefix: '',
     selectedExercise: null,
-    modeLabel: '',          // 计量方式标签文案(由 exercise_type 映射)
     isSelectMode: false,
+    // 动作分享 token —— 必须在**点分享之前**就准备好(见 onShareAppMessage 的注释)
+    shareToken: '',
+    shareFailed: false,
     favorExercises: [],
     practicedExercises: [],
     filterFavor: false,
@@ -177,6 +179,8 @@ Page({
     this._loadOrbSession();
     // 收藏/练过标记: openid 可能在 onLoad 时还没就绪, 这里再兜一次
     this._loadUserExercises();
+    // 允许从右上角菜单分享(动作详情弹层里的分享按钮也依赖这个开关)
+    wx.showShareMenu({ withShareTicket: true });
   },
 
   async _loadOrbSession() {
@@ -357,12 +361,82 @@ Page({
       wx.navigateBack();
     } else {
       // Open detail sheet
-      this.setData({ selectedExercise: item, modeLabel: buildModeLabel(item, this.data.t || {}) });
+      this.setData({ selectedExercise: item });
+      // 打开弹层就把分享链接备好 —— 见 _prepareShareToken 的注释
+      this._prepareShareToken(item);
     }
   },
 
   closeSheet() {
-    this.setData({ selectedExercise: null });
+    this.setData({ selectedExercise: null, shareToken: '' });
+  },
+
+  /**
+   * 预取动作分享 token
+   *
+   * ⚠️ **必须提前取**, 因为 onShareAppMessage 是**同步**回调 ——
+   *    微信要求它同步返回 {title, path, imageUrl}, 没有 await 的余地。
+   *    分享按钮又是 open-type="share"(点一下直接调起分享面板), 点完再取来不及。
+   *    所以在弹层打开时就先把 token 备好 —— 跟训练分享的 workout-summary-modal 同一套。
+   */
+  async _prepareShareToken(item) {
+    const exerciseId = Number(item && item.id) || 0;
+    this.setData({ shareToken: '', shareFailed: false });
+    if (!exerciseId) return;
+    try {
+      const res = await api.callCloud('share.create', { exercise_id: exerciseId });
+      const token = res && res.result && res.result.share && res.result.share.token;
+      if (token) {
+        this.setData({ shareToken: token });
+      } else {
+        this.setData({ shareFailed: true });
+      }
+    } catch (err) {
+      console.warn('[library] 动作分享链接预取失败:', err);
+      this.setData({ shareFailed: true });
+    }
+  },
+
+  /**
+   * 分享当前打开的动作
+   *
+   * 分享出去的卡片 → /pages/exercise-share/index?token=xxx
+   * B 点开就能看到这个动作的详情(媒体/器械/肌群/计量方式), 跟训练分享一个套路。
+   */
+  onShareAppMessage() {
+    const isZh = (this.data.locale || 'zh') === 'zh';
+    const ex = this.data.selectedExercise;
+
+    // 弹层没开(用户从右上角菜单分享) → 分享动作库本身
+    if (!ex) {
+      return {
+        title: isZh ? 'GFIT 动作库 · 7000+ 专业动作' : 'GFIT Library · 7000+ professional exercises',
+        path: '/pages/library/index',
+      };
+    }
+
+    const name = isZh ? (ex.name_zh || ex.name) : (ex.name || ex.name_zh);
+    const title = isZh ? `这个动作很赞：${name} 💪` : `Great exercise: ${name} 💪`;
+    const token = this.data.shareToken;
+
+    // 预取失败 → 别发一个点开什么都看不到的卡片
+    if (!token) {
+      wx.showToast({ title: isZh ? '分享链接生成失败' : 'Failed to create share link', icon: 'none' });
+      return { title, path: '/pages/library/index' };
+    }
+
+    // 记录"用户真的分享了" —— "我的分享"只列真正发出去的链接
+    // ⚠️ onShareAppMessage 只能同步返回, 这里只能发出去不等结果。
+    //    用户点完分享面板又取消的情况也会记上, 属于可接受的误差(宁可多列也别漏列)。
+    api.callCloud('share.markShared', { token }).catch((err) => {
+      console.warn('[library] markShared failed:', err);
+    });
+
+    return {
+      title,
+      path: `/pages/exercise-share/index?token=${token}`,
+      imageUrl: ex.image_name ? `${this.data.imgPrefix}/exer_images/${ex.image_name}` : '',
+    };
   },
 
   onFavoriteTap(e) {
@@ -467,11 +541,6 @@ Page({
       });
   },
 
-  onVideoTap(e) {
-    // 阻止事件冒泡到 sheet 和 mask，不关闭弹框
-    e.stopPropagation();
-  },
-
   // 空事件处理器: wxml 里 catchtouchmove="noop" / catchtap="noop" 需要它存在,
   // 否则每次触摸遮罩都会抛 "noop is not a function"
   noop() {},
@@ -551,16 +620,3 @@ Page({
     wx.navigateBack();
   },
 });
-
-/**
- * 计量方式 → 显示文案。
- *
- * 数据源: exercises_library.exercise_type (字段本来就有)
- * 旧值 'Strength' 是历史遗留默认值(线上 0 行), 按次数类显示。
- */
-function buildModeLabel(item, t) {
-  const raw = (item && item.exercise_type) || 'weight_reps';
-  if (raw === 'duration') return t.MODE_TIMED || 'TIMED';
-  if (raw === 'distance_duration') return t.MODE_DISTANCE || 'DISTANCE';
-  return t.REPS || 'REPS';
-}

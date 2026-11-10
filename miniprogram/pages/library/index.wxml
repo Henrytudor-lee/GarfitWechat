@@ -155,43 +155,33 @@
         <view class="sheet-close" bindtap="closeSheet">✕</view>
       </view>
 
-      <!-- Media -->
-      <view class="sheet-media">
-        <video
-          wx:if="{{selectedExercise.video_name}}"
-          class="sheet-video"
-          src="{{vidPrefix}}/exer_videos/{{selectedExercise.video_name}}"
-          controls
-          show-center-play-btn
-          enable-play-gesture
-          bindtap="onVideoTap"
-        />
-        <image
-          wx:elif="{{selectedExercise.image_name}}"
-          class="sheet-img"
-          src="{{imgPrefix}}/exer_images/{{selectedExercise.image_name}}"
-          mode="aspectFill"
-        />
-        <view wx:else class="sheet-img sheet-img-placeholder">
-          <text class="placeholder-icon">🏋️</text>
-        </view>
-        <!-- 视频缺失提示: 有图无视频时叠在图片上, 无图时叠在占位符上 -->
-        <view wx:if="{{!selectedExercise.video_name}}" class="sheet-media-tip">
-          <text class="tip-icon">🎬</text>
-          <text class="tip-text">{{t.NO_DEMO_VIDEO_FOR_THIS_EXERCISE_YET}}</text>
-          <text wx:if="{{selectedExercise.image_name}}" class="tip-sub">{{t.SHOWING_PREVIEW_IMAGE_ONLY}}</text>
-        </view>
-      </view>
+      <!-- Media: 固定在滚动区外(视频/图片/占位符 + 无视频提示)
+           ⚠️ 动作详情被抽成了组件(exercise-detail), 训练分享页/动作分享页共用同一套。
+              这里拆成两个实例: 媒体一个、内容一个 —— 保持"媒体不跟着内容滚"的原布局。 -->
+      <exercise-detail
+        variant="compact"
+        show-body="{{false}}"
+        exercise="{{selectedExercise}}"
+        locale="{{locale}}"
+        theme="{{theme}}"
+        imgPrefix="{{imgPrefix}}"
+        vidPrefix="{{vidPrefix}}"
+        show-video-tip="{{true}}"
+        tip-text="{{t.NO_DEMO_VIDEO_FOR_THIS_EXERCISE_YET}}"
+        tip-sub-text="{{t.SHOWING_PREVIEW_IMAGE_ONLY}}"
+      />
 
       <!-- Scrollable Content -->
       <scroll-view class="sheet-scroll" scroll-y>
         <view class="sheet-content">
-          <view class="sheet-en">{{selectedExercise.name}}</view>
-          <view class="sheet-tags">
-            <text class="chip chip-neutral">{{locale === 'en' ? selectedExercise.equipment_name : (selectedExercise.equipment_name_zh || selectedExercise.equipment_name)}}</text>
-            <text wx:if="{{selectedExercise.muscle_name}}" class="chip">{{locale === 'en' ? selectedExercise.muscle_name : (selectedExercise.muscle_name_zh || selectedExercise.muscle_name)}}</text>
-            <text class="chip chip-neutral">{{modeLabel}}</text>
-          </view>
+          <exercise-detail
+            variant="compact"
+            show-media="{{false}}"
+            show-title="{{false}}"
+            exercise="{{selectedExercise}}"
+            locale="{{locale}}"
+            theme="{{theme}}"
+          />
         </view>
       </scroll-view>
 
@@ -207,6 +197,12 @@
             mode="aspectFit"
           />
         </view>
+        <!-- 分享: open-type="share" 由页面级 onShareAppMessage 提供卡片内容 -->
+        <button
+          wx:if="{{!isSelectMode}}"
+          class="sheet-share-btn {{shareFailed ? 'failed' : ''}}"
+          open-type="share"
+        >{{t.SHARE}}</button>
         <button
           class="sheet-btn"
           bindtap="{{isSelectMode ? 'doSelect' : 'addToWorkout'}}"

@@ -40,6 +40,48 @@
 }
 .theme-day .item-date { color: #1a1a1a; }
 
+/* 头部右侧: 分享类型 + 状态 */
+.item-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+.item-kind {
+  font-size: 20rpx;
+  font-weight: 800;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(204, 242, 0, 0.14);
+  color: #ccf200;
+}
+
+/* 动作分享的缩略图 + 动作名 */
+.item-ex {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 10rpx;
+}
+.item-ex-img {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 14rpx;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+.item-ex-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+.item-ex-name {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #f2f2f2;
+}
+.theme-day .item-ex-name { color: #1a1a1a; }
+
 .item-status {
   font-size: 20rpx;
   font-weight: 800;

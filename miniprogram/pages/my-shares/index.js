@@ -21,6 +21,7 @@ Page({
     loading: true,
     items: [],
     revoking: '',
+    imgPrefix: '',
     locale: 'zh',
     theme: 'night',
     t: {},
@@ -31,6 +32,7 @@ Page({
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t || {},
+      imgPrefix: app.globalData.imagePrefix || '',
     });
     this.load();
   },
@@ -40,6 +42,7 @@ Page({
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t || {},
+      imgPrefix: app.globalData.imagePrefix || '',
     });
     if (this.data.items.length) this.load();   // 从别的页返回时刷新(撤销后状态要更新)
   },
@@ -58,17 +61,29 @@ Page({
       this.setData({
         loading: false,
         items: items.map((it) => {
+          // ⚠️ 两种分享混在一条列表里(2026-11-10 新增动作分享):
+          //    kind='training' 是训练分享, kind='exercise' 是动作分享。
+          //    动作分享没有 session_id → 不能用 session_id == null 判"训练已删除"。
+          const isExercise = it.kind === 'exercise';
           const expired = !!it.expires_at && new Date(it.expires_at).getTime() < now;
           let status = 'ACTIVE';
           if (it.revoked) status = 'REVOKED';
           else if (expired) status = 'EXPIRED';
-          else if (it.session_id == null) status = 'DELETED';
+          else if (!isExercise && it.session_id == null) status = 'DELETED';
+          // 动作分享的"时间"是分享动作的时间, 训练分享是训练开始时间
+          const timeText = isExercise ? (it.shared_at || it.created_at) : it.start_time;
           return {
             ...it,
+            isExercise,
             status,
             durationStr: formatDuration(it.duration),
-            dateText: it.start_time
-              ? new Date(it.start_time).toLocaleString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US',
+            nameText: isExercise
+              ? (this.data.locale === 'zh'
+                ? (it.name_zh || it.name || '')
+                : (it.name || it.name_zh || ''))
+              : '',
+            dateText: timeText
+              ? new Date(timeText).toLocaleString(this.data.locale === 'zh' ? 'zh-CN' : 'en-US',
                 { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
               : '',
           };
@@ -90,8 +105,11 @@ Page({
    */
   onItemTap(e) {
     const token = e.currentTarget.dataset.token;
+    const kind = e.currentTarget.dataset.kind;
     if (!token) return;
-    wx.navigateTo({ url: `/pages/share/index?token=${token}` });
+    // 动作分享 → 动作分享详情页; 训练分享 → 训练分享详情页
+    const page = kind === 'exercise' ? 'exercise-share' : 'share';
+    wx.navigateTo({ url: `/pages/${page}/index?token=${token}` });
   },
 
   onRevoke(e) {
