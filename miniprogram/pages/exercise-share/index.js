@@ -1,16 +1,42 @@
 // pages/exercise-share/index.js — 动作分享详情页
 //
-// B 点开 A 分享的**动作**卡片后进这里(path: /pages/exercise-share/index?token=xxx)。
-// 数据走 share.view —— 这是**公开接口**, 不需要登录, 凭 token 精确查。
-// (B 可能压根没登录过小程序, 更没有 A 的身份 —— 训练数据全按 _openid 归属校验,
-//  只有 token 这一条路能读。动作虽然是全局公共目录, 但分享者身份一样要靠 token 认。)
+// B 点开 A 分享的**动作**卡片后进这里(path: /pages/exercise-share/index?exercise_id=xxx)。
 //
-// ⚠️ 后端 share.view 对"训练分享"和"动作分享"返回同一个结构,
-//    用 kind 字段区分:
-//      'training' → 转到训练分享页(防呆: 老的链接被塞到这个页也要能看)
-//      'exercise' → 本页渲染
+// 为什么是"带 id 直查", 而不是训练分享那种"分享链接表":
+//   动作在 exercises_library 里是**全局公共目录数据** —— 同一份数据所有人看到都一样,
+//   所以不需要 token 防枚举(能猜到 id 也只是看到动作库里本来就有的动作),
+//   也不需要存 per-share 状态(这次分享没有任何业务属性), 更不需要撤销/限期
+//   (内容一直在, 撤一个链接等于撤一个公开页面)。
+//   接收方拿 id 走**已有的** library.detail 查就行, 后端零改动。
+//
+//   训练分享不同: 训练数据按 _openid 归属校验, 必须有一条"凭 token 精确查"的
+//   公开只读通道, 那个场景确实要存状态、要建表。
+//
+// 数据来源: library.detail(SELECT * FROM exercises_library WHERE id = ?)
+//   ⚠️ 该接口要 JWT —— 小程序打开时会自动静默登录, 这里 await app.whenAuthReady() 等它完成。
+//
+// 分享者信息(n=昵称 a=头像)直接**放在 URL 里**:
+//   分享者身份只存在分享者本机(storage 的 userName/avatarUrl), 不入库;
+//   接收方看到昵称头像, 看不到 openid —— 跟训练分享一个口径。
+//   两个参数都可选: 没有就把"分享者"那一行整行隐藏, 不显示占位假信息。
 const app = getApp();
 const api = require('../../utils/api.js');
+
+/**
+ * URL 参数解码
+ *
+ * ⚠️ 微信各基础库对 onLoad 的 query 是否已经解码过不一致, 这里统一再解一次。
+ *    已经解过的再解可能抛 URIError(比如昵称里带 "%"), 所以必须 try/catch 兜底,
+ *    失败就用原值 —— 宁可多一个百分号, 也别整个页面打不开。
+ */
+function safeDecode(raw) {
+  if (!raw) return '';
+  try {
+    return decodeURIComponent(raw);
+  } catch (e) {
+    return raw;
+  }
+}
 
 Page({
   data: {
@@ -18,11 +44,12 @@ Page({
     error: '',
     errorCode: '',
 
-    token: '',
-    owner: null,
+    exerciseId: '',
+    sharerName: '',
+    sharerAvatar: '',
     exercise: null,
 
-    // 收藏: 动作级收藏(存在 user_exercise_stats), 与训练/会话无关,
+    // 收藏: 动作级收藏(存在 users.favor_exercises), 与训练/会话无关,
     // 所以**分享页也能收藏**。状态从 app.globalData 读 —— 全局唯一事实来源。
     isFavorite: false,
 
@@ -34,20 +61,25 @@ Page({
   },
 
   onLoad(query) {
-    const token = (query && query.token) || '';
+    const q = query || {};
+    const exerciseId = Number(safeDecode(q.exercise_id)) || 0;
+
     this.setData({
-      token,
+      exerciseId,
+      sharerName: safeDecode(q.n),
+      sharerAvatar: safeDecode(q.a),
       imgPrefix: app.globalData.imagePrefix || '',
       vidPrefix: app.globalData.videoPrefix || '',
       locale: app.globalData.language || 'zh',
       theme: app.globalData.theme || 'night',
       t: app.globalData.t || {},
     });
-    if (!token) {
+
+    if (!exerciseId) {
       this.setData({ loading: false, errorCode: 'NOT_FOUND', error: this._t('SHARE_NOT_FOUND') });
       return;
     }
-    this.loadShare(token);
+    this.loadExercise();
   },
 
   onShow() {
@@ -84,53 +116,50 @@ Page({
     return dict[key] || fallback || key;
   },
 
-  async loadShare(token) {
+  /**
+   * 按 id 拉动作详情
+   *
+   * library.detail 返回 exercises_library 整行(id/name/name_zh/image_name/video_name/
+   * equipment_id/body_part_id/exercise_type), 正好够渲染动作卡片 + 收藏。
+   */
+  async loadExercise() {
     this.setData({ loading: true, error: '', errorCode: '' });
     try {
-      const res = await api.callCloud('share.view', { token });
-      const body = res.result || {};
-
-      // 防呆: 训练分享的 token 落到这个页面 → 转去训练分享页, 别显示错内容
-      if (body.kind === 'training') {
-        wx.redirectTo({ url: `/pages/share/index?token=${token}` });
+      // library.detail 要 JWT —— 小程序启动时静默登录已经在跑了, 这里等它一下
+      await app.whenAuthReady();
+      const res = await api.callCloud('library.detail', { id: this.data.exerciseId });
+      const exercise = (res && res.result && res.result.item) || null;
+      if (!exercise) {
+        this.setData({
+          loading: false,
+          errorCode: 'NOT_FOUND',
+          error: this._t('SHARE_NOT_FOUND'),
+        });
         return;
       }
-
-      const exercise = body.exercise || null;
       this.setData({
         loading: false,
-        owner: body.owner || null,
         exercise,
-        isFavorite: exercise ? this._favorIds().includes(Number(exercise.id)) : false,
+        isFavorite: this._favorIds().includes(Number(exercise.id)),
       });
     } catch (err) {
-      // 失效原因要分清楚: 过期 / 被撤销 / 不存在 / 网络错
-      const msg = String(err && err.message || '');
-      let code = 'LOAD_FAILED';
-      if (/过期/.test(msg)) code = 'EXPIRED';
-      else if (/取消/.test(msg)) code = 'REVOKED';
-      else if (/无效|不存在|删除/.test(msg)) code = 'NOT_FOUND';
+      console.error('[exercise-share] load failed:', err);
       this.setData({
         loading: false,
-        errorCode: code,
-        error: this._t(
-          code === 'EXPIRED' ? 'SHARE_EXPIRED'
-            : code === 'REVOKED' ? 'SHARE_REVOKED'
-            : code === 'NOT_FOUND' ? 'SHARE_NOT_FOUND'
-            : 'SHARE_LOAD_FAILED',
-        ),
+        errorCode: 'LOAD_FAILED',
+        error: this._t('SHARE_LOAD_FAILED'),
       });
     }
   },
 
   onRetry() {
-    this.loadShare(this.data.token);
+    this.loadExercise();
   },
 
   /**
    * 收藏 / 取消收藏 这个动作
    *
-   * 动作收藏是**动作级**的(存在 user_exercise_stats), 跟训练/会话无关,
+   * 动作收藏是**动作级**的(存在 users.favor_exercises), 跟训练/会话无关,
    * 所以在分享页也能收藏 —— 看到别人的动作不错, 直接收藏进自己的库。
    *
    * 跟动作库页同一套逻辑: 乐观更新 → 调接口 → 用服务端返回的完整列表覆盖
@@ -186,21 +215,33 @@ Page({
   },
 
   /**
-   * 分享这个动作(接收方可以再转发)
+   * 转发这个动作(接收方可以再转发)
    *
-   * token 就是当前页面 URL 里的那个 —— 同一个动作同一个分享者,
-   * 后端会复用同一个 token, 所以直接透传即可。
+   * 分享者信息换成**当前转发的人** —— B 转给 C, C 看到的是 B 分享的。
+   * 当前用户自己没填昵称/头像时, 沿用原分享者的信息(至少页面不空)。
    */
   onShareAppMessage() {
     const isZh = (this.data.locale || 'zh') === 'zh';
     const ex = this.data.exercise;
-    const name = isZh
-      ? ((ex && (ex.name_zh || ex.name)) || '')
-      : ((ex && (ex.name || ex.name_zh)) || '');
+    if (!ex) {
+      return {
+        title: isZh ? 'GFIT 动作库 · 7000+ 专业动作' : 'GFIT Library · 7000+ professional exercises',
+        path: '/pages/library/index',
+      };
+    }
+
+    const name = isZh ? (ex.name_zh || ex.name) : (ex.name || ex.name_zh);
+    const sharer = app.getSharerInfo ? app.getSharerInfo() : {};
+    const sharerName = sharer.nickname || this.data.sharerName;
+    const sharerAvatar = sharer.avatarUrl || this.data.sharerAvatar;
+    const qs = [`exercise_id=${ex.id}`];
+    if (sharerName) qs.push('n=' + encodeURIComponent(sharerName));
+    if (sharerAvatar) qs.push('a=' + encodeURIComponent(sharerAvatar));
+
     return {
       title: isZh ? `推荐这个动作：${name} 💪` : `Great exercise: ${name} 💪`,
-      path: `/pages/exercise-share/index?token=${this.data.token}`,
-      imageUrl: ex && ex.image_name ? `${this.data.imgPrefix}/exer_images/${ex.image_name}` : '',
+      path: `/pages/exercise-share/index?${qs.join('&')}`,
+      imageUrl: ex.image_name ? `${this.data.imgPrefix}/exer_images/${ex.image_name}` : '',
     };
   },
 });

@@ -13,32 +13,18 @@
   <view wx:else class="list">
     <!-- 整行可点 → 打开那次分享的详情页(分享出去后 B 看到的就是这个页面,
          自己也能预览 —— 顺便验证分享效果) -->
-    <view class="item" wx:for="{{items}}" wx:key="token" bindtap="onItemTap"
-          data-token="{{item.token}}" data-kind="{{item.kind}}">
+    <view class="item" wx:for="{{items}}" wx:key="token" bindtap="onItemTap" data-token="{{item.token}}">
       <view class="item-head">
         <view class="item-date">{{item.dateText || '—'}}</view>
-        <view class="item-head-right">
-          <!-- 分享类型: 训练分享 / 动作分享 -->
-          <view class="item-kind">{{item.isExercise ? t.SHARE_ITEM_EXERCISE : t.SHARE_ITEM_WORKOUT}}</view>
-          <view class="item-status item-status-{{item.status}}">
-            {{item.status === 'ACTIVE' ? (locale === 'zh' ? '有效' : 'Active')
-              : item.status === 'REVOKED' ? (locale === 'zh' ? '已取消' : 'Revoked')
-              : item.status === 'EXPIRED' ? (locale === 'zh' ? '已过期' : 'Expired')
-              : (locale === 'zh' ? '训练已删除' : 'Deleted')}}
-          </view>
+        <view class="item-status item-status-{{item.status}}">
+          {{item.status === 'ACTIVE' ? (locale === 'zh' ? '有效' : 'Active')
+            : item.status === 'REVOKED' ? (locale === 'zh' ? '已取消' : 'Revoked')
+            : item.status === 'EXPIRED' ? (locale === 'zh' ? '已过期' : 'Expired')
+            : (locale === 'zh' ? '训练已删除' : 'Deleted')}}
         </view>
       </view>
 
-      <!-- 动作分享: 缩略图 + 动作名 -->
-      <view wx:if="{{item.isExercise}}" class="item-ex">
-        <image wx:if="{{item.image_name}}" class="item-ex-img"
-               src="{{imgPrefix}}/exer_images/{{item.image_name}}" mode="aspectFill" />
-        <view wx:else class="item-ex-img item-ex-placeholder">🏋️</view>
-        <view class="item-ex-name">{{item.nameText}}</view>
-      </view>
-
-      <!-- 训练分享: 时长 / 动作数 / 卡路里 -->
-      <view wx:else class="item-stats">
+      <view class="item-stats">
         <text class="item-stat">{{item.durationStr}}</text>
         <text class="item-dot">·</text>
         <text class="item-stat">{{item.exercise_count}} {{t.EXERCISES}}</text>

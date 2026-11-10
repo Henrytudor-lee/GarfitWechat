@@ -155,8 +155,6 @@ module.exports = {
   "LOAD_HINT": "Extra load such as dumbbells (optional)",
   "SHARE_TRAINING": "SHARED WORKOUT",
   "SHARE_EXERCISE": "SHARED EXERCISE",
-  "SHARE_ITEM_WORKOUT": "WORKOUT",
-  "SHARE_ITEM_EXERCISE": "EXERCISE",
   "SHARE_LOAD_FAILED": "Failed to load shared workout",
   "SHARE_EXPIRED": "This share link has expired",
   "SHARE_REVOKED": "This share has been revoked",

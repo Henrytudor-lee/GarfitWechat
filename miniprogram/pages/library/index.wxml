@@ -200,7 +200,7 @@
         <!-- 分享: open-type="share" 由页面级 onShareAppMessage 提供卡片内容 -->
         <button
           wx:if="{{!isSelectMode}}"
-          class="sheet-share-btn {{shareFailed ? 'failed' : ''}}"
+          class="sheet-share-btn"
           open-type="share"
         >{{t.SHARE}}</button>
         <button

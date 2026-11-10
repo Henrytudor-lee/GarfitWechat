@@ -16,13 +16,13 @@
 
   <!-- 正常内容 -->
   <block wx:else>
-    <!-- 分享者 -->
-    <view class="share-head">
+    <!-- 分享者(可选): URL 里没带昵称/头像时整行隐藏, 不显示占位假信息 -->
+    <view class="share-head" wx:if="{{sharerName || sharerAvatar}}">
       <view class="owner">
-        <image wx:if="{{owner.avatar}}" class="owner-avatar" src="{{owner.avatar}}" mode="aspectFill" />
+        <image wx:if="{{sharerAvatar}}" class="owner-avatar" src="{{sharerAvatar}}" mode="aspectFill" />
         <view wx:else class="owner-avatar owner-avatar-placeholder">👤</view>
         <view class="owner-info">
-          <view class="owner-name">{{owner.name || (locale === 'zh' ? 'GFIT 用户' : 'GFIT User')}}</view>
+          <view class="owner-name">{{sharerName || (locale === 'zh' ? 'GFIT 用户' : 'GFIT User')}}</view>
           <view class="owner-label">{{t.SHARE_BY}} {{t.SHARE_EXERCISE}}</view>
         </view>
       </view>

@@ -107,6 +107,21 @@ App({
     return this.globalData.themeVars;
   },
 
+  /**
+   * 当前用户的昵称 / 头像 —— 分享卡片上要显示"谁分享的"
+   *
+   * ⚠️ globalData.userInfo 只在用户**改过资料**之后才有值(profile 页写的),
+   *    所以这里同时兜 storage —— 分享时用户可能从来没进过 profile 页。
+   *    昵称/头像都允许为空: 分享页拿不到就整行隐藏, 不显示占位假信息。
+   */
+  getSharerInfo() {
+    const info = this.globalData.userInfo || {};
+    return {
+      nickname: info.nickname || wx.getStorageSync('userName') || '',
+      avatarUrl: info.avatarUrl || wx.getStorageSync('avatarUrl') || '',
+    };
+  },
+
   // ---- 全局 running session ----
   // 单一事实来源: 任何页面创建/结束 session 都必须写这里,
   // 否则各页 local 状态与 global 脱节, onShow 同步时会误判成"session 被结束"而清空 UI.

@@ -136,9 +136,6 @@ Page({
     vidPrefix: '',
     selectedExercise: null,
     isSelectMode: false,
-    // 动作分享 token —— 必须在**点分享之前**就准备好(见 onShareAppMessage 的注释)
-    shareToken: '',
-    shareFailed: false,
     favorExercises: [],
     practicedExercises: [],
     filterFavor: false,
@@ -362,46 +359,31 @@ Page({
     } else {
       // Open detail sheet
       this.setData({ selectedExercise: item });
-      // 打开弹层就把分享链接备好 —— 见 _prepareShareToken 的注释
-      this._prepareShareToken(item);
     }
   },
 
   closeSheet() {
-    this.setData({ selectedExercise: null, shareToken: '' });
-  },
-
-  /**
-   * 预取动作分享 token
-   *
-   * ⚠️ **必须提前取**, 因为 onShareAppMessage 是**同步**回调 ——
-   *    微信要求它同步返回 {title, path, imageUrl}, 没有 await 的余地。
-   *    分享按钮又是 open-type="share"(点一下直接调起分享面板), 点完再取来不及。
-   *    所以在弹层打开时就先把 token 备好 —— 跟训练分享的 workout-summary-modal 同一套。
-   */
-  async _prepareShareToken(item) {
-    const exerciseId = Number(item && item.id) || 0;
-    this.setData({ shareToken: '', shareFailed: false });
-    if (!exerciseId) return;
-    try {
-      const res = await api.callCloud('share.create', { exercise_id: exerciseId });
-      const token = res && res.result && res.result.share && res.result.share.token;
-      if (token) {
-        this.setData({ shareToken: token });
-      } else {
-        this.setData({ shareFailed: true });
-      }
-    } catch (err) {
-      console.warn('[library] 动作分享链接预取失败:', err);
-      this.setData({ shareFailed: true });
-    }
+    this.setData({ selectedExercise: null });
   },
 
   /**
    * 分享当前打开的动作
    *
-   * 分享出去的卡片 → /pages/exercise-share/index?token=xxx
-   * B 点开就能看到这个动作的详情(媒体/器械/肌群/计量方式), 跟训练分享一个套路。
+   * 分享出去的卡片 → /pages/exercise-share/index?exercise_id=xxx
+   *
+   * 为什么地址里直接带动作 id, 而不是训练分享那种"分享 token":
+   *   动作在 exercises_library 里是**全局公共目录数据** —— 所有人看到的是同一份,
+   *   内容本来就在动作库里公开可见。所以:
+   *     · 不需要 token 防枚举(能猜到 id 也只是看到动作库里本来就有的动作)
+   *     · 不需要建表存"这次分享"(没有任何 per-share 的业务属性)
+   *     · 不需要撤销/限期(内容一直在, 撤一个链接等于撤一个公开页面)
+   *   接收方拿 id 走**已有的** library.detail 查就行, 后端零改动。
+   *
+   *   训练分享才需要那张表: 训练数据按 _openid 归属校验,
+   *   必须有一条"凭 token 精确查"的公开只读通道, 那个场景确实要存状态。
+   *
+   * n=昵称 a=头像 是分享者信息, 只在分享者本机 storage 里, 不入库 ——
+   *   接收方看到昵称头像, 看不到 openid, 跟训练分享一个口径。
    */
   onShareAppMessage() {
     const isZh = (this.data.locale || 'zh') === 'zh';
@@ -416,25 +398,14 @@ Page({
     }
 
     const name = isZh ? (ex.name_zh || ex.name) : (ex.name || ex.name_zh);
-    const title = isZh ? `这个动作很赞：${name} 💪` : `Great exercise: ${name} 💪`;
-    const token = this.data.shareToken;
-
-    // 预取失败 → 别发一个点开什么都看不到的卡片
-    if (!token) {
-      wx.showToast({ title: isZh ? '分享链接生成失败' : 'Failed to create share link', icon: 'none' });
-      return { title, path: '/pages/library/index' };
-    }
-
-    // 记录"用户真的分享了" —— "我的分享"只列真正发出去的链接
-    // ⚠️ onShareAppMessage 只能同步返回, 这里只能发出去不等结果。
-    //    用户点完分享面板又取消的情况也会记上, 属于可接受的误差(宁可多列也别漏列)。
-    api.callCloud('share.markShared', { token }).catch((err) => {
-      console.warn('[library] markShared failed:', err);
-    });
+    const sharer = app.getSharerInfo ? app.getSharerInfo() : {};
+    const qs = [`exercise_id=${ex.id}`];
+    if (sharer.nickname) qs.push('n=' + encodeURIComponent(sharer.nickname));
+    if (sharer.avatarUrl) qs.push('a=' + encodeURIComponent(sharer.avatarUrl));
 
     return {
-      title,
-      path: `/pages/exercise-share/index?token=${token}`,
+      title: isZh ? `这个动作很赞：${name} 💪` : `Great exercise: ${name} 💪`,
+      path: `/pages/exercise-share/index?${qs.join('&')}`,
       imageUrl: ex.image_name ? `${this.data.imgPrefix}/exer_images/${ex.image_name}` : '',
     };
   },

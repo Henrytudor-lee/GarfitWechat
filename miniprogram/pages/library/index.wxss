@@ -913,11 +913,6 @@
 }
 .sheet-share-btn::after { border: none; }
 
-/* 分享链接预取失败 → 按钮置灰(点的时候会提示, 关掉弹层重开可重试) */
-.sheet-share-btn.failed {
-  opacity: 0.45;
-}
-
 .page.theme-day .sheet-share-btn {
   border-color: rgba(0, 0, 0, 0.15);
   color: #52525b;
