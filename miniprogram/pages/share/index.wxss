@@ -190,21 +190,33 @@
 }
 
 /* ── sets ── */
+/* 组列表: 一行两条, 每条**撑满半宽**
+   ⚠️ 原来用 flex + 内容宽度(wrap), 卡片右边空一大块(2026-11-19 用户截图)。
+      改成 grid 两列等分 —— 跟 workout-summary-modal / session-detail-modal
+      的 .sets-grid / .ec-sets-grid 一个口径, 全 app 的组列表排版统一。 */
 .sets-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12rpx;
   margin-top: 20rpx;
 }
 .set-item {
   display: flex;
   align-items: center;
+  /* 超长文案(距离+时长+负重)放不下时整段换行, 不横向溢出到隔壁格子 */
+  flex-wrap: wrap;
+  align-content: center;
   gap: 8rpx;
   padding: 10rpx 16rpx;
   border-radius: 12rpx;
   background: rgba(255, 255, 255, 0.05);
   font-size: 24rpx;
   color: #d8d8d8;
+  min-width: 0;
+}
+/* 奇数条 → 最后一条独占整行, 不留半格空白 */
+.set-item.wide {
+  grid-column: span 2;
 }
 .theme-day .set-item {
   background: rgba(0, 0, 0, 0.04);

@@ -1,10 +1,14 @@
 /**
- * 生成分享页「动作详情弹层」的排版预览 (自包含 HTML, 浏览器直接打开)
+ * 生成分享页「组列表」的排版预览 (自包含 HTML, 浏览器直接打开)
  *
  * 为什么要有它:
  *   小程序样式没法用普通方式截图回归, 组列表这种「一行几条」的排版改动
  *   靠肉眼在真机上试太慢。这里把**真实的 index.wxss** 内联进 HTML,
  *   配上 mock DOM, 浏览器里看到的就是真机排版。
+ *
+ * 覆盖两处组列表(两处都要看, 改一个别把另一个带歪):
+ *   A. 动作分组卡片里的内联组列表 (.sets-grid / .set-item) —— 分享页主体
+ *   B. 动作详情弹层里的组列表 (.sheet-sets-grid / .sheet-set-row)
  *
  * ⚠️ 唯一偏差: wxss 里的 rpx 在小程序里按屏幕宽换算(750rpx = 屏宽),
  *    HTML 里无法知道屏宽, 这里按 375px 宽折算(1rpx = 0.5px)。
@@ -23,6 +27,8 @@ const OUT = path.join(ROOT, 'docs/preview/share-sheet-2col.html');
 /** rpx → px(375 基准) */
 const rpx2px = (css) => css.replace(/(-?\d+(?:\.\d+)?)rpx/g, (_, n) => `${parseFloat(n) * 0.5}px`);
 
+const T = { SETS: '组', KM: '公里', DURATION_UNIT: '秒', REPS: '次数', CAL: '大卡' };
+
 const CASES = [
   {
     label: 'A · 奇数 3 条',
@@ -35,7 +41,7 @@ const CASES = [
   },
   {
     label: 'B · 偶数 4 条',
-    note: '标准 2 × 2',
+    note: '标准 2 × 2, 每条撑满半宽',
     sets: [
       { id: 1, weight: 20, weightUnit: 'kg', reps: 12 },
       { id: 2, weight: 25, weightUnit: 'kg', reps: 10 },
@@ -58,9 +64,7 @@ const CASES = [
   },
 ];
 
-const T = { SETS: '组', KM: '公里', DURATION_UNIT: '秒', REPS: '次数' };
-
-/** 按 WXML 的 wx:if / wx:elif / wx:else 三分支复刻组内容 */
+/** 按 WXML 的 wx:if / wx:elif / wx:else 三分支复刻组内容(弹层用, 纯 inline) */
 function setBody(s) {
   if (s.distanceKm > 0) {
     return (
@@ -76,6 +80,66 @@ function setBody(s) {
     );
   }
   return `<text>${s.weight} ${s.weightUnit || 'kg'} × ${s.reps} ${T.REPS}</text>`;
+}
+
+/** 动作分组卡片里的 set-item(复刻 pages/share/index.wxml 的 .sets-grid) */
+function setBodyGroup(s) {
+  const val = (cls, txt) => `<view class="set-val ${cls}">${txt}</view>`;
+  const sep = '<view class="set-sep">·</view>';
+  if (s.distanceKm > 0) {
+    return (
+      val('reps', `${s.distanceKm} <text class="set-unit">${T.KM}</text>`) +
+      (s.durationSec > 0 ? sep + val('reps', `${s.durationSec} <text class="set-unit">${T.DURATION_UNIT}</text>`) : '') +
+      (s.weight > 0 ? sep + val('', `${s.weight} <text class="set-unit">${s.weightUnit || 'kg'}</text>`) : '')
+    );
+  }
+  if (s.durationSec > 0) {
+    return (
+      val('reps', `${s.durationSec} <text class="set-unit">${T.DURATION_UNIT}</text>`) +
+      (s.weight > 0 ? sep + val('', `${s.weight} <text class="set-unit">${s.weightUnit || 'kg'}</text>`) : '')
+    );
+  }
+  return (
+    val('', `${s.weight} <text class="set-unit">${s.weightUnit || 'kg'}</text>`) +
+    '<view class="set-sep">×</view>' +
+    val('reps', `${s.reps} <text class="set-unit">${T.REPS}</text>`)
+  );
+}
+
+function setItem(s, i, total) {
+  const wide = i === total - 1 && total % 2 === 1 ? ' wide' : '';
+  return `<view class="set-item${wide}">
+      <view class="set-num">${i + 1}</view>
+      ${setBodyGroup(s)}
+    </view>`;
+}
+
+/** 动作分组卡片(分享页主体) */
+function groupCard(c) {
+  const items = c.sets.map((s, i) => setItem(s, i, c.sets.length)).join('\n');
+  return `<section class="case">
+    <h3>${c.label} <em>${c.note}</em></h3>
+    <view class="gc-wrap">
+      <view class="groups">
+        <view class="group">
+          <view class="group-head">
+            <view class="group-img-wrap"><view class="group-img group-img-placeholder">🏋️</view></view>
+            <view class="group-info">
+              <view class="group-name">史密斯低杠深蹲</view>
+              <view class="group-sub">${c.sets.length} ${T.SETS} · 次数</view>
+            </view>
+            <view class="group-right">
+              <view class="group-cal">100 ${T.CAL}</view>
+              <view class="group-detail-hint">查看动作详情</view>
+            </view>
+          </view>
+          <view class="sets-grid">
+${items}
+          </view>
+        </view>
+      </view>
+    </view>
+  </section>`;
 }
 
 function setRow(s, i, total) {
@@ -116,7 +180,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>分享页 · 动作详情弹层 · 组列表排版预览</title>
+<title>分享页 · 组列表排版预览</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -130,9 +194,12 @@ const html = `<!DOCTYPE html>
   .page-head { padding: 0 16px 18px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 8px; }
   .page-head h1 { font-size: 15px; margin: 0 0 6px; color: #f2f2f2; }
   .page-head p { font-size: 12px; line-height: 1.7; color: #8a8a8a; margin: 0; }
+  .sec-title { font-size: 12px; color: #ccf200; margin: 20px 16px 8px; font-weight: 800; letter-spacing: .08em; }
   .case { margin: 18px 0 0; }
   .case h3 { font-size: 12px; color: #8a8a8a; margin: 0 0 6px 16px; font-weight: 600; }
   .case h3 em { font-style: normal; color: #666; margin-left: 6px; }
+  /* 分享页 .page 的左右内边距(28rpx) */
+  .gc-wrap { padding: 0 14px; }
   .sheet {
     width: 100%; background: #1a1a1a; border-radius: 16px 16px 0 0;
     overflow: hidden; display: flex; flex-direction: column;
@@ -145,14 +212,18 @@ ${rpx2px(css)}
 <body>
 <div class="page">
   <div class="page-head">
-    <h1>分享页 · 动作详情弹层 · 组列表排版预览</h1>
+    <h1>分享页 · 组列表排版预览</h1>
     <p>
-      组列表改为<b>一行两条</b>; 奇数条时最后一条独占整行, 不留半格空白。<br>
+      两处组列表都是<b>一行两条</b>; 奇数条时最后一条独占整行, 不留半格空白。<br>
+      A = 动作分组卡片里的内联组列表(本次改动); B = 动作详情弹层里的组列表。<br>
       样式直接内联自 <code>miniprogram/pages/share/index.wxss</code>(真实文件, 非手抄)。<br>
       ⚠️ rpx 按 375px 宽折算 → 请用 375px 宽的窗口看, 1:1 还原真机。<br>
       本页是<b>快照</b>: 改完 wxss 后跑 <code>node tools/preview-share-sheet.js</code> 重新生成。
     </p>
   </div>
+  <div class="sec-title">A · 动作分组卡片(内联组列表)</div>
+${CASES.map(groupCard).join('\n')}
+  <div class="sec-title">B · 动作详情弹层</div>
 ${CASES.map(sheet).join('\n')}
 </div>
 </body>

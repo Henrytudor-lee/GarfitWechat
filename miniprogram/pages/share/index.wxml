@@ -69,8 +69,10 @@
           </view>
         </view>
 
+        <!-- 组列表: 一行两条, 每条撑满半宽; 奇数条时最后一条独占整行 -->
         <view class="sets-grid">
-          <view class="set-item" wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
+          <view class="set-item {{index === item.sets.length - 1 && item.sets.length % 2 === 1 ? 'wide' : ''}}"
+                wx:for="{{item.sets}}" wx:for-item="s" wx:key="id">
             <view class="set-num">{{index + 1}}</view>
             <!-- 距离类: 距离必显, 时长可选, 负重可选 -->
             <block wx:if="{{s.distanceKm > 0}}">
