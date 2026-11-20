@@ -157,9 +157,11 @@
     </view>
   </block>
 
-  <!-- 离屏画布: 生成海报用。
+  <!-- 离屏画布: 生成海报用(兜底路径, 主路径是 wx.createOffscreenCanvas)。
        节点必须**常驻** DOM(不能用 wx:if), 否则取不到 node;
-       用 opacity 而不是 display:none —— display:none 的节点在部分机型上不渲染。 -->
-  <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
+       隐藏方式必须是"移到屏幕外" —— iOS 上不可见(opacity:0 / display:none)的
+       画布不栅格化, canvasToTempFilePath 会直接 fail on image。 -->
+  <canvas type="2d" id="posterCanvas" class="poster-canvas"
+           style="width:{{posterW}}px;height:{{posterH}}px"></canvas>
 
 </view>

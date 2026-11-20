@@ -7,17 +7,27 @@
 //   跟现有 "npm ci && npm run build && pm2 restart" 的部署链路冲突, 小 VPS 内存也扛不住。
 //   所以走 canvas 2d 手写排版: 数据现成(分享页已有 training + groups), 零新增数据接口。
 //
-// 画布尺寸上限(为什么有 dpr 降级):
+// 画布尺寸上限(为什么有倍率降级):
 //   iOS 上 canvas 单边约 4096 设备像素, 超了 wx.canvasToTempFilePath 会直接失败。
-//   所以按内容高度自适应降 dpr(3 → 2 → 1), 还超高就截断动作 + 标「等 N 个动作」。
+//   所以按内容高度自适应降渲染倍率(3 → 2 → 1.5 → 1), 还超高就截断动作 + 标「等 N 个动作」。
 //
 // 版式跟分享页视觉对齐(深色底 + 荧光绿主色), 宽度按 750rpx 折算成 375 CSS px。
 
 const DESIGN_W = 375;        // 750rpx → CSS px
-const MAX_EDGE_PX = 4096;    // 画布单边上限(设备像素)
-const MAX_DPR = 3;
-/** dpr 下限 —— 低于 2 倍图就明显糊了, 宁可截断几个动作也不出糊图 */
-const MIN_DPR = 2;
+const MAX_EDGE_PX = 4096;    // 画布单边上限(设备像素, iOS 硬限制)
+/** 画布总像素上限 —— 4M px × 4B ≈ 16MB, 超过 iOS 画布显存就崩 */
+const MAX_AREA_PX = 4 * 1000 * 1000;
+/**
+ * 渲染倍率阶梯
+ *
+ * 为什么是"渲染倍率"而不是"设备 dpr":
+ *   画布单边 4096 物理像素是硬限制, 而海报高度随动作数增长(10 个动作 ≈ 1558 CSS px),
+ *   375 × 1558 × 3 = 4674 > 4096 → 出不来。
+ *   所以要在**内容完整**的前提下挑倍率: 3 → 2 → 1.5 → 1,
+ *   挑最大的那个"高度 × 倍率 ≤ 4096 且总像素不超上限"的。
+ *   只有连 1 倍都塞不下(20+ 个动作)才截断动作。
+ */
+const SCALE_LADDER = [3, 2, 1.5, 1];
 
 /** 画布配色 —— 跟 pages/share/index.wxss 一个口径 */
 const C = {
@@ -278,81 +288,176 @@ function paint(ctx, layout, assets) {
 }
 
 /**
- * 按内容高度挑 dpr
+ * 按内容高度挑渲染倍率
  *
- * iOS 上 canvas 单边约 4096 设备像素, 超了 wx.canvasToTempFilePath 会失败。
- * 所以从设备 dpr 往下退(3 → 2 → 1), 找一个装得下的。
+ * 目标: **动作全部画上**(用户明确要"全画"), 同时高度不超 4096 物理像素。
+ * 倍率越小越清晰度低但完整, 倍率越大越清晰但可能超出画布上限 —— 优先完整。
  */
-function pickDpr(height) {
-  let deviceDpr = MAX_DPR;
-  try {
-    const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
-    deviceDpr = info.pixelRatio || 2;
-  } catch (e) {
-    deviceDpr = 2;
+function pickScale(height) {
+  for (const s of SCALE_LADDER) {
+    const w = Math.round(DESIGN_W * s);
+    const h = Math.round(height * s);
+    if (h <= MAX_EDGE_PX && w * h <= MAX_AREA_PX) return s;
   }
-  const maxDpr = Math.min(MAX_DPR, Math.max(MIN_DPR, deviceDpr));
-  for (let d = maxDpr; d > MIN_DPR; d--) {
-    if (height * d <= MAX_EDGE_PX) return d;
-  }
-  return MIN_DPR;
+  return 1;
 }
 
 /**
- * 画海报并导出临时文件路径
+ * 规划海报: 排版 + 倍率 + 像素尺寸
  *
- * @param {Object} opts
- *   canvas  canvas 节点(离屏的 type="2d")
- *   model   排版数据(见 pages/share/index.js 的 _posterModel)
- *   assets  { avatar, qrcode, thumbs: {key: img} }
+ * 分两步是有意的:
+ *   1) 先按"不截断"排一次, 拿到完整高度;
+ *   2) 用完整高度挑倍率 —— 只有连 1 倍都超 4096 才截断动作。
+ * 这样 5 个动作出 1125×2598, 10 个动作出 750×3116, 都是长图且不丢内容。
  */
-function renderPoster(opts) {
-  const canvas = opts.canvas;
-  // 高度预算按 MIN_DPR 算 —— 保证出的图至少 2 倍清晰度
-  const layout = buildLayout(opts.model, Math.floor(MAX_EDGE_PX / MIN_DPR));
-  const dpr = pickDpr(layout.height);
+function planPoster(model) {
+  let layout = buildLayout(model, 0);          // 0 = 不设预算 = 全画
+  let scale = pickScale(layout.height);
+  if (Math.round(layout.height * scale) > MAX_EDGE_PX) {
+    // 连 1 倍都装不下 → 只能截断动作, 剩下的用「等 N 个动作」带过
+    layout = buildLayout(model, MAX_EDGE_PX);
+    scale = 1;
+  }
+  const cssW = DESIGN_W;
+  const cssH = layout.height;
+  return {
+    layout,
+    scale,
+    cssW,
+    cssH,
+    pxW: Math.round(cssW * scale),
+    pxH: Math.round(cssH * scale),
+  };
+}
 
-  canvas.width = Math.round(DESIGN_W * dpr);
-  canvas.height = Math.round(layout.height * dpr);
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  paint(ctx, layout, opts.assets || {});
-
+/** 导出画布 → 临时文件路径(显式给全尺寸, 别让基础库自己猜) */
+function exportCanvas(canvas, pxW, pxH) {
   return new Promise((resolve, reject) => {
     wx.canvasToTempFilePath({
       canvas,
+      x: 0,
+      y: 0,
+      width: pxW,
+      height: pxH,
+      // ⚠️ destWidth/destHeight 必须给 —— 不给的话基础库按**逻辑尺寸**导,
+      //    出来的图只有 375px 宽(看着像"被压缩了")。
+      destWidth: pxW,
+      destHeight: pxH,
       fileType: 'png',
+      quality: 1,
       success: (res) => resolve(res.tempFilePath),
       fail: (err) => reject(new Error((err && err.errMsg) || 'canvas export failed')),
     });
   });
 }
 
-/**
- * 网络图 → 本地临时路径
- *
- * ⚠️ 网络图**不能直接**丢给 canvas.drawImage —— 跨域图会污染画布,
- *    导致 canvasToTempFilePath 导出失败。必须先换成本地路径。
- */
-function loadLocalImage(src) {
+/** 读图片实际尺寸 —— 用来校验导出的图有没有被降分辨率 */
+function getImageSize(filePath) {
   return new Promise((resolve) => {
-    if (!src) { resolve(''); return; }
     wx.getImageInfo({
-      src,
-      success: (res) => resolve(res.path || ''),
-      fail: () => resolve(''),
+      src: filePath,
+      success: (res) => resolve({ width: res.width, height: res.height }),
+      fail: () => resolve(null),
     });
   });
 }
 
-/** 本地路径 → canvas 图片对象(加载失败返回 null, 调用方跳过就行) */
-function toCanvasImage(canvas, localPath) {
+/** 按给定倍率画一遍并导出 */
+async function renderAtScale(canvas, layout, scale, assets) {
+  const pxW = Math.round(DESIGN_W * scale);
+  const pxH = Math.round(layout.height * scale);
+
+  // 后备缓冲 = 物理像素尺寸; 绘制时按倍率放大, 排版坐标仍是 CSS px
+  canvas.width = pxW;
+  canvas.height = pxH;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  paint(ctx, layout, assets || {});
+
+  const filePath = await exportCanvas(canvas, pxW, pxH);
+
+  // 自愈: 校验导出尺寸, 不符就再导一次(不带 dest, 让基础库按画布原始尺寸出)
+  const size = await getImageSize(filePath);
+  if (size && (size.width !== pxW || size.height !== pxH)) {
+    console.warn('[poster] export size mismatch:', size, 'want', pxW, pxH);
+    try {
+      const retry = await new Promise((resolve, reject) => {
+        wx.canvasToTempFilePath({
+          canvas,
+          fileType: 'png',
+          quality: 1,
+          success: (res) => resolve(res.tempFilePath),
+          fail: (err) => reject(new Error((err && err.errMsg) || 'canvas export failed')),
+        });
+      });
+      return retry;
+    } catch (e) {
+      // 重试也失败就还是用第一次的结果 —— 尺寸不理想总比整个保存失败强
+      console.warn('[poster] retry export failed:', e);
+    }
+  }
+  return filePath;
+}
+
+/**
+ * 画海报并导出临时文件路径
+ *
+ * @param {Object} opts
+ *   canvas  canvas 节点(离屏的 type="2d" 或 wx.createOffscreenCanvas)
+ *   model   排版数据(见 pages/share/index.js 的 _posterModel)
+ *   assets  { avatar, qrcode, thumbs: {key: img} }
+ *   plan    可选, planPoster() 的结果(不传就现算)
+ */
+async function renderPoster(opts) {
+  const canvas = opts.canvas;
+  const plan = opts.plan || planPoster(opts.model);
+  const assets = opts.assets || {};
+
+  // 倍率降级重试: 有些机型画布上限更严(exceed max size),
+  // 降一档重画 —— 内容一条不少, 只是清晰度低一点, 总比直接失败强。
+  const candidates = [plan.scale].concat(SCALE_LADDER.filter((s) => s < plan.scale));
+  let lastErr = null;
+  for (const scale of candidates) {
+    try {
+      return await renderAtScale(canvas, plan.layout, scale, assets);
+    } catch (err) {
+      lastErr = err;
+      console.warn('[poster] render failed @' + scale + 'x:', err);
+    }
+  }
+  throw lastErr || new Error('canvas export failed');
+}
+
+/**
+ * 任意图片源 → canvas 图片对象
+ *
+ * ⚠️ 网络图**不能直接**丢给老 canvas 的 drawImage —— 跨域图会污染画布,
+ *    导致 canvasToTempFilePath 导出失败。所以先 wx.getImageInfo 换本地临时路径。
+ *
+ * 但 getImageInfo 走的是 downloadFile 白名单 —— 域名没配就拿不到本地路径,
+ * 这时候再退一步: 直接把网络地址给 canvas Image(canvas 2d 支持网络图)。
+ * 两条路都不通就返回 null, 调用方画占位块, 不让整张海报挂掉。
+ */
+function loadImage(canvas, src) {
   return new Promise((resolve) => {
-    if (!localPath) { resolve(null); return; }
-    const img = canvas.createImage();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = localPath;
+    if (!src) { resolve(null); return; }
+    const fromPath = (path) => new Promise((done) => {
+      const img = canvas.createImage();
+      img.onload = () => done(img);
+      img.onerror = () => done(null);
+      img.src = path;
+    });
+    wx.getImageInfo({
+      src,
+      success: (res) => {
+        if (res && res.path) {
+          fromPath(res.path).then((img) => resolve(img || fromPath(src)));
+        } else {
+          fromPath(src).then(resolve);
+        }
+      },
+      fail: () => { fromPath(src).then(resolve); },
+    });
   });
 }
 
@@ -372,10 +477,11 @@ module.exports = {
   DESIGN_W,
   MAX_EDGE_PX,
   buildLayout,
+  planPoster,
+  pickScale,
   paint,
   renderPoster,
-  loadLocalImage,
-  toCanvasImage,
+  loadImage,
   writeBase64File,
   setText,
 };

@@ -59,6 +59,10 @@ Page({
     locale: 'zh',
     theme: 'night',
     t: {},
+
+    // 离屏画布的 CSS 尺寸(兜底路径用; 主路径走 wx.createOffscreenCanvas)
+    posterW: 375,
+    posterH: 667,
   },
 
   onLoad(query) {
@@ -299,22 +303,65 @@ Page({
     } catch (err) {
       console.error('[share] save poster failed:', err);
       wx.hideLoading();
-      wx.showToast({ title: this._t('POSTER_FAILED'), icon: 'none' });
+      const reason = String((err && (err.errMsg || err.message)) || err || '');
+      // 相册权限被拒时 _saveToAlbum 已经弹过"去设置"了, 别再叠一个弹框
+      if (reason !== 'album auth denied') {
+        // 把**真实原因**显示出来 —— 只弹个"生成失败"的 toast 根本没法排查
+        wx.showModal({
+          title: this._t('POSTER_FAILED'),
+          content: reason || this._t('POSTER_FAILED'),
+          showCancel: false,
+        });
+      }
     } finally {
       this._posterBusy = false;
     }
   },
 
-  /** 画海报 → 临时文件路径 */
+  /**
+   * 画海报 → 临时文件路径
+   *
+   * 两条路, 主备关系:
+   *   1) wx.createOffscreenCanvas —— 离屏画布**没有 CSS 尺寸**,
+   *      导出区域跟像素尺寸完全一致, 不存在"逻辑像素 / 物理像素"的歧义,
+   *      也不会因为元素被隐藏(iOS 不栅格化不可见画布)而导出失败。
+   *   2) DOM 里的 canvas —— 兜底(老基础库没有 createOffscreenCanvas),
+   *      这条路 CSS 尺寸必须跟像素尺寸设成一样大, 否则老基础库按 CSS 尺寸
+   *      算导出区域, 出来的图会被压扁 / 少一截。
+   */
   async _buildPoster() {
-    const canvas = await this._posterCanvas();
     const model = this._posterModel();
-    const assets = await this._posterAssets(canvas);
-    return poster.renderPoster({ canvas, model, assets });
+    const plan = poster.planPoster(model);
+    try {
+      const canvas = this._offscreenCanvas(plan);
+      const assets = await this._posterAssets(canvas);
+      return await poster.renderPoster({ canvas, plan, assets });
+    } catch (e1) {
+      console.warn('[share] offscreen canvas failed, fallback to dom canvas:', e1);
+      const canvas = await this._domPosterCanvas(plan);
+      const assets = await this._posterAssets(canvas);
+      return await poster.renderPoster({ canvas, plan, assets });
+    }
   },
 
-  /** 离屏的 canvas 节点(必须有真实布局, 隐藏的也能拿到 node) */
-  _posterCanvas() {
+  /** 离屏画布(基础库 2.16.1+) —— 没有 CSS 尺寸, 导出最稳 */
+  _offscreenCanvas(plan) {
+    if (typeof wx.createOffscreenCanvas !== 'function') {
+      throw new Error('createOffscreenCanvas unsupported');
+    }
+    const canvas = wx.createOffscreenCanvas({ type: '2d', width: plan.pxW, height: plan.pxH });
+    if (!canvas || typeof canvas.getContext !== 'function') {
+      throw new Error('createOffscreenCanvas unavailable');
+    }
+    return canvas;
+  },
+
+  /** 兜底: DOM 里的 canvas 节点(CSS 尺寸跟像素尺寸保持一致) */
+  async _domPosterCanvas(plan) {
+    await new Promise((resolve) => {
+      this.setData({ posterW: plan.pxW, posterH: plan.pxH }, resolve);
+    });
+    await new Promise((resolve) => wx.nextTick(resolve));
     return new Promise((resolve, reject) => {
       wx.createSelectorQuery().in(this).select('#posterCanvas').node((res) => {
         if (res && res.node) resolve(res.node);
@@ -375,14 +422,6 @@ Page({
   async _posterAssets(canvas) {
     const d = this.data;
 
-    // 缩略图
-    const thumbPaths = {};
-    await Promise.all((d.groups || []).map(async (g) => {
-      if (!g.image_name) return;
-      const local = await poster.loadLocalImage(d.imgPrefix + '/exer_images/' + g.image_name);
-      if (local) thumbPaths[String(g.exercise_id)] = local;
-    }));
-
     // 小程序码 —— 拉不到就退化成"海报不带码", 不阻断整个保存
     let qrFile = '';
     try {
@@ -394,13 +433,29 @@ Page({
     }
 
     const assets = { avatar: null, qrcode: null, thumbs: {} };
-    const avatarLocal = await poster.loadLocalImage((d.owner && d.owner.avatar) || '');
-    if (avatarLocal) assets.avatar = await poster.toCanvasImage(canvas, avatarLocal);
-    if (qrFile) assets.qrcode = await poster.toCanvasImage(canvas, qrFile);
-    for (const key of Object.keys(thumbPaths)) {
-      const img = await poster.toCanvasImage(canvas, thumbPaths[key]);
-      if (img) assets.thumbs[key] = img;
+    const jobs = [];
+
+    // 头像
+    const avatarSrc = (d.owner && d.owner.avatar) || '';
+    if (avatarSrc) {
+      jobs.push(poster.loadImage(canvas, avatarSrc).then((img) => { assets.avatar = img; }));
     }
+
+    // 动作缩略图 —— 并发加载(loadImage 内部先试本地路径, 拿不到再试网络地址)
+    for (const g of d.groups || []) {
+      if (!g.image_name) continue;
+      const src = d.imgPrefix + '/exer_images/' + g.image_name;
+      jobs.push(poster.loadImage(canvas, src).then((img) => {
+        if (img) assets.thumbs[String(g.exercise_id)] = img;
+      }));
+    }
+
+    // 小程序码(本地文件)
+    if (qrFile) {
+      jobs.push(poster.loadImage(canvas, qrFile).then((img) => { assets.qrcode = img; }));
+    }
+
+    await Promise.all(jobs);
     return assets;
   },
 

@@ -299,14 +299,14 @@
   color: #000;
 }
 
-/* 离屏画布: 生成海报用(见 index.wxml) */
+/* 离屏画布: 生成海报用(见 index.wxml), 移到屏幕外。
+   ⚠️ 千万别用 opacity:0 / display:none —— iOS 上不可见的画布不栅格化,
+      wx.canvasToTempFilePath 会报 "fail on image"。
+   宽高由 JS 动态设(wxml style 绑定), 要跟画布像素尺寸一致。 */
 .poster-canvas {
   position: fixed;
-  left: 0;
+  left: -9999px;
   top: 0;
-  width: 375px;
-  height: 667px;
-  opacity: 0;
   pointer-events: none;
 }
 

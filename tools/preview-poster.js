@@ -147,7 +147,9 @@ function svgCtx(out) {
 
 function render() {
   const model = buildModel();
-  const layout = poster.buildLayout(model, Math.floor(poster.MAX_EDGE_PX / 2));
+  // 跟小程序里走同一套规划(排版 + 倍率 + 像素尺寸)
+  const plan = poster.planPoster(model);
+  const layout = plan.layout;
 
   const assets = { avatar: { href: AVATAR }, qrcode: null, thumbs: {} };
   model.groups.forEach((g) => { assets.thumbs[g.key] = { href: g.image }; });
@@ -175,13 +177,13 @@ function render() {
 </style></head>
 <body>
   <h1>训练分享海报 · 排版预览</h1>
-  <p>真实 utils/poster.js 排版结果, 2 倍放大显示(实际导出为 ${poster.DESIGN_W * 2}px 宽)。字体宽度是估算的, 省略号截断时机可能差一两个字。</p>
+  <p>真实 utils/poster.js 排版结果, 2 倍放大显示(实际导出 ${plan.pxW}×${plan.pxH}px, 渲染倍率 ${plan.scale}x)。字体宽度是估算的, 省略号截断时机可能差一两个字。</p>
   <div class="frame"><div>${svg}</div></div>
 </body></html>`;
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, html, 'utf8');
-  console.log('poster height =', layout.height, 'px  (device @2x =', layout.height * 2, 'px)');
+  console.log('poster height =', plan.cssH, 'css px  scale =', plan.scale + 'x  ->', plan.pxW + 'x' + plan.pxH, 'px');
   console.log('written:', path.relative(ROOT, OUT));
 }
 
