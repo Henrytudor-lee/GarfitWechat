@@ -12,6 +12,8 @@ const { modeLabel } = require('../../utils/exerciseMeta.js');
 const { normalizeAvatar } = require('../../utils/avatar.js');
 // 海报绘制(canvas 2d 手绘) —— 为什么不用"截图": 小程序截不了 WXML
 const poster = require('../../utils/poster.js');
+// 相册是隐私接口 —— 后台没声明隐私类型会直接 errno 112, 调用前先过授权
+const privacy = require('../../utils/privacy.js');
 
 /** 时长(秒) → "H:MM" / "M:SS"(与会话详情弹框同一口径) */
 function formatDuration(sec) {
@@ -294,6 +296,18 @@ Page({
       return;
     }
     this._posterBusy = true;
+    // 隐私授权要先拿到 —— 否则海报画十几秒, 最后一步才被拦, 白等
+    try {
+      await privacy.ensurePrivacyAuthorized();
+    } catch (e) {
+      this._posterBusy = false;
+      wx.showModal({
+        title: this._t('PRIVACY_TITLE'),
+        content: this._t('PRIVACY_DENIED'),
+        showCancel: false,
+      });
+      return;
+    }
     wx.showLoading({ title: this._t('POSTER_GENERATING'), mask: true });
     try {
       const filePath = await this._buildPoster();
@@ -305,7 +319,7 @@ Page({
       wx.hideLoading();
       const reason = String((err && (err.errMsg || err.message)) || err || '');
       // 相册权限被拒时 _saveToAlbum 已经弹过"去设置"了, 别再叠一个弹框
-      if (reason !== 'album auth denied') {
+      if (reason !== 'album auth denied' && reason !== 'privacy scope not declared') {
         // 把**真实原因**显示出来 —— 只弹个"生成失败"的 toast 根本没法排查
         wx.showModal({
           title: this._t('POSTER_FAILED'),
@@ -467,6 +481,17 @@ Page({
         success: resolve,
         fail: (err) => {
           const msg = String((err && err.errMsg) || '');
+          // 后台《用户隐私保护指引》没声明相册(仅写入) → errno 112
+          // 这不是用户权限问题, 弹"去设置"没用, 得让开发者去后台补声明
+          if (privacy.isPrivacyScopeError(err)) {
+            wx.showModal({
+              title: this._t('POSTER_FAILED'),
+              content: this._t('PRIVACY_NOT_DECLARED'),
+              showCancel: false,
+            });
+            reject(new Error('privacy scope not declared'));
+            return;
+          }
           if (/auth deny|authorize|deny/i.test(msg)) {
             wx.showModal({
               title: this._t('POSTER_SAVE_TIP'),

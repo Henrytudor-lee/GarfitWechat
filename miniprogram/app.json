@@ -21,6 +21,7 @@
       "desc": "用于保存训练分享海报到相册"
     }
   },
+  "__usePrivacyCheck__": true,
   "tabBar": {
     "custom": true,
     "color": "#52525b",

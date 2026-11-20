@@ -17,6 +17,8 @@ const i18n = require('../../utils/i18n.js');
 const { compressToLimit } = require('../../utils/image.js');
 const api = require('../../utils/api.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
+// 选相册/拍照是隐私接口 —— 后台没声明隐私类型会直接 errno 112
+const privacy = require('../../utils/privacy.js');
 
 // 初始文案(attached 时会按当前语言再刷新一次) —— 全部取自 locales 字典
 const t0 = i18n.getTranslations();
@@ -221,6 +223,17 @@ Component({
         wx.showToast({ title: 'openid unavailable', icon: 'none' });
         return;
       }
+      // 隐私授权先拿到 —— 否则 chooseImage 直接 fail, 用户完全不知道发生了什么
+      try {
+        await privacy.ensurePrivacyAuthorized();
+      } catch (e) {
+        wx.showModal({
+          title: (this.data.t || {}).PRIVACY_TITLE || 'Privacy',
+          content: (this.data.t || {}).PRIVACY_DENIED || '',
+          showCancel: false,
+        });
+        return;
+      }
       wx.chooseImage({
         count: 1,
         sizeType: ['compressed'],
@@ -274,6 +287,21 @@ Component({
               this._uploadFailed();
             },
           });
+        },
+        fail: (err) => {
+          // 后台没声明「相册(仅读取)」/「摄像头」隐私类型 → errno 112
+          if (privacy.isPrivacyScopeError(err)) {
+            wx.showModal({
+              title: (this.data.t || {}).PRIVACY_TITLE || 'Privacy',
+              content: (this.data.t || {}).PRIVACY_NOT_DECLARED_READ || '',
+              showCancel: false,
+            });
+            return;
+          }
+          // 用户主动取消 —— 静默返回, 别弹错误
+          if (!/cancel/i.test(String((err && err.errMsg) || ''))) {
+            wx.showToast({ title: (this.data.t || {}).AVATAR_PICK_FAILED || '', icon: 'none' });
+          }
         },
       });
     },

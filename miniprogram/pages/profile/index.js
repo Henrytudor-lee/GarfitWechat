@@ -3,6 +3,8 @@ const { normalizeAvatar } = require('../../utils/avatar.js');
 const { compressToLimit } = require('../../utils/image.js');
 const app = getApp();
 const api = require('../../utils/api.js');
+// 选相册是隐私接口 —— 后台没声明隐私类型会直接 errno 112
+const privacy = require('../../utils/privacy.js');
 
 // Fire color tiers: 0=gray, 1-7=orange, 8-30=yellow, 31-60=lime, 61-120=green, 121-360=teal, 361+=blue
 function getFlameColor(streak) {
@@ -177,6 +179,17 @@ Page({
       .finally(() => wx.hideLoading());
   },
   async changeAvatar() {
+    // 隐私授权先拿到 —— 否则 chooseImage 直接 fail, 界面上一点提示都没有
+    try {
+      await privacy.ensurePrivacyAuthorized();
+    } catch (e) {
+      wx.showModal({
+        title: (this.data.t || {}).PRIVACY_TITLE || 'Privacy',
+        content: (this.data.t || {}).PRIVACY_DENIED || '',
+        showCancel: false,
+      });
+      return;
+    }
     wx.chooseImage({
       count: 1,
       sourceType: ['album'],
@@ -242,6 +255,21 @@ Page({
         } else {
           // 没有 userId (登录未完成) → 根本不会发起上传, 不能报成功
           this._avatarUploadFailed(prevAvatar, 'no userId');
+        }
+      },
+      fail: (err) => {
+        // 后台没声明「相册(仅读取)」隐私类型 → errno 112
+        if (privacy.isPrivacyScopeError(err)) {
+          wx.showModal({
+            title: (this.data.t || {}).PRIVACY_TITLE || 'Privacy',
+            content: (this.data.t || {}).PRIVACY_NOT_DECLARED_READ || '',
+            showCancel: false,
+          });
+          return;
+        }
+        // 用户主动取消选图 —— 不弹错误, 静默返回
+        if (!/cancel/i.test(String((err && err.errMsg) || ''))) {
+          wx.showToast({ title: (this.data.t || {}).AVATAR_PICK_FAILED || '', icon: 'none' });
         }
       },
     });
