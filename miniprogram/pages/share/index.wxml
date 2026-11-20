@@ -99,9 +99,10 @@
       </view>
     </view>
 
-    <!-- 底部: 去练自己的 -->
+    <!-- 底部: 保存海报 + 去练自己的 -->
     <view class="foot">
-      <button class="foot-btn" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
+      <button class="foot-btn foot-btn-ghost" bindtap="onSavePoster">{{t.SAVE_POSTER}}</button>
+      <button class="foot-btn foot-btn-main" bindtap="goStartWorkout">{{t.START_YOUR_WORKOUT}}</button>
     </view>
 
     <!-- 动作详情弹层 -->
@@ -155,5 +156,10 @@
       </view>
     </view>
   </block>
+
+  <!-- 离屏画布: 生成海报用。
+       节点必须**常驻** DOM(不能用 wx:if), 否则取不到 node;
+       用 opacity 而不是 display:none —— display:none 的节点在部分机型上不渲染。 -->
+  <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
 
 </view>

@@ -257,22 +257,57 @@
   padding: 24rpx 28rpx calc(24rpx + env(safe-area-inset-bottom, 0px));
   background: rgba(19, 19, 19, 0.92);
   border-top: 1rpx solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
 }
 .theme-day .foot {
   background: rgba(245, 245, 245, 0.94);
   border-top-color: rgba(0, 0, 0, 0.08);
 }
 .foot-btn {
-  width: 100%;
   height: 92rpx;
   border-radius: 999rpx;
-  background: #ccf200;
-  color: #000;
   font-size: 30rpx;
   font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.foot-btn::after { border: none; }
+
+.foot-btn-ghost {
+  flex-shrink: 0;
+  padding: 0 30rpx;
+  background: transparent;
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  color: #f2f2f2;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+.theme-day .foot-btn-ghost {
+  border-color: rgba(0, 0, 0, 0.16);
+  color: #1a1a1a;
+}
+
+.foot-btn-main {
+  flex: 1;
+  background: #ccf200;
+  color: #000;
+}
+
+/* 离屏画布: 生成海报用(见 index.wxml) */
+.poster-canvas {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 375px;
+  height: 667px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── 动作详情弹层 ── */

@@ -16,6 +16,11 @@
     "navigationBarTitleText": "GFIT",
     "navigationBarTextStyle": "white"
   },
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存训练分享海报到相册"
+    }
+  },
   "tabBar": {
     "custom": true,
     "color": "#52525b",

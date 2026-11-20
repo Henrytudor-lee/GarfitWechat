@@ -9,6 +9,9 @@ const api = require('../../utils/api.js');
 // 动作元信息的口径统一收口到 utils/exerciseMeta.js
 // (动作库页 / 训练分享页 / 动作分享页三处共用, 别再各写一份)
 const { modeLabel } = require('../../utils/exerciseMeta.js');
+const { normalizeAvatar } = require('../../utils/avatar.js');
+// 海报绘制(canvas 2d 手绘) —— 为什么不用"截图": 小程序截不了 WXML
+const poster = require('../../utils/poster.js');
 
 /** 时长(秒) → "H:MM" / "M:SS"(与会话详情弹框同一口径) */
 function formatDuration(sec) {
@@ -59,7 +62,10 @@ Page({
   },
 
   onLoad(query) {
-    const token = (query && query.token) || '';
+    // ⚠️ 小程序码扫码进来时 token 走 query.scene
+    //    (微信把 getUnlimited 的 scene 当 query 参数传给页面),
+    //    直接分享卡片进来才是 query.token。
+    const token = (query && (query.token || query.scene)) || '';
     this.setData({
       token,
       imgPrefix: app.globalData.imagePrefix || '',
@@ -115,6 +121,17 @@ Page({
     return dict[key] || fallback || key;
   },
 
+  /**
+   * 分享者头像归一化
+   *
+   * ⚠️ 库里的原始值可能是老的 cloud:// 格式, 直接给 <image> 用不了,
+   *    海报 canvas 更必须绝对地址 —— 统一过一道 normalizeAvatar。
+   */
+  _normalizeOwner(owner) {
+    if (!owner) return null;
+    return { ...owner, avatar: normalizeAvatar(owner.avatar, this.data.imgPrefix) };
+  },
+
   async loadShare(token) {
     this.setData({ loading: true, error: '', errorCode: '' });
     try {
@@ -138,7 +155,7 @@ Page({
           durationStr: formatDuration(body.training && body.training.duration),
           dateText: formatDateTime(body.training && body.training.start_time, isZh),
         },
-        owner: body.owner || null,
+        owner: this._normalizeOwner(body.owner || null),
         groups,
       });
     } catch (err) {
@@ -255,5 +272,159 @@ Page({
   // ── 去练自己的 ──
   goStartWorkout() {
     wx.switchTab({ url: '/pages/index/index' });
+  },
+
+  // ── 保存海报到相册 ──
+  /**
+   * 生成海报并保存到相册
+   *
+   * 为什么前端画而不是后端出整张图:
+   *   小程序**截不了 WXML**(canvas.drawImage 画不了 DOM 节点),
+   *   后端渲染要装 headless Chromium, 跟现有部署链路冲突。
+   *   所以后端只出小程序码, 排版在前端 canvas 画 —— 数据现成, 零新增数据接口。
+   */
+  async onSavePoster() {
+    if (this._posterBusy) return;
+    if (!this.data.training || !this.data.groups.length) {
+      wx.showToast({ title: this._t('POSTER_NO_DATA'), icon: 'none' });
+      return;
+    }
+    this._posterBusy = true;
+    wx.showLoading({ title: this._t('POSTER_GENERATING'), mask: true });
+    try {
+      const filePath = await this._buildPoster();
+      await this._saveToAlbum(filePath);
+      wx.hideLoading();
+      wx.showToast({ title: this._t('POSTER_SAVED'), icon: 'success' });
+    } catch (err) {
+      console.error('[share] save poster failed:', err);
+      wx.hideLoading();
+      wx.showToast({ title: this._t('POSTER_FAILED'), icon: 'none' });
+    } finally {
+      this._posterBusy = false;
+    }
+  },
+
+  /** 画海报 → 临时文件路径 */
+  async _buildPoster() {
+    const canvas = await this._posterCanvas();
+    const model = this._posterModel();
+    const assets = await this._posterAssets(canvas);
+    return poster.renderPoster({ canvas, model, assets });
+  },
+
+  /** 离屏的 canvas 节点(必须有真实布局, 隐藏的也能拿到 node) */
+  _posterCanvas() {
+    return new Promise((resolve, reject) => {
+      wx.createSelectorQuery().in(this).select('#posterCanvas').node((res) => {
+        if (res && res.node) resolve(res.node);
+        else reject(new Error('poster canvas not ready'));
+      }).exec();
+    });
+  },
+
+  /**
+   * 当前小程序版本环境(develop / trial / release)
+   *
+   * ⚠️ 小程序码必须指向**当前这个版本**才扫得开 ——
+   *    开发者工具里生成的码如果指到正式版, 正式版可能还没有这个页面。
+   */
+  _miniProgramEnv() {
+    try {
+      const info = wx.getAccountInfoSync();
+      return (info && info.miniProgram && info.miniProgram.envVersion) || 'release';
+    } catch (e) {
+      return 'release';
+    }
+  },
+
+  /** 海报要画的内容 —— 跟页面共用同一份数据, 不额外请求接口 */
+  _posterModel() {
+    const d = this.data;
+    const t = d.t || {};
+    const isZh = (d.locale || 'zh') === 'zh';
+    const owner = d.owner || {};
+    const training = d.training || {};
+    const groups = (d.groups || []).map((g) => ({
+      key: String(g.exercise_id),
+      name: isZh ? (g.name_zh || g.name_en) : (g.name_en || g.name_zh),
+      sub: g.sets.length + ' ' + (g.sets.length === 1 ? (t.SET || '组') : (t.SETS || '组')) + ' · ' + g.modeLabel,
+      calories: g.totalCalories + ' ' + (t.CAL_UNIT_SHORT || '大卡'),
+      sets: (g.sets || []).map((s, i) => ({ num: i + 1, text: poster.setText(s, t) })),
+    }));
+    return {
+      ownerName: owner.name || (isZh ? 'GFIT 用户' : 'GFIT User'),
+      ownerLabel: (t.SHARE_BY || '来自') + ' ' + (t.SHARE_TRAINING || '分享的训练'),
+      dateText: training.dateText || '',
+      durationText: training.durationStr || '--:--',
+      exerciseCount: training.exercise_count || groups.length,
+      calories: training.calories || 0,
+      groups,
+      moreTemplate: isZh ? '等 {n} 个动作' : '+{n} more exercises',
+      footerHint: isZh ? '扫码查看完整训练' : 'Scan to view the full workout',
+      t,
+    };
+  },
+
+  /**
+   * 准备海报要用的图
+   *
+   * ⚠️ 网络图必须先换成本地路径才能画到 canvas —— 直接 drawImage 网络图
+   *    会污染画布, 导致 canvasToTempFilePath 导出失败。
+   */
+  async _posterAssets(canvas) {
+    const d = this.data;
+
+    // 缩略图
+    const thumbPaths = {};
+    await Promise.all((d.groups || []).map(async (g) => {
+      if (!g.image_name) return;
+      const local = await poster.loadLocalImage(d.imgPrefix + '/exer_images/' + g.image_name);
+      if (local) thumbPaths[String(g.exercise_id)] = local;
+    }));
+
+    // 小程序码 —— 拉不到就退化成"海报不带码", 不阻断整个保存
+    let qrFile = '';
+    try {
+      const res = await api.callCloud('share.qrcode', { token: d.token, env_version: this._miniProgramEnv() });
+      const base64 = res && res.result && res.result.qrcode;
+      if (base64) qrFile = poster.writeBase64File(base64, 'poster-qr.jpg');
+    } catch (err) {
+      console.warn('[share] qrcode unavailable:', err);
+    }
+
+    const assets = { avatar: null, qrcode: null, thumbs: {} };
+    const avatarLocal = await poster.loadLocalImage((d.owner && d.owner.avatar) || '');
+    if (avatarLocal) assets.avatar = await poster.toCanvasImage(canvas, avatarLocal);
+    if (qrFile) assets.qrcode = await poster.toCanvasImage(canvas, qrFile);
+    for (const key of Object.keys(thumbPaths)) {
+      const img = await poster.toCanvasImage(canvas, thumbPaths[key]);
+      if (img) assets.thumbs[key] = img;
+    }
+    return assets;
+  },
+
+  /** 存相册 —— 用户拒了相册权限就引导去设置里开 */
+  _saveToAlbum(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.saveImageToPhotosAlbum({
+        filePath,
+        success: resolve,
+        fail: (err) => {
+          const msg = String((err && err.errMsg) || '');
+          if (/auth deny|authorize|deny/i.test(msg)) {
+            wx.showModal({
+              title: this._t('POSTER_SAVE_TIP'),
+              content: this._t('POSTER_SAVE_AUTH'),
+              confirmText: this._t('GO_SETTINGS'),
+              success: (r) => { if (r.confirm) wx.openSetting({}); },
+            });
+            reject(new Error('album auth denied'));
+            return;
+          }
+          reject(new Error(msg || 'save failed'));
+        },
+      });
+    });
   },
 });
