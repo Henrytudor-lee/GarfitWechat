@@ -7,6 +7,11 @@
     <view class="bg-blob blob-1"></view>
     <view class="bg-blob blob-2"></view>
 
+    <!-- 右上角关闭按钮(替代原来左下角的"已完成") -->
+    <view class="btn-close" catchtap="onCloseTap" hover-class="btn-close-hover">
+      <text class="btn-close-icon">✕</text>
+    </view>
+
     <!-- Header -->
     <view class="card-header">
       <view class="brand-row">
@@ -103,10 +108,28 @@
     <view class="date-footer">{{_dateStr}}</view>
 
     <!-- Action Buttons -->
+    <!-- ⚠️ 图标颜色跟着按钮底色走, 日/夜主题各一套:
+           生成海报 —— 夜: 深底白字 → 白图标; 日: 浅底黑字 → 黑图标
+           分  享   —— 夜: 荧光绿底黑字 → 黑图标; 日: 深绿底白字 → 白图标 -->
     <view class="card-footer">
-      <button class="btn-secondary" bindtap="closeModal">{{t.DONE}}</button>
-      <button class="btn-share" open-type="share">{{t.SHARE}}</button>
+      <button class="btn-poster{{_posterBusy ? ' btn-poster-busy' : ''}}"
+              bindtap="onSavePoster" disabled="{{_posterBusy}}">
+        <image class="btn-icon" mode="aspectFit"
+               src="{{imgPrefix}}/icons/icon-poster-{{_theme === 'day' ? 'dark' : 'light'}}.png" />
+        <text class="btn-label">{{_posterBusy ? t.POSTER_GENERATING : t.GENERATE_POSTER}}</text>
+      </button>
+      <button class="btn-share" open-type="share">
+        <image class="btn-icon" mode="aspectFit"
+               src="{{imgPrefix}}/icons/icon-share-{{_theme === 'day' ? 'light' : 'dark'}}.png" />
+        <text class="btn-label">{{t.SHARE}}</text>
+      </button>
     </view>
+
+    <!-- 海报画布兜底节点(主路径走 wx.createOffscreenCanvas, 这里只给老基础库用)
+         ⚠️ 必须**真的在 DOM 里**且尺寸跟像素尺寸一致, 否则 canvasToTempFilePath
+            会按 CSS 尺寸算导出区域, 出来的图被压扁 / 少一截。 -->
+    <canvas type="2d" id="posterCanvas" class="poster-canvas"
+             style="width:{{posterW}}px;height:{{posterH}}px"></canvas>
 
   </view>
 </view>

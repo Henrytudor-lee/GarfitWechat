@@ -171,6 +171,8 @@ module.exports = {
   "SHARE_REVOKED_TOAST": "已取消分享",
   "NO_SHARES_YET": "还没有分享过训练",
   "START_YOUR_WORKOUT": "开始我的训练",
+  "GENERATE_POSTER": "生成海报",
+  "WORKOUT_SUMMARY_LABEL": "本次训练",
   "SAVE_POSTER": "保存海报",
   "POSTER_GENERATING": "生成中...",
   "POSTER_SAVED": "已保存到相册",

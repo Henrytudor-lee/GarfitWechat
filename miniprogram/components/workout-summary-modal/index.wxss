@@ -63,6 +63,42 @@
 }
 
 /* Header */
+/* 右上角关闭按钮 */
+.btn-close {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  z-index: 5;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close-hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.btn-close-icon {
+  font-size: 28rpx;
+  line-height: 1;
+  color: #fff;
+  font-weight: 700;
+}
+
+.theme-day .btn-close {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-day .btn-close-icon {
+  color: #111111;
+}
+
 .card-header {
   position: relative;
   z-index: 1;
@@ -377,9 +413,11 @@
 
 .btn-primary,
 .btn-secondary,
+.btn-poster,
 .btn-share {
   flex: 1;
   height: 80rpx;
+  gap: 10rpx;
   border-radius: 100rpx;
   font-family: 'Lexend Deca', 'Lexend', sans-serif;
   font-size: 22rpx;
@@ -407,6 +445,42 @@
   color: #000;
 }
 
+.btn-icon {
+  width: 30rpx;
+  height: 30rpx;
+  flex-shrink: 0;
+}
+
+/* 按钮里的文字标签
+   ⚠️ 组件 wxss 不支持标签名/属性选择器(.btn-poster text 会被直接丢弃),
+      所以必须给 <text> 加 .btn-label 类才能单独设置它。
+   图文垂直居中: 图标是 30rpx 的方盒(PNG 墨迹在画布里居中),
+   这里把文字行盒高也设成 30rpx, flex 的 align-items:center
+   才能让图标盒与文字盒的中心严格落在同一条按钮中线上。
+   (微信 <text> 的墨迹位置由基线决定, 改 line-height 不会移动它,
+    实测文字墨迹中心与图标墨迹中心相差 0.8rpx ≈ 0.4px, 已属居中。) */
+.btn-label {
+  line-height: 30rpx;
+}
+
+.btn-poster {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1rpx solid rgba(255, 255, 255, 0.14);
+}
+
+.theme-day .btn-poster {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111111;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ⚠️ 组件 wxss 不支持属性选择器(.btn-poster[disabled] 会被直接丢弃),
+    所以 disabled 态的样式改用 JS 动态挂的 .btn-poster-busy 类。 */
+.btn-poster-busy {
+  opacity: 0.6;
+}
+
 .btn-share {
   background: linear-gradient(135deg, var(--primary), #8bc34a);
   color: #000;
@@ -419,6 +493,7 @@
 
 .btn-primary::after,
 .btn-secondary::after,
+.btn-poster::after,
 .btn-share::after {
   border: none;
 }
@@ -520,4 +595,13 @@
 .theme-night {
   --primary-text: #ccf200;
   --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}
+
+/* 海报画布(兜底用) —— 移出可视区但**不能 display:none**
+   (iOS 不栅格化不可见画布, 导出会失败) */
+.poster-canvas {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  pointer-events: none;
 }

@@ -1,7 +1,14 @@
 // components/workout-summary-modal/index.js
 const app = getApp();
+const api = require('../../utils/api.js');
 const { setVolume } = require('../../utils/unit.js');
 const { calcSetsCalories } = require('../../utils/calories.js');
+// 计量方式口径(次数/计时/距离)统一走 exerciseMeta —— 跟动作库、分享页保持一致
+const { modeLabel } = require('../../utils/exerciseMeta.js');
+// 海报绘制(canvas 2d 手绘) —— 为什么不用"截图": 小程序截不了 WXML
+const poster = require('../../utils/poster.js');
+// 相册是隐私接口 —— 后台没声明隐私类型会直接 errno 112, 调用前先过授权
+const privacy = require('../../utils/privacy.js');
 
 Component({
   properties: {
@@ -28,10 +35,18 @@ Component({
   },
 
   data: {
-    imgPrefix: '',
+    // ⚠️ 初始就给上 —— 弹框是 wx:if 渲染的, 第一次打开时 observer 里的
+    //    setData 可能晚一帧, imgPrefix 为空会让图标/缩略图 src 变成相对路径
+    //    (小程序里会渲染成裂图)。
+    imgPrefix: app.globalData.imagePrefix || '',
     exerciseList: [],
     _locale: 'en',
     _dateStr: '',
+    // 海报画布尺寸(兜底路径用; 主路径走 wx.createOffscreenCanvas)
+    posterW: 375,
+    posterH: 667,
+    // 海报生成中 —— 防连点
+    _posterBusy: false,
     t: app.globalData.t,  // 注入 i18n 字典
     // 分享 token —— 必须在**点分享之前**就准备好(见 onShareAppMessage 的注释)
     _shareToken: '',
@@ -165,7 +180,6 @@ Component({
       if (!sessionId) return;
       this.setData({ _shareToken: '', _shareFailed: false });
       try {
-        const api = require('../../utils/api.js');
         const res = await api.callCloud('share.create', { session_id: sessionId });
         const token = res && res.result && res.result.share && res.result.share.token;
         if (token) {
@@ -177,6 +191,282 @@ Component({
         console.warn('[summary] 分享链接预取失败:', err);
         this.setData({ _shareFailed: true });
       }
+    },
+
+    /**
+     * 右上角关闭按钮 —— 跟原来左下角"已完成"是同一个行为
+     */
+    onCloseTap() {
+      this.closeModal();
+    },
+
+    // ── 生成分享海报(跟 pages/share 的"保存海报"同一套实现) ──
+    /**
+     * 生成海报并保存到相册
+     *
+     * 为什么前端画而不是后端出整张图:
+     *   小程序**截不了 WXML**(canvas.drawImage 画不了 DOM 节点),
+     *   后端渲染要装 headless Chromium, 跟现有部署链路冲突。
+     *   所以排版在前端 canvas 画 —— 数据现成(就是弹框里这份 session), 零新增接口。
+     */
+    async onSavePoster() {
+      if (this._posterBusy) return;
+      if (!this.data.exerciseList || !this.data.exerciseList.length) {
+        wx.showToast({ title: this._t('POSTER_NO_DATA'), icon: 'none' });
+        return;
+      }
+      this._posterBusy = true;
+      this.setData({ _posterBusy: true });
+      // 隐私授权要先拿到 —— 否则海报画十几秒, 最后一步才被拦, 白等
+      try {
+        await privacy.ensurePrivacyAuthorized();
+      } catch (e) {
+        this._posterBusy = false;
+        this.setData({ _posterBusy: false });
+        wx.showModal({
+          title: this._t('PRIVACY_TITLE'),
+          content: this._t('PRIVACY_DENIED'),
+          showCancel: false,
+        });
+        return;
+      }
+      wx.showLoading({ title: this._t('POSTER_GENERATING'), mask: true });
+      try {
+        const filePath = await this._buildPoster();
+        await this._saveToAlbum(filePath);
+        wx.hideLoading();
+        wx.showToast({ title: this._t('POSTER_SAVED'), icon: 'success' });
+      } catch (err) {
+        console.error('[summary] save poster failed:', err);
+        wx.hideLoading();
+        const reason = String((err && (err.errMsg || err.message)) || err || '');
+        // 相册权限被拒时 _saveToAlbum 已经弹过"去设置"了, 别再叠一个弹框
+        if (reason !== 'album auth denied' && reason !== 'privacy scope not declared') {
+          // 把**真实原因**显示出来 —— 只弹个"生成失败"的 toast 根本没法排查
+          wx.showModal({
+            title: this._t('POSTER_FAILED'),
+            content: reason || this._t('POSTER_FAILED'),
+            showCancel: false,
+          });
+        }
+      } finally {
+        this._posterBusy = false;
+        this.setData({ _posterBusy: false });
+      }
+    },
+
+    /** i18n 取值 */
+    _t(key, fallback) {
+      const dict = this.data.t || {};
+      return dict[key] || fallback || key;
+    },
+
+    /**
+     * 画海报 → 临时文件路径
+     *
+     * 两条路, 主备关系:
+     *   1) wx.createOffscreenCanvas —— 离屏画布**没有 CSS 尺寸**,
+     *      导出区域跟像素尺寸完全一致, 不存在"逻辑像素 / 物理像素"的歧义。
+     *   2) DOM 里的 canvas —— 兜底(老基础库没有 createOffscreenCanvas),
+     *      这条路 CSS 尺寸必须跟像素尺寸设成一样大, 否则老基础库按 CSS 尺寸
+     *      算导出区域, 出来的图会被压扁 / 少一截。
+     */
+    async _buildPoster() {
+      const model = this._posterModel();
+      const plan = poster.planPoster(model);
+      try {
+        const canvas = this._offscreenCanvas(plan);
+        const assets = await this._posterAssets(canvas);
+        return await poster.renderPoster({ canvas, plan, assets });
+      } catch (e1) {
+        console.warn('[summary] offscreen canvas failed, fallback to dom canvas:', e1);
+        const canvas = await this._domPosterCanvas(plan);
+        const assets = await this._posterAssets(canvas);
+        return await poster.renderPoster({ canvas, plan, assets });
+      }
+    },
+
+    /** 离屏画布(基础库 2.16.1+) —— 没有 CSS 尺寸, 导出最稳 */
+    _offscreenCanvas(plan) {
+      if (typeof wx.createOffscreenCanvas !== 'function') {
+        throw new Error('createOffscreenCanvas unsupported');
+      }
+      const canvas = wx.createOffscreenCanvas({ type: '2d', width: plan.pxW, height: plan.pxH });
+      if (!canvas || typeof canvas.getContext !== 'function') {
+        throw new Error('createOffscreenCanvas unavailable');
+      }
+      return canvas;
+    },
+
+    /** 兜底: DOM 里的 canvas 节点(CSS 尺寸跟像素尺寸保持一致) */
+    async _domPosterCanvas(plan) {
+      await new Promise((resolve) => {
+        this.setData({ posterW: plan.pxW, posterH: plan.pxH }, resolve);
+      });
+      await new Promise((resolve) => wx.nextTick(resolve));
+      return new Promise((resolve, reject) => {
+        wx.createSelectorQuery().in(this).select('#posterCanvas').node((res) => {
+          if (res && res.node) resolve(res.node);
+          else reject(new Error('poster canvas not ready'));
+        }).exec();
+      });
+    },
+
+    /**
+     * 海报要画的内容 —— 直接用弹框里这份 session, 不额外请求接口
+     */
+    _posterModel() {
+      const d = this.data;
+      const t = d.t || {};
+      const isZh = (d._locale || 'zh') === 'zh';
+      const sharer = typeof app.getSharerInfo === 'function' ? app.getSharerInfo() : {};
+      const groups = (d.exerciseList || []).map((g) => ({
+        key: String(g.id),
+        name: isZh ? (g.name_zh || g.name) : (g.name || g.name_zh),
+        sub: (g.sets.length || 0) + ' ' + (g.sets.length === 1 ? (t.SET || '组') : (t.SETS || '组'))
+          + ' · ' + modeLabel(g.countMode || g.exercise_type, t),
+        calories: (g.totalCalories || 0) + ' ' + (t.CAL_UNIT_SHORT || '大卡'),
+        sets: (g.sets || []).map((s, i) => ({ num: i + 1, text: poster.setText(this._setToPoster(s), t) })),
+      }));
+      return {
+        ownerName: sharer.nickname || (isZh ? 'GFIT 用户' : 'GFIT User'),
+        ownerLabel: t.WORKOUT_SUMMARY_LABEL || (isZh ? '本次训练' : "TODAY'S WORKOUT"),
+        dateText: d._dateStr || '',
+        durationText: d._stats.durationStr || '--:--',
+        exerciseCount: d._stats.exerciseCount || 0,
+        calories: d._stats.totalCalories || 0,
+        groups,
+        moreTemplate: isZh ? '等 {n} 个动作' : '+{n} more exercises',
+        footerHint: isZh ? '扫码查看完整训练' : 'Scan to view the full workout',
+        t,
+      };
+    },
+
+    /**
+     * set 的字段名有两套, 这里统一转成 poster.setText 要的驼峰
+     *
+     * ⚠️ 页面/会话详情用下划线(duration_sec / distance_km / weight_unit),
+     *    poster.setText 用驼峰(durationSec / distanceKm / weightUnit) —— 混用会画成 0。
+     */
+    _setToPoster(s) {
+      const src = s || {};
+      return {
+        weight: src.weight,
+        weightUnit: src.weight_unit || src.weightUnit || 'kg',
+        reps: src.reps,
+        durationSec: src.duration_sec != null ? src.duration_sec : (src.durationSec || 0),
+        distanceKm: src.distance_km != null ? src.distance_km : (src.distanceKm || 0),
+      };
+    },
+
+    /**
+     * 准备海报要用的图
+     *
+     * ⚠️ 网络图必须先换成本地路径才能画到 canvas —— 直接 drawImage 网络图
+     *    会污染画布, 导致 canvasToTempFilePath 导出失败。
+     */
+    async _posterAssets(canvas) {
+      const d = this.data;
+
+      // 小程序码 —— 拉不到就退化成"海报不带码", 不阻断整个保存
+      let qrFile = '';
+      try {
+        const token = await this._ensureShareToken();
+        if (token) {
+          const res = await api.callCloud('share.qrcode', {
+            token,
+            env_version: this._miniProgramEnv(),
+          });
+          const base64 = res && res.result && res.result.qrcode;
+          if (base64) qrFile = poster.writeBase64File(base64, 'poster-qr.jpg');
+        }
+      } catch (err) {
+        console.warn('[summary] qrcode unavailable:', err);
+      }
+
+      const assets = { avatar: null, qrcode: null, thumbs: {} };
+      const jobs = [];
+
+      // 头像
+      const sharer = typeof app.getSharerInfo === 'function' ? app.getSharerInfo() : {};
+      const avatarSrc = sharer.avatarUrl || '';
+      if (avatarSrc) {
+        jobs.push(poster.loadImage(canvas, avatarSrc).then((img) => { assets.avatar = img; }));
+      }
+
+      // 动作缩略图 —— 并发加载(loadImage 内部先试本地路径, 拿不到再试网络地址)
+      for (const g of d.exerciseList || []) {
+        if (!g.image_name) continue;
+        const src = (d.imgPrefix || '') + '/exer_images/' + g.image_name;
+        jobs.push(poster.loadImage(canvas, src).then((img) => {
+          if (img) assets.thumbs[String(g.id)] = img;
+        }));
+      }
+
+      // 小程序码(本地文件)
+      if (qrFile) {
+        jobs.push(poster.loadImage(canvas, qrFile).then((img) => { assets.qrcode = img; }));
+      }
+
+      await Promise.all(jobs);
+      return assets;
+    },
+
+    /** 弹框打开时预取的 token 可能还没到 / 失败过, 这里兜底再取一次 */
+    async _ensureShareToken() {
+      if (this.data._shareToken) return this.data._shareToken;
+      await this._prepareShareToken(this.data.session);
+      return this.data._shareToken;
+    },
+
+    /**
+     * 当前小程序版本环境(develop / trial / release)
+     *
+     * ⚠️ 小程序码必须指向**当前这个版本**才扫得开 ——
+     *    开发者工具里生成的码如果指到正式版, 正式版可能还没有这个页面。
+     */
+    _miniProgramEnv() {
+      try {
+        const info = wx.getAccountInfoSync();
+        return (info && info.miniProgram && info.miniProgram.envVersion) || 'release';
+      } catch (e) {
+        return 'release';
+      }
+    },
+
+    /** 存相册 —— 用户拒了相册权限就引导去设置里开 */
+    _saveToAlbum(filePath) {
+      return new Promise((resolve, reject) => {
+        wx.saveImageToPhotosAlbum({
+          filePath,
+          success: resolve,
+          fail: (err) => {
+            const msg = String((err && err.errMsg) || '');
+            // 后台《用户隐私保护指引》没声明相册(仅写入) → errno 112
+            // 这不是用户权限问题, 弹"去设置"没用, 得让开发者去后台补声明
+            if (privacy.isPrivacyScopeError(err)) {
+              wx.showModal({
+                title: this._t('POSTER_FAILED'),
+                content: this._t('PRIVACY_NOT_DECLARED'),
+                showCancel: false,
+              });
+              reject(new Error('privacy scope not declared'));
+              return;
+            }
+            if (/auth deny|authorize|deny/i.test(msg)) {
+              wx.showModal({
+                title: this._t('POSTER_SAVE_TIP'),
+                content: this._t('POSTER_SAVE_AUTH'),
+                confirmText: this._t('GO_SETTINGS'),
+                success: (r) => { if (r.confirm) wx.openSetting({}); },
+              });
+              reject(new Error('album auth denied'));
+              return;
+            }
+            reject(new Error(msg || 'save failed'));
+          },
+        });
+      });
     },
 
     onShareAppMessage() {

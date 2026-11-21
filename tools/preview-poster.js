@@ -187,4 +187,9 @@ function render() {
   console.log('written:', path.relative(ROOT, OUT));
 }
 
-render();
+// 直接跑 → 输出海报预览; 被别的脚本 require → 只当工具库用(不写文件)
+if (require.main === module) {
+  render();
+} else {
+  module.exports = { svgCtx, buildModel, measure, parseFont, esc, render, T, IMG_PREFIX };
+}

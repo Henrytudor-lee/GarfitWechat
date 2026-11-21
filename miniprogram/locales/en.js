@@ -171,6 +171,8 @@ module.exports = {
   "SHARE_REVOKED_TOAST": "Share revoked",
   "NO_SHARES_YET": "No shared workouts yet",
   "START_YOUR_WORKOUT": "Start my workout",
+  "GENERATE_POSTER": "POSTER",
+  "WORKOUT_SUMMARY_LABEL": "TODAY'S WORKOUT",
   "SAVE_POSTER": "Save poster",
   "POSTER_GENERATING": "Generating...",
   "POSTER_SAVED": "Saved to album",
