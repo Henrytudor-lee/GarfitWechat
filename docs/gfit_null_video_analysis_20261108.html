@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFit 动作库 · 2018 条字面量 "NULL" 视频分析</title>
+<style>
+:root{
+  --bg:#131313; --surface:#1c1c1c; --card:#1a1a1a; --border:rgba(255,255,255,.09);
+  --primary:#ccf200; --text:#f2f2f2; --text2:#b9b9b9; --muted:#8a8a8a;
+  --red:#ff6b6b; --amber:#ffb454; --green:#5ddc8a; --blue:#6bb8ff; --dim:#5a5a5a;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.hero{padding:60px 0 34px;border-bottom:1px solid var(--border);margin-bottom:38px}
+.kicker{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:15px}
+h1{font-size:36px;line-height:1.2;font-weight:900;letter-spacing:-.02em;margin-bottom:15px}
+h1 .hl{color:var(--amber)}
+.lede{font-size:16px;color:var(--text2);max-width:860px}
+.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.chip b{color:var(--primary);font-weight:700}
+section{margin:48px 0}
+h2{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:22px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+h3{font-size:18px;font-weight:800;margin:28px 0 11px}
+p{color:var(--text2);margin-bottom:13px} p strong{color:var(--text)}
+ul{margin:0 0 14px 20px;color:var(--text2)} li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;color:var(--primary)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px;margin:24px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.stat .v{font-size:32px;font-weight:900;letter-spacing:-.03em;line-height:1;font-family:var(--mono)}
+.stat .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
+.stat .s{font-size:12px;color:var(--text2);margin-top:5px}
+.ok .v{color:var(--primary)} .warn .v{color:var(--amber)} .red .v{color:var(--red)} .blue .v{color:var(--blue)} .dim .v{color:var(--dim)}
+.callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 14px 14px 0;padding:20px 24px;margin:20px 0}
+.callout.red{border-left-color:var(--red)} .callout.amber{border-left-color:var(--amber)} .callout.blue{border-left-color:var(--blue)}
+.callout p:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+th{text-align:left;padding:10px 13px;background:#242424;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;border-bottom:1px solid var(--border)}
+td{padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.07);color:var(--text2)}
+td strong{color:var(--text)}
+.grp{border:1px solid var(--border);border-radius:11px;margin-bottom:9px;overflow:hidden;background:#171717}
+.grp-h{display:flex;align-items:baseline;gap:12px;padding:10px 15px;background:rgba(255,255,255,.03)}
+.grp-h b{font-family:var(--mono);font-size:13px;color:var(--text)}
+.grp-meta{font-size:11.5px;color:var(--muted);margin-left:auto}
+.mem{display:flex;gap:12px;align-items:center;padding:7px 15px;font-size:13px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.04)}
+.mid{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:52px}
+.mzh{min-width:170px;color:var(--text);font-weight:600}
+.men{flex:1;min-width:190px;color:var(--text2);font-size:12px;font-family:var(--mono)}
+.mtags{display:flex;gap:5px;flex-wrap:wrap}
+.t{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--muted)}
+.t.ok{background:rgba(93,220,138,.12);color:var(--green)}
+.t.no{background:rgba(255,180,84,.12);color:var(--amber)}
+.t.use{background:rgba(204,242,0,.13);color:var(--primary)}
+.t.del{background:var(--primary);color:#2a3500;font-weight:700}
+.t.keep{background:rgba(255,107,107,.18);color:var(--red);font-weight:700}
+.t.dim{background:rgba(255,255,255,.05)}
+footer{margin-top:55px;padding-top:22px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+.idlist{font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:2;background:#151515;border:1px solid var(--border);border-radius:9px;padding:13px 16px;margin:14px 0;max-height:250px;overflow-y:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+  <div class="kicker">Null Asset Analysis</div>
+  <h1>2018 条 <span class="hl">video_name = "NULL"</span> 的动作</h1>
+  <p class="lede">
+    这批动作的<strong>视频字段是字面量字符串 "NULL"</strong>（不是 SQL NULL），
+    小程序端 <code>wx:if="{{item.video_name}}"</code> 判为<strong>真</strong>，会显示播放按钮，
+    点开却请求 <code>/exer_videos/NULL</code> → <strong>404</strong>。
+    全部<strong>有图片</strong>，训练记录只有 15 条。
+  </p>
+  <div class="meta">
+    <span class="chip">总数 <b>2018</b></span>
+    <span class="chip">有图 <b>2018</b> / 无图 0</span>
+    <span class="chip">被训练过 <b>15</b> 条（152 条记录）</span>
+    <span class="chip">磁盘有对应视频 <b>0</b> 条</span>
+    <span class="chip">中文名全库唯一 <b>1781</b></span>
+  </div>
+</div>
+
+<section>
+  <h2>结论</h2>
+
+  <div class="callout amber">
+    <p><strong>这批不能靠"关联已有素材"解决。</strong>逐条按素材组号回查生产机磁盘，
+    <strong>同素材组有视频文件的：0 条</strong> —— 视频素材是真的不存在，不是没关联上。
+    和之前那 2674 条的结论一致。</p>
+    <p>所以处理方式只剩两种：<strong>上传新视频</strong>，或<strong>把 "NULL" 清洗成真正的 NULL</strong>（显示占位图而不是裂图）。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat ok"><div class="v">145</div><div class="k">重复条目</div><div class="s">同名且替身视频确属同一动作 → 这条是冗余</div></div>
+    <div class="stat red"><div class="v">54</div><div class="k">不能删</div><div class="s">同名是巧合或错译，替身视频其实是别的动作</div></div>
+    <div class="stat blue"><div class="v">11</div><div class="k">用户真在用</div><div class="s">被训练过且无替身 → 必须补视频</div></div>
+    <div class="stat dim"><div class="v">1808</div><div class="k">普遍缺失</div><div class="s">从未被训练 → 清洗占位即可</div></div>
+  </div>
+
+  <h3>为什么不能按"同名"盲删</h3>
+  <p>
+    同中文名下另一个 id 有视频，<strong>不代表那个视频是这个动作的演示</strong>。
+    我按<strong>素材文件名主干</strong>逐条比对（去掉 <code>(female)/(male)/(version-N)</code> 等变体词后比较），结果：
+  </p>
+  <table>
+    <thead><tr><th>判定</th><th>条数</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>✓ 替身确属同一动作</strong></td><td>145</td>
+        <td>id=55「腕弯举」↔ id=54（视频 <code>...-Wrist-Curl...</code>）</td>
+      </tr>
+      <tr>
+        <td><strong>✗ 同名但替身是别的动作</strong></td><td>54</td>
+        <td>id=1558「杠铃站立前平举过头顶」↔ id=1548（视频居然是 <code>Barbell-Side-Split-Squat</code> 侧分蹲）</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    第二类说明：<strong>库里的中文名本身就有错配</strong>。同中文名下挂着的是<strong>不同动作</strong>，
+    删任何一条都会丢掉一个真实动作。
+  </p>
+</section>
+
+<section>
+  <h2>【A】被训练过 + 同名有视频 → 1 条</h2>
+  <p>这批被用户真实使用，<strong>优先级最高</strong>。但需逐条人工确认后再动。</p>
+  <div class="grp">
+    <div class="mem">
+        <span class="mid">1551</span>
+        <span class="mzh">杠铃滑雪者</span>
+        <span class="men">Barbell Skier</span>
+        <span class="mtags">
+          <span class="t use">训练 3</span>
+          <span class="t del">替身 id=4055 同一动作</span>
+        </span>
+      </div>
+  </div>
+</section>
+
+<section>
+  <h2>【B】被训练过 + 无同名替身 → 11 条</h2>
+  <p><strong>这才是补视频的第一优先级</strong> —— 用户真在用，但既没视频也没替代素材，只能上传新视频。</p>
+  <div class="grp">
+    <div class="mem">
+        <span class="mid">328</span>
+        <span class="mzh">器械内侧胸推</span>
+        <span class="men">Machine Inner Chest Press</span>
+        <span class="mtags">
+          <span class="t use">训练 5</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">337</span>
+        <span class="mzh">上拉</span>
+        <span class="men">Upper Row</span>
+        <span class="mtags">
+          <span class="t use">训练 19</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">385</span>
+        <span class="mzh">杠杆坐姿宽距深蹲</span>
+        <span class="men">Lever Seated Wide Squat</span>
+        <span class="mtags">
+          <span class="t use">训练 4</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">1552</span>
+        <span class="mzh">杠铃快速深蹲</span>
+        <span class="men">Barbell Speed Squat</span>
+        <span class="mtags">
+          <span class="t use">训练 3</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">1560</span>
+        <span class="mzh">杠铃站立式上举肱三头肌伸展</span>
+        <span class="men">Barbell Standing Overhead Triceps Extension</span>
+        <span class="mtags">
+          <span class="t use">训练 2</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">2794</span>
+        <span class="mzh">下压保持等长收缩</span>
+        <span class="men">Dip Hold Isometric</span>
+        <span class="mtags">
+          <span class="t use">训练 61</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">3148</span>
+        <span class="mzh">额外斜板仰卧起坐</span>
+        <span class="men">Extra Decline Sit-up</span>
+        <span class="mtags">
+          <span class="t use">训练 4</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">4360</span>
+        <span class="mzh">阻力带坐姿肩部推举</span>
+        <span class="men">Resistance Band Seated Shoulder Press</span>
+        <span class="mtags">
+          <span class="t use">训练 10</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">5418</span>
+        <span class="mzh">1到2跳跃箱</span>
+        <span class="men">1 to 2 Jump Box </span>
+        <span class="mtags">
+          <span class="t use">训练 2</span>
+          <span class="t">标记 2</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">5443</span>
+        <span class="mzh">哑铃坐姿弯腰后束划船</span>
+        <span class="men">Dumbbell Seated Bent Over Rear Delt Row</span>
+        <span class="mtags">
+          <span class="t use">训练 3</span>
+          <span class="t">标记 1</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div><div class="mem">
+        <span class="mid">27819</span>
+        <span class="mzh">1 2 棒训练（男性）</span>
+        <span class="men">1 2 Stick Drill (male)</span>
+        <span class="mtags">
+          <span class="t use">训练 21</span>
+          <span class="t">标记 2</span>
+          <span class="t no">必须补视频</span>
+        </span>
+      </div>
+  </div>
+</section>
+
+<section>
+  <h2>【C】可删的重复条目 → 144 条</h2>
+  <p>完整 id 清单（未训练 + 同名且替身视频确属同一动作）：</p>
+  <div class="idlist"><span title="替身 id=54">55</span> <span title="替身 id=3997">279</span> <span title="替身 id=224">309</span> <span title="替身 id=270">315</span> <span title="替身 id=208">368</span> <span title="替身 id=124">410</span> <span title="替身 id=375">413</span> <span title="替身 id=52">434</span> <span title="替身 id=2049">440</span> <span title="替身 id=2048">442</span> <span title="替身 id=212">446</span> <span title="替身 id=3633">1454</span> <span title="替身 id=5030">1457</span> <span title="替身 id=4820">1459</span> <span title="替身 id=3767">1468</span> <span title="替身 id=3627">1514</span> <span title="替身 id=5537">1524</span> <span title="替身 id=1576">1577</span> <span title="替身 id=2648">1586</span> <span title="替身 id=4289">1623</span> <span title="替身 id=1638">1637</span> <span title="替身 id=114">1729</span> <span title="替身 id=1733">1732</span> <span title="替身 id=3399">1750</span> <span title="替身 id=1756">1755</span> <span title="替身 id=1794">1793</span> <span title="替身 id=3943">1798</span> <span title="替身 id=1811">1812</span> <span title="替身 id=1864">1863</span> <span title="替身 id=1908">1907</span> <span title="替身 id=1937">1936</span> <span title="替身 id=201">1948</span> <span title="替身 id=5630">1957</span> <span title="替身 id=273">2054</span> <span title="替身 id=2044">2126</span> <span title="替身 id=2133">2132</span> <span title="替身 id=1860">2178</span> <span title="替身 id=2187">2186</span> <span title="替身 id=2242">2241</span> <span title="替身 id=4460">2248</span> <span title="替身 id=262">2264</span> <span title="替身 id=2274">2275</span> <span title="替身 id=4317">2314</span> <span title="替身 id=2850">2358</span> <span title="替身 id=2842">2385</span> <span title="替身 id=4235">2421</span> <span title="替身 id=1796">2480</span> <span title="替身 id=1694">2500</span> <span title="替身 id=2567">2532</span> <span title="替身 id=2519">2558</span> <span title="替身 id=1727">2650</span> <span title="替身 id=4636">2735</span> <span title="替身 id=3914">2740</span> <span title="替身 id=4202">2772</span> <span title="替身 id=3504">3401</span> <span title="替身 id=3794">3422</span> <span title="替身 id=3423">3424</span> <span title="替身 id=3795">3425</span> <span title="替身 id=46844">3441</span> <span title="替身 id=1648">3483</span> <span title="替身 id=270">3485</span> <span title="替身 id=4189">3615</span> <span title="替身 id=3822">3641</span> <span title="替身 id=2837">3681</span> <span title="替身 id=1733">3687</span> <span title="替身 id=1728">3688</span> <span title="替身 id=1592">3704</span> <span title="替身 id=3714">3713</span> <span title="替身 id=1532">3746</span> <span title="替身 id=3470">3753</span> <span title="替身 id=1979">3772</span> <span title="替身 id=1983">3773</span> <span title="替身 id=2140">3777</span> <span title="替身 id=2869">3785</span> <span title="替身 id=3018">3788</span> <span title="替身 id=450">3792</span> <span title="替身 id=3477">3831</span> <span title="替身 id=1860">3862</span> <span title="替身 id=3047">3872</span> <span title="替身 id=2956">3881</span> <span title="替身 id=3894">3895</span> <span title="替身 id=1530">3921</span> <span title="替身 id=1809">3922</span> <span title="替身 id=1815">3924</span> <span title="替身 id=1806">3928</span> <span title="替身 id=2129">3942</span> <span title="替身 id=4568">3977</span> <span title="替身 id=47180">3983</span> <span title="替身 id=3608">4048</span> <span title="替身 id=4054">4053</span> <span title="替身 id=2151">4102</span> <span title="替身 id=3567">4106</span> <span title="替身 id=4126">4127</span> <span title="替身 id=4132">4133</span> <span title="替身 id=2607">4190</span> <span title="替身 id=4191">4192</span> <span title="替身 id=4196">4195</span> <span title="替身 id=4209">4208</span> <span title="替身 id=4214">4215</span> <span title="替身 id=4730">4226</span> <span title="替身 id=4234">4233</span> <span title="替身 id=2116">4240</span> <span title="替身 id=1655">4297</span> <span title="替身 id=1747">4313</span> <span title="替身 id=203">4336</span> <span title="替身 id=4389">4387</span> <span title="替身 id=4393">4392</span> <span title="替身 id=1759">4412</span> <span title="替身 id=1553">4421</span> <span title="替身 id=47134">4430</span> <span title="替身 id=5458">4567</span> <span title="替身 id=1787">4572</span> <span title="替身 id=4584">4579</span> <span title="替身 id=4652">4653</span> <span title="替身 id=1760">4658</span> <span title="替身 id=3635">4660</span> <span title="替身 id=4598">4675</span> <span title="替身 id=4682">4683</span> <span title="替身 id=4686">4687</span> <span title="替身 id=5031">4761</span> <span title="替身 id=5032">4765</span> <span title="替身 id=5040">4786</span> <span title="替身 id=5039">4791</span> <span title="替身 id=5033">4811</span> <span title="替身 id=1960">4880</span> <span title="替身 id=2814">4928</span> <span title="替身 id=4625">4971</span> <span title="替身 id=2803">4989</span> <span title="替身 id=4751">4996</span> <span title="替身 id=4416">5090</span> <span title="替身 id=4330">5172</span> <span title="替身 id=42">5385</span> <span title="替身 id=47126">5465</span> <span title="替身 id=1858">5533</span> <span title="替身 id=5273">5555</span> <span title="替身 id=4629">5580</span> <span title="替身 id=47848">5594</span> <span title="替身 id=2455">5596</span> <span title="替身 id=5632">5598</span> <span title="替身 id=2001">5702</span> <span title="替身 id=2785">5735</span> <span title="替身 id=5769">5778</span> <span title="替身 id=2023">5862</span> <span title="替身 id=5415">5864</span></div>
+  <p style="font-size:12.5px;color:var(--muted);">
+    但注意：这些条目的中文名在别处也有，删掉不影响搜索。不过它们<strong>本身有图片</strong>，
+    属于"素材可用、只是缺视频"的动作 —— 与其删掉，不如<strong>给它们补上视频</strong>（替身的视频就是现成的）。
+  </p>
+</section>
+
+<section>
+  <h2>【D】普遍缺失 → 1808 条</h2>
+  <p>从未被训练、中文名全库唯一、也没有替代素材。留着占位（清洗成 NULL）或补素材二选一，<strong>删掉会丢搜索入口</strong>。</p>
+</section>
+
+<section>
+  <h2>推荐处理顺序</h2>
+  <table>
+    <thead><tr><th>优先级</th><th>动作</th><th>条数</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td>给 B 类补视频</td><td>11</td><td>用户真在用，缺视频影响体验</td></tr>
+      <tr><td><strong>2</strong></td><td>把 "NULL" 清洗成 SQL NULL</td><td>2018</td><td>一次性消灭所有裂图，改动小、零丢失</td></tr>
+      <tr><td><strong>3</strong></td><td>给 C 类关联替身视频</td><td>144</td><td>视频是现成的，只需改字段</td></tr>
+      <tr><td><strong>4</strong></td><td>修中文名错配</td><td>54</td><td>同名挂着不同动作，属数据质量问题</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <p><strong>数据来源</strong>：2026-11-08 直连生产库 <code>47.108.200.98/gfit</code> 只读查询 + 生产机 <code>/media/gift/exer_videos</code>、<code>/media/gift/exer_images</code> 只读列目录。</p>
+  <p><strong>判定口径</strong>：「被训练」= <code>exercises</code> 表有引用 <strong>或</strong> <code>user_exercise_stats</code> 表有标记；「替身同一动作」= 视频文件名主干（去变体词后）与动作名或图片名主干互相包含。</p>
+  <p><strong>本次分析全程只读</strong> —— 未改动任何数据。</p>
+</footer>
+</div>
+</body>
+</html>

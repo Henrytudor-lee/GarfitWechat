@@ -1,0 +1,1454 @@
+{
+  "generatedAt": "2026-11-21T01:34:32.152Z",
+  "clean": [
+    {
+      "id": 4541,
+      "name": "Barbell Weighted Bench Press",
+      "nameZh": "杠铃负重卧推",
+      "keeperId": 2,
+      "keeperName": "Bench Press"
+    },
+    {
+      "id": 4539,
+      "name": "Barbell Weighted Deadlift",
+      "nameZh": "杠铃负重硬拉",
+      "keeperId": 7,
+      "keeperName": "Deadlift"
+    },
+    {
+      "id": 4540,
+      "name": "Barbell Weighted Front Chest Squat",
+      "nameZh": "杠铃负重胸前深蹲",
+      "keeperId": 14,
+      "keeperName": "Front Chest Squat"
+    },
+    {
+      "id": 4542,
+      "name": "Barbell Front Squat ",
+      "nameZh": "杠铃前深蹲",
+      "keeperId": 3740,
+      "keeperName": "Barbell Front Squat "
+    },
+    {
+      "id": 4572,
+      "name": "Dumbbell Lunge ",
+      "nameZh": "哑铃弓步",
+      "keeperId": 3458,
+      "keeperName": "Dumbbell Lunge "
+    },
+    {
+      "id": 5559,
+      "name": "Bodyweight Shrug",
+      "nameZh": "徒手耸肩",
+      "keeperId": 5385,
+      "keeperName": "Shrug "
+    },
+    {
+      "id": 1561,
+      "name": "Barbell Standing Reverse Grip Curl",
+      "nameZh": "杠铃站立反握弯举",
+      "keeperId": 46,
+      "keeperName": "Standing Reverse Grip Curl"
+    },
+    {
+      "id": 3146,
+      "name": "Lever Cable Shoulder Press",
+      "nameZh": "杠杆缆绳肩部推举",
+      "keeperId": 273,
+      "keeperName": "Lever Shoulder Press"
+    },
+    {
+      "id": 1691,
+      "name": "Cable Supine Reverse Fly",
+      "nameZh": "绳索仰卧反飞鸟",
+      "keeperId": 106,
+      "keeperName": "Supine Reverse Fly"
+    },
+    {
+      "id": 2040,
+      "name": "Lever One Arm Bent over Row ",
+      "nameZh": "单臂弯腰划船",
+      "keeperId": 1515,
+      "keeperName": "Barbell One Arm Bent over Row"
+    },
+    {
+      "id": 4280,
+      "name": "Cable Concentration Curl ",
+      "nameZh": "绳索集中弯举",
+      "keeperId": 410,
+      "keeperName": "Concentration Curl"
+    },
+    {
+      "id": 4284,
+      "name": "Cable Decline Press ",
+      "nameZh": "绳索下斜推举",
+      "keeperId": 323,
+      "keeperName": "Decline Press"
+    },
+    {
+      "id": 5265,
+      "name": "Dumbbell Seated Lateral Raise on Stability Ball",
+      "nameZh": "稳定球上坐姿侧平举",
+      "keeperId": 171,
+      "keeperName": "Seated Lateral Raise"
+    },
+    {
+      "id": 1863,
+      "name": "Dumbbell Squat ",
+      "nameZh": "哑铃深蹲",
+      "keeperId": 384,
+      "keeperName": "Squat"
+    },
+    {
+      "id": 4279,
+      "name": "Cable Close Grip Curl ",
+      "nameZh": "绳索窄距弯举",
+      "keeperId": 409,
+      "keeperName": "Close Grip Curl"
+    },
+    {
+      "id": 440,
+      "name": "Lever Seated Hip Adduction",
+      "nameZh": "坐姿髋内收",
+      "keeperId": 3790,
+      "keeperName": "Lever Seated Hip Adduction "
+    },
+    {
+      "id": 2700,
+      "name": "Push Up on Bosu Ball",
+      "nameZh": "在Bosu球上俯卧撑",
+      "keeperId": 2104,
+      "keeperName": "Push-up "
+    },
+    {
+      "id": 5093,
+      "name": "Barbell Hip Thrust with Resistance Band",
+      "nameZh": "弹力带臀部推举",
+      "keeperId": 292,
+      "keeperName": "Hip Thrust"
+    },
+    {
+      "id": 5640,
+      "name": "Barbell Resistance Band Hip Thrust",
+      "nameZh": "杠铃弹力带臀推",
+      "keeperId": 292,
+      "keeperName": "Hip Thrust"
+    },
+    {
+      "id": 3782,
+      "name": "Cable Wide Grip Rear Pulldown Behind Neck ",
+      "nameZh": "高位绳索宽握后颈下拉",
+      "keeperId": 338,
+      "keeperName": "Wide Grip Rear Pulldown Behind Neck"
+    },
+    {
+      "id": 3856,
+      "name": "Dumbbell Lying Rear Delt Row ",
+      "nameZh": "反握垂直划船",
+      "keeperId": 341,
+      "keeperName": "Lying Rear Delt Row"
+    },
+    {
+      "id": 3923,
+      "name": "Dumbbell One Arm Seated Neutral Wrist Curl ",
+      "nameZh": "哑铃坐姿中性腕弯举",
+      "keeperId": 359,
+      "keeperName": "One Arm Seated Neutral Wrist Curl"
+    },
+    {
+      "id": 4270,
+      "name": "Barbell Standing Wide Military Press ",
+      "nameZh": "杠铃站姿宽距军用推",
+      "keeperId": 374,
+      "keeperName": "Standing Wide Military Press"
+    },
+    {
+      "id": 4318,
+      "name": "Dumbbell Lying Single Extension ",
+      "nameZh": "哑铃仰卧单臂伸展",
+      "keeperId": 428,
+      "keeperName": "Lying Single Extension"
+    },
+    {
+      "id": 2644,
+      "name": "Plate Hyperextension",
+      "nameZh": "板式超伸展",
+      "keeperId": 27380,
+      "keeperName": "Weighted Hyperextension"
+    },
+    {
+      "id": 4563,
+      "name": "Weighted Stability Ball Crunch ",
+      "nameZh": "稳定球负重卷腹",
+      "keeperId": 3778,
+      "keeperName": "Weighted Crunch "
+    },
+    {
+      "id": 5461,
+      "name": "Medicine Ball Crunch",
+      "nameZh": "药球卷腹",
+      "keeperId": 4652,
+      "keeperName": "Crunch with Medicine Ball"
+    },
+    {
+      "id": 5264,
+      "name": "Dumbbell One Arm Triceps Extension on Stability Ball",
+      "nameZh": "稳定球上单臂肱三头肌伸展",
+      "keeperId": 1813,
+      "keeperName": "Dumbbell One Arm Triceps Extension "
+    },
+    {
+      "id": 2178,
+      "name": "Single Leg Calf Raise ",
+      "nameZh": "单腿提踵",
+      "keeperId": 1860,
+      "keeperName": "Dumbbell Single Leg Calf Raise"
+    },
+    {
+      "id": 2764,
+      "name": "Muscle-up ",
+      "nameZh": "引体向上",
+      "keeperId": 46848,
+      "keeperName": "Bodyweight Muscle-up"
+    },
+    {
+      "id": 4867,
+      "name": "Wheel Run",
+      "nameZh": "轮式跑步",
+      "keeperId": 2135,
+      "keeperName": "Run "
+    },
+    {
+      "id": 4048,
+      "name": "Barbell Split Squat ",
+      "nameZh": "杠铃分腿蹲",
+      "keeperId": 4047,
+      "keeperName": "Barbell Split Squat "
+    },
+    {
+      "id": 3130,
+      "name": "Assisted Rotating Neck Stretch",
+      "nameZh": "辅助旋转颈部拉伸",
+      "keeperId": 3118,
+      "keeperName": "Rotating Neck Stretch"
+    },
+    {
+      "id": 3390,
+      "name": "Standing Side Stretch With Stick",
+      "nameZh": "持棍站立侧拉",
+      "keeperId": 3389,
+      "keeperName": "Standing Side Stretch"
+    },
+    {
+      "id": 4940,
+      "name": "Dumbbell Split Squat Front Foot Elevanted with Bosu Ball ",
+      "nameZh": "哑铃前脚抬高bosu球分腿蹲",
+      "keeperId": 4196,
+      "keeperName": "Dumbbell Split Squat Front Foot Elevanted "
+    },
+    {
+      "id": 5863,
+      "name": "Assisted Commando Pull-up",
+      "nameZh": "辅助特种部队引体向上",
+      "keeperId": 5872,
+      "keeperName": "Commando Pull-up"
+    }
+  ],
+  "blocked": [
+    {
+      "id": 5078,
+      "name": "Resistance Band Bent Over Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2348,
+      "name": "Band hammer curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5843,
+      "name": "Resistance Band Hammer Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5731,
+      "name": "Smith Drag Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5091,
+      "name": "Barbell Front Chest Squat with Resistance Band",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2506,
+      "name": "Suspension Front Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3753,
+      "name": "Cable Front Raise ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27764,
+      "name": "Kettlebell Front Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 284,
+      "name": "Lever Full Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3416,
+      "name": "Resistance Band Full Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27677,
+      "name": "Bodyweight Good Morning",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5729,
+      "name": "Band Incline Bench Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3662,
+      "name": "Resistance Band Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4581,
+      "name": "Cable Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2333,
+      "name": "Dumbbell one leg squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2520,
+      "name": "Suspension Rear Delt Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5391,
+      "name": "Resistance Band Rear Delt Row ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2560,
+      "name": "Suspension Rear Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2368,
+      "name": "Band reverse curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5365,
+      "name": "Weighted Seated Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4988,
+      "name": "Lever Seated Good Morning",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2461,
+      "name": "Band straight leg deadlift",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5256,
+      "name": "Kettlebell Sumo Deadlift",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 350,
+      "name": "Smith Reverse Grip Bent Over Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27767,
+      "name": "Kettlebell Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 266,
+      "name": "Bench Dip",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2281,
+      "name": "Weighted Bench Dip",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2359,
+      "name": "Band low fly",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27765,
+      "name": "Kettlebell Overhead Triceps Extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3147,
+      "name": "Lever Cable Rear Pulldown",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5646,
+      "name": "Band Seated Wide Grip Row ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2149,
+      "name": "Shoulder Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2448,
+      "name": "Band shoulder press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2379,
+      "name": "Band straight-arm pulldown",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2464,
+      "name": "Band underhand pulldown",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2426,
+      "name": "Band close-grip push-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1729,
+      "name": "Decline Push-up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1456,
+      "name": "Alternate Biceps Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3645,
+      "name": "Barbell Biceps Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27762,
+      "name": "Kettlebell Biceps Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4313,
+      "name": "Dumbbell Close grip Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27761,
+      "name": "Kettlebell Concentration Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2354,
+      "name": "Band kickback",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3878,
+      "name": "Cable kickback ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5373,
+      "name": "Cable One Arm Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2293,
+      "name": "Weighted Pullover ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4552,
+      "name": "Resistance Band Rear Fly",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5364,
+      "name": "Weighted Seated Neutral Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 173,
+      "name": "Seated Palms Up Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1852,
+      "name": "Dumbbell Seated Palms Up Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4360,
+      "name": "Resistance Band Seated Shoulder Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4371,
+      "name": "Resistance Band Seated Shoulder Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2303,
+      "name": "Weighted Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5076,
+      "name": "Resistance Band Smith Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5077,
+      "name": "Resistance Band Cable Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5596,
+      "name": "Resistance Band Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4306,
+      "name": "Cable Standing Biceps Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27759,
+      "name": "Kettlebell Standing Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27768,
+      "name": "Kettlebell Standing One Arm Extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2848,
+      "name": "Band EZ Barbell Close-grip Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 402,
+      "name": "Lever Reverse Grip Preacher Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5302,
+      "name": "Weighted Seated Triceps Extension ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2511,
+      "name": "Suspension Inverted Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5577,
+      "name": "Resistance Band Inverted Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27274,
+      "name": "Resistance Band Seated Leg Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2535,
+      "name": "Suspension Triceps Extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2559,
+      "name": "Suspension Push-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3876,
+      "name": "Barbell Hack Squat ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 283,
+      "name": "Lever Chair Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3987,
+      "name": "Lever Assisted Leg Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1513,
+      "name": "Barbell Narrow Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2534,
+      "name": "Suspension Triceps Dip",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2386,
+      "name": "Band Upright Shoulder External Rotation",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 285,
+      "name": "Lever Pistol Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3410,
+      "name": "Lever Hip Thrust With Resistance Band",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 308,
+      "name": "Lever Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3663,
+      "name": "Resistance Band Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1851,
+      "name": "Dumbbell Seated One Leg Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2759,
+      "name": "Smith Seated One Leg Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2732,
+      "name": "Smith One Arm Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2284,
+      "name": "Weighted Donkey Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5545,
+      "name": "Lever Standing Leg Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1578,
+      "name": "Barbell Zercher Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2839,
+      "name": "Barbell Reverse Band Bench Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4681,
+      "name": "Dumbbell Reverse Bench Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 413,
+      "name": "Seated Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4300,
+      "name": "Cable Seated Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3882,
+      "name": "Dumbbell Biceps Curl Reverse ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3757,
+      "name": "Barbell Incline Close Grip Bench Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2353,
+      "name": "Band hyperextension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3992,
+      "name": "Weighted Hip Thrusts ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2568,
+      "name": "Suspension Sit-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27760,
+      "name": "Kettlebell Clean and Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5098,
+      "name": "Resistance Band Jump Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27766,
+      "name": "Kettlebell Lying Triceps Extension Skull Crusher",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1518,
+      "name": "Barbell One Arm Snatch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5395,
+      "name": "Resistance Band Overhead Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2522,
+      "name": "Suspension Rollout",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3937,
+      "name": "Barbell Rollout ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27967,
+      "name": "Dumbbell Rollout",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2300,
+      "name": "Weighted Seated Twist ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3637,
+      "name": "Cable Seated Twist",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1551,
+      "name": "Barbell Skier",
+      "why": "有训练记录 / 有收藏/练过标记"
+    },
+    {
+      "id": 5008,
+      "name": "Band Skier",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5024,
+      "name": "Resistance Band Skier",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2222,
+      "name": "Smith Standing Back Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 28016,
+      "name": "EZ Barbell Standing Back Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 28017,
+      "name": "Dumbbell Standing Back Wrist Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1586,
+      "name": "Bird Dog",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4096,
+      "name": "Roll Up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27494,
+      "name": "Resistance Band Kneeling Ab Crunch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4102,
+      "name": "Side Bend",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2059,
+      "name": "Lever Twist",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2536,
+      "name": "Suspension Twist",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5257,
+      "name": "Kettlebell Dead Bug",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5334,
+      "name": "Dead Bug with Medicine Ball ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1732,
+      "name": "Decline Sit-up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3145,
+      "name": "Lever Decline Sit-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3687,
+      "name": "Decline Sit up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27728,
+      "name": "Cable Incline Biceps Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1803,
+      "name": "Dumbbell Neutral Grip Bench Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2450,
+      "name": "Band single leg calf raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2532,
+      "name": "Suspension Single Leg Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4996,
+      "name": "Dumbbell Single Leg Squat ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2460,
+      "name": "Band stiff leg deadlift",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1909,
+      "name": "Floor Fly ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27763,
+      "name": "Kettlebell Floor Fly",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3007,
+      "name": "Stability Ball Front Plank",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2546,
+      "name": "Suspension Handstand Push-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1941,
+      "name": "Incline Close-Grip Push-Up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1954,
+      "name": "Jack knife on Ball",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4880,
+      "name": "Jump Box ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3772,
+      "name": "Kettlebell Double Push Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5641,
+      "name": "Dumbbell Hang Clean",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 1996,
+      "name": "Kettlebell Plyo Push-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27769,
+      "name": "Bodyweight Swing",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5702,
+      "name": "Kettlebell Thruster ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2342,
+      "name": "Band back extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3426,
+      "name": "Resistance Band Reverse Hyperextension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3983,
+      "name": "Smith Reverse Hyperextension ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4415,
+      "name": "Stability Ball Reverse Hyperextension ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27742,
+      "name": "Band Assisted Muscle-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2529,
+      "name": "Suspension Side Bridge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2471,
+      "name": "Band Side Crunch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5368,
+      "name": "Weighted Side Crunch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3427,
+      "name": "Resistance Band Side Plank",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5331,
+      "name": "Single Arm Push-Up on Medicine Ball ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2184,
+      "name": "Single Leg Step-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4941,
+      "name": "Single Leg Step Up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5344,
+      "name": "Kettlebell Single Leg Step Up ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4946,
+      "name": "Split Squat with Roll",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5845,
+      "name": "Resistance Band Split Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5073,
+      "name": "Resistance Band Standing Hip Abduction",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2244,
+      "name": "Standing Lateral Raise ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2575,
+      "name": "Suspension Standing Ab Rollout",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5299,
+      "name": "Kettlebell Sumo Squat ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2465,
+      "name": "Band v-up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2361,
+      "name": "Band lying leg and hip raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27495,
+      "name": "Resistance Band Standing Ab Crunch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2352,
+      "name": "Band hip extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2363,
+      "name": "Band lying leg raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4987,
+      "name": "Lever Standing Chest Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3788,
+      "name": "Cable Squat Row ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2463,
+      "name": "Band twisting overhead press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3780,
+      "name": "Cable twisting overhead press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2481,
+      "name": "One leg kickback ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2493,
+      "name": "Weighted one leg hip thrust",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2554,
+      "name": "Suspension One Arm Biceps Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2576,
+      "name": "Suspension Star Plank",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2994,
+      "name": "Medicine Ball Single Leg Deadlift",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5384,
+      "name": "Weighted Standing Shoulder Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2659,
+      "name": "Cable Decline One Arm Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2684,
+      "name": "Dumbbell One Arm Fly on Exercise Ball",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4810,
+      "name": "Kettlebell Deep Push-Up",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2939,
+      "name": "Dumbbell Incline One Arm Hammer Press on Exercise Ball",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2685,
+      "name": "Dumbbell One Arm Incline Chest Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2799,
+      "name": "Lever Calf Stretch ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3848,
+      "name": "Lever Seated Squat Calf Raise on Leg Press ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2767,
+      "name": "Back Stretch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3448,
+      "name": "Roll Back Stretch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5255,
+      "name": "Kettlebell Lateral Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2945,
+      "name": "Cable One Arm Reverse Preacher Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2821,
+      "name": "Jack Plank",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3785,
+      "name": "Barbell Power Jerk ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5717,
+      "name": "Kettlebell Snatch ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2893,
+      "name": "Dumbbell Stiff Leg Deadlift on Bench",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2895,
+      "name": "Dumbbell Wall Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3224,
+      "name": "Assisted One Leg Extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3786,
+      "name": "Standing Long Jump ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5536,
+      "name": "Barbell Spider Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 2949,
+      "name": "Cable Rope One Arm Hammer Preacher Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3881,
+      "name": "Dumbbell Alternate Seated Hammer Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3787,
+      "name": "Dumbbell Lunge with Bicep Curl ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3070,
+      "name": "Standing Chest Stretch ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5713,
+      "name": "Kettlebell Farmers Walk ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3401,
+      "name": "Stationary Bike Run ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3414,
+      "name": "Resistance Band External Rotation",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3425,
+      "name": "Resistance Band Plank March",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5636,
+      "name": "Kettlebell Assisted Bulgarian Split Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5087,
+      "name": "Duck Walk ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4792,
+      "name": "Barbell Glute Bridge Two Legs on Bench ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3747,
+      "name": "Barbell Reverse Grip Incline Row ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4873,
+      "name": "Weighted Cossack Squats ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 3989,
+      "name": "Kettlebell Dumbbell Sumo Squat off Stepbox ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4155,
+      "name": "Dumbbell Farmers Carry",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4176,
+      "name": "Band Upper Body Resistance Dead Bug",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4419,
+      "name": "Weighted Frog Pump",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4513,
+      "name": "Weighted Floor Crunch Feet on Bench ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4586,
+      "name": "Cable Forward Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4611,
+      "name": "Inverted Row under Table ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27709,
+      "name": "Cable Seated Leg Extension",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4971,
+      "name": "Sliding Leg Curl on Floor with Towel",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5580,
+      "name": "Barbell Front Rack Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4761,
+      "name": "Alternate Punching",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4786,
+      "name": "High Knee Run",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27722,
+      "name": "Dumbbell Lying Row on Rack",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 4961,
+      "name": "Kettlebell Gobelt Curtsey Lunge",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5644,
+      "name": "Band Bent Over Wide Grip Row ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5018,
+      "name": "Resistance Band Single Stiff Leg Deadlift with Single Arm Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5854,
+      "name": "Bar Band Bent Over Row",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5324,
+      "name": "Resistance Band Bent Over Rear Delt Fly ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5370,
+      "name": "Squat Hold Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5371,
+      "name": "Dumbbell Rear Lunge Front Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5393,
+      "name": "Dumbbell Banded Bench Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5419,
+      "name": "Kettlebell Split Snatch",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5653,
+      "name": "Side Bridge with Bent Leg ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27673,
+      "name": "Weighted Full Squat with Overhead Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5714,
+      "name": "Kettlebell Unilateral Farmers Walk ",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5725,
+      "name": "Dumbbell One Arm Thruster",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5804,
+      "name": "Dumbbell Seated Tuck Crunch on Floor",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 5839,
+      "name": "Bar Band Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27729,
+      "name": "Barbell Hang Power Clean",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27777,
+      "name": "Bodyweight Wood Chop Squat",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27498,
+      "name": "Resistance Band Kneeling Ab Crunch (VERSION 2)",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27676,
+      "name": "Dumbbell KAS Glute Bridge (female)",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27687,
+      "name": "Dumbbell Prone Rear Delt Swing",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27714,
+      "name": "Barbell Srtict Curl",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27723,
+      "name": "Dumbbell Walking Calf Raise",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    },
+    {
+      "id": 27968,
+      "name": "Dumbbell Incline Twist Press",
+      "why": "同核心名但器械/部位/中文名不兼容"
+    }
+  ]
+}

@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFit 动作库 · 死条目清单（图片与视频皆为 NULL）</title>
+<style>
+:root{
+  --bg:#131313; --card:#1a1a1a; --border:rgba(255,255,255,.09);
+  --primary:#ccf200; --text:#f2f2f2; --text2:#b9b9b9; --muted:#8a8a8a;
+  --red:#ff6b6b; --amber:#ffb454; --green:#5ddc8a; --blue:#6bb8ff;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.hero{padding:60px 0 34px;border-bottom:1px solid var(--border);margin-bottom:38px}
+.kicker{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:15px}
+h1{font-size:36px;line-height:1.2;font-weight:900;letter-spacing:-.02em;margin-bottom:15px}
+h1 .hl{color:var(--red)}
+.lede{font-size:16px;color:var(--text2);max-width:840px}
+.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:999px;background:#1c1c1c;border:1px solid var(--border);color:var(--text2)}
+.chip b{color:var(--primary);font-weight:700}
+section{margin:46px 0}
+h2{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:22px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+h3{font-size:18px;font-weight:800;margin:28px 0 11px}
+p{color:var(--text2);margin-bottom:13px} p strong{color:var(--text)}
+code{font-family:var(--mono);font-size:.87em;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;color:var(--primary)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px;margin:24px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.stat .v{font-size:32px;font-weight:900;letter-spacing:-.03em;line-height:1;font-family:var(--mono)}
+.stat .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
+.stat .s{font-size:12px;color:var(--text2);margin-top:5px}
+.red .v{color:var(--red)} .amber .v{color:var(--amber)} .green .v{color:var(--green)} .blue .v{color:var(--blue)}
+.callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 14px 14px 0;padding:20px 24px;margin:20px 0}
+.callout.red{border-left-color:var(--red)} .callout.amber{border-left-color:var(--amber)}
+.callout p:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+th{text-align:left;padding:10px 13px;background:#242424;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;border-bottom:1px solid var(--border)}
+td{padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.07);color:var(--text2)}
+td strong{color:var(--text)}
+.grp{border:1px solid var(--border);border-radius:11px;margin-bottom:9px;overflow:hidden;background:#171717}
+.grp-h{display:flex;align-items:baseline;gap:12px;padding:10px 15px;background:rgba(255,255,255,.03)}
+.grp-h b{font-family:var(--mono);font-size:13px;color:var(--text)}
+.grp-meta{font-size:11.5px;color:var(--muted);margin-left:auto}
+.mem{display:flex;gap:12px;align-items:center;padding:6px 15px;font-size:13px;flex-wrap:wrap}
+.mid{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:50px}
+.mzh{min-width:160px;color:var(--text);font-weight:600}
+.men{flex:1;min-width:190px;color:var(--text2);font-size:12px;font-family:var(--mono)}
+footer{margin-top:55px;padding-top:22px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+  <div class="kicker">Dead Entry Inventory</div>
+  <h1>动作库死条目清单<br><span class="hl">图片与视频皆为 "NULL"</span></h1>
+  <p class="lede">
+    这批动作在库里<strong>看起来是正常的</strong>（英文名、中文名、器械、部位都填好了），
+    但 <code>image_name</code> 与 <code>video_name</code> 都是<strong>字面量字符串 "NULL"</strong> —— 导入时把空值写成了字符串而不是 SQL NULL。
+    小程序端 <code>wx:if="{{item.image_name}}"</code> 对 "NULL" 判为<strong>真</strong>，于是会去请求
+    <code>/exer_images/NULL</code>，实测返回 <strong>404</strong>。
+  </p>
+  <div class="callout red" style="margin-top:22px;">
+    <p><strong>✅ 已于 2026-11-08 执行删除</strong> —— 这 347 条已从生产库删除完毕。</p>
+    <p>动作库 <strong>7333 → 6986</strong>；训练明细 2076、收藏标记 133 <strong>均未受影响</strong>（这批本来就没人用）；
+    孤儿记录 <strong>0</strong>，零孤儿不变量保持。</p>
+    <p>备份：<code>gfit-backend/.gfit-backup-dead-1794103138294.json</code>（347 行完整数据，可回滚）。</p>
+  </div>
+  <div class="meta">
+    <span class="chip">死条目 <b>347</b> 条 · 已删除</span>
+    <span class="chip">image_name 形态 <b>全部为字面量 "NULL"</b></span>
+    <span class="chip">磁盘上 <b>0 个</b>对应文件</span>
+    <span class="chip">训练引用 <b>0</b></span>
+    <span class="chip">收藏标记 <b>0</b></span>
+  </div>
+</div>
+
+<section>
+  <h2>这是什么</h2>
+  <div class="callout red">
+    <p><strong>不是素材缺失，是导入时的脏数据。</strong>正常的"没有图片"应该写 SQL NULL 或空串，
+    但这批写的是<strong>字符串 'NULL'</strong>。两者的差别是致命的：小程序用 <code>wx:if</code> 判断，
+    对 SQL NULL 判假（正常显示占位图），对字符串 "NULL" 判真（去请求一个不存在的文件）。</p>
+    <p>实测验证：<code>GET /exer_images/NULL</code> → <strong>404</strong>，而 <code>GET /exer_images/00251101-Barbell-Bench-Press_Chest-FIX_small.png</code> → <strong>200</strong>。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat red"><div class="v">347</div><div class="k">死条目总数</div><div class="s">图片视频双缺，用户看到的是裂图</div></div>
+    <div class="stat amber"><div class="v">27</div><div class="k">删了不影响搜索</div><div class="s">同中文名在别处还有</div></div>
+    <div class="stat blue"><div class="v">320</div><div class="k">删了中文名消失</div><div class="s">中文名只此一条，用户搜不到</div></div>
+  </div>
+
+  <h3>两种处理方式</h3>
+  <table>
+    <thead><tr><th>方式</th><th>做法</th><th>效果</th><th>代价</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>A. 清洗</strong><br><span style="font-size:11px;color:var(--muted)">推荐</span></td>
+        <td>把 <code>image_name</code>/<code>video_name</code> 的 "NULL" 改成真正的 SQL NULL</td>
+        <td>小程序正常显示占位图，<strong>动作仍留在库里可被搜索</strong></td>
+        <td>一条 UPDATE，零丢失</td>
+      </tr>
+      <tr>
+        <td><strong>B. 删除 ✅ 已执行</strong></td>
+        <td>删掉这 347 条</td>
+        <td>库更干净</td>
+        <td><strong>320 条的中文名会从小程序消失</strong>，用户搜「背部放松姿势」就搜不到了</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px;">
+    这批动作<strong>本身是有价值的</strong>（名字/器械/部位都齐全），只是缺素材。
+    清洗成 NULL 之后，它们会变成"待补素材"的状态 —— 正好是你接下来想做的事（补演示视频）。
+  </p>
+</section>
+
+<section>
+  <h2>完整清单 · 347 条 · 已删除</h2>
+  <p>按中文名首字分组。完整字段见配套 CSV。</p>
+  
+  <div class="grp">
+    <div class="grp-h"><b>背</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">2475</span>
+      <span class="mzh">背部放松姿势</span>
+      <span class="men">Back relaxed pose</span>
+    </div><div class="mem">
+      <span class="mid">3294</span>
+      <span class="mzh">背阔肌</span>
+      <span class="men">Latissimus Dorsi</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>前</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">2476</span>
+      <span class="mzh">前部放松姿势</span>
+      <span class="men">Front relaxed pose</span>
+    </div><div class="mem">
+      <span class="mid">3323</span>
+      <span class="mzh">前锯肌</span>
+      <span class="men">Serratus Anterior</span>
+    </div><div class="mem">
+      <span class="mid">28164</span>
+      <span class="mzh">前臂支撑瑜伽姿势宾查玛尤拉斯纳（女性）</span>
+      <span class="men">Forearms Stand Yoga Pose Pincha Mayurasana (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>按</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">2646</span>
+      <span class="mzh">按身体部位 肌肉男性身体</span>
+      <span class="men">By BODY PARTS Muscle body male </span>
+    </div><div class="mem">
+      <span class="mid">2647</span>
+      <span class="mzh">按身体部位 肌肉女性身体</span>
+      <span class="men">By BODY PARTS Muscle body female </span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>俯</b><span class="grp-meta">5 条</span></div>
+    <div class="mem">
+      <span class="mid">3055</span>
+      <span class="mzh">俯卧撑姿势</span>
+      <span class="men">Push-up Pose</span>
+    </div><div class="mem">
+      <span class="mid">27159</span>
+      <span class="mzh">俯卧撑和双杠三头肌下压</span>
+      <span class="men">Push-up and Triceps Dip on Parallel Bars</span>
+    </div><div class="mem">
+      <span class="mid">27238</span>
+      <span class="mzh">俯卧撑到侧平板（版本2）</span>
+      <span class="men">Push-up to Side Plank (VERSION 2)</span>
+    </div><div class="mem">
+      <span class="mid">28008</span>
+      <span class="mzh">俯卧Y形抬升</span>
+      <span class="men">Lying Prone Y Raise</span>
+    </div><div class="mem">
+      <span class="mid">28049</span>
+      <span class="mzh">俯卧撑拉（男性）</span>
+      <span class="men">Push-up Pull (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>拇</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">3264</span>
+      <span class="mzh">拇长展肌</span>
+      <span class="men">Abductor pollicis longus</span>
+    </div><div class="mem">
+      <span class="mid">3278</span>
+      <span class="mzh">拇指短伸肌</span>
+      <span class="men">Extensor pollicis brevis</span>
+    </div><div class="mem">
+      <span class="mid">3282</span>
+      <span class="mzh">拇指长屈肌</span>
+      <span class="men">Flexor pollicis longus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>短</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3265</span>
+      <span class="mzh">短收肌</span>
+      <span class="men">Adductor Brevis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>长</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">3266</span>
+      <span class="mzh">长收肌</span>
+      <span class="men">Adductor Longus</span>
+    </div><div class="mem">
+      <span class="mid">27277</span>
+      <span class="mzh">长杠杆下斜仰卧起坐（女性）</span>
+      <span class="men">Long Lever Decline Sit-up (female)</span>
+    </div><div class="mem">
+      <span class="mid">27295</span>
+      <span class="mzh">长杠杆仰卧背伸</span>
+      <span class="men">Long Lever Lying Back Extension</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>大</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">3267</span>
+      <span class="mzh">大收肌</span>
+      <span class="men">Adductor Magnus</span>
+    </div><div class="mem">
+      <span class="mid">3316</span>
+      <span class="mzh">大菱形肌</span>
+      <span class="men">Rhomboid Major</span>
+    </div><div class="mem">
+      <span class="mid">3331</span>
+      <span class="mzh">大圆肌</span>
+      <span class="men">Teres Major</span>
+    </div><div class="mem">
+      <span class="mid">28051</span>
+      <span class="mzh">大转身背部伸展（女性）</span>
+      <span class="men">Big Turn Back Stretch (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>肱</b><span class="grp-meta">9 条</span></div>
+    <div class="mem">
+      <span class="mid">3268</span>
+      <span class="mzh">肱二头肌</span>
+      <span class="men">Biceps Brachii</span>
+    </div><div class="mem">
+      <span class="mid">3271</span>
+      <span class="mzh">肱肌</span>
+      <span class="men">Brachialis</span>
+    </div><div class="mem">
+      <span class="mid">3272</span>
+      <span class="mzh">肱桡肌</span>
+      <span class="men">Brachioradialis</span>
+    </div><div class="mem">
+      <span class="mid">3336</span>
+      <span class="mzh">肱三头肌外侧头</span>
+      <span class="men">Triceps brachii Lateral head</span>
+    </div><div class="mem">
+      <span class="mid">3337</span>
+      <span class="mzh">肱三头肌长头</span>
+      <span class="men">Triceps brachii Long head</span>
+    </div><div class="mem">
+      <span class="mid">3338</span>
+      <span class="mzh">肱三头肌</span>
+      <span class="men">Triceps brachii</span>
+    </div><div class="mem">
+      <span class="mid">3339</span>
+      <span class="mzh">肱三头肌内侧头</span>
+      <span class="men">Triceps brachii Medial head</span>
+    </div><div class="mem">
+      <span class="mid">27187</span>
+      <span class="mzh">肱三头肌推举（高位杠铃位置）</span>
+      <span class="men">Triceps Press (high bar position)</span>
+    </div><div class="mem">
+      <span class="mid">27188</span>
+      <span class="mzh">肱三头肌推举（低位杠铃位置）</span>
+      <span class="men">Triceps Press (low bar position)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>股</b><span class="grp-meta">8 条</span></div>
+    <div class="mem">
+      <span class="mid">3269</span>
+      <span class="mzh">股二头肌长头</span>
+      <span class="men">Biceps femoris Long head</span>
+    </div><div class="mem">
+      <span class="mid">3270</span>
+      <span class="mzh">股二头肌短头</span>
+      <span class="men">Biceps femoris Short head</span>
+    </div><div class="mem">
+      <span class="mid">3312</span>
+      <span class="mzh">股方肌</span>
+      <span class="men">Quadratus femoris</span>
+    </div><div class="mem">
+      <span class="mid">3313</span>
+      <span class="mzh">股四头肌</span>
+      <span class="men">Quadriceps</span>
+    </div><div class="mem">
+      <span class="mid">3315</span>
+      <span class="mzh">股直肌</span>
+      <span class="men">Rectus Femoris</span>
+    </div><div class="mem">
+      <span class="mid">3340</span>
+      <span class="mzh">股外侧肌</span>
+      <span class="men">Vastus Lateralis</span>
+    </div><div class="mem">
+      <span class="mid">3341</span>
+      <span class="mzh">股内侧肌</span>
+      <span class="men">Vastus Medialis</span>
+    </div><div class="mem">
+      <span class="mid">3356</span>
+      <span class="mzh">股中间肌</span>
+      <span class="men">Vastus intermedius</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>三</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3273</span>
+      <span class="mzh">三角肌</span>
+      <span class="men">Deltoid</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>尺</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3274</span>
+      <span class="mzh">尺侧腕伸肌</span>
+      <span class="men">Extensor carpi ulnaris</span>
+    </div><div class="mem">
+      <span class="mid">3280</span>
+      <span class="mzh">尺侧腕屈肌</span>
+      <span class="men">Flexor carpi ulnaris</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>小</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">3275</span>
+      <span class="mzh">小指伸肌</span>
+      <span class="men">Extensor digiti minimi</span>
+    </div><div class="mem">
+      <span class="mid">3318</span>
+      <span class="mzh">小菱形肌</span>
+      <span class="men">Rhomboid Minor</span>
+    </div><div class="mem">
+      <span class="mid">3332</span>
+      <span class="mzh">小圆肌</span>
+      <span class="men">Teres Minor</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>趾</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3276</span>
+      <span class="mzh">趾长伸肌</span>
+      <span class="men">Extensor digitorum longus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>指</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3277</span>
+      <span class="mzh">指伸肌</span>
+      <span class="men">Extensor digitorum</span>
+    </div><div class="mem">
+      <span class="mid">3281</span>
+      <span class="mzh">指浅屈肌</span>
+      <span class="men">Flexor digitorum superficialis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>桡</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3279</span>
+      <span class="mzh">桡侧腕屈肌</span>
+      <span class="men">Flexor carpi radialis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>腓</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">3283</span>
+      <span class="mzh">腓肠肌</span>
+      <span class="men">Gastrocnemius</span>
+    </div><div class="mem">
+      <span class="mid">3306</span>
+      <span class="mzh">腓骨短肌</span>
+      <span class="men">Peroneus brevis</span>
+    </div><div class="mem">
+      <span class="mid">3307</span>
+      <span class="mzh">腓骨长肌</span>
+      <span class="men">Peroneus longus</span>
+    </div><div class="mem">
+      <span class="mid">3325</span>
+      <span class="mzh">腓肠肌</span>
+      <span class="men">Soleus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>内</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3284</span>
+      <span class="mzh">内侧臀小肌</span>
+      <span class="men">Gemellius interior</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>上</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3285</span>
+      <span class="mzh">上臀小肌</span>
+      <span class="men">Gemellius superior</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>臀</b><span class="grp-meta">8 条</span></div>
+    <div class="mem">
+      <span class="mid">3286</span>
+      <span class="mzh">臀大肌</span>
+      <span class="men">Gluteus maximus</span>
+    </div><div class="mem">
+      <span class="mid">3287</span>
+      <span class="mzh">臀中肌</span>
+      <span class="men">Gluteus Medius</span>
+    </div><div class="mem">
+      <span class="mid">3288</span>
+      <span class="mzh">臀小肌</span>
+      <span class="men">Gluteus minimus</span>
+    </div><div class="mem">
+      <span class="mid">3343</span>
+      <span class="mzh">臀部外展肌</span>
+      <span class="men">Abductors</span>
+    </div><div class="mem">
+      <span class="mid">27147</span>
+      <span class="mzh">臀腿开发器坐起和俄罗斯转体</span>
+      <span class="men">Glute Ham Developer Sit-up and Russian Twist</span>
+    </div><div class="mem">
+      <span class="mid">27148</span>
+      <span class="mzh">臀腿超伸转体</span>
+      <span class="men">Glute Ham Hyperextension Twist</span>
+    </div><div class="mem">
+      <span class="mid">27149</span>
+      <span class="mzh">臀腿单腿超伸</span>
+      <span class="men">Glute Ham Single Leg Hyperextension</span>
+    </div><div class="mem">
+      <span class="mid">28065</span>
+      <span class="mzh">臀腿坐起（女性）</span>
+      <span class="men">Glute Ham Sit-up (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>缝</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3289</span>
+      <span class="mzh">缝匠肌</span>
+      <span class="men">Gracilis</span>
+    </div><div class="mem">
+      <span class="mid">3319</span>
+      <span class="mzh">缝匠肌</span>
+      <span class="men">Sartorius</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>腘</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3290</span>
+      <span class="mzh">腘绳肌</span>
+      <span class="men">Hamstrings</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>髂</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">3291</span>
+      <span class="mzh">髂肌</span>
+      <span class="men">Iliacus</span>
+    </div><div class="mem">
+      <span class="mid">3292</span>
+      <span class="mzh">髂肋肌</span>
+      <span class="men">Iliocostalis</span>
+    </div><div class="mem">
+      <span class="mid">3311</span>
+      <span class="mzh">髂腰肌</span>
+      <span class="men">Psoas major</span>
+    </div><div class="mem">
+      <span class="mid">3350</span>
+      <span class="mzh">髂腰肌（次要）</span>
+      <span class="men">Psoas minor</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>冈</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3293</span>
+      <span class="mzh">冈下肌</span>
+      <span class="men">Infraspinatus</span>
+    </div><div class="mem">
+      <span class="mid">3329</span>
+      <span class="mzh">冈上肌</span>
+      <span class="men">Supraspinatus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>斜</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3295</span>
+      <span class="mzh">斜方肌上部</span>
+      <span class="men">Levator scapulae</span>
+    </div><div class="mem">
+      <span class="mid">3335</span>
+      <span class="mzh">斜方肌</span>
+      <span class="men">Trapezius</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>最</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3296</span>
+      <span class="mzh">最长肌</span>
+      <span class="men">Longissimus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>腹</b><span class="grp-meta">5 条</span></div>
+    <div class="mem">
+      <span class="mid">3297</span>
+      <span class="mzh">腹斜肌</span>
+      <span class="men">Oblique</span>
+    </div><div class="mem">
+      <span class="mid">3314</span>
+      <span class="mzh">腹直肌</span>
+      <span class="men">Rectus Abdominis</span>
+    </div><div class="mem">
+      <span class="mid">3348</span>
+      <span class="mzh">腹内斜肌</span>
+      <span class="men">Internal obliques</span>
+    </div><div class="mem">
+      <span class="mid">3355</span>
+      <span class="mzh">腹横肌</span>
+      <span class="men">Transversus abdominus</span>
+    </div><div class="mem">
+      <span class="mid">28066</span>
+      <span class="mzh">腹肌垫坐起（女性）</span>
+      <span class="men">Ab Mat Sit-up (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>闭</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3298</span>
+      <span class="mzh">闭孔内肌</span>
+      <span class="men">Obturator internus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>肩</b><span class="grp-meta">6 条</span></div>
+    <div class="mem">
+      <span class="mid">3299</span>
+      <span class="mzh">肩胛舌骨肌</span>
+      <span class="men">Omohyoid</span>
+    </div><div class="mem">
+      <span class="mid">3352</span>
+      <span class="mzh">肩袖肌群</span>
+      <span class="men">Rotator Cuff</span>
+    </div><div class="mem">
+      <span class="mid">3354</span>
+      <span class="mzh">肩胛下肌</span>
+      <span class="men">Subscapularis</span>
+    </div><div class="mem">
+      <span class="mid">28137</span>
+      <span class="mzh">肩外旋测试（女性）</span>
+      <span class="men">Shoulder External Rotation Test (female)</span>
+    </div><div class="mem">
+      <span class="mid">28138</span>
+      <span class="mzh">肩内旋测试（女性）</span>
+      <span class="men">Shoulder Internal Rotation Test (female)</span>
+    </div><div class="mem">
+      <span class="mid">28139</span>
+      <span class="mzh">肩水平测试（女性）</span>
+      <span class="men">Shoulder Level Test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>掌</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3300</span>
+      <span class="mzh">掌长肌</span>
+      <span class="men">Palmaris longus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>耻</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3301</span>
+      <span class="mzh">耻骨肌</span>
+      <span class="men">Pectineus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>胸</b><span class="grp-meta">6 条</span></div>
+    <div class="mem">
+      <span class="mid">3302</span>
+      <span class="mzh">胸大肌锁骨部</span>
+      <span class="men">Pectoralis Major Calvicular</span>
+    </div><div class="mem">
+      <span class="mid">3303</span>
+      <span class="mzh">胸大肌</span>
+      <span class="men">Pectoralis Major</span>
+    </div><div class="mem">
+      <span class="mid">3304</span>
+      <span class="mzh">胸大肌胸骨部</span>
+      <span class="men">Pectoralis Major Sternal Head</span>
+    </div><div class="mem">
+      <span class="mid">3305</span>
+      <span class="mzh">胸小肌</span>
+      <span class="men">Pectoralis minor</span>
+    </div><div class="mem">
+      <span class="mid">3327</span>
+      <span class="mzh">胸锁乳突肌</span>
+      <span class="men">Sternocleidomastoid</span>
+    </div><div class="mem">
+      <span class="mid">3328</span>
+      <span class="mzh">胸骨舌骨肌</span>
+      <span class="men">Sternohyoid</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>梨</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3308</span>
+      <span class="mzh">梨状肌</span>
+      <span class="men">Piriformis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>旋</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3309</span>
+      <span class="mzh">旋后肌</span>
+      <span class="men">Pronator quadratus</span>
+    </div><div class="mem">
+      <span class="mid">3310</span>
+      <span class="mzh">旋前圆肌</span>
+      <span class="men">Pronator teres</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>菱</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3317</span>
+      <span class="mzh">菱形肌</span>
+      <span class="men">Rhomboid</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>半</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3320</span>
+      <span class="mzh">半膜肌</span>
+      <span class="men">Semimembranosus</span>
+    </div><div class="mem">
+      <span class="mid">3322</span>
+      <span class="mzh">半腱肌</span>
+      <span class="men">Semitendinosus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>头</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3321</span>
+      <span class="mzh">头半棘肌</span>
+      <span class="men">Semispinalis capitis</span>
+    </div><div class="mem">
+      <span class="mid">3326</span>
+      <span class="mzh">头夹肌</span>
+      <span class="men">Splenius capitis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>后</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3324</span>
+      <span class="mzh">后锯肌</span>
+      <span class="men">Serratus Posterior</span>
+    </div><div class="mem">
+      <span class="mid">28140</span>
+      <span class="mzh">后链灵活性测试（女性）</span>
+      <span class="men">Posterior Chain Flexibility Test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>阔</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3330</span>
+      <span class="mzh">阔筋膜张肌</span>
+      <span class="men">Tensor Fasciae Latae</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>胫</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">3333</span>
+      <span class="mzh">胫骨前肌</span>
+      <span class="men">Tibialis anterior</span>
+    </div><div class="mem">
+      <span class="mid">3334</span>
+      <span class="mzh">胫骨后肌</span>
+      <span class="men">Tibialis posterior</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>膈</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3344</span>
+      <span class="mzh">膈肌</span>
+      <span class="men">Diaphragm</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>竖</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3345</span>
+      <span class="mzh">竖脊肌</span>
+      <span class="men">Erector Spinae</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>髋</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">3346</span>
+      <span class="mzh">髋屈肌</span>
+      <span class="men">Hip flexors</span>
+    </div><div class="mem">
+      <span class="mid">28134</span>
+      <span class="mzh">髋外旋测试（女性）</span>
+      <span class="men">Hip External Rotation Test (female)</span>
+    </div><div class="mem">
+      <span class="mid">28135</span>
+      <span class="mzh">髋内旋测试（女性）</span>
+      <span class="men">Hip Internal Rotation Test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>肋</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3347</span>
+      <span class="mzh">肋间肌</span>
+      <span class="men">Intercostal</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>多</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3349</span>
+      <span class="mzh">多裂肌</span>
+      <span class="men">Multifidus</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>腰</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3351</span>
+      <span class="mzh">腰方肌</span>
+      <span class="men">Quadratus Lumborum</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>脊</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">3353</span>
+      <span class="mzh">脊柱肌</span>
+      <span class="men">Spinalis</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>硬</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">4409</span>
+      <span class="mzh">硬拉-起始姿势</span>
+      <span class="men">Deadlift - Start pose</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>宽</b><span class="grp-meta">5 条</span></div>
+    <div class="mem">
+      <span class="mid">4410</span>
+      <span class="mzh">宽距硬拉-结束姿势</span>
+      <span class="men">Sumo Deadlift - End pose</span>
+    </div><div class="mem">
+      <span class="mid">4507</span>
+      <span class="mzh">宽距硬拉姿势</span>
+      <span class="men">Wide deadlift pose</span>
+    </div><div class="mem">
+      <span class="mid">27190</span>
+      <span class="mzh">宽距坐姿引体向上</span>
+      <span class="men">Wide Seated Pull-up</span>
+    </div><div class="mem">
+      <span class="mid">27191</span>
+      <span class="mzh">宽距到窄距俯卧撑</span>
+      <span class="men">Wide to Narrow Push-up</span>
+    </div><div class="mem">
+      <span class="mid">27743</span>
+      <span class="mzh">宽距臀部脉冲桥（女性）</span>
+      <span class="men">Wide Glute Pulse Bridge (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>哑</b><span class="grp-meta">43 条</span></div>
+    <div class="mem">
+      <span class="mid">4515</span>
+      <span class="mzh">哑铃肱二头肌姿势</span>
+      <span class="men">Dumbbell Biceps Pose </span>
+    </div><div class="mem">
+      <span class="mid">5875</span>
+      <span class="mzh">哑铃凳上臂屈伸（腿抬高）</span>
+      <span class="men">Dumbbell Bench Dip with Legs Elevated</span>
+    </div><div class="mem">
+      <span class="mid">5877</span>
+      <span class="mzh">哑铃桥式卧推</span>
+      <span class="men">Dumbbell Bridge Bench Press</span>
+    </div><div class="mem">
+      <span class="mid">27121</span>
+      <span class="mzh">哑铃地板擦地</span>
+      <span class="men">Dumbbell Floor Wiper</span>
+    </div><div class="mem">
+      <span class="mid">27122</span>
+      <span class="mzh">哑铃壶铃深蹲和二头肌弯举</span>
+      <span class="men">Dumbbell Goblet Squat and Biceps Curl</span>
+    </div><div class="mem">
+      <span class="mid">27124</span>
+      <span class="mzh">哑铃悬挂力量清洁与挺举</span>
+      <span class="men">Dumbbell Hang Power Clean and Jerk</span>
+    </div><div class="mem">
+      <span class="mid">27126</span>
+      <span class="mzh">哑铃臀部推举</span>
+      <span class="men">Dumbbell Hip Thrust</span>
+    </div><div class="mem">
+      <span class="mid">27127</span>
+      <span class="mzh">哑铃倾斜二头肌弯举（版本2）（女性）</span>
+      <span class="men">Dumbbell Incline Biceps Curl (VERSION 2) (female)</span>
+    </div><div class="mem">
+      <span class="mid">27128</span>
+      <span class="mzh">哑铃倾斜头部支撑划船</span>
+      <span class="men">Dumbbell Incline Head Supported Row</span>
+    </div><div class="mem">
+      <span class="mid">27131</span>
+      <span class="mzh">哑铃仰卧木匠劈砍</span>
+      <span class="men">Dumbbell Lying Woodchop</span>
+    </div><div class="mem">
+      <span class="mid">27133</span>
+      <span class="mzh">哑铃罗马尼亚硬拉和弯腰划船</span>
+      <span class="men">Dumbbell RDL and Bent over Row</span>
+    </div><div class="mem">
+      <span class="mid">27134</span>
+      <span class="mzh">哑铃俄罗斯转体（腿离地）</span>
+      <span class="men">Dumbbell Russian Twist with Legs Floor Off</span>
+    </div><div class="mem">
+      <span class="mid">27135</span>
+      <span class="mzh">哑铃臀桥（女性）</span>
+      <span class="men">Dumbbells Glute Bridge (female)</span>
+    </div><div class="mem">
+      <span class="mid">27136</span>
+      <span class="mzh">哑铃侧凳深蹲</span>
+      <span class="men">Dumbbell Side Bench Squat</span>
+    </div><div class="mem">
+      <span class="mid">27137</span>
+      <span class="mzh">哑铃侧弓步肩推</span>
+      <span class="men">Dumbbell Side Lunge with Shoulder Press</span>
+    </div><div class="mem">
+      <span class="mid">27140</span>
+      <span class="mzh">哑铃坐起</span>
+      <span class="men">Dumbbell Sit-up</span>
+    </div><div class="mem">
+      <span class="mid">27141</span>
+      <span class="mzh">哑铃错位站姿罗马尼亚硬拉</span>
+      <span class="men">Dumbbell Staggered Stance Romanian Deadlift</span>
+    </div><div class="mem">
+      <span class="mid">27142</span>
+      <span class="mzh">哑铃后退弓步划船</span>
+      <span class="men">Dumbbell Step Back Lunge and Row</span>
+    </div><div class="mem">
+      <span class="mid">27203</span>
+      <span class="mzh">哑铃单腿上台阶（在凳子上）</span>
+      <span class="men">Dumbbell Single Leg Step-up on Bench</span>
+    </div><div class="mem">
+      <span class="mid">27212</span>
+      <span class="mzh">哑铃站姿单臂阿诺德推举</span>
+      <span class="men">Dumbbell Standing Single Arm Arnold Press</span>
+    </div><div class="mem">
+      <span class="mid">27213</span>
+      <span class="mzh">哑铃稳定球交替胸推</span>
+      <span class="men">Dumbbell Alternate Chest Press on Stability Ball</span>
+    </div><div class="mem">
+      <span class="mid">27214</span>
+      <span class="mzh">哑铃旋转握法卧推</span>
+      <span class="men">Dumbbell Rotational Grip Bench Press</span>
+    </div><div class="mem">
+      <span class="mid">27215</span>
+      <span class="mzh">哑铃反握挤压卧推</span>
+      <span class="men">Dumbbell Reverse Grip Squeeze Bench Press</span>
+    </div><div class="mem">
+      <span class="mid">27231</span>
+      <span class="mzh">哑铃交替侧平举</span>
+      <span class="men">Dumbbell Alternate Lateral Raise</span>
+    </div><div class="mem">
+      <span class="mid">27232</span>
+      <span class="mzh">哑铃侧弓步</span>
+      <span class="men">Dumbbell Lateral Lunge</span>
+    </div><div class="mem">
+      <span class="mid">27244</span>
+      <span class="mzh">哑铃过顶行走弓步</span>
+      <span class="men">Dumbbell Overhead Walking Lunge</span>
+    </div><div class="mem">
+      <span class="mid">27248</span>
+      <span class="mzh">哑铃六种方式抬举</span>
+      <span class="men">Dumbbell 6 Ways Raise</span>
+    </div><div class="mem">
+      <span class="mid">27258</span>
+      <span class="mzh">哑铃臀桥（版本2）（女性）</span>
+      <span class="men">Dumbbells Glute Bridge (VERSION 2) (female)</span>
+    </div><div class="mem">
+      <span class="mid">27259</span>
+      <span class="mzh">哑铃站姿高风车</span>
+      <span class="men">Dumbbell Standing High Windmill</span>
+    </div><div class="mem">
+      <span class="mid">27281</span>
+      <span class="mzh">哑铃弯曲手臂等长保持</span>
+      <span class="men">Dumbbell Bent Arm Iso Hold</span>
+    </div><div class="mem">
+      <span class="mid">27334</span>
+      <span class="mzh">哑铃倾斜二头肌弯举（70度）（女性）</span>
+      <span class="men">Dumbbell Incline Biceps Curl (70 degrees) (female)</span>
+    </div><div class="mem">
+      <span class="mid">27347</span>
+      <span class="mzh">哑铃台阶训练（版本2）</span>
+      <span class="men">Dumbbell Step-up (VERSION 2)</span>
+    </div><div class="mem">
+      <span class="mid">27446</span>
+      <span class="mzh">哑铃硬拉（版本2）（男性）</span>
+      <span class="men">Dumbbell Deadlift (VERSION 2) (male)</span>
+    </div><div class="mem">
+      <span class="mid">27508</span>
+      <span class="mzh">哑铃硬拉弯举</span>
+      <span class="men">Dumbbell Deadlift Bent over Row</span>
+    </div><div class="mem">
+      <span class="mid">27521</span>
+      <span class="mzh">哑铃倾斜肩推</span>
+      <span class="men">Dumbbell Incline Shoulders Press</span>
+    </div><div class="mem">
+      <span class="mid">27542</span>
+      <span class="mzh">哑铃后三角肌飞鸟（45度）</span>
+      <span class="men">Dumbbell Rear Delt Fly (45 degrees)</span>
+    </div><div class="mem">
+      <span class="mid">27550</span>
+      <span class="mzh">哑铃好晨深蹲</span>
+      <span class="men">Dumbbell Good Morning Squat</span>
+    </div><div class="mem">
+      <span class="mid">27551</span>
+      <span class="mzh">哑铃臀部主导台阶训练（女性）</span>
+      <span class="men">Dumbbell Glute Dominant Step-Up (female)</span>
+    </div><div class="mem">
+      <span class="mid">28038</span>
+      <span class="mzh">哑铃划船（版本2）（女性）</span>
+      <span class="men">Dumbbell Pullover (VERSION 2) (female)</span>
+    </div><div class="mem">
+      <span class="mid">28069</span>
+      <span class="mzh">哑铃弹力带墙坐（男性）</span>
+      <span class="men">Dumbbell Banded Wall Sit (male)</span>
+    </div><div class="mem">
+      <span class="mid">28292</span>
+      <span class="mzh">哑铃倾斜臂屈伸（男性）</span>
+      <span class="men">Dumbbell Incline Triceps Kickback (male)</span>
+    </div><div class="mem">
+      <span class="mid">28293</span>
+      <span class="mzh">哑铃跪姿臂屈伸（女性）</span>
+      <span class="men">Dumbbell Kneeling Triceps Kickback (female)</span>
+    </div><div class="mem">
+      <span class="mid">28297</span>
+      <span class="mzh">哑铃坐姿臂屈伸（版本2）</span>
+      <span class="men">Dumbbell Seated Triceps Extension (VERSION 2)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>交</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">5861</span>
+      <span class="mzh">交替超人</span>
+      <span class="men">Alternating Superman</span>
+    </div><div class="mem">
+      <span class="mid">27562</span>
+      <span class="mzh">交叉扭转仰卧起坐（版本2）（女性）</span>
+      <span class="men">Cross Twisting Sit-up (VERSION 2) (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>弹</b><span class="grp-meta">12 条</span></div>
+    <div class="mem">
+      <span class="mid">5865</span>
+      <span class="mzh">弹力带辅助臂屈伸</span>
+      <span class="men">Band Assisted Dip </span>
+    </div><div class="mem">
+      <span class="mid">5866</span>
+      <span class="mzh">弹力带跪姿卷腹</span>
+      <span class="men">Band Kneeling Crunch </span>
+    </div><div class="mem">
+      <span class="mid">27218</span>
+      <span class="mzh">弹力带下肢死虫式</span>
+      <span class="men">Banded Lower Body Dead Bug</span>
+    </div><div class="mem">
+      <span class="mid">27276</span>
+      <span class="mzh">弹力带臀腿提升（版本3）</span>
+      <span class="men">Banded Glute Ham Raise (VERSION 3)</span>
+    </div><div class="mem">
+      <span class="mid">27346</span>
+      <span class="mzh">弹力带辅助仰卧臀腿抬升</span>
+      <span class="men">Band Assisted Floor Glute Ham Raise</span>
+    </div><div class="mem">
+      <span class="mid">27554</span>
+      <span class="mzh">弹力带拉开（45度）</span>
+      <span class="men">Resistance Band Pull Apart (45 degrees)</span>
+    </div><div class="mem">
+      <span class="mid">28020</span>
+      <span class="mzh">弹力带反向卷腹（男性）</span>
+      <span class="men">Resistance Band Reverse Crunch (male)</span>
+    </div><div class="mem">
+      <span class="mid">28021</span>
+      <span class="mzh">弹力带反向卷腹（版本2）（男性）</span>
+      <span class="men">Resistance Band Reverse Crunch (VERSION 2) (male)</span>
+    </div><div class="mem">
+      <span class="mid">28184</span>
+      <span class="mzh">弹力带行走弓步（女性）</span>
+      <span class="men">Resistance Band Walking Lunge (female)</span>
+    </div><div class="mem">
+      <span class="mid">28218</span>
+      <span class="mzh">弹力带膝盖臀推（男性）</span>
+      <span class="men">Resistance Band Hip Thrusts on Knees (male)</span>
+    </div><div class="mem">
+      <span class="mid">28221</span>
+      <span class="mzh">弹力带腿后踢（男性）</span>
+      <span class="men">Resistance Band Leg Kickback (male)</span>
+    </div><div class="mem">
+      <span class="mid">28222</span>
+      <span class="mzh">弹力带行走（男性）</span>
+      <span class="men">Resistance Band Walk (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>引</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">5870</span>
+      <span class="mzh">引体向上</span>
+      <span class="men">Chin-up </span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>跪</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">27129</span>
+      <span class="mzh">跪姿阿诺德推举</span>
+      <span class="men">Dumbbell Kneeling Arnold Press</span>
+    </div><div class="mem">
+      <span class="mid">27264</span>
+      <span class="mzh">跪姿半肱三头肌伸展</span>
+      <span class="men">Kneeling Half Triceps Extension</span>
+    </div><div class="mem">
+      <span class="mid">27586</span>
+      <span class="mzh">跪姿上背部旋转滚动</span>
+      <span class="men">Roll Kneeling Upper Back Rotation</span>
+    </div><div class="mem">
+      <span class="mid">28053</span>
+      <span class="mzh">跪姿高位到低位飞鸟（男性）</span>
+      <span class="men">Cable Kneeling High to Low Fly (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>抬</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27144</span>
+      <span class="mzh">抬高站立提踵</span>
+      <span class="men">Elevated Standing Calf Raise</span>
+    </div><div class="mem">
+      <span class="mid">27145</span>
+      <span class="mzh">抬高站立单腿提踵</span>
+      <span class="men">Elevated Standing Single Leg Calf Raise</span>
+    </div><div class="mem">
+      <span class="mid">27547</span>
+      <span class="mzh">抬高侧弓步</span>
+      <span class="men">Elevated Side Lunge</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>悬</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27151</span>
+      <span class="mzh">悬垂膝盖画圈抬升</span>
+      <span class="men">Hanging Knee Circle Raise</span>
+    </div><div class="mem">
+      <span class="mid">28058</span>
+      <span class="mzh">悬空空心保持（女性）</span>
+      <span class="men">Hanging Hollow Hold (female)</span>
+    </div><div class="mem">
+      <span class="mid">28220</span>
+      <span class="mzh">悬带深蹲拉力（男性）</span>
+      <span class="men">Suspender Squat Power Pull (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>倾</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27152</span>
+      <span class="mzh">倾斜交替踢腿</span>
+      <span class="men">Incline Alternate Flutter Kicks</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>倒</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27153</span>
+      <span class="mzh">倒立划船滑动</span>
+      <span class="men">Inverted Row Slide</span>
+    </div><div class="mem">
+      <span class="mid">27282</span>
+      <span class="mzh">倒立宽到窄划船</span>
+      <span class="men">Inverted Wide to Narrow Row</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>跳</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27155</span>
+      <span class="mzh">跳跃分腿双手放髋</span>
+      <span class="men">Jump Split with Hands on Hip</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>地</b><span class="grp-meta">6 条</span></div>
+    <div class="mem">
+      <span class="mid">27161</span>
+      <span class="mzh">地面反向背伸展</span>
+      <span class="men">Reverse Back Extension on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27225</span>
+      <span class="mzh">地面仰卧单臂翻转壶铃胸部推举</span>
+      <span class="men">Kettlebell Lying on Floor Single Arm Bottoms-up Chest Press</span>
+    </div><div class="mem">
+      <span class="mid">27335</span>
+      <span class="mzh">地板倒立划船滑动</span>
+      <span class="men">Inverted Row Slide on Floor</span>
+    </div><div class="mem">
+      <span class="mid">28057</span>
+      <span class="mzh">地锚单腿臀推（女性）</span>
+      <span class="men">Landmine Single Leg Hip Thrust (female)</span>
+    </div><div class="mem">
+      <span class="mid">28064</span>
+      <span class="mzh">地雷单腿罗马尼亚硬拉（女性）</span>
+      <span class="men">Landmine Single Leg Romanian Deadlift (female)</span>
+    </div><div class="mem">
+      <span class="mid">28295</span>
+      <span class="mzh">地轴硬拉（男性）</span>
+      <span class="men">Landmine Deadlift (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>反</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27162</span>
+      <span class="mzh">反向卷腹（版本3）</span>
+      <span class="men">Reverse Crunch (VERSION 3)</span>
+    </div><div class="mem">
+      <span class="mid">27287</span>
+      <span class="mzh">反向腿伸展（女性）</span>
+      <span class="men">Reverse Leg Extension (female)</span>
+    </div><div class="mem">
+      <span class="mid">27303</span>
+      <span class="mzh">反向平板（版本2）</span>
+      <span class="men">Reverse Plank (VERSION 2)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>侧</b><span class="grp-meta">7 条</span></div>
+    <div class="mem">
+      <span class="mid">27170</span>
+      <span class="mzh">侧凳深蹲</span>
+      <span class="men">Side Bench Squat</span>
+    </div><div class="mem">
+      <span class="mid">27171</span>
+      <span class="mzh">侧卷腹双手放胸（女性）</span>
+      <span class="men">Side Crunch with Hands on Chest (female)</span>
+    </div><div class="mem">
+      <span class="mid">27172</span>
+      <span class="mzh">侧分腿深蹲</span>
+      <span class="men">Side Split Squat</span>
+    </div><div class="mem">
+      <span class="mid">27269</span>
+      <span class="mzh">侧踢跳跃</span>
+      <span class="men">Kick Side Jump</span>
+    </div><div class="mem">
+      <span class="mid">27280</span>
+      <span class="mzh">侧向宽蹲</span>
+      <span class="men">Side to Wide Squat</span>
+    </div><div class="mem">
+      <span class="mid">27594</span>
+      <span class="mzh">侧卧地面滚动腓肠肌</span>
+      <span class="men">Roll Peroneal Side Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">28037</span>
+      <span class="mzh">侧平板弯曲腿提升（男性）</span>
+      <span class="men">Side Plank Bent Leg Lift (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>单</b><span class="grp-meta">13 条</span></div>
+    <div class="mem">
+      <span class="mid">27175</span>
+      <span class="mzh">单腿臀桥（手臂放胸）（女性）</span>
+      <span class="men">Single Leg Glute Bridge (arms on chest) (female)</span>
+    </div><div class="mem">
+      <span class="mid">27177</span>
+      <span class="mzh">单腿臀部推举跳</span>
+      <span class="men">Single Leg Hip Thrust Jump</span>
+    </div><div class="mem">
+      <span class="mid">27178</span>
+      <span class="mzh">单腿跳跃臀桥</span>
+      <span class="men">Single Leg Jumping Glute Bridge</span>
+    </div><div class="mem">
+      <span class="mid">27179</span>
+      <span class="mzh">单腿上凳（女性）</span>
+      <span class="men">Single Leg Step-up on Bench (female)</span>
+    </div><div class="mem">
+      <span class="mid">27180</span>
+      <span class="mzh">单腿站立提踵平衡</span>
+      <span class="men">Standing Single Leg Calf Raise Balance</span>
+    </div><div class="mem">
+      <span class="mid">27263</span>
+      <span class="mzh">单腿抬高深蹲</span>
+      <span class="men">Elevated Single Leg Squat</span>
+    </div><div class="mem">
+      <span class="mid">27512</span>
+      <span class="mzh">单哑铃下斜过头仰卧起坐</span>
+      <span class="men">Single Dumbbell Decline Overhead Sit-up</span>
+    </div><div class="mem">
+      <span class="mid">27593</span>
+      <span class="mzh">单腿仰卧地面滚动胫骨前肌</span>
+      <span class="men">Roll Tibialis Anterior (Single Leg) Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27595</span>
+      <span class="mzh">单腿侧卧地面滚动腓肠肌</span>
+      <span class="men">Roll Peroneal (Single Leg) Side Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">28002</span>
+      <span class="mzh">单膝屈膝礼（女性）</span>
+      <span class="men">Single Curtsy Lunge (female)</span>
+    </div><div class="mem">
+      <span class="mid">28040</span>
+      <span class="mzh">单臂高位划船（绳索）</span>
+      <span class="men">Cable Single Arm High Row</span>
+    </div><div class="mem">
+      <span class="mid">28041</span>
+      <span class="mzh">单臂高位肩胛划船（绳索）</span>
+      <span class="men">Cable Single Arm High Scapular Row</span>
+    </div><div class="mem">
+      <span class="mid">28042</span>
+      <span class="mzh">单臂低位肩胛划船（绳索）</span>
+      <span class="men">Cable Single Arm Low Scapular Row</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>桌</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27185</span>
+      <span class="mzh">桌式桥旋转</span>
+      <span class="men">Table Top Bridge Rotation</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>脚</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27186</span>
+      <span class="mzh">脚尖行走</span>
+      <span class="men">Toe Walk</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>仰</b><span class="grp-meta">11 条</span></div>
+    <div class="mem">
+      <span class="mid">27192</span>
+      <span class="mzh">仰卧抬腿（女性）</span>
+      <span class="men">Lying Leg Raise (female)</span>
+    </div><div class="mem">
+      <span class="mid">27256</span>
+      <span class="mzh">仰卧倾斜髋抬升（女性）</span>
+      <span class="men">Lying Incline Hip Raise (female)</span>
+    </div><div class="mem">
+      <span class="mid">27348</span>
+      <span class="mzh">仰卧腿部8字运动</span>
+      <span class="men">Lying Leg Figure Eight</span>
+    </div><div class="mem">
+      <span class="mid">27580</span>
+      <span class="mzh">仰卧地面滚动中背部</span>
+      <span class="men">Roll Middle Back Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27581</span>
+      <span class="mzh">仰卧地面滚动下背部（侧边）</span>
+      <span class="men">Roll Lower Back (Side) Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27582</span>
+      <span class="mzh">仰卧地面滚动胸椎</span>
+      <span class="men">Roll Thoracic Spine Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27583</span>
+      <span class="mzh">仰卧地面滚动肩胛骨伸展</span>
+      <span class="men">Roll Shoulder Blade Reach Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27584</span>
+      <span class="mzh">仰卧地面滚动世界环</span>
+      <span class="men">Roll Around the World Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27585</span>
+      <span class="mzh">仰卧地面滚动竖脊肌</span>
+      <span class="men">Roll Erector Spinae Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27589</span>
+      <span class="mzh">仰卧地面臀部扭转滚动</span>
+      <span class="men">Roll Glute Twist Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27591</span>
+      <span class="mzh">仰卧地面滚动股四头肌（外侧）</span>
+      <span class="men">Roll Quadriceps (Vastus Lateralis) Lying on Floor</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>吊</b><span class="grp-meta">8 条</span></div>
+    <div class="mem">
+      <span class="mid">27200</span>
+      <span class="mzh">吊环高位划船</span>
+      <span class="men">Ring Elevated Row</span>
+    </div><div class="mem">
+      <span class="mid">27283</span>
+      <span class="mzh">吊环腿弯举（版本2）</span>
+      <span class="men">Ring Leg Curl (VERSION 2)</span>
+    </div><div class="mem">
+      <span class="mid">27294</span>
+      <span class="mzh">吊环反向飞鸟</span>
+      <span class="men">Ring Reverse Fly</span>
+    </div><div class="mem">
+      <span class="mid">27338</span>
+      <span class="mzh">吊环交替超人（女性）</span>
+      <span class="men">Ring Alternate Superman (female)</span>
+    </div><div class="mem">
+      <span class="mid">27440</span>
+      <span class="mzh">吊环腿举</span>
+      <span class="men">Captains Chair Leg Raise</span>
+    </div><div class="mem">
+      <span class="mid">28215</span>
+      <span class="mzh">吊带尖峰（男性）</span>
+      <span class="men">Suspender Pike (male)</span>
+    </div><div class="mem">
+      <span class="mid">28216</span>
+      <span class="mzh">吊带前平板（男性）</span>
+      <span class="men">Suspender Front Plank (male)</span>
+    </div><div class="mem">
+      <span class="mid">28219</span>
+      <span class="mzh">吊带背阔肌拉伸（男性）</span>
+      <span class="men">Suspender Lat Stretch (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>直</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27219</span>
+      <span class="mzh">直腿死虫式</span>
+      <span class="men">Straight Leg Dead Bug</span>
+    </div><div class="mem">
+      <span class="mid">28187</span>
+      <span class="mzh">直排轮滑（女性）</span>
+      <span class="men">Inline Skating (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>杠</b><span class="grp-meta">21 条</span></div>
+    <div class="mem">
+      <span class="mid">27220</span>
+      <span class="mzh">杠铃弹力带辅助硬拉</span>
+      <span class="men">Barbell Band Assisted Deadlift</span>
+    </div><div class="mem">
+      <span class="mid">27233</span>
+      <span class="mzh">杠铃坐地斜体扭转</span>
+      <span class="men">Barbell Sitting on Floor Oblique Twist</span>
+    </div><div class="mem">
+      <span class="mid">27235</span>
+      <span class="mzh">杠铃针式窄距卧推</span>
+      <span class="men">Barbell Pin Close Grip Bench Press</span>
+    </div><div class="mem">
+      <span class="mid">27241</span>
+      <span class="mzh">杠铃站姿抓举耸肩</span>
+      <span class="men">Barbell Standing Snatch Grip Shrug</span>
+    </div><div class="mem">
+      <span class="mid">27270</span>
+      <span class="mzh">杠杆宽握划船（杠铃加载）</span>
+      <span class="men">Lever Bent over Wide Row (plate loaded)</span>
+    </div><div class="mem">
+      <span class="mid">27342</span>
+      <span class="mzh">杠铃窄握弯举</span>
+      <span class="men">Bar Close Grip Biceps Curl</span>
+    </div><div class="mem">
+      <span class="mid">27449</span>
+      <span class="mzh">杠铃抓举和挺举</span>
+      <span class="men">Barbell Clean and Jerk</span>
+    </div><div class="mem">
+      <span class="mid">27555</span>
+      <span class="mzh">杠杆VMX多模式绳索高位下拉</span>
+      <span class="men">Lever VMX Multy Mode Rope Lat Pulldown</span>
+    </div><div class="mem">
+      <span class="mid">27556</span>
+      <span class="mzh">杠杆T杆罗马尼亚硬拉</span>
+      <span class="men">Lever T-bar Romanian Deadlift</span>
+    </div><div class="mem">
+      <span class="mid">27559</span>
+      <span class="mzh">杠铃抬高分腿深蹲（女性）</span>
+      <span class="men">Barbell Elevated Split Squat (female)</span>
+    </div><div class="mem">
+      <span class="mid">27754</span>
+      <span class="mzh">杠铃行走弓步</span>
+      <span class="men">Barbell Walking Lunge</span>
+    </div><div class="mem">
+      <span class="mid">28043</span>
+      <span class="mzh">杠杆弯体划船（有胸垫）</span>
+      <span class="men">Lever Bent Over Row (with chest support)</span>
+    </div><div class="mem">
+      <span class="mid">28044</span>
+      <span class="mzh">杠杆中握距弯体划船（有胸垫）</span>
+      <span class="men">Lever Bent Over Neutral Grip Row (with chest support)</span>
+    </div><div class="mem">
+      <span class="mid">28045</span>
+      <span class="mzh">杠杆单臂中握距弯体划船（有胸垫）</span>
+      <span class="men">Lever Bent Over Single Arm Neutral Grip Row (with chest support)</span>
+    </div><div class="mem">
+      <span class="mid">28046</span>
+      <span class="mzh">杠杆宽握距弯体划船（有胸垫）</span>
+      <span class="men">Lever Bent Over Wide Grip Row (with chest support)</span>
+    </div><div class="mem">
+      <span class="mid">28047</span>
+      <span class="mzh">杠杆单臂宽握距弯体划船（有胸垫）</span>
+      <span class="men">Lever Bent Over Single Arm Wide Grip Row (with chest support)</span>
+    </div><div class="mem">
+      <span class="mid">28048</span>
+      <span class="mzh">杠杆直线硬拉（男性）</span>
+      <span class="men">Lever Linear Hack Squat (male)</span>
+    </div><div class="mem">
+      <span class="mid">28067</span>
+      <span class="mzh">杠铃前架分腿蹲（女性）</span>
+      <span class="men">Barbell Front Rack Split Squat (female)</span>
+    </div><div class="mem">
+      <span class="mid">28072</span>
+      <span class="mzh">杠杆腹部摆动（男性）</span>
+      <span class="men">Lever Ab Swing (male)</span>
+    </div><div class="mem">
+      <span class="mid">28159</span>
+      <span class="mzh">杠铃卧推（侧面视角）</span>
+      <span class="men">Barbell Bench Press (side POV)</span>
+    </div><div class="mem">
+      <span class="mid">28296</span>
+      <span class="mzh">杠杆毛巾俯卧撑（男性）</span>
+      <span class="men">Lever Push-up with Towels (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>陷</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27221</span>
+      <span class="mzh">陷阱杆弹力带硬拉</span>
+      <span class="men">Trap bar Banded Deadlift</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>深</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27222</span>
+      <span class="mzh">深度跳到远跳</span>
+      <span class="men">Depth Jump to Broad Jump</span>
+    </div><div class="mem">
+      <span class="mid">27223</span>
+      <span class="mzh">深度跳</span>
+      <span class="men">Depth Jump</span>
+    </div><div class="mem">
+      <span class="mid">27509</span>
+      <span class="mzh">深蹲位交叉拳</span>
+      <span class="men">Cross Body Punch in Squat Position</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>负</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">27226</span>
+      <span class="mzh">负重板站姿高位前平举</span>
+      <span class="men">Weighted Plate Standing High Front Raise</span>
+    </div><div class="mem">
+      <span class="mid">28039</span>
+      <span class="mzh">负重板站立侧平举（男性）</span>
+      <span class="men">Weighted Plate Standing Lateral Raise (male)</span>
+    </div><div class="mem">
+      <span class="mid">28060</span>
+      <span class="mzh">负重哑铃站立绕世界（女性）</span>
+      <span class="men">Weighted Plate Standing Around the World (female)</span>
+    </div><div class="mem">
+      <span class="mid">28070</span>
+      <span class="mzh">负重哑铃胫骨前肌卷曲（男性）</span>
+      <span class="men">Weighted Plate Tibialis Anterior Curl (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>自</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27234</span>
+      <span class="mzh">自重站立斜体扭转</span>
+      <span class="men">Bodyweight Standing Oblique Twist</span>
+    </div><div class="mem">
+      <span class="mid">28035</span>
+      <span class="mzh">自重青蛙臀推（男性）</span>
+      <span class="men">Bodyweight Frog Hip Thrust (male)</span>
+    </div><div class="mem">
+      <span class="mid">28052</span>
+      <span class="mzh">自重长凳深蹲（女性）</span>
+      <span class="men">Bodyweight Bench Squat (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>横</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27237</span>
+      <span class="mzh">横向行走俯卧撑</span>
+      <span class="men">Lateral Walk Push-up</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>膝</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27239</span>
+      <span class="mzh">膝驱动俯卧撑</span>
+      <span class="men">Push-up with Knee Drive</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>双</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27261</span>
+      <span class="mzh">双臂伸展臀腿提升</span>
+      <span class="men">Glute Ham Raise with Extended Arms</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>错</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27265</span>
+      <span class="mzh">错位侧桥</span>
+      <span class="men">Staggered Leg Side Bridge</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>站</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27266</span>
+      <span class="mzh">站立小腿抬升画圈</span>
+      <span class="men">Standing Calf Raise Circle</span>
+    </div><div class="mem">
+      <span class="mid">27272</span>
+      <span class="mzh">站立哑铃风车</span>
+      <span class="men">Dumbbell Standing Windmill</span>
+    </div><div class="mem">
+      <span class="mid">27568</span>
+      <span class="mzh">站立单臂锤式弯举（绳索附件）</span>
+      <span class="men">Cable Standing One Arm Hammer Curl with Rope Attachment</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>毛</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27268</span>
+      <span class="mzh">毛巾辅助反向滑动腿弯举</span>
+      <span class="men">Reverse Sliding Leg Curl on Floor with Towel</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>坐</b><span class="grp-meta">5 条</span></div>
+    <div class="mem">
+      <span class="mid">27271</span>
+      <span class="mzh">坐姿抬高小腿抬升</span>
+      <span class="men">Elevated Seated Calf Raise</span>
+    </div><div class="mem">
+      <span class="mid">27588</span>
+      <span class="mzh">坐姿地面滚动臀部</span>
+      <span class="men">Roll Glutes Sitting on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27590</span>
+      <span class="mzh">坐姿地面滚动腘绳肌和臀部</span>
+      <span class="men">Roll Hamstrings and Glute Sitting on Floor</span>
+    </div><div class="mem">
+      <span class="mid">28162</span>
+      <span class="mzh">坐姿瑜伽式悉达萨纳（女性）</span>
+      <span class="men">Sitting Yoga Pose Siddhasana (female)</span>
+    </div><div class="mem">
+      <span class="mid">28291</span>
+      <span class="mzh">坐姿颈部侧拉（女性）</span>
+      <span class="men">Seated Neck Side Stretch (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>垫</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27279</span>
+      <span class="mzh">垫子上哑铃过板反向腕屈伸（女性）</span>
+      <span class="men">Dumbbell Over Bench Revers Wrist Curl with Mat (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>窄</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27284</span>
+      <span class="mzh">窄握上半身引体向上（女性）</span>
+      <span class="men">Narrow Top Half Pull-up (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>高</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27288</span>
+      <span class="mzh">高杆倒立划船</span>
+      <span class="men">High Bar Inverted Row</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>腿</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27291</span>
+      <span class="mzh">腿辅助吊环引体向上</span>
+      <span class="men">Leg Assisted Ring Pull-up</span>
+    </div><div class="mem">
+      <span class="mid">28136</span>
+      <span class="mzh">腿长测试（女性）</span>
+      <span class="men">Leg Length Test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>世</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27304</span>
+      <span class="mzh">世界环绕超人</span>
+      <span class="men">Around the World Superman</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>相</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27305</span>
+      <span class="mzh">相扑式空气深蹲</span>
+      <span class="men">Sumo Air Squat</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>辅</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27331</span>
+      <span class="mzh">辅助引体向上（下蹲姿势）</span>
+      <span class="men">Assisted Chin-up (squat position)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>下</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27333</span>
+      <span class="mzh">下斜仰卧起坐和俄罗斯转体</span>
+      <span class="men">Decline Sit-up and Russian Twist</span>
+    </div><div class="mem">
+      <span class="mid">28059</span>
+      <span class="mzh">下斜膝抬高（女性）</span>
+      <span class="men">Decline Knee Raise (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>登</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27337</span>
+      <span class="mzh">登山者跳跃</span>
+      <span class="men">Mountain Climber Jump</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>女</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27344</span>
+      <span class="mzh">女性引体向上悬停</span>
+      <span class="men">Top Pull-up Hold (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>固</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27445</span>
+      <span class="mzh">固定器械扭转（版本2）（男性）</span>
+      <span class="men">Cable Twist (VERSION 2) (male)</span>
+    </div><div class="mem">
+      <span class="mid">27447</span>
+      <span class="mzh">固定器械踢腿（男性）</span>
+      <span class="men">Cable Kickback (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>从</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27541</span>
+      <span class="mzh">从缺陷位开始的壶铃全蹲（女性）</span>
+      <span class="men">Kettlebell Full Squat from Deficit (female)</span>
+    </div><div class="mem">
+      <span class="mid">27549</span>
+      <span class="mzh">从缺陷位开始的后弓步</span>
+      <span class="men">Rear Lunge from Deficit</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>E</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27545</span>
+      <span class="mzh">EZ杆俄罗斯转体仰卧起坐</span>
+      <span class="men">EZ-Bar Russian Twist Sit-up</span>
+    </div><div class="mem">
+      <span class="mid">27546</span>
+      <span class="mzh">EZ杆肩推仰卧起坐</span>
+      <span class="men">EZ-Bar Shoulder Press Sit-up</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>健</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27548</span>
+      <span class="mzh">健身球前锯肌墙滑</span>
+      <span class="men">Exercise Ball Serratus Wall Slide</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>史</b><span class="grp-meta">4 条</span></div>
+    <div class="mem">
+      <span class="mid">27553</span>
+      <span class="mzh">史密斯弯腰窄握正握划船</span>
+      <span class="men">Smith Bent Over Narrow Pronated Grip Row</span>
+    </div><div class="mem">
+      <span class="mid">28036</span>
+      <span class="mzh">史密斯青蛙臀推（男性）</span>
+      <span class="men">Smith Frog Hip Thrust (male)</span>
+    </div><div class="mem">
+      <span class="mid">28061</span>
+      <span class="mzh">史密斯杆倾斜俯卧撑（男性）</span>
+      <span class="men">Incline Push-up on a Smith Bar (male)</span>
+    </div><div class="mem">
+      <span class="mid">28068</span>
+      <span class="mzh">史密斯杆深蹲硬拉（女性）</span>
+      <span class="men">Smith Sumo Deadlift (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>壶</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">27564</span>
+      <span class="mzh">壶铃前弓步（版本2）（女性）</span>
+      <span class="men">Kettlebell Forward Lunge (VERSION 2) (female)</span>
+    </div><div class="mem">
+      <span class="mid">28255</span>
+      <span class="mzh">壶铃摆动转正握前蹲（女性）</span>
+      <span class="men">Kettlebell Swing Clean grip Front Squat (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>波</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27565</span>
+      <span class="mzh">波比跳俯卧撑登山者复合动作</span>
+      <span class="men">Burpee Push-up Mountain Climber Complex</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>绳</b><span class="grp-meta">5 条</span></div>
+    <div class="mem">
+      <span class="mid">27567</span>
+      <span class="mzh">绳索跪姿单臂划船</span>
+      <span class="men">Cable Kneeling One Arm Row</span>
+    </div><div class="mem">
+      <span class="mid">28054</span>
+      <span class="mzh">绳索高位前平举（女性）</span>
+      <span class="men">Cable Front Raise (rope attachment) (female)</span>
+    </div><div class="mem">
+      <span class="mid">28055</span>
+      <span class="mzh">绳索壶铃深蹲（女性）</span>
+      <span class="men">Cable Goblet Squat (female)</span>
+    </div><div class="mem">
+      <span class="mid">28063</span>
+      <span class="mzh">绳索罗马尼亚硬拉（女性）</span>
+      <span class="men">Cable Romanian Deadlift (female)</span>
+    </div><div class="mem">
+      <span class="mid">28081</span>
+      <span class="mzh">绳索高位拉（男性）</span>
+      <span class="men">Cable High Pull with Rope Attachment (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>平</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27575</span>
+      <span class="mzh">平躺胸部滚动</span>
+      <span class="men">Roll Chest Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27577</span>
+      <span class="mzh">平躺后肩滚动</span>
+      <span class="men">Roll Posterior Shoulder Lying on Floor</span>
+    </div><div class="mem">
+      <span class="mid">27578</span>
+      <span class="mzh">平躺肩部后旋滚动</span>
+      <span class="men">Roll Shoulder Back Rotation Lying on Floor</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>滚</b><span class="grp-meta">3 条</span></div>
+    <div class="mem">
+      <span class="mid">27579</span>
+      <span class="mzh">滚压菱形肌</span>
+      <span class="men">Roll Rhomboids</span>
+    </div><div class="mem">
+      <span class="mid">27592</span>
+      <span class="mzh">滚动胫骨前肌</span>
+      <span class="men">Roll Tibialis Anterior</span>
+    </div><div class="mem">
+      <span class="mid">27596</span>
+      <span class="mzh">滚动脚部</span>
+      <span class="men">Roll Foot</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>鸽</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27587</span>
+      <span class="mzh">鸽子式拉伸滚动</span>
+      <span class="men">Roll Pigeon Stretch</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>山</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27791</span>
+      <span class="mzh">山式（女性）</span>
+      <span class="men">Mountain Pose (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>海</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">27985</span>
+      <span class="mzh">海豚式（女性）</span>
+      <span class="men">Dolphin Pose (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>无</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28050</span>
+      <span class="mzh">无臂祈祷伸展（男性）</span>
+      <span class="men">Armless Prayer Stretch (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>靠</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28056</span>
+      <span class="mzh">靠墙倒立保持（男性）</span>
+      <span class="men">Handstand Hold on Wall (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>徒</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28062</span>
+      <span class="mzh">徒手后退弓步上举（男性）</span>
+      <span class="men">Bodyweight Reverse Lunge with Overhead Reach (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>9</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28071</span>
+      <span class="mzh">90度伸展（女性）</span>
+      <span class="men">90 to 90 Stretch (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>法</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28133</span>
+      <span class="mzh">法伯测试（女性）</span>
+      <span class="men">Faber test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>托</b><span class="grp-meta">2 条</span></div>
+    <div class="mem">
+      <span class="mid">28141</span>
+      <span class="mzh">托马斯测试（女性）</span>
+      <span class="men">Thomas Test (female)</span>
+    </div><div class="mem">
+      <span class="mid">28142</span>
+      <span class="mzh">托马斯冠状面测试（女性）</span>
+      <span class="men">Thomas Frontal Test (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>稳</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28160</span>
+      <span class="mzh">稳定球背部拉伸（女性）</span>
+      <span class="men">Back Stretch on Stability Ball (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>管</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28161</span>
+      <span class="mzh">管状拉伸背部（女性）</span>
+      <span class="men">Back Stretch on Tube (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>支</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28163</span>
+      <span class="mzh">支撑倒立式瑜伽姿势西尔萨萨纳（女性）</span>
+      <span class="men">Supported Headstand Yoga Pose Sirsasana (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>牛</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28169</span>
+      <span class="mzh">牛面式瑜伽姿势戈穆哈萨纳（女性）</span>
+      <span class="men">Cow Face Yoga Pose Gomukhasana (female)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>完</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28177</span>
+      <span class="mzh">完整腕部俯卧撑（男性）</span>
+      <span class="men">Wrist Full Push-up (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>瓶</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28217</span>
+      <span class="mzh">瓶装加重大猩猩划船（男性）</span>
+      <span class="men">Bottle Weighted Gorilla Row (male)</span>
+    </div>
+  </div>
+
+  <div class="grp">
+    <div class="grp-h"><b>板</b><span class="grp-meta">1 条</span></div>
+    <div class="mem">
+      <span class="mid">28294</span>
+      <span class="mzh">板凳推（男性）</span>
+      <span class="men">Plate Push (male)</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>数据来源</strong>：2026-11-08 直连生产库 <code>47.108.200.98/gfit</code> 只读查询 + 生产机 <code>/media/gfit/exer_images</code> 只读列目录。</p>
+  <p><strong>本轮清理全部完成</strong>：先删 308 条（134 安全项 + 174 中文名会消失项），再删 347 条死条目。
+    动作库 <strong>7641 → 6986</strong>（共 -655），训练明细 2076、收藏标记 133 <strong>全程未变</strong>，
+    孤儿记录始终为 <strong>0</strong>。</p>
+  <p><strong>备份（可回滚）</strong>：<code>.gfit-backup-delete308-1794102730915.json</code>（308 行）、
+    <code>.gfit-backup-dead-1794103138294.json</code>（347 行）、
+    <code>.gfit-backup-ex2-1794052720226.json</code>（id=2 的 142 条训练记录还原备份）。</p>
+</footer>
+</div>
+</body>
+</html>

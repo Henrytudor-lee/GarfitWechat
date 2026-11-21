@@ -1,0 +1,1457 @@
+{
+  "generatedAt": "2026-11-13T13:27:39.790Z",
+  "count": 161,
+  "ids": [
+    55,
+    3916,
+    4129,
+    1948,
+    4334,
+    4336,
+    368,
+    446,
+    4340,
+    4341,
+    442,
+    309,
+    3909,
+    2264,
+    3686,
+    315,
+    2054,
+    279,
+    2482,
+    3693,
+    3692,
+    3792,
+    4266,
+    1512,
+    1514,
+    1524,
+    3921,
+    3746,
+    2740,
+    1549,
+    4421,
+    1577,
+    4277,
+    4287,
+    4290,
+    1625,
+    4294,
+    1637,
+    3677,
+    3483,
+    1668,
+    4304,
+    3817,
+    1685,
+    3913,
+    2500,
+    3376,
+    2650,
+    3688,
+    3641,
+    1750,
+    1755,
+    4412,
+    3759,
+    3754,
+    1793,
+    3826,
+    2480,
+    3928,
+    3922,
+    1812,
+    3924,
+    3833,
+    5533,
+    3862,
+    4323,
+    1886,
+    1905,
+    1907,
+    4327,
+    3890,
+    5172,
+    1933,
+    1936,
+    1947,
+    3770,
+    3771,
+    3773,
+    3774,
+    4989,
+    2132,
+    3777,
+    4240,
+    2186,
+    2241,
+    2275,
+    3485,
+    2314,
+    5557,
+    2385,
+    2421,
+    2558,
+    2530,
+    2572,
+    2603,
+    4190,
+    2712,
+    5550,
+    2772,
+    3919,
+    3920,
+    5735,
+    4928,
+    3681,
+    4302,
+    4303,
+    4305,
+    3872,
+    3217,
+    3222,
+    3422,
+    3424,
+    3441,
+    4106,
+    3615,
+    4660,
+    3644,
+    3713,
+    3895,
+    3977,
+    4053,
+    4127,
+    4133,
+    4195,
+    4208,
+    4215,
+    4233,
+    4387,
+    4392,
+    5090,
+    4567,
+    4579,
+    4675,
+    4653,
+    4683,
+    4687,
+    4765,
+    4791,
+    5710,
+    4921,
+    5250,
+    5555,
+    5711,
+    5864,
+    5594,
+    5598,
+    5708,
+    5716,
+    5722,
+    5778,
+    3751,
+    3743,
+    3603,
+    3561,
+    4324,
+    1932,
+    3942,
+    3779,
+    2635,
+    4430,
+    27712
+  ],
+  "rows": [
+    {
+      "id": 55,
+      "name": "Wrist Curl",
+      "nameZh": "腕弯举",
+      "keeperId": 54,
+      "keeperName": "Wrist Curl",
+      "tier": "A"
+    },
+    {
+      "id": 3916,
+      "name": "Cable Bench Press ",
+      "nameZh": "绳索卧推",
+      "keeperId": 59,
+      "keeperName": "Cable Bench Press",
+      "tier": "A"
+    },
+    {
+      "id": 4129,
+      "name": "Flutter Kicks ",
+      "nameZh": "交替踢腿",
+      "keeperId": 199,
+      "keeperName": "Flutter Kicks",
+      "tier": "A"
+    },
+    {
+      "id": 1948,
+      "name": "Inverted Row ",
+      "nameZh": "倒立划船",
+      "keeperId": 201,
+      "keeperName": "Inverted Row",
+      "tier": "A"
+    },
+    {
+      "id": 4334,
+      "name": "Lever Alternating Narrow Grip Seated Row ",
+      "nameZh": "杠杆交替窄握坐姿划船",
+      "keeperId": 202,
+      "keeperName": "Lever Alternating Narrow Grip Seated Row",
+      "tier": "A"
+    },
+    {
+      "id": 4336,
+      "name": "Lever Bicep Curl ",
+      "nameZh": "杠杆二头肌弯举",
+      "keeperId": 203,
+      "keeperName": "Lever Bicep Curl",
+      "tier": "A"
+    },
+    {
+      "id": 368,
+      "name": "Lever Gripless Shrug",
+      "nameZh": "杠杆无握耸肩",
+      "keeperId": 208,
+      "keeperName": "Lever Gripless Shrug",
+      "tier": "A"
+    },
+    {
+      "id": 446,
+      "name": "Lever Leg Extension",
+      "nameZh": "杠杆腿伸展",
+      "keeperId": 212,
+      "keeperName": "Lever Leg Extension",
+      "tier": "A"
+    },
+    {
+      "id": 4340,
+      "name": "Lever Narrow Grip Seated Row ",
+      "nameZh": "杠杆窄握坐姿划船",
+      "keeperId": 215,
+      "keeperName": "Lever Narrow Grip Seated Row",
+      "tier": "A"
+    },
+    {
+      "id": 4341,
+      "name": "Lever Preacher Curl ",
+      "nameZh": "杠杆preacher弯举",
+      "keeperId": 217,
+      "keeperName": "Lever Preacher Curl",
+      "tier": "A"
+    },
+    {
+      "id": 442,
+      "name": "Lever Seated Hip Abduction",
+      "nameZh": "坐姿髋外展",
+      "keeperId": 220,
+      "keeperName": "Lever Seated Hip Abduction",
+      "tier": "A"
+    },
+    {
+      "id": 309,
+      "name": "Lever Shrug",
+      "nameZh": "杠杆耸肩",
+      "keeperId": 224,
+      "keeperName": "Lever Shrug",
+      "tier": "A"
+    },
+    {
+      "id": 3909,
+      "name": "Smith Narrow Row ",
+      "nameZh": "史密斯机窄距划船",
+      "keeperId": 250,
+      "keeperName": "Smith Narrow Row",
+      "tier": "A"
+    },
+    {
+      "id": 2264,
+      "name": "Triceps Dip ",
+      "nameZh": "肱三头肌臂屈伸",
+      "keeperId": 262,
+      "keeperName": "Triceps Dip",
+      "tier": "A"
+    },
+    {
+      "id": 3686,
+      "name": "Vertical Leg Raise ",
+      "nameZh": "垂直腿抬升",
+      "keeperId": 265,
+      "keeperName": "Vertical Leg Raise",
+      "tier": "A"
+    },
+    {
+      "id": 315,
+      "name": "Seated Row",
+      "nameZh": "坐姿划船",
+      "keeperId": 270,
+      "keeperName": "seated row",
+      "tier": "A"
+    },
+    {
+      "id": 2054,
+      "name": "Lever Shoulder Press ",
+      "nameZh": "杠铃耸肩",
+      "keeperId": 273,
+      "keeperName": "Lever Shoulder Press",
+      "tier": "A"
+    },
+    {
+      "id": 279,
+      "name": "Lever Side Hip Abduction",
+      "nameZh": "杠杆侧髋外展",
+      "keeperId": 3997,
+      "keeperName": "Lever Side Hip Abduction ",
+      "tier": "A"
+    },
+    {
+      "id": 2482,
+      "name": "Smith Calf Raise ",
+      "nameZh": "史密斯机提踵",
+      "keeperId": 295,
+      "keeperName": "Smith Calf Raise",
+      "tier": "A"
+    },
+    {
+      "id": 3693,
+      "name": "Lever Incline Chest Press ",
+      "nameZh": "上斜杠杆胸部推举",
+      "keeperId": 326,
+      "keeperName": "Lever Incline Chest Press",
+      "tier": "A"
+    },
+    {
+      "id": 3692,
+      "name": "Lever Decline Chest Press ",
+      "nameZh": "下斜杠杆胸部推举",
+      "keeperId": 327,
+      "keeperName": "Lever Decline Chest Press",
+      "tier": "A"
+    },
+    {
+      "id": 3792,
+      "name": "Sled Full Hack Squat ",
+      "nameZh": "雪橇全深蹲",
+      "keeperId": 450,
+      "keeperName": "Sled Full Hack Squat",
+      "tier": "A"
+    },
+    {
+      "id": 4266,
+      "name": "Barbell JM Bench Press ",
+      "nameZh": "杠铃JM平板卧推",
+      "keeperId": 1503,
+      "keeperName": "Barbell JM Bench Press",
+      "tier": "A"
+    },
+    {
+      "id": 1512,
+      "name": "Barbell Lying Triceps Extension",
+      "nameZh": "杠铃仰卧肱三头肌伸展",
+      "keeperId": 3930,
+      "keeperName": "Barbell Lying Triceps Extension ",
+      "tier": "A"
+    },
+    {
+      "id": 1514,
+      "name": "Barbell Narrow Stance Squat",
+      "nameZh": "杠铃窄距深蹲",
+      "keeperId": 3627,
+      "keeperName": "Barbell Narrow Stance Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 1524,
+      "name": "Barbell Pullover",
+      "nameZh": "杠铃划船",
+      "keeperId": 5537,
+      "keeperName": "Barbell Pullover",
+      "tier": "A"
+    },
+    {
+      "id": 3921,
+      "name": "Barbell Revers Wrist Curl ",
+      "nameZh": "杠铃反向腕弯举",
+      "keeperId": 1530,
+      "keeperName": "Barbell Revers Wrist Curl ",
+      "tier": "A"
+    },
+    {
+      "id": 3746,
+      "name": "Barbell Reverse Preacher Curl ",
+      "nameZh": "杠铃反向 preacher 弯举",
+      "keeperId": 1532,
+      "keeperName": "Barbell Reverse Preacher Curl",
+      "tier": "A"
+    },
+    {
+      "id": 2740,
+      "name": "Barbell Seated Calf Raise",
+      "nameZh": "杠铃坐姿提踵",
+      "keeperId": 1539,
+      "keeperName": "Barbell Seated Calf Raise",
+      "tier": "A"
+    },
+    {
+      "id": 1549,
+      "name": "Barbell Side Split Squat",
+      "nameZh": "杠铃站立腿部提踵",
+      "keeperId": 1548,
+      "keeperName": "Barbell Side Split Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 4421,
+      "name": "Barbell Squat ",
+      "nameZh": "杠铃深蹲",
+      "keeperId": 1553,
+      "keeperName": "Barbell Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 1577,
+      "name": "Barbell Wrist Curl",
+      "nameZh": "杠铃手腕弯举",
+      "keeperId": 1576,
+      "keeperName": "Barbell Wrist Curl ",
+      "tier": "A"
+    },
+    {
+      "id": 4277,
+      "name": "Cable Alternate Triceps Extension ",
+      "nameZh": "绳索交替肱三头肌伸展",
+      "keeperId": 1600,
+      "keeperName": "Cable Alternate Triceps Extension",
+      "tier": "A"
+    },
+    {
+      "id": 4287,
+      "name": "Cable Incline Bench Press ",
+      "nameZh": "绳索上斜卧推",
+      "keeperId": 1620,
+      "keeperName": "Cable Incline Bench Press",
+      "tier": "A"
+    },
+    {
+      "id": 4290,
+      "name": "Cable Incline Triceps Extension ",
+      "nameZh": "绳索上斜臂屈伸",
+      "keeperId": 1624,
+      "keeperName": "Cable Incline Triceps Extension",
+      "tier": "A"
+    },
+    {
+      "id": 1625,
+      "name": "Cable Judo Flip",
+      "nameZh": "固定器械柔道翻转",
+      "keeperId": 4291,
+      "keeperName": "Cable Judo Flip ",
+      "tier": "A"
+    },
+    {
+      "id": 4294,
+      "name": "Cable Lying Extension Pullover ",
+      "nameZh": "绳索仰卧伸展划船",
+      "keeperId": 1635,
+      "keeperName": "Cable Lying Extension Pullover ",
+      "tier": "A"
+    },
+    {
+      "id": 1637,
+      "name": "Cable Lying Triceps Extension ",
+      "nameZh": "固定器械仰卧臂屈伸",
+      "keeperId": 1638,
+      "keeperName": "Cable Lying Triceps Extension",
+      "tier": "A"
+    },
+    {
+      "id": 3677,
+      "name": "Cable Middle Fly ",
+      "nameZh": "绳索中段飞鸟",
+      "keeperId": 1639,
+      "keeperName": "Cable Middle Fly",
+      "tier": "A"
+    },
+    {
+      "id": 3483,
+      "name": "Cable Pulldown ",
+      "nameZh": "高位下拉",
+      "keeperId": 1648,
+      "keeperName": "Cable Pulldown ",
+      "tier": "A"
+    },
+    {
+      "id": 1668,
+      "name": "Cable Seated Supine-grip Row",
+      "nameZh": "绳索坐姿仰卧握把划船",
+      "keeperId": 4464,
+      "keeperName": "Cable Seated Supine-grip Row ",
+      "tier": "A"
+    },
+    {
+      "id": 4304,
+      "name": "Cable Shoulder Press ",
+      "nameZh": "绳索肩推",
+      "keeperId": 1670,
+      "keeperName": "Cable Shoulder Press",
+      "tier": "A"
+    },
+    {
+      "id": 3817,
+      "name": "Cable Shrug ",
+      "nameZh": "缆绳耸肩",
+      "keeperId": 1671,
+      "keeperName": "Cable Shrug",
+      "tier": "A"
+    },
+    {
+      "id": 1685,
+      "name": "Cable Standing Row ",
+      "nameZh": "绳索站立划船",
+      "keeperId": 27429,
+      "keeperName": "Cable Standing Row",
+      "tier": "A"
+    },
+    {
+      "id": 3913,
+      "name": "Cable Standing Shoulder External Rotation ",
+      "nameZh": "绳索站立肩部外旋",
+      "keeperId": 1686,
+      "keeperName": "Cable Standing Shoulder External Rotation",
+      "tier": "A"
+    },
+    {
+      "id": 2500,
+      "name": "Cable twist ",
+      "nameZh": "绳索扭转",
+      "keeperId": 1694,
+      "keeperName": "Cable Twist",
+      "tier": "A"
+    },
+    {
+      "id": 3376,
+      "name": "Cat Stretch ",
+      "nameZh": "猫式拉伸",
+      "keeperId": 1700,
+      "keeperName": "Cat Stretch",
+      "tier": "A"
+    },
+    {
+      "id": 2650,
+      "name": "Dead Bug ",
+      "nameZh": "死虫式",
+      "keeperId": 1727,
+      "keeperName": "Dead Bug",
+      "tier": "A"
+    },
+    {
+      "id": 3688,
+      "name": "Decline Crunch ",
+      "nameZh": "下斜卷腹",
+      "keeperId": 1728,
+      "keeperName": "Decline Crunch",
+      "tier": "A"
+    },
+    {
+      "id": 3641,
+      "name": "Dumbbell Alternate Biceps Curl ",
+      "nameZh": "哑铃交替二头肌弯举",
+      "keeperId": 1736,
+      "keeperName": "Dumbbell Alternate Biceps Curl",
+      "tier": "A"
+    },
+    {
+      "id": 1750,
+      "name": "Dumbbell Cuban Press",
+      "nameZh": "哑铃古巴推举",
+      "keeperId": 3399,
+      "keeperName": "Dumbbell Cuban Press ",
+      "tier": "A"
+    },
+    {
+      "id": 1755,
+      "name": "Dumbbell Decline Shrug ",
+      "nameZh": "下斜哑铃耸肩",
+      "keeperId": 1756,
+      "keeperName": "Dumbbell Decline Shrug",
+      "tier": "A"
+    },
+    {
+      "id": 4412,
+      "name": "Dumbbell Fly ",
+      "nameZh": "哑铃飞鸟",
+      "keeperId": 1759,
+      "keeperName": "Dumbbell Fly",
+      "tier": "A"
+    },
+    {
+      "id": 3759,
+      "name": "Dumbbell Incline Inner Biceps Curl ",
+      "nameZh": "倾斜哑铃内侧二头肌弯举",
+      "keeperId": 1773,
+      "keeperName": "Dumbbell Incline Inner Biceps Curl",
+      "tier": "A"
+    },
+    {
+      "id": 3754,
+      "name": "Dumbbell Incline Raise ",
+      "nameZh": "倾斜哑铃侧平举",
+      "keeperId": 1776,
+      "keeperName": "Dumbbell Incline Raise",
+      "tier": "A"
+    },
+    {
+      "id": 1793,
+      "name": "Dumbbell Lying One Arm Press ",
+      "nameZh": "哑铃仰卧单臂推举",
+      "keeperId": 1794,
+      "keeperName": "Dumbbell Lying One Arm Press",
+      "tier": "A"
+    },
+    {
+      "id": 3826,
+      "name": "Dumbbell Lying One Arm Pronated Triceps Extension ",
+      "nameZh": "哑铃仰卧单臂正握肱三头肌伸展",
+      "keeperId": 1795,
+      "keeperName": "Dumbbell Lying One Arm Pronated Triceps Extension",
+      "tier": "A"
+    },
+    {
+      "id": 2480,
+      "name": "Dumbbell Lying One Arm Rear Lateral Raise",
+      "nameZh": "哑铃仰卧单臂后侧平举",
+      "keeperId": 1796,
+      "keeperName": "Dumbbell Lying One Arm Rear Lateral Raise",
+      "tier": "A"
+    },
+    {
+      "id": 3928,
+      "name": "Dumbbell One Arm Lateral Raise ",
+      "nameZh": "哑铃单臂侧平举",
+      "keeperId": 1806,
+      "keeperName": "Dumbbell One Arm Lateral Raise",
+      "tier": "A"
+    },
+    {
+      "id": 3922,
+      "name": "Dumbbell One arm Revers Wrist Curl ",
+      "nameZh": "哑铃单臂反向腕弯举",
+      "keeperId": 1809,
+      "keeperName": "Dumbbell One arm Revers Wrist Curl",
+      "tier": "A"
+    },
+    {
+      "id": 1812,
+      "name": "Dumbbell One Arm Shoulder Press",
+      "nameZh": "哑铃单臂肩推",
+      "keeperId": 1811,
+      "keeperName": "Dumbbell One Arm Shoulder Press ",
+      "tier": "A"
+    },
+    {
+      "id": 3924,
+      "name": "Dumbbell One arm Wrist Curl ",
+      "nameZh": "哑铃单臂腕弯举",
+      "keeperId": 1815,
+      "keeperName": "Dumbbell One arm Wrist Curl",
+      "tier": "A"
+    },
+    {
+      "id": 3833,
+      "name": "Dumbbell Seated Alternate Front Raise ",
+      "nameZh": "哑铃坐姿交替前平举",
+      "keeperId": 1838,
+      "keeperName": "Dumbbell Seated Alternate Front Raise",
+      "tier": "A"
+    },
+    {
+      "id": 5533,
+      "name": "Dumbbell Side Bend ",
+      "nameZh": "哑铃侧弯",
+      "keeperId": 1858,
+      "keeperName": "Dumbbell Side Bend",
+      "tier": "A"
+    },
+    {
+      "id": 3862,
+      "name": "Dumbbell Single Leg Calf Raise ",
+      "nameZh": "单腿地面提踵",
+      "keeperId": 1860,
+      "keeperName": "Dumbbell Single Leg Calf Raise",
+      "tier": "A"
+    },
+    {
+      "id": 4323,
+      "name": "Dumbbell Standing One Arm Curl ",
+      "nameZh": "哑铃站姿单臂弯举",
+      "keeperId": 1873,
+      "keeperName": "Dumbbell Standing One Arm Curl ",
+      "tier": "A"
+    },
+    {
+      "id": 1886,
+      "name": "Dumbbell Sumo Squat ",
+      "nameZh": "哑铃深蹲（宽距）",
+      "keeperId": 3560,
+      "keeperName": "Dumbbell Sumo Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 1905,
+      "name": "EZ Barbell Spider Curl",
+      "nameZh": "EZ杆蜘蛛弯举",
+      "keeperId": 2942,
+      "keeperName": "EZ Barbell Spider Curl",
+      "tier": "A"
+    },
+    {
+      "id": 1907,
+      "name": "Flexion Leg Sit up ",
+      "nameZh": "屈腿仰卧起坐",
+      "keeperId": 1908,
+      "keeperName": "Flexion Leg Sit up ",
+      "tier": "A"
+    },
+    {
+      "id": 4327,
+      "name": "Groin Crunch ",
+      "nameZh": "腹股沟卷腹",
+      "keeperId": 1920,
+      "keeperName": "Groin Crunch",
+      "tier": "A"
+    },
+    {
+      "id": 3890,
+      "name": "Hanging Pike ",
+      "nameZh": "悬垂尖峰",
+      "keeperId": 1924,
+      "keeperName": "Hanging Pike",
+      "tier": "A"
+    },
+    {
+      "id": 5172,
+      "name": "High Knee Squat ",
+      "nameZh": "高膝深蹲",
+      "keeperId": 1929,
+      "keeperName": "High Knee Squat",
+      "tier": "A"
+    },
+    {
+      "id": 1933,
+      "name": "Hip Crunch ",
+      "nameZh": "髋部卷腹",
+      "keeperId": 46827,
+      "keeperName": "Hip Crunch",
+      "tier": "A"
+    },
+    {
+      "id": 1936,
+      "name": "Hip Raise Bridge ",
+      "nameZh": "髋部提升桥式",
+      "keeperId": 1937,
+      "keeperName": "Hip Raise Bridge",
+      "tier": "A"
+    },
+    {
+      "id": 1947,
+      "name": "Inverse Leg Curl ",
+      "nameZh": "倒立腿弯举",
+      "keeperId": 3638,
+      "keeperName": "Inverse Leg Curl ",
+      "tier": "A"
+    },
+    {
+      "id": 3770,
+      "name": "Kettlebell Alternating Press on Floor ",
+      "nameZh": "地面交替壶铃推举",
+      "keeperId": 1970,
+      "keeperName": "Kettlebell Alternating Press on Floor",
+      "tier": "A"
+    },
+    {
+      "id": 3771,
+      "name": "Kettlebell Alternating Renegade Row ",
+      "nameZh": "交替壶铃叛徒划船",
+      "keeperId": 1972,
+      "keeperName": "Kettlebell Alternating Renegade Row",
+      "tier": "A"
+    },
+    {
+      "id": 3773,
+      "name": "Kettlebell Figure 8 ",
+      "nameZh": "壶铃8字运动",
+      "keeperId": 1983,
+      "keeperName": "Kettlebell Figure 8",
+      "tier": "A"
+    },
+    {
+      "id": 3774,
+      "name": "Kettlebell Lunge Pass Through ",
+      "nameZh": "壶铃弓步穿刺",
+      "keeperId": 1987,
+      "keeperName": "Kettlebell Lunge Pass Through",
+      "tier": "A"
+    },
+    {
+      "id": 4989,
+      "name": "Lever Seated Crunch ",
+      "nameZh": "杠杆坐姿卷腹",
+      "keeperId": 2046,
+      "keeperName": "Lever Seated Crunch ",
+      "tier": "A"
+    },
+    {
+      "id": 2132,
+      "name": "Rotate Push-up ",
+      "nameZh": "旋转俯卧撑",
+      "keeperId": 2133,
+      "keeperName": "Rotate Push-up",
+      "tier": "A"
+    },
+    {
+      "id": 3777,
+      "name": "Seated Leg Raise ",
+      "nameZh": "坐姿抬腿",
+      "keeperId": 2140,
+      "keeperName": "Seated Leg Raise",
+      "tier": "A"
+    },
+    {
+      "id": 4240,
+      "name": "Single Arm Push-up ",
+      "nameZh": "单臂俯卧撑",
+      "keeperId": 2176,
+      "keeperName": "Single Arm Push-up",
+      "tier": "A"
+    },
+    {
+      "id": 2186,
+      "name": "Sit-Up ",
+      "nameZh": "仰卧起坐",
+      "keeperId": 2187,
+      "keeperName": "Sit-Up",
+      "tier": "A"
+    },
+    {
+      "id": 2241,
+      "name": "Standing Hip Abduction ",
+      "nameZh": "站姿髋外展",
+      "keeperId": 2242,
+      "keeperName": "Standing Hip Abduction",
+      "tier": "A"
+    },
+    {
+      "id": 2275,
+      "name": "Twisting Crunch",
+      "nameZh": "扭转卷腹",
+      "keeperId": 2274,
+      "keeperName": "Twisting Crunch ",
+      "tier": "A"
+    },
+    {
+      "id": 3485,
+      "name": "Cable Seated Row ",
+      "nameZh": "坐姿划船",
+      "keeperId": 2312,
+      "keeperName": "Cable seated row",
+      "tier": "A"
+    },
+    {
+      "id": 2314,
+      "name": "Dumbbell lying external shoulder rotation",
+      "nameZh": "哑铃仰卧肩外旋",
+      "keeperId": 4317,
+      "keeperName": "Dumbbell lying external shoulder rotation ",
+      "tier": "A"
+    },
+    {
+      "id": 5557,
+      "name": "Band overhead triceps extension ",
+      "nameZh": "弹力带过顶肱三头肌伸展",
+      "keeperId": 2365,
+      "keeperName": "Band overhead triceps extension",
+      "tier": "A"
+    },
+    {
+      "id": 2385,
+      "name": "Band upright row",
+      "nameZh": "弹力带直立划船",
+      "keeperId": 2842,
+      "keeperName": "Band Upright Row ",
+      "tier": "A"
+    },
+    {
+      "id": 2421,
+      "name": "Band assisted pull-up",
+      "nameZh": "弹力带辅助引体向上",
+      "keeperId": 4235,
+      "keeperName": "Band Assisted Pull-Up ",
+      "tier": "A"
+    },
+    {
+      "id": 2558,
+      "name": "Suspension Pull-up ",
+      "nameZh": "悬吊引体向上",
+      "keeperId": 2519,
+      "keeperName": "Suspension Pull-up",
+      "tier": "A"
+    },
+    {
+      "id": 2530,
+      "name": "Suspension Single Leg Split Squat ",
+      "nameZh": "悬吊单腿分腿蹲",
+      "keeperId": 2531,
+      "keeperName": "Suspension Single Leg Split Squat",
+      "tier": "A"
+    },
+    {
+      "id": 2572,
+      "name": "Suspension Squat ",
+      "nameZh": "悬吊深蹲",
+      "keeperId": 2574,
+      "keeperName": "Suspension Squat",
+      "tier": "A"
+    },
+    {
+      "id": 2603,
+      "name": "Dumbbell Standing Single Leg Calf Raise",
+      "nameZh": "哑铃单腿站立提踵",
+      "keeperId": 4943,
+      "keeperName": "Dumbbell Standing Single Leg Calf Raise",
+      "tier": "A"
+    },
+    {
+      "id": 4190,
+      "name": "Smith kneeling rear kick ",
+      "nameZh": "史密斯跪姿后踢",
+      "keeperId": 2607,
+      "keeperName": "Smith kneeling rear kick",
+      "tier": "A"
+    },
+    {
+      "id": 2712,
+      "name": "Exercise Ball Back Extension With Hands Behind Head",
+      "nameZh": "健身球双手抱头背部伸展",
+      "keeperId": 4059,
+      "keeperName": "Exercise Ball Back Extension With Hands Behind Head ",
+      "tier": "A"
+    },
+    {
+      "id": 5550,
+      "name": "Bench Dip on floor ",
+      "nameZh": "地板长凳臂屈伸",
+      "keeperId": 2762,
+      "keeperName": "Bench dip on floor",
+      "tier": "A"
+    },
+    {
+      "id": 2772,
+      "name": "Barbell Glute Bridge",
+      "nameZh": "杠铃臀桥",
+      "keeperId": 4202,
+      "keeperName": "Barbell Glute Bridge ",
+      "tier": "A"
+    },
+    {
+      "id": 3919,
+      "name": "Barbell Palms Down Wrist Curl Over A Bench ",
+      "nameZh": "杠铃掌心向下腕弯举（过长凳）",
+      "keeperId": 2774,
+      "keeperName": "Barbell Palms Down Wrist Curl Over A Bench",
+      "tier": "A"
+    },
+    {
+      "id": 3920,
+      "name": "Barbell Palms Up Wrist Curl Over A Bench ",
+      "nameZh": "杠铃掌心向上腕弯举（过长凳）",
+      "keeperId": 2775,
+      "keeperName": "Barbell Palms Up Wrist Curl Over A Bench",
+      "tier": "A"
+    },
+    {
+      "id": 5735,
+      "name": "Seated Glute Stretch ",
+      "nameZh": "坐姿臀部拉伸",
+      "keeperId": 2785,
+      "keeperName": "Seated Glute Stretch",
+      "tier": "A"
+    },
+    {
+      "id": 4928,
+      "name": "Inchworm ",
+      "nameZh": "尺蠖",
+      "keeperId": 2814,
+      "keeperName": "Inchworm",
+      "tier": "A"
+    },
+    {
+      "id": 3681,
+      "name": "Oblique Crunch ",
+      "nameZh": "侧腹卷腹",
+      "keeperId": 2837,
+      "keeperName": "Oblique Crunch ",
+      "tier": "A"
+    },
+    {
+      "id": 4302,
+      "name": "Cable Seated One Arm Concentration Curl ",
+      "nameZh": "绳索单臂集中弯举",
+      "keeperId": 2950,
+      "keeperName": "Cable Seated One Arm Concentration Curl",
+      "tier": "A"
+    },
+    {
+      "id": 4303,
+      "name": "Cable Seated Overhead Curl ",
+      "nameZh": "绳索坐姿过顶弯举",
+      "keeperId": 2951,
+      "keeperName": "Cable Seated Overhead Curl",
+      "tier": "A"
+    },
+    {
+      "id": 4305,
+      "name": "Cable Squatting Curl ",
+      "nameZh": "绳索深蹲弯举",
+      "keeperId": 2952,
+      "keeperName": "Cable Squatting Curl",
+      "tier": "A"
+    },
+    {
+      "id": 3872,
+      "name": "Barbell Single Leg Deadlift ",
+      "nameZh": "哑铃单腿硬拉",
+      "keeperId": 3047,
+      "keeperName": "Barbell Single Leg Deadlift",
+      "tier": "A"
+    },
+    {
+      "id": 3217,
+      "name": "Lying Leg Tuck Hip Stretch",
+      "nameZh": "仰卧腿卷曲髋部拉伸",
+      "keeperId": 4702,
+      "keeperName": "Lying Leg Tuck Hip Stretch ",
+      "tier": "A"
+    },
+    {
+      "id": 3222,
+      "name": "Flexion And Extension Hip Stretch",
+      "nameZh": "屈伸髋部拉伸",
+      "keeperId": 4626,
+      "keeperName": "Flexion And Extension Hip Stretch ",
+      "tier": "A"
+    },
+    {
+      "id": 3422,
+      "name": "Resistance Band One Leg Glute Bridge",
+      "nameZh": "单腿弹力带臀桥",
+      "keeperId": 3794,
+      "keeperName": "Resistance Band One Leg Glute Bridge ",
+      "tier": "A"
+    },
+    {
+      "id": 3424,
+      "name": "Resistance Band One Leg Kickback",
+      "nameZh": "单腿弹力带后踢",
+      "keeperId": 3423,
+      "keeperName": "Resistance Band One Leg Kickback ",
+      "tier": "A"
+    },
+    {
+      "id": 3441,
+      "name": "Roll Recumbent Hip External Rotator and Hip Extensor Stretch ",
+      "nameZh": "仰卧髋外旋和髋伸展拉伸",
+      "keeperId": 4797,
+      "keeperName": "Roll Recumbent Hip External Rotator and Hip Extensor Stretch ",
+      "tier": "A"
+    },
+    {
+      "id": 4106,
+      "name": "Spine Twist ",
+      "nameZh": "脊柱扭转",
+      "keeperId": 3567,
+      "keeperName": "Spine Twist",
+      "tier": "A"
+    },
+    {
+      "id": 3615,
+      "name": "Lever Horizontal Leg Press ",
+      "nameZh": "杠杆水平腿举",
+      "keeperId": 4189,
+      "keeperName": "Lever Horizontal Leg Press",
+      "tier": "A"
+    },
+    {
+      "id": 4660,
+      "name": "Dumbbell Scott Press ",
+      "nameZh": "哑铃斯科特推举",
+      "keeperId": 3635,
+      "keeperName": "Dumbbell Scott Press",
+      "tier": "A"
+    },
+    {
+      "id": 3644,
+      "name": "Cable Reverse Grip Triceps Pushdown ",
+      "nameZh": "反握绳索三头肌下压",
+      "keeperId": 47672,
+      "keeperName": "Cable Reverse Grip Triceps Pushdown",
+      "tier": "A"
+    },
+    {
+      "id": 3713,
+      "name": "Glute Bridge One Leg on Floor ",
+      "nameZh": "单腿地面臀桥",
+      "keeperId": 3714,
+      "keeperName": "Glute Bridge One Leg on Floor ",
+      "tier": "A"
+    },
+    {
+      "id": 3895,
+      "name": "Cable One Arm Biceps Curl ",
+      "nameZh": "绳索单臂肱二头肌弯举",
+      "keeperId": 3894,
+      "keeperName": "Cable One Arm Biceps Curl ",
+      "tier": "A"
+    },
+    {
+      "id": 3977,
+      "name": "Dumbbell Side Bridge ",
+      "nameZh": "哑铃侧桥",
+      "keeperId": 4568,
+      "keeperName": "Dumbbell Side Bridge",
+      "tier": "A"
+    },
+    {
+      "id": 4053,
+      "name": "V-Up Down ",
+      "nameZh": "V形起身下放",
+      "keeperId": 4054,
+      "keeperName": "V-Up Down ",
+      "tier": "A"
+    },
+    {
+      "id": 4127,
+      "name": "Starfish Crunch ",
+      "nameZh": "星鱼卷腹",
+      "keeperId": 4126,
+      "keeperName": "Starfish Crunch ",
+      "tier": "A"
+    },
+    {
+      "id": 4133,
+      "name": "Front Plank with Arm Lift ",
+      "nameZh": "手臂抬起的平板支撑",
+      "keeperId": 4132,
+      "keeperName": "Front Plank with Arm Lift ",
+      "tier": "A"
+    },
+    {
+      "id": 4195,
+      "name": "Dumbbell Split Squat Front Foot Elevanted",
+      "nameZh": "哑铃分腿深蹲（前脚抬高）",
+      "keeperId": 4196,
+      "keeperName": "Dumbbell Split Squat Front Foot Elevanted ",
+      "tier": "A"
+    },
+    {
+      "id": 4208,
+      "name": "Band Thruster",
+      "nameZh": "弹力带推举",
+      "keeperId": 4209,
+      "keeperName": "Band Thruster ",
+      "tier": "A"
+    },
+    {
+      "id": 4215,
+      "name": "Landmine Squat and Press ",
+      "nameZh": "地锚深蹲与推举",
+      "keeperId": 4214,
+      "keeperName": "Landmine Squat and Press",
+      "tier": "A"
+    },
+    {
+      "id": 4233,
+      "name": "Band Single Arm Shoulder Press ",
+      "nameZh": "弹力带单臂肩推",
+      "keeperId": 4234,
+      "keeperName": "Band Single Arm Shoulder Press",
+      "tier": "A"
+    },
+    {
+      "id": 4387,
+      "name": "Chin Tuck",
+      "nameZh": "下巴收回",
+      "keeperId": 4389,
+      "keeperName": "Chin Tuck ",
+      "tier": "A"
+    },
+    {
+      "id": 4392,
+      "name": "Bodyweight Standing Close-grip One Arm Row ",
+      "nameZh": "徒手站立窄握单臂划船",
+      "keeperId": 4393,
+      "keeperName": "Bodyweight Standing Close-grip One Arm Row",
+      "tier": "A"
+    },
+    {
+      "id": 5090,
+      "name": "Frog Reverse Hyperextension ",
+      "nameZh": "青蛙反向超伸",
+      "keeperId": 4416,
+      "keeperName": "Frog Reverse Hyperextension ",
+      "tier": "A"
+    },
+    {
+      "id": 4567,
+      "name": "Dumbbell V-up",
+      "nameZh": "哑铃V型起身",
+      "keeperId": 4676,
+      "keeperName": "Dumbbell V-up ",
+      "tier": "A"
+    },
+    {
+      "id": 4579,
+      "name": "Cable Front Squat",
+      "nameZh": "绳索前深蹲",
+      "keeperId": 4584,
+      "keeperName": "Cable Front Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 4675,
+      "name": "Dumbbell Swing ",
+      "nameZh": "哑铃摆动",
+      "keeperId": 4598,
+      "keeperName": "Dumbbell Swing",
+      "tier": "A"
+    },
+    {
+      "id": 4653,
+      "name": "Crunch with Medicine Ball ",
+      "nameZh": "药球卷腹",
+      "keeperId": 4652,
+      "keeperName": "Crunch with Medicine Ball",
+      "tier": "A"
+    },
+    {
+      "id": 4683,
+      "name": "Dumbbell Svend Press ",
+      "nameZh": "哑铃斯文举",
+      "keeperId": 4682,
+      "keeperName": "Dumbbell Svend Press",
+      "tier": "A"
+    },
+    {
+      "id": 4687,
+      "name": "Burpee with Push-up ",
+      "nameZh": "俯卧撑波比跳",
+      "keeperId": 4686,
+      "keeperName": "Burpee with Push-up ",
+      "tier": "A"
+    },
+    {
+      "id": 4765,
+      "name": "Bodyweight Pulse Squat",
+      "nameZh": "自重脉冲深蹲",
+      "keeperId": 5032,
+      "keeperName": "Bodyweight Pulse Squat ",
+      "tier": "A"
+    },
+    {
+      "id": 4791,
+      "name": "Glute Bridge March",
+      "nameZh": "臀桥踏步",
+      "keeperId": 5039,
+      "keeperName": "Glute Bridge March ",
+      "tier": "A"
+    },
+    {
+      "id": 5710,
+      "name": "Kettlebell Forward Lunge ",
+      "nameZh": "壶铃前蹲",
+      "keeperId": 4804,
+      "keeperName": "Kettlebell Forward Lunge",
+      "tier": "A"
+    },
+    {
+      "id": 4921,
+      "name": "Dumbbell Goblet Split Squat",
+      "nameZh": "哑铃壶式分腿蹲",
+      "keeperId": 27374,
+      "keeperName": "Dumbbell Goblet Split Squat",
+      "tier": "A"
+    },
+    {
+      "id": 5250,
+      "name": "Landmine Rear Lunge ",
+      "nameZh": "杠铃后撤步深蹲",
+      "keeperId": 5137,
+      "keeperName": "Landmine Rear Lunge",
+      "tier": "A"
+    },
+    {
+      "id": 5555,
+      "name": "Band Biceps Curl ",
+      "nameZh": "弹力带二头肌弯举",
+      "keeperId": 5273,
+      "keeperName": "Band Biceps Curl",
+      "tier": "A"
+    },
+    {
+      "id": 5711,
+      "name": "Kettlebell Side Lunge ",
+      "nameZh": "壶铃侧蹲",
+      "keeperId": 5308,
+      "keeperName": "Kettlebell Side Lunge ",
+      "tier": "A"
+    },
+    {
+      "id": 5864,
+      "name": "Band Assisted Chin-Up ",
+      "nameZh": "弹力带辅助引体向上",
+      "keeperId": 5415,
+      "keeperName": "Band Assisted Chin-Up ",
+      "tier": "A"
+    },
+    {
+      "id": 5594,
+      "name": "Kettlebell Side Bend ",
+      "nameZh": "壶铃侧弯",
+      "keeperId": 47848,
+      "keeperName": "Kettlebell Side Bend",
+      "tier": "A"
+    },
+    {
+      "id": 5598,
+      "name": "Kettlebell Step-Up",
+      "nameZh": "壶铃台阶上举",
+      "keeperId": 5632,
+      "keeperName": "Kettlebell Step-Up ",
+      "tier": "A"
+    },
+    {
+      "id": 5708,
+      "name": "Kettlebell Single Leg Deadlift ",
+      "nameZh": "单腿壶铃硬拉",
+      "keeperId": 47247,
+      "keeperName": "Kettlebell Single Leg Deadlift",
+      "tier": "A"
+    },
+    {
+      "id": 5716,
+      "name": "Kettlebell Single Arm Clean and Press ",
+      "nameZh": "单臂壶铃挺举并推举",
+      "keeperId": 46898,
+      "keeperName": "Kettlebell Single Arm Clean and Press",
+      "tier": "A"
+    },
+    {
+      "id": 5722,
+      "name": "Kettlebell Bent-Over Row ",
+      "nameZh": "壶铃弯腰划船",
+      "keeperId": 47226,
+      "keeperName": "Kettlebell Bent-over Row",
+      "tier": "A"
+    },
+    {
+      "id": 5778,
+      "name": "Hook Kick Kickboxing ",
+      "nameZh": "钩踢",
+      "keeperId": 5769,
+      "keeperName": "Hook Kick Kickboxing ",
+      "tier": "A"
+    },
+    {
+      "id": 3751,
+      "name": "Cable One Arm Lateral Bent over ",
+      "nameZh": "单臂侧向弯体绳索拉力",
+      "keeperId": 1642,
+      "keeperName": "Cable One Arm Lateral Bent-over",
+      "tier": "B"
+    },
+    {
+      "id": 3743,
+      "name": "Dumbbell Incline Palm in Press ",
+      "nameZh": "倾斜哑铃掌心向内推举",
+      "keeperId": 1775,
+      "keeperName": "Dumbbell Incline Palm-in Press",
+      "tier": "B"
+    },
+    {
+      "id": 3603,
+      "name": "Dumbbells Straight Arm Pullover ",
+      "nameZh": "哑铃直臂下拉",
+      "keeperId": 1884,
+      "keeperName": "Dumbbell Straight Arm Pullover",
+      "tier": "B"
+    },
+    {
+      "id": 3561,
+      "name": "Dumbbells Sumo Squat ",
+      "nameZh": "哑铃sumo深蹲",
+      "keeperId": 3560,
+      "keeperName": "Dumbbell Sumo Squat ",
+      "tier": "B"
+    },
+    {
+      "id": 4324,
+      "name": "Elbow To Knee Twists ",
+      "nameZh": "肘膝转体",
+      "keeperId": 1893,
+      "keeperName": "Elbow-To-Knee Twists",
+      "tier": "B"
+    },
+    {
+      "id": 1932,
+      "name": "High knees butt kicks",
+      "nameZh": "高抬腿脚跟击臀",
+      "keeperId": 46756,
+      "keeperName": "High Knee to Butt Kick",
+      "tier": "B"
+    },
+    {
+      "id": 3942,
+      "name": "Rocky Pull Up Pulldown ",
+      "nameZh": "岩石引体向上下拉",
+      "keeperId": 2129,
+      "keeperName": "Rocky Pull-Up Pulldown",
+      "tier": "B"
+    },
+    {
+      "id": 3779,
+      "name": "Band jack knife sit up ",
+      "nameZh": "弹力带折叠式仰卧起坐",
+      "keeperId": 2432,
+      "keeperName": "Band jack knife sit-up",
+      "tier": "B"
+    },
+    {
+      "id": 2635,
+      "name": "Assisted Close-grip Underhand Chin-up",
+      "nameZh": "辅助窄距反握引体向上",
+      "keeperId": 3781,
+      "keeperName": "Assisted Close grip Underhand Chin up ",
+      "tier": "B"
+    },
+    {
+      "id": 4430,
+      "name": "Glute-Ham Raise",
+      "nameZh": "臀腿提升",
+      "keeperId": 5648,
+      "keeperName": "Glute Ham Raise ",
+      "tier": "B"
+    },
+    {
+      "id": 27712,
+      "name": "Dumbbell Z Press",
+      "nameZh": "哑铃Z式推举",
+      "keeperId": 28166,
+      "keeperName": "Dumbbell Z-Press",
+      "tier": "B"
+    }
+  ]
+}

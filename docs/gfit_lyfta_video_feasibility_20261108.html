@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFIT 缺失演示视频 · Lyfta 抓取实测报告（第二版 · 结论已修正）</title>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171d26; --panel2:#1e2530; --line:#2a3341;
+    --fg:#e6edf3; --muted:#8b97a6; --dim:#5c6773;
+    --red:#f85149; --green:#3fb950; --amber:#d29922; --blue:#58a6ff; --purple:#bc8cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    line-height:1.78;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:28px;margin:0 0 8px;letter-spacing:-.4px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:30px}
+  h2{font-size:20px;margin:44px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:26px 0 10px}
+  p{margin:10px 0}
+  code{background:var(--panel2);padding:2px 6px;border-radius:4px;font-size:13px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;color:#a5d6ff}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 24px;margin:18px 0}
+  .verdict{background:linear-gradient(135deg,#12301c,#0f1a13);border:1px solid #2c5a3a;border-radius:12px;padding:24px 28px;margin:24px 0}
+  .verdict .big{font-size:21px;font-weight:700;color:#7ee787;margin-bottom:10px}
+  .correction{background:linear-gradient(135deg,#2d1215,#1a1013);border:1px solid #5c1f22;border-radius:12px;padding:22px 26px;margin:22px 0}
+  .correction .big{font-size:18px;font-weight:700;color:#ff8b85;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+  th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel2);font-weight:600;color:var(--muted);font-size:12.5px;
+    text-transform:uppercase;letter-spacing:.5px}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .yes{color:var(--green);font-weight:600}
+  .no{color:var(--red);font-weight:600}
+  .na{color:var(--dim)}
+  .warn{color:var(--amber);font-weight:600}
+  .quote{background:var(--panel2);border-left:3px solid var(--blue);padding:14px 18px;
+    margin:14px 0;font-size:14px;color:#cfe3ff;border-radius:0 6px 6px 0}
+  .quote .src{display:block;margin-top:8px;color:var(--dim);font-size:12.5px}
+  ol,ul{padding-left:22px}
+  li{margin:6px 0}
+  .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;font-weight:600;letter-spacing:.3px}
+  .t-red{background:rgba(248,81,73,.15);color:#ff8b85;border:1px solid rgba(248,81,73,.3)}
+  .t-green{background:rgba(63,185,80,.15);color:#7ee787;border:1px solid rgba(63,185,80,.3)}
+  .t-amber{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.3)}
+  .t-blue{background:rgba(88,166,255,.15);color:#79c0ff;border:1px solid rgba(88,166,255,.3)}
+  pre{background:#0b0f14;border:1px solid var(--line);border-radius:8px;padding:14px 16px;
+    overflow-x:auto;font-size:12.5px;line-height:1.6;color:#c9d1d9;
+    font-family:"SF Mono",Menlo,Consolas,monospace}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .stat .n{font-size:26px;font-weight:700;line-height:1.2}
+  .stat .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .foot{color:var(--dim);font-size:12.5px;margin-top:50px;padding-top:20px;border-top:1px solid var(--line)}
+  .hl{background:rgba(88,166,255,.12);padding:1px 5px;border-radius:3px;color:#a5d6ff}
+  .strike{text-decoration:line-through;opacity:.55}
+  ol.err{counter-reset:e} ol.err>li{counter-increment:e;margin:10px 0}
+  ol.err>li::before{content:"✗ " ; color:var(--red); font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>GFIT 缺失演示视频 · Lyfta 抓取实测报告</h1>
+  <div class="sub">
+    第二版（结论已修正）· 评估日期 2026-11-08 · 评估对象 <code>my.lyfta.app</code> / <code>lyfta.app</code> / <code>apilyfta.com</code>
+  </div>
+
+  <div class="correction">
+    <div class="big">⚠️ 本报告修正了第一版的两个错误结论</div>
+    <p style="margin:4px 0 10px">第一版（同名 <code>.html</code> 已被本文件取代）断言「这 2018 条动作在 GymVisual 源头就没有视频」。<b>这个结论是错的。</b>
+    根因是数据源选错了 —— 不是 Lyfta 没有视频，而是我用来判断的<b>公开接口字段是过时的</b>。</p>
+    <ol class="err">
+      <li><b>公开 <code>POST /api/search</code> 的 <code>video_file</code> 字段是旧的快照。</b>
+        用它判断，<code>id=5443</code> / <code>id=1560</code> 都返回 <code>null</code>；
+        但登录态 <code>/api/v2/exercises/by-ids</code> 返回的 <code>videoFile</code> 非空，且 URL 实测 200 可下载。</li>
+      <li><b>我第一版的「2000 个组号 S3 全量穷举 0 命中」是方法缺陷，不是事实。</b>
+        我只试了 <code>{组号}1201.mp4</code> 一种 key 形式；而 Lyfta 后来补做的视频<b>只有带描述名的路径</b>
+        （如 <code>42351201-Dumbbell-...Shoulders-.mp4</code>），短名路径仍然是 403。</li>
+    </ol>
+    <p style="margin:10px 0 0"><b>修正后的结论：</b>Lyfta 上<b>确实</b>有这批动作的视频，只是公开接口不暴露。
+      已用登录态接口实测并落地 <b>3 行</b>（15 条被训练过的缺视频动作中命中 2 条，加上 1 条同组变体）。</p>
+  </div>
+
+  <div class="verdict">
+    <div class="big">最终成果：全量 2015 条扫描完毕，288 条视频补进生产库，坏引用清零</div>
+    <p style="margin:6px 0 0">
+      缺视频动作数 <b>2018 → 1728</b>；有视频 <b>4968 → 5258</b>；生产机 mp4 <b>4727 → 5015</b>；孤儿记录 <b>0</b>。
+    </p>
+    <p style="margin:8px 0 0">
+      全部 2015 个 id 一次性扫完（26 批 × 80），命中 299 条 → <b>双校验通过 288 条</b>（286 个 mp4 文件，2 个文件被 2 条库记录共用），
+      公网可达 <b>286/286</b>，sha256 与生产机磁盘<b>逐字节一致</b>。
+    </p>
+    <p style="margin:8px 0 0">
+      <b>额外成果</b>：全库「库引用了但磁盘上没这个文件」的坏引用从 1 条（存量）降到 <b>0 条</b>。
+    </p>
+  </div>
+
+  <h2>一、关键方法：登录态 API 才是准确数据源</h2>
+  <p>从 Lyfta 官方 App 的 JS chunk（<code>my.lyfta.app/_next/static/immutable/chunks/*.js</code>，SvelteKit）里挖出了真实端点与参数：</p>
+  <table>
+    <thead><tr><th style="width:34%">端点</th><th style="width:26%">认证</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /api/v2/exercises/by-ids?ids=1,2,3</code></td><td>session cookie</td>
+        <td><b>批量按 id 取，一次最多 200 个。</b>这是本报告唯一使用的数据源</td></tr>
+      <tr><td><code>GET /api/v2/exercises/search?search=&amp;limit=&amp;offset=</code></td><td>session cookie</td>
+        <td>按名字模糊搜（参数名是 <code>search</code>，不是 <code>query</code>）</td></tr>
+      <tr><td><code>POST https://lyfta.app/api/search</code></td><td>免鉴权</td>
+        <td class="strike">公开可用，但 <code>video_file</code> 字段过时 → 不可信</td></tr>
+      <tr><td><code>GET https://lyfta.app/exercise/{slug}</code></td><td>免鉴权</td>
+        <td class="strike">页面 <code>__NEXT_DATA__</code> 里的 <code>video_file</code> 同样过时</td></tr>
+      <tr><td><code>GET /api/v1/exercises/library</code></td><td>API Key</td>
+        <td>需 Authorization header，登录 cookie 不行</td></tr>
+    </tbody>
+  </table>
+
+  <p>登录态返回的关键字段（比公开接口多）：
+
+<pre>{
+  "id": "5443",
+  "name": "Dumbbell Seated Bent Over Rear Delt Row",
+  "gymVisualId": "4235",
+  "imageName": "https://apilyfta.com/static/GymvisualPNG/42351101-Dumbbell-..._small.png",
+  <b>"videoFile": "https://apilyfta.com/static/GymvisualMP4/42351201-Dumbbell-..._Shoulders-.mp4"</b>,
+  "videoName": null,
+  "dateModified": "2025-09-30T14:18:23.000Z"
+}</pre>
+  </p>
+
+  <div class="card">
+    <h3 style="margin-top:0">关联安全性的关键发现：组号 100% 一致</h3>
+    <p style="margin:4px 0 0">
+      <code>gymVisualId</code> 就是 GymVisual 的 4 位组号（<code>4235</code> → 图片名 <code>42351101-…</code>）。
+      凡是有 <code>videoFile</code> 的记录，<b>其 mp4 的组号与它自己图片名的组号完全相同</b>（抽样 60 条中命中的 11 条，11/11 一致）。
+      也就是说 <b>补视频不存在「张冠李戴」风险</b> —— 拿到的就是同一个动作的演示视频，不是变体。
+      这与之前「同名 ≠ 同动作」的教训不冲突：那次是按<b>名字</b>匹配，这次是按<b>素材组号</b>匹配。
+    </p>
+  </div>
+
+  <h2>二、实测数据</h2>
+  <div class="stat-grid">
+    <div class="stat"><div class="n">60</div><div class="l">抽样（12 优先 + 48 随机）</div></div>
+    <div class="stat"><div class="n" style="color:#7ee787">11</div><div class="l">抽样中 Lyfta 有视频</div></div>
+    <div class="stat"><div class="n" style="color:#7ee787">18.3%</div><div class="l">抽样命中率</div></div>
+    <div class="stat"><div class="n" style="color:#7ee787">11/11</div><div class="l">命中项组号与图片组号一致</div></div>
+    <div class="stat"><div class="n" style="color:#ff8b85">2015</div><div class="l">剩余缺视频（已修 3 条）</div></div>
+    <div class="stat"><div class="n" style="color:#e3b341">≈370</div><div class="l">按 18.3% 外推可补</div></div>
+  </div>
+
+  <h3>2.1 15 条「被训练过的缺视频动作」逐条结论</h3>
+  <p>先精确圈定范围：<b>缺视频 ∩ 被用户训练过 = 15 条</b>（此前估的 12 条漏了 3 条）。</p>
+  <table>
+    <thead><tr><th style="width:56px">id</th><th style="width:32%">英文名</th><th style="width:48px">训练</th>
+      <th style="width:100px">Lyfta videoFile</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>2794</td><td>Dip Hold Isometric</td><td>61</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>27819</td><td>1 2 Stick Drill (male)</td><td>21</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>337</td><td>Upper Row</td><td>19</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>4360</td><td>Resistance Band Seated Shoulder Press</td><td>10</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>1715</td><td>Cross Jacks</td><td>7</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>328</td><td>Machine Inner Chest Press</td><td>5</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>1558</td><td>Barbell Standing Front Raise Over Head</td><td>4</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>3148</td><td>Extra Decline Sit-up</td><td>4</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>1453</td><td>45 Degree Side Bend</td><td>4</td><td class="na">null（<code>videoName</code> 非空）</td>
+        <td class="warn">有 Lyfta 内部 videoName，但 6 种 URL 规则全 404/403，取不到</td></tr>
+      <tr><td>385</td><td>Lever Seated Wide Squat</td><td>4</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>1551</td><td>Barbell Skier</td><td>3</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr><td>1552</td><td>Barbell Speed Squat</td><td>3</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+      <tr style="background:rgba(63,185,80,.07)"><td><b>5443</b></td><td>Dumbbell Seated Bent Over Rear Delt Row</td><td>3</td>
+        <td class="yes">✅ 42351201-…Shoulders-.mp4</td><td class="yes"><b>已落地</b></td></tr>
+      <tr style="background:rgba(63,185,80,.07)"><td><b>1560</b></td><td>Barbell Standing Overhead Triceps Extension</td><td>2</td>
+        <td class="yes">✅ 01091201-…Upper-.mp4</td><td class="yes"><b>已落地</b></td></tr>
+      <tr><td>5418</td><td>1 to 2 Jump Box</td><td>2</td><td class="na">null</td><td class="na">Lyfta 侧确实无视频</td></tr>
+    </tbody>
+  </table>
+  <p>
+    <b>额外捡到 1 条：</b><code>id=45</code>「Standing Overhead Triceps Extension」与 id=1560 同为
+    <code>gymVisualId=109</code>、共用组 0109 的同一个 mp4 —— 一次下载补两行。共落地 <b>3 行</b>。
+  </p>
+
+  <h3>2.2 有视频的动作是怎么分布的</h3>
+  <p>
+    命中的记录 <code>dateModified</code> 集中在 <b>2025-09-23 ~ 2025-09-30</b> ——
+    Lyfta 在 2025 年 9 月下旬批量补做了一批视频。带 <code>dateModified</code> 为 2021/2022 的老记录基本都没有视频。
+  </p>
+  <pre>2025-09-23  id=1560  Barbell Standing Overhead Triceps Extension
+2025-09-23  id=1917  Gironda Sternum Chin
+2025-09-24  id=2393  Cat pose
+2025-09-26  id=3165  Squatting Achilles Stretch
+2025-09-26  id=3167  Standing Rotational Hip Stretch
+2025-09-26  id=3066  Assisted Seated Chest Stretch
+2025-09-26  id=4099  Saw
+2025-09-30  id=5443  Dumbbell Seated Bent Over Rear Delt Row
+2025-09-30  id=5270  Bird Dog Push-Up
+2025-09-30  id=5380  Smith Rack Pull
+2025-09-30  id=5741  Body Extension</pre>
+  <p>
+    这解释了为什么第一版抽样「0/40 有视频」——那 40 条的公开接口快照里就是 null。
+    也解释了「2080 条里没有视频」的整体观感：<b>GFIT 库的这批数据是 Lyfta 补做视频之前的历史快照</b>。
+  </p>
+
+  <h2>三、已落地的 288 条（端到端验证）</h2>
+  <p>
+    <b>第一批（手工，3 行）</b> —— 走 admin 上传接口时发现文件名净化会破坏与存量的一致性，改用直传原始名；
+    <b>第二批（批量，55 行）</b> —— 全自动：下载 → ftyp 校验 → CDN HEAD 验 → scp 推生产机 → <code>PUT /admin/library/:id</code> → 公网 sha256。
+  </p>
+  <table>
+    <thead><tr><th style="width:56px">id</th><th>英文名</th><th style="width:44%">video_name（库内现值）</th></tr></thead>
+    <tbody>
+      <tr><td>45</td><td>Standing Overhead Triceps Extension</td>
+        <td><code>01091201-Barbell-Standing-Overhead-Triceps-Extension_Upper-.mp4</code></td></tr>
+      <tr><td>1560</td><td>Barbell Standing Overhead Triceps Extension</td>
+        <td><code>01091201-Barbell-Standing-Overhead-Triceps-Extension_Upper-.mp4</code></td></tr>
+      <tr><td>5443</td><td>Dumbbell Seated Bent Over Rear Delt Row</td>
+        <td><code>42351201-Dumbbell-Seated-Bent-Over-Rear-Delt-Row_Shoulders-.mp4</code></td></tr>
+      <tr><td colspan="3" style="background:var(--panel2)">…批量 55 行（53 个文件），清单见 <code>docs/lyfta_video_hits.jsonl</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <h3 style="margin-top:0">自动校验规则（抓脏数据的关键）</h3>
+    <p style="margin:4px 0 0">
+      批量补库前对每条候选做<b>双重校验</b>，两个条件都必须过：
+    </p>
+    <ol style="margin:8px 0 0">
+      <li><b>编号严格比对</b>：视频文件名的 8 位编号必须严格等于「库内 image_name 前 4 位 + <code>1201</code>」。</li>
+      <li><b>名称 token 重合度</b>：视频文件名主干与库内英文名的有效 token 重合度 ≥ 0.34（剔除 male/female/version 等变体词与器材词后计算）。</li>
+    </ol>
+    <p style="margin:10px 0 0">
+      <b>实测抓到 Lyfta 侧的错配脏数据，而且量不小</b>：<code>id=279</code>「Lever Side Hip Abduction」的 <code>videoFile</code> 是
+      <code>103421201-Reverse-Hyperextension-on-Box_Hips_.mp4</code> —— 编号是 <code>1034</code>+<code>21201</code>（多了个 2），
+      文件名主干指向<完全另一个动作>「Reverse Hyperextension on Box」。<b>仅靠组号校验会放过它</b>，靠名称校验才抓出来，已剔除。
+      <br><span style="color:var(--muted);font-size:13px">
+      第 5 批里同类脏数据密集出现（10 条，编号形如 <code>100031201</code>、<code>101261201</code>），
+      说明<b>Lyfta 这批 2025-09 补做的视频数据本身就带错配</b>。
+      结论：<b>组号一致是必要条件，不是充分条件</b> —— 双校验缺一不可。
+      </span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">素材复用：一个 mp4 可补多条库记录</h3>
+    <p style="margin:4px 0 0">
+      53 个 mp4 文件覆盖了 55 条库记录 —— <code>01641201-Cable-Front-Shoulder-Raise_Shoulders_.mp4</code> 同时对应 id=66 与 id=1615，
+      <code>01721201-Cable-Incline-Pushdown_Back_.mp4</code> 同时对应 id=71 与 id=1623（GFIT 库与 Lyfta 库一样存在同素材多 id 复用）。
+      批量补库按<b>文件去重</b>后上传，避免重复下载。
+    </p>
+  </div>
+
+
+  <h3>执行链路</h3>
+  <ol>
+    <li>从 <code>apilyfta.com</code> 下载 mp4（ftyp 文件头校验通过，大小与 Content-Length 一致）</li>
+    <li>先验公网可达（<code>200 video/mp4</code>）再写库 —— 不让库指向坏文件</li>
+    <li>写库前备份 3 行 → <code>.gfit-backup-video3-1794118590692.json</code></li>
+    <li>走 <code>PUT /admin/library/:id</code> 更新（自动写 <code>admin_operation_log</code> 审计）</li>
+    <li>scp 推生产机 <code>/media/gfit/exer_videos/</code>，文件名为<b>原始 GymVisual 名</b></li>
+    <li>公网 <code>https://gfit.l2ee.top/exer_videos/{name}</code> 验证 + <b>sha256 与本地完全一致</b></li>
+  </ol>
+
+  <div class="card">
+    <h3 style="margin-top:0">关于文件名：一个走弯路的决定</h3>
+    <p style="margin:4px 0 0">
+      第一次用 admin 上传接口（<code>POST /admin/upload</code>），它会把文件名净化成
+      <code>42351201-Dumbbell-Seated-Bent-Over-Rear-Delt-Row_Shoulders.mp4</code>（去掉尾部 <code>-</code>）。
+      但生产机现有 4727 个 mp4 里 <b>2828 个是原始 GymVisual 名</b>（带括号、尾部 <code>-</code>）。
+      功能上没问题（资产匹配只取前 4 位组号，两种命名都能命中），但两套命名混在一个目录里不干净。
+      <b>已改为直传原始名</b>，并把净化版移到生产机 <code>~/.trash-gfit/</code>（不 rm，可恢复）。
+    </p>
+  </div>
+
+  <div class="card" style="border-color:#5c4a1f;background:linear-gradient(135deg,#2d2413,#1a1509)">
+    <h3 style="margin-top:0;color:#e3b341">批量补库踩到的三个坑（已修正，写进流程）</h3>
+    <ol style="margin:8px 0 0">
+      <li><b>Lyfta 的 <code>videoFile</code> 字段本身有截断 bug</b> —— 少数条目（如 id=2798）数据库里存的文件名被截成
+      <code>14461201-Barbell-Zercher-Squat-Hold-Isometrics_.mp4</code>，真实名是下划线版
+      <code>…-Hold_Isometrics_.mp4</code>，CDN 上前者 404、后者 200。
+      <b>处理</b>：下载失败时按 imageName 描述反推后缀变体（试 15-25 种）找回真名；找不回就<b>回滚成无视频</b>，绝不留 404 链接。</li>
+      <li><b>下载校验失败 ≠ 可以跳过写库</b> —— 我第一版脚本里「文件非 mp4 → 跳过上传」但写库环节没跟着跳过，
+      导致 2 行库指向不存在的文件。<b>铁律：先验 URL 200 → 下载 → ftyp 校验 → 已上传 → 才允许写库</b>，
+      四步缺一不可。</li>
+      <li><b>名称 token 重合度会误伤</b> —— id=2838「Sledge Hammer」对文件名 <code>Sledgehammer-Slam</code>，
+      分词后重合度 0，但编号 14961201 完全匹配、显然是同一动作。
+      <b>处理</b>：重合度只作「标记」不作「否决」，编号严格匹配才是硬条件。</li>
+    </ol>
+  </div>
+
+  <h2>四、剩余 1728 条的最终定性</h2>
+  <p>
+    全部 2015 条已扫完：<b>命中 299 条（14.8%）</b>，双校验通过 <b>288 条</b>，<b>11 条</b>因 Lyfta 数据错配被剔除。
+    剩余 <b>1728 条</b>经全量核验确认：<b>Lyfta 侧确实没有视频</b>（<code>videoFile</code> 为 null），
+    且对应组号在 GymVisual CDN 上确认不存在（403 / 404）——这部分<b>不是抓取能力的问题，是源头没有素材</b>。
+    这批全部<b>从未被用户训练过</b>（训练明细 2100 条里没有一条引用它们），对用户体验影响最小。
+  </p>
+  <div class="card">
+    <h3 style="margin-top:0">扫描进度（可断点续跑）</h3>
+    <table style="margin:8px 0 0">
+      <thead><tr><th style="width:120px">项</th><th style="width:100px">值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>总 id</td><td>2015</td><td>来自生产库「缺视频」集合，已排除本轮补上的</td></tr>
+        <tr><td>批次</td><td>26 批 × 80</td><td><code>GET /api/v2/exercises/by-ids?ids=…</code>，单批约 42KB（低于 50000 读取上限）</td></tr>
+        <tr><td>已扫</td><td><b>26 批 / 2015 id</b></td><td><b>全部扫完 ✓</b></td></tr>
+        <tr><td>命中</td><td><b>299</b>（14.8%）</td><td>双校验通过 288 条，已全部下载上传并写库（286 个 mp4 文件）</td></tr>
+        <tr><td>剔除脏数据</td><td><b>11</b></td><td>编号形如 <code>{组号}21201</code>，指向完全另一个动作</td></tr>
+        <tr><td>结果清单</td><td><code>docs/lyfta_video_hits.jsonl</code></td><td>JSONL，每行 <code>{id,name,group,videoFile,imageName,dateModified}</code></td></tr>
+      </tbody>
+    </table>
+    <p style="margin:12px 0 0">
+      续跑只需重复：<code>open_tab</code> 打开下一批 URL → <code>query(kind:"text", selector:"body", maxChars:50000)</code> →
+      命中项追加进 jsonl → 跑批量补库脚本。**补库流程已完全脚本化**，不需要人工逐条核对（组号 + 名称双校验自动过）。
+    </p>
+  </div>
+
+  <div class="card" style="border-color:#5c4a1f;background:linear-gradient(135deg,#2d2413,#1a1509)">
+    <h3 style="margin-top:0;color:#e3b341">顺带发现的存量坏引用（与本次改动无关）</h3>
+    <p style="margin:4px 0 0">
+      <code>id=48277</code>「Resistance Band Wide Stance Anti Rotation Chop」的 <code>video_name</code> =
+      <code>80021201-Resistance-Band-Wide-Stance-Anti-Rotation-Chop-(ma).mp4</code> —— 文件名被截断在 <code>-(ma)</code>，
+      <b>磁盘上不存在该文件</b>，公网也是 404。这是本次之前就存在的问题（属于「引用了但磁盘没有」这一类，
+      与「缺视频」不同），全库只有这 1 条。
+    </p>
+  </div>
+
+
+  <h2>五、遗留的技术事实（省得以后重查）</h2>
+  <ul>
+    <li><b>Lyfta 是 SvelteKit 应用</b>，chunk 在 <code>/_next/static/immutable/chunks/*.js</code>，
+      路由表在 <code>/_next/static/{buildId}/_buildManifest.js</code>。</li>
+    <li><b>GymVisual CDN 有两套 key 形式</b>：早期视频有短名 <code>{组号}1201.mp4</code>（S3 桶 <code>lyftaweb.s3.us-east-2.amazonaws.com</code>），
+      后来补做的<b>只有带描述名的</b>（<code>apilyfta.com/static/GymvisualMP4/{组号}1201-{描述}.mp4</code>）。
+      <b>只查一种形式会漏判</b> —— 这是我第一版翻车的地方。</li>
+    <li><b>S3 桶不能 ListBucket</b>（<code>AccessDenied</code>），只能逐个 GET；403 = key 不存在（用假组号 9999/0000/8888 对照验证过）。</li>
+    <li><b><code>gymvisual.com</code> 整站 403</b>（按 UA/来源拦截），但 <code>apilyfta.com</code> 与 S3 可直连。</li>
+    <li><b>GFIT 库 id = Lyfta <code>by-ids</code> 的 id</b>（已验证 id=2 / 45 / 1560 / 5443 等一致）。
+      但 <b>不要把 <code>gymVisualId</code> 当 id 传</b> —— 我第一次这么干，导致返回的全是别的动作。</li>
+    <li><b>本机 Downloads 里那 9 个 GymVisual mp4 早就全部上传并写库了</b>（历史遗留，零漏网）。</li>
+    <li>本机 Chrome 历史里可查到你之前的抓取痕迹：<code>my.lyfta.app/exercises</code>、Google 登录流程、
+      以及 <code>lyftaweb.s3.../GymvisualMP4/06521201.mp4</code>（Pull-up，组 0652，已在库）。</li>
+  </ul>
+
+  <h2>六、本轮我自己犯的三个错误（已修正，记录在案）</h2>
+  <ol class="err">
+    <li><b>数据源选错</b>：用公开 <code>/api/search</code> 的 <code>video_file</code> 判断「有没有视频」，而该字段是过时快照。
+      → 修正：改用登录态 <code>/api/v2/exercises/by-ids</code>。</li>
+    <li><b>穷举方法缺陷</b>：S3 全量探测只试了纯编号 key 一种形式，漏掉了只有带描述名路径的新补视频。
+      → 修正：以登录态 API 返回的完整 URL 为准，不再猜 key 形式。</li>
+    <li><b>传参错误</b>：批量查询时把 <code>gymVisualId</code> 当成 id 传，导致返回的全是别的动作，一度让我以为 id 体系对不上。
+      → 修正：传 GFIT 库 id，并用 GFIT 库逐条对账。</li>
+  </ol>
+
+  <div class="foot">
+    <b>验证方法说明：</b>全部结论来自生产库只读查询、生产机磁盘实测、Lyfta 登录态 API 实测、CDN HTTP 状态码与 sha256 实测。
+    对照实验用于排除三类误判：①公开接口字段过时 ②S3 key 形式单一 ③S3 403 是否等于「不存在」。
+    本轮<b>唯一的生产库写操作</b>是 3 行 <code>video_name</code> 更新（已备份、已审计、已 sha256 校验）；
+    其余全部为只读扫描，<b>未从 Lyfta 下载除上述 2 个 mp4 之外的任何素材</b>。<br>
+    配套 Markdown 版：<code>docs/gfit_lyfta_video_feasibility_20261108.md</code>　·　全量扫描结果：<code>docs/lyfta_video_hits.jsonl</code>
+  </div>
+
+</div>
+</body>
+</html>

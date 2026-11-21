@@ -1,0 +1,116 @@
+{
+  "createdAt": "2026-11-21T01:30:55.819Z",
+  "reason": "为 10 条缺视频动作补 YouTube 检索到的演示视频",
+  "rows": [
+    {
+      "id": 46,
+      "name": "Standing Reverse Grip Curl",
+      "name_zh": "站立反握弯举",
+      "image_name": "01101101-Barbell-Standing-Reverse-Grip-Curl_Forearms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 106,
+      "name": "Supine Reverse Fly",
+      "name_zh": "仰卧反飞鸟",
+      "image_name": "02401101-Cable-Supine-Reverse-Fly_Shoulders-FIX_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 294,
+      "name": "Standing Military Press",
+      "name_zh": "站姿军事推举",
+      "image_name": "11621101-Barbell-Standing-Military-Press_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 320,
+      "name": "Reverse Grip Decline Bench Press",
+      "name_zh": "反握下斜卧推",
+      "image_name": "12561101-Barbell-Reverse-Grip-Decline-Bench-Press_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 329,
+      "name": "Smith Wide Grip Bench Press",
+      "name_zh": "史密斯宽握卧推",
+      "image_name": "13081101-Smith-Wide-Grip-Bench-Press_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "8",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 410,
+      "name": "Concentration Curl",
+      "name_zh": "集中弯举",
+      "image_name": "16311101-Cable-Concentration-Curl_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 424,
+      "name": "Reverse Grip Skullcrusher",
+      "name_zh": "反向杠铃臂屈伸",
+      "image_name": "17211101-Barbell-Reverse-Grip-Skullcrusher_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 434,
+      "name": "Upright Row",
+      "name_zh": "直立划船",
+      "image_name": "17651101-Dumbbell-Upright-Row-(back-POV)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1471,
+      "name": "Balance Board",
+      "name_zh": "平衡板",
+      "image_name": "00201101-Balance-Board_Calves_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "8",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1534,
+      "name": "Barbell Rollout from Bench",
+      "name_zh": "杠铃滚出",
+      "image_name": "00831101-Barbell-Rollout-from-Bench_waist_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    }
+  ]
+}

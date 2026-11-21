@@ -1,0 +1,438 @@
+{
+  "generatedAt": "2026-11-21T01:34:50.338Z",
+  "trueDup": [
+    {
+      "id": 4542,
+      "name": "Barbell Front Squat ",
+      "nameZh": "杠铃前深蹲",
+      "keeperId": 3740,
+      "keeperName": "Barbell Front Squat ",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4572,
+      "name": "Dumbbell Lunge ",
+      "nameZh": "哑铃弓步",
+      "keeperId": 3458,
+      "keeperName": "Dumbbell Lunge ",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5559,
+      "name": "Bodyweight Shrug",
+      "nameZh": "徒手耸肩",
+      "keeperId": 5385,
+      "keeperName": "Shrug ",
+      "extra": [
+        "bodyweight"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 1561,
+      "name": "Barbell Standing Reverse Grip Curl",
+      "nameZh": "杠铃站立反握弯举",
+      "keeperId": 46,
+      "keeperName": "Standing Reverse Grip Curl",
+      "extra": [
+        "barbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3146,
+      "name": "Lever Cable Shoulder Press",
+      "nameZh": "杠杆缆绳肩部推举",
+      "keeperId": 273,
+      "keeperName": "Lever Shoulder Press",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 1691,
+      "name": "Cable Supine Reverse Fly",
+      "nameZh": "绳索仰卧反飞鸟",
+      "keeperId": 106,
+      "keeperName": "Supine Reverse Fly",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 2040,
+      "name": "Lever One Arm Bent over Row ",
+      "nameZh": "单臂弯腰划船",
+      "keeperId": 1515,
+      "keeperName": "Barbell One Arm Bent over Row",
+      "extra": [
+        "lever"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4280,
+      "name": "Cable Concentration Curl ",
+      "nameZh": "绳索集中弯举",
+      "keeperId": 410,
+      "keeperName": "Concentration Curl",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4284,
+      "name": "Cable Decline Press ",
+      "nameZh": "绳索下斜推举",
+      "keeperId": 323,
+      "keeperName": "Decline Press",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 1863,
+      "name": "Dumbbell Squat ",
+      "nameZh": "哑铃深蹲",
+      "keeperId": 384,
+      "keeperName": "Squat",
+      "extra": [
+        "dumbbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4279,
+      "name": "Cable Close Grip Curl ",
+      "nameZh": "绳索窄距弯举",
+      "keeperId": 409,
+      "keeperName": "Close Grip Curl",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 440,
+      "name": "Lever Seated Hip Adduction",
+      "nameZh": "坐姿髋内收",
+      "keeperId": 3790,
+      "keeperName": "Lever Seated Hip Adduction ",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3782,
+      "name": "Cable Wide Grip Rear Pulldown Behind Neck ",
+      "nameZh": "高位绳索宽握后颈下拉",
+      "keeperId": 338,
+      "keeperName": "Wide Grip Rear Pulldown Behind Neck",
+      "extra": [
+        "cable"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3856,
+      "name": "Dumbbell Lying Rear Delt Row ",
+      "nameZh": "反握垂直划船",
+      "keeperId": 341,
+      "keeperName": "Lying Rear Delt Row",
+      "extra": [
+        "dumbbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3923,
+      "name": "Dumbbell One Arm Seated Neutral Wrist Curl ",
+      "nameZh": "哑铃坐姿中性腕弯举",
+      "keeperId": 359,
+      "keeperName": "One Arm Seated Neutral Wrist Curl",
+      "extra": [
+        "dumbbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4270,
+      "name": "Barbell Standing Wide Military Press ",
+      "nameZh": "杠铃站姿宽距军用推",
+      "keeperId": 374,
+      "keeperName": "Standing Wide Military Press",
+      "extra": [
+        "barbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4318,
+      "name": "Dumbbell Lying Single Extension ",
+      "nameZh": "哑铃仰卧单臂伸展",
+      "keeperId": 428,
+      "keeperName": "Lying Single Extension",
+      "extra": [
+        "dumbbell"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5461,
+      "name": "Medicine Ball Crunch",
+      "nameZh": "药球卷腹",
+      "keeperId": 4652,
+      "keeperName": "Crunch with Medicine Ball",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 2178,
+      "name": "Single Leg Calf Raise ",
+      "nameZh": "单腿提踵",
+      "keeperId": 1860,
+      "keeperName": "Dumbbell Single Leg Calf Raise",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 2764,
+      "name": "Muscle-up ",
+      "nameZh": "引体向上",
+      "keeperId": 46848,
+      "keeperName": "Bodyweight Muscle-up",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4048,
+      "name": "Barbell Split Squat ",
+      "nameZh": "杠铃分腿蹲",
+      "keeperId": 4047,
+      "keeperName": "Barbell Split Squat ",
+      "extra": [],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3390,
+      "name": "Standing Side Stretch With Stick",
+      "nameZh": "持棍站立侧拉",
+      "keeperId": 3389,
+      "keeperName": "Standing Side Stretch",
+      "extra": [
+        "stick"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    }
+  ],
+  "variant": [
+    {
+      "id": 4541,
+      "name": "Barbell Weighted Bench Press",
+      "nameZh": "杠铃负重卧推",
+      "keeperId": 2,
+      "keeperName": "Bench Press",
+      "extra": [
+        "barbell",
+        "weighted"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4539,
+      "name": "Barbell Weighted Deadlift",
+      "nameZh": "杠铃负重硬拉",
+      "keeperId": 7,
+      "keeperName": "Deadlift",
+      "extra": [
+        "barbell",
+        "weighted"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4540,
+      "name": "Barbell Weighted Front Chest Squat",
+      "nameZh": "杠铃负重胸前深蹲",
+      "keeperId": 14,
+      "keeperName": "Front Chest Squat",
+      "extra": [
+        "barbell",
+        "weighted"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5265,
+      "name": "Dumbbell Seated Lateral Raise on Stability Ball",
+      "nameZh": "稳定球上坐姿侧平举",
+      "keeperId": 171,
+      "keeperName": "Seated Lateral Raise",
+      "extra": [
+        "dumbbell",
+        "stability",
+        "ball"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 2700,
+      "name": "Push Up on Bosu Ball",
+      "nameZh": "在Bosu球上俯卧撑",
+      "keeperId": 2104,
+      "keeperName": "Push-up ",
+      "extra": [
+        "bosu",
+        "ball"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5093,
+      "name": "Barbell Hip Thrust with Resistance Band",
+      "nameZh": "弹力带臀部推举",
+      "keeperId": 292,
+      "keeperName": "Hip Thrust",
+      "extra": [
+        "barbell",
+        "resistance",
+        "band"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5640,
+      "name": "Barbell Resistance Band Hip Thrust",
+      "nameZh": "杠铃弹力带臀推",
+      "keeperId": 292,
+      "keeperName": "Hip Thrust",
+      "extra": [
+        "barbell",
+        "resistance",
+        "band"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 2644,
+      "name": "Plate Hyperextension",
+      "nameZh": "板式超伸展",
+      "keeperId": 27380,
+      "keeperName": "Weighted Hyperextension",
+      "extra": [
+        "plate"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4563,
+      "name": "Weighted Stability Ball Crunch ",
+      "nameZh": "稳定球负重卷腹",
+      "keeperId": 3778,
+      "keeperName": "Weighted Crunch ",
+      "extra": [
+        "stability",
+        "ball"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5264,
+      "name": "Dumbbell One Arm Triceps Extension on Stability Ball",
+      "nameZh": "稳定球上单臂肱三头肌伸展",
+      "keeperId": 1813,
+      "keeperName": "Dumbbell One Arm Triceps Extension ",
+      "extra": [
+        "stability",
+        "ball"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4867,
+      "name": "Wheel Run",
+      "nameZh": "轮式跑步",
+      "keeperId": 2135,
+      "keeperName": "Run ",
+      "extra": [
+        "wheel"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 3130,
+      "name": "Assisted Rotating Neck Stretch",
+      "nameZh": "辅助旋转颈部拉伸",
+      "keeperId": 3118,
+      "keeperName": "Rotating Neck Stretch",
+      "extra": [
+        "assisted"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 4940,
+      "name": "Dumbbell Split Squat Front Foot Elevanted with Bosu Ball ",
+      "nameZh": "哑铃前脚抬高bosu球分腿蹲",
+      "keeperId": 4196,
+      "keeperName": "Dumbbell Split Squat Front Foot Elevanted ",
+      "extra": [
+        "bosu",
+        "ball"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    },
+    {
+      "id": 5863,
+      "name": "Assisted Commando Pull-up",
+      "nameZh": "辅助特种部队引体向上",
+      "keeperId": 5872,
+      "keeperName": "Commando Pull-up",
+      "extra": [
+        "assisted"
+      ],
+      "sameEq": true,
+      "sameBp": true
+    }
+  ]
+}

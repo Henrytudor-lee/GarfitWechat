@@ -1,0 +1,1971 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<title>GFit 动作库 · 缺视频重复项分析 20261113</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--fg:#e8eaf0;--dim:#9aa3b2;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#58a6ff}
+*{box-sizing:border-box}body{margin:0;padding:32px;background:var(--bg);color:var(--fg);
+font:14px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card .n{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.card .l{color:var(--dim);font-size:12px;margin-top:2px}
+.card.hl .n{color:var(--ok)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+th{background:#1e222b;text-align:left;padding:9px 10px;color:var(--dim);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #20242e;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#1c2029}
+.num{font-variant-numeric:tabular-nums;color:var(--acc)}
+.bad{color:var(--warn);font-size:12px}
+.tag{display:inline-block;padding:1px 7px;border-radius:99px;font-size:11px;font-weight:600}
+.tA{background:#12331f;color:var(--ok)}.tB{background:#12324a;color:var(--acc)}
+.note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:8px;padding:12px 16px;color:var(--dim);font-size:13px}
+.note b{color:var(--fg)}
+ul{color:var(--dim);font-size:13px}li{margin:3px 0}
+code{background:#20242e;padding:1px 5px;border-radius:4px;font-size:12px}
+</style></head><body>
+<h1>GFit 动作库 · 缺视频重复项分析</h1>
+<div class="sub">生成时间 2026/11/13 21:27:39 · 只读分析，未改动任何数据</div>
+
+<div class="cards">
+  <div class="card"><div class="n">6923</div><div class="l">动作库总数</div></div>
+  <div class="card"><div class="n">1728</div><div class="l">缺视频</div></div>
+  <div class="card"><div class="n">1714</div><div class="l">缺视频且从未被用过</div></div>
+  <div class="card"><div class="n">928</div><div class="l">相似组数</div></div>
+  <div class="card hl"><div class="n">161</div><div class="l">✅ 可删候选</div></div>
+  <div class="card"><div class="n" style="color:var(--warn)">48</div><div class="l">⚠️ 需人工判断</div></div>
+</div>
+
+<h2>判定规则</h2>
+<div class="note">
+<b>A 级</b> = 英文名 trim+小写后完全一致；<b>B 级</b> = 归一化（去标点/连字符/空格、&→and、复数折叠）后一致。<br>
+只有同时满足以下条件才列为可删：① 自己无视频；② 组内有<b>有视频</b>的兄弟；③ 从未被用户训练/收藏/分享引用；④ 不是精选；
+⑤ 器械与部位不冲突（双方非空且完全不相交即判为不同动作）；⑥ 中文名有共同汉字；⑦ 守护者不比候选取长（候选取长而守护者缺 → 删了是净损失）。
+</div>
+
+<h2>✅ 可删候选（161 条）</h2>
+
+  <table class="ok">
+    <thead><tr>
+      <th>层级</th><th>待删 id</th><th>待删名称</th><th>中文名</th><th>待删有图</th>
+      <th>保留 id</th><th>保留名称</th><th>保留中文名</th><th>保留有图</th><th>阻塞原因</th>
+    </tr></thead>
+    <tbody><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">55</td>
+      <td>Wrist Curl</td><td>腕弯举</td>
+      <td>✓</td>
+      <td class="num">54</td>
+      <td>Wrist Curl</td><td>腕弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3916</td>
+      <td>Cable Bench Press </td><td>绳索卧推</td>
+      <td>✓</td>
+      <td class="num">59</td>
+      <td>Cable Bench Press</td><td>固定器械卧推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4129</td>
+      <td>Flutter Kicks </td><td>交替踢腿</td>
+      <td>✓</td>
+      <td class="num">199</td>
+      <td>Flutter Kicks</td><td>蛙跳踢</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1948</td>
+      <td>Inverted Row </td><td>倒立划船</td>
+      <td>✓</td>
+      <td class="num">201</td>
+      <td>Inverted Row</td><td>倒立划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4334</td>
+      <td>Lever Alternating Narrow Grip Seated Row </td><td>杠杆交替窄握坐姿划船</td>
+      <td>✓</td>
+      <td class="num">202</td>
+      <td>Lever Alternating Narrow Grip Seated Row</td><td>杠杆交替窄握坐姿划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4336</td>
+      <td>Lever Bicep Curl </td><td>杠杆二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">203</td>
+      <td>Lever Bicep Curl</td><td>杠杆二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">368</td>
+      <td>Lever Gripless Shrug</td><td>杠杆无握耸肩</td>
+      <td>✓</td>
+      <td class="num">208</td>
+      <td>Lever Gripless Shrug</td><td>杠杆无握耸肩</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">446</td>
+      <td>Lever Leg Extension</td><td>杠杆腿伸展</td>
+      <td>✓</td>
+      <td class="num">212</td>
+      <td>Lever Leg Extension</td><td>杠杆腿伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4340</td>
+      <td>Lever Narrow Grip Seated Row </td><td>杠杆窄握坐姿划船</td>
+      <td>✓</td>
+      <td class="num">215</td>
+      <td>Lever Narrow Grip Seated Row</td><td>杠杆窄握坐姿划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4341</td>
+      <td>Lever Preacher Curl </td><td>杠杆preacher弯举</td>
+      <td>✓</td>
+      <td class="num">217</td>
+      <td>Lever Preacher Curl</td><td>杠杆臂屈伸弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">442</td>
+      <td>Lever Seated Hip Abduction</td><td>坐姿髋外展</td>
+      <td>✓</td>
+      <td class="num">220</td>
+      <td>Lever Seated Hip Abduction</td><td>杠杆坐姿髋外展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">309</td>
+      <td>Lever Shrug</td><td>杠杆耸肩</td>
+      <td>✓</td>
+      <td class="num">224</td>
+      <td>Lever Shrug</td><td>杠杆耸肩</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3909</td>
+      <td>Smith Narrow Row </td><td>史密斯机窄距划船</td>
+      <td>✓</td>
+      <td class="num">250</td>
+      <td>Smith Narrow Row</td><td>史密斯窄距划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2264</td>
+      <td>Triceps Dip </td><td>肱三头肌臂屈伸</td>
+      <td>✓</td>
+      <td class="num">262</td>
+      <td>Triceps Dip</td><td>肱三头肌臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3686</td>
+      <td>Vertical Leg Raise </td><td>垂直腿抬升</td>
+      <td>✓</td>
+      <td class="num">265</td>
+      <td>Vertical Leg Raise</td><td>垂直抬腿</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">315</td>
+      <td>Seated Row</td><td>坐姿划船</td>
+      <td>✓</td>
+      <td class="num">270</td>
+      <td>seated row</td><td>坐姿划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2054</td>
+      <td>Lever Shoulder Press </td><td>杠铃耸肩</td>
+      <td>✓</td>
+      <td class="num">273</td>
+      <td>Lever Shoulder Press</td><td>杠杆肩推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">279</td>
+      <td>Lever Side Hip Abduction</td><td>杠杆侧髋外展</td>
+      <td>✓</td>
+      <td class="num">3997</td>
+      <td>Lever Side Hip Abduction </td><td>杠杆侧髋外展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2482</td>
+      <td>Smith Calf Raise </td><td>史密斯机提踵</td>
+      <td>✓</td>
+      <td class="num">295</td>
+      <td>Smith Calf Raise</td><td>史密斯提踵</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3693</td>
+      <td>Lever Incline Chest Press </td><td>上斜杠杆胸部推举</td>
+      <td>✓</td>
+      <td class="num">326</td>
+      <td>Lever Incline Chest Press</td><td>杠杆上斜胸推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3692</td>
+      <td>Lever Decline Chest Press </td><td>下斜杠杆胸部推举</td>
+      <td>✓</td>
+      <td class="num">327</td>
+      <td>Lever Decline Chest Press</td><td>杠杆下斜胸推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3792</td>
+      <td>Sled Full Hack Squat </td><td>雪橇全深蹲</td>
+      <td>✓</td>
+      <td class="num">450</td>
+      <td>Sled Full Hack Squat</td><td>雪橇全深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4266</td>
+      <td>Barbell JM Bench Press </td><td>杠铃JM平板卧推</td>
+      <td>✓</td>
+      <td class="num">1503</td>
+      <td>Barbell JM Bench Press</td><td>杠铃JM卧推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1512</td>
+      <td>Barbell Lying Triceps Extension</td><td>杠铃仰卧肱三头肌伸展</td>
+      <td>✓</td>
+      <td class="num">3930</td>
+      <td>Barbell Lying Triceps Extension </td><td>杠铃仰卧三头肌伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1514</td>
+      <td>Barbell Narrow Stance Squat</td><td>杠铃窄距深蹲</td>
+      <td>✓</td>
+      <td class="num">3627</td>
+      <td>Barbell Narrow Stance Squat </td><td>杠铃窄距深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1524</td>
+      <td>Barbell Pullover</td><td>杠铃划船</td>
+      <td>✓</td>
+      <td class="num">5537</td>
+      <td>Barbell Pullover</td><td>杠铃划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3921</td>
+      <td>Barbell Revers Wrist Curl </td><td>杠铃反向腕弯举</td>
+      <td>✓</td>
+      <td class="num">1530</td>
+      <td>Barbell Revers Wrist Curl </td><td>杠铃反向弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3746</td>
+      <td>Barbell Reverse Preacher Curl </td><td>杠铃反向 preacher 弯举</td>
+      <td>✓</td>
+      <td class="num">1532</td>
+      <td>Barbell Reverse Preacher Curl</td><td>杠铃反向腕弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2740</td>
+      <td>Barbell Seated Calf Raise</td><td>杠铃坐姿提踵</td>
+      <td>✓</td>
+      <td class="num">1539</td>
+      <td>Barbell Seated Calf Raise</td><td>杠铃坐姿窄距集中弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1549</td>
+      <td>Barbell Side Split Squat</td><td>杠铃站立腿部提踵</td>
+      <td>✓</td>
+      <td class="num">1548</td>
+      <td>Barbell Side Split Squat </td><td>杠铃站立前平举过头顶</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4421</td>
+      <td>Barbell Squat </td><td>杠铃深蹲</td>
+      <td>✓</td>
+      <td class="num">1553</td>
+      <td>Barbell Squat </td><td>杠铃深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1577</td>
+      <td>Barbell Wrist Curl</td><td>杠铃手腕弯举</td>
+      <td>✓</td>
+      <td class="num">1576</td>
+      <td>Barbell Wrist Curl </td><td>杠铃手腕弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4277</td>
+      <td>Cable Alternate Triceps Extension </td><td>绳索交替肱三头肌伸展</td>
+      <td>✓</td>
+      <td class="num">1600</td>
+      <td>Cable Alternate Triceps Extension</td><td>固定器械交替臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4287</td>
+      <td>Cable Incline Bench Press </td><td>绳索上斜卧推</td>
+      <td>✓</td>
+      <td class="num">1620</td>
+      <td>Cable Incline Bench Press</td><td>固定器械上斜卧推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4290</td>
+      <td>Cable Incline Triceps Extension </td><td>绳索上斜臂屈伸</td>
+      <td>✓</td>
+      <td class="num">1624</td>
+      <td>Cable Incline Triceps Extension</td><td>固定器械上斜臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1625</td>
+      <td>Cable Judo Flip</td><td>固定器械柔道翻转</td>
+      <td>✓</td>
+      <td class="num">4291</td>
+      <td>Cable Judo Flip </td><td>绳索柔道翻转</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4294</td>
+      <td>Cable Lying Extension Pullover </td><td>绳索仰卧伸展划船</td>
+      <td>✓</td>
+      <td class="num">1635</td>
+      <td>Cable Lying Extension Pullover </td><td>固定器械仰卧臂伸展过顶</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1637</td>
+      <td>Cable Lying Triceps Extension </td><td>固定器械仰卧臂屈伸</td>
+      <td>✓</td>
+      <td class="num">1638</td>
+      <td>Cable Lying Triceps Extension</td><td>固定器械仰卧臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3677</td>
+      <td>Cable Middle Fly </td><td>绳索中段飞鸟</td>
+      <td>✓</td>
+      <td class="num">1639</td>
+      <td>Cable Middle Fly</td><td>固定器械中位飞鸟</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3483</td>
+      <td>Cable Pulldown </td><td>高位下拉</td>
+      <td>✓</td>
+      <td class="num">1648</td>
+      <td>Cable Pulldown </td><td>绳索下拉</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1668</td>
+      <td>Cable Seated Supine-grip Row</td><td>绳索坐姿仰卧握把划船</td>
+      <td>✓</td>
+      <td class="num">4464</td>
+      <td>Cable Seated Supine-grip Row </td><td>固定器械坐姿反握划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4304</td>
+      <td>Cable Shoulder Press </td><td>绳索肩推</td>
+      <td>✓</td>
+      <td class="num">1670</td>
+      <td>Cable Shoulder Press</td><td>绳索肩部推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3817</td>
+      <td>Cable Shrug </td><td>缆绳耸肩</td>
+      <td>✓</td>
+      <td class="num">1671</td>
+      <td>Cable Shrug</td><td>绳索耸肩</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1685</td>
+      <td>Cable Standing Row </td><td>绳索站立划船</td>
+      <td>✓</td>
+      <td class="num">27429</td>
+      <td>Cable Standing Row</td><td>固定器械站立划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3913</td>
+      <td>Cable Standing Shoulder External Rotation </td><td>绳索站立肩部外旋</td>
+      <td>✓</td>
+      <td class="num">1686</td>
+      <td>Cable Standing Shoulder External Rotation</td><td>绳索站立肩外旋</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2500</td>
+      <td>Cable twist </td><td>绳索扭转</td>
+      <td>✓</td>
+      <td class="num">1694</td>
+      <td>Cable Twist</td><td>绳索扭转</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3376</td>
+      <td>Cat Stretch </td><td>猫式拉伸</td>
+      <td>✓</td>
+      <td class="num">1700</td>
+      <td>Cat Stretch</td><td>猫式伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2650</td>
+      <td>Dead Bug </td><td>死虫式</td>
+      <td>✓</td>
+      <td class="num">1727</td>
+      <td>Dead Bug</td><td>死虫式</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3688</td>
+      <td>Decline Crunch </td><td>下斜卷腹</td>
+      <td>✓</td>
+      <td class="num">1728</td>
+      <td>Decline Crunch</td><td>下斜卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3641</td>
+      <td>Dumbbell Alternate Biceps Curl </td><td>哑铃交替二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">1736</td>
+      <td>Dumbbell Alternate Biceps Curl</td><td>哑铃交替弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1750</td>
+      <td>Dumbbell Cuban Press</td><td>哑铃古巴推举</td>
+      <td>✓</td>
+      <td class="num">3399</td>
+      <td>Dumbbell Cuban Press </td><td>哑铃古巴推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1755</td>
+      <td>Dumbbell Decline Shrug </td><td>下斜哑铃耸肩</td>
+      <td>✓</td>
+      <td class="num">1756</td>
+      <td>Dumbbell Decline Shrug</td><td>下斜哑铃耸肩</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4412</td>
+      <td>Dumbbell Fly </td><td>哑铃飞鸟</td>
+      <td>✓</td>
+      <td class="num">1759</td>
+      <td>Dumbbell Fly</td><td>哑铃飞鸟</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3759</td>
+      <td>Dumbbell Incline Inner Biceps Curl </td><td>倾斜哑铃内侧二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">1773</td>
+      <td>Dumbbell Incline Inner Biceps Curl</td><td>上斜哑铃内侧弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3754</td>
+      <td>Dumbbell Incline Raise </td><td>倾斜哑铃侧平举</td>
+      <td>✓</td>
+      <td class="num">1776</td>
+      <td>Dumbbell Incline Raise</td><td>上斜哑铃平举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1793</td>
+      <td>Dumbbell Lying One Arm Press </td><td>哑铃仰卧单臂推举</td>
+      <td>✓</td>
+      <td class="num">1794</td>
+      <td>Dumbbell Lying One Arm Press</td><td>哑铃仰卧单臂推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3826</td>
+      <td>Dumbbell Lying One Arm Pronated Triceps Extension </td><td>哑铃仰卧单臂正握肱三头肌伸展</td>
+      <td>✓</td>
+      <td class="num">1795</td>
+      <td>Dumbbell Lying One Arm Pronated Triceps Extension</td><td>哑铃仰卧单臂掌心向下臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2480</td>
+      <td>Dumbbell Lying One Arm Rear Lateral Raise</td><td>哑铃仰卧单臂后侧平举</td>
+      <td>✓</td>
+      <td class="num">1796</td>
+      <td>Dumbbell Lying One Arm Rear Lateral Raise</td><td>哑铃仰卧单臂后侧平举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3928</td>
+      <td>Dumbbell One Arm Lateral Raise </td><td>哑铃单臂侧平举</td>
+      <td>✓</td>
+      <td class="num">1806</td>
+      <td>Dumbbell One Arm Lateral Raise</td><td>哑铃单臂侧平举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3922</td>
+      <td>Dumbbell One arm Revers Wrist Curl </td><td>哑铃单臂反向腕弯举</td>
+      <td>✓</td>
+      <td class="num">1809</td>
+      <td>Dumbbell One arm Revers Wrist Curl</td><td>哑铃单臂反向腕弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1812</td>
+      <td>Dumbbell One Arm Shoulder Press</td><td>哑铃单臂肩推</td>
+      <td>✓</td>
+      <td class="num">1811</td>
+      <td>Dumbbell One Arm Shoulder Press </td><td>哑铃单臂肩推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3924</td>
+      <td>Dumbbell One arm Wrist Curl </td><td>哑铃单臂腕弯举</td>
+      <td>✓</td>
+      <td class="num">1815</td>
+      <td>Dumbbell One arm Wrist Curl</td><td>哑铃单臂腕弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3833</td>
+      <td>Dumbbell Seated Alternate Front Raise </td><td>哑铃坐姿交替前平举</td>
+      <td>✓</td>
+      <td class="num">1838</td>
+      <td>Dumbbell Seated Alternate Front Raise</td><td>坐姿交替前平举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5533</td>
+      <td>Dumbbell Side Bend </td><td>哑铃侧弯</td>
+      <td>✓</td>
+      <td class="num">1858</td>
+      <td>Dumbbell Side Bend</td><td>哑铃侧弯</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3862</td>
+      <td>Dumbbell Single Leg Calf Raise </td><td>单腿地面提踵</td>
+      <td>✓</td>
+      <td class="num">1860</td>
+      <td>Dumbbell Single Leg Calf Raise</td><td>单腿提踵</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4323</td>
+      <td>Dumbbell Standing One Arm Curl </td><td>哑铃站姿单臂弯举</td>
+      <td>✓</td>
+      <td class="num">1873</td>
+      <td>Dumbbell Standing One Arm Curl </td><td>站立单臂弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1886</td>
+      <td>Dumbbell Sumo Squat </td><td>哑铃深蹲（宽距）</td>
+      <td>✓</td>
+      <td class="num">3560</td>
+      <td>Dumbbell Sumo Squat </td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1905</td>
+      <td>EZ Barbell Spider Curl</td><td>EZ杆蜘蛛弯举</td>
+      <td>✓</td>
+      <td class="num">2942</td>
+      <td>EZ Barbell Spider Curl</td><td>EZ杠铃蜘蛛弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1907</td>
+      <td>Flexion Leg Sit up </td><td>屈腿仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">1908</td>
+      <td>Flexion Leg Sit up </td><td>屈腿仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4327</td>
+      <td>Groin Crunch </td><td>腹股沟卷腹</td>
+      <td>✓</td>
+      <td class="num">1920</td>
+      <td>Groin Crunch</td><td>大腿内侧卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3890</td>
+      <td>Hanging Pike </td><td>悬垂尖峰</td>
+      <td>✓</td>
+      <td class="num">1924</td>
+      <td>Hanging Pike</td><td>悬垂体前屈</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5172</td>
+      <td>High Knee Squat </td><td>高膝深蹲</td>
+      <td>✓</td>
+      <td class="num">1929</td>
+      <td>High Knee Squat</td><td>高抬腿深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1933</td>
+      <td>Hip Crunch </td><td>髋部卷腹</td>
+      <td>✓</td>
+      <td class="num">46827</td>
+      <td>Hip Crunch</td><td>髋部卷曲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1936</td>
+      <td>Hip Raise Bridge </td><td>髋部提升桥式</td>
+      <td>✓</td>
+      <td class="num">1937</td>
+      <td>Hip Raise Bridge</td><td>髋部提升桥式</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1947</td>
+      <td>Inverse Leg Curl </td><td>倒立腿弯举</td>
+      <td>✓</td>
+      <td class="num">3638</td>
+      <td>Inverse Leg Curl </td><td>反向腿弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3770</td>
+      <td>Kettlebell Alternating Press on Floor </td><td>地面交替壶铃推举</td>
+      <td>✓</td>
+      <td class="num">1970</td>
+      <td>Kettlebell Alternating Press on Floor</td><td>地面交替按压</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3771</td>
+      <td>Kettlebell Alternating Renegade Row </td><td>交替壶铃叛徒划船</td>
+      <td>✓</td>
+      <td class="num">1972</td>
+      <td>Kettlebell Alternating Renegade Row</td><td>交替叛逆划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3773</td>
+      <td>Kettlebell Figure 8 </td><td>壶铃8字运动</td>
+      <td>✓</td>
+      <td class="num">1983</td>
+      <td>Kettlebell Figure 8</td><td>壶铃8字运动</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3774</td>
+      <td>Kettlebell Lunge Pass Through </td><td>壶铃弓步穿刺</td>
+      <td>✓</td>
+      <td class="num">1987</td>
+      <td>Kettlebell Lunge Pass Through</td><td>壶铃箭步穿过</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4989</td>
+      <td>Lever Seated Crunch </td><td>杠杆坐姿卷腹</td>
+      <td>✓</td>
+      <td class="num">2046</td>
+      <td>Lever Seated Crunch </td><td>坐姿卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2132</td>
+      <td>Rotate Push-up </td><td>旋转俯卧撑</td>
+      <td>✓</td>
+      <td class="num">2133</td>
+      <td>Rotate Push-up</td><td>旋转俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3777</td>
+      <td>Seated Leg Raise </td><td>坐姿抬腿</td>
+      <td>✓</td>
+      <td class="num">2140</td>
+      <td>Seated Leg Raise</td><td>坐姿抬腿</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4240</td>
+      <td>Single Arm Push-up </td><td>单臂俯卧撑</td>
+      <td>✓</td>
+      <td class="num">2176</td>
+      <td>Single Arm Push-up</td><td>单臂俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2186</td>
+      <td>Sit-Up </td><td>仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">2187</td>
+      <td>Sit-Up</td><td>仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2241</td>
+      <td>Standing Hip Abduction </td><td>站姿髋外展</td>
+      <td>✓</td>
+      <td class="num">2242</td>
+      <td>Standing Hip Abduction</td><td>站姿髋外展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2275</td>
+      <td>Twisting Crunch</td><td>扭转卷腹</td>
+      <td>✓</td>
+      <td class="num">2274</td>
+      <td>Twisting Crunch </td><td>扭转卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3485</td>
+      <td>Cable Seated Row </td><td>坐姿划船</td>
+      <td>✓</td>
+      <td class="num">2312</td>
+      <td>Cable seated row</td><td>固定器械坐姿划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2314</td>
+      <td>Dumbbell lying external shoulder rotation</td><td>哑铃仰卧肩外旋</td>
+      <td>✓</td>
+      <td class="num">4317</td>
+      <td>Dumbbell lying external shoulder rotation </td><td>哑铃仰卧肩外旋</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5557</td>
+      <td>Band overhead triceps extension </td><td>弹力带过顶肱三头肌伸展</td>
+      <td>✓</td>
+      <td class="num">2365</td>
+      <td>Band overhead triceps extension</td><td>弹力带过顶三头肌伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2385</td>
+      <td>Band upright row</td><td>弹力带直立划船</td>
+      <td>✓</td>
+      <td class="num">2842</td>
+      <td>Band Upright Row </td><td>弹力带直立划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2421</td>
+      <td>Band assisted pull-up</td><td>弹力带辅助引体向上</td>
+      <td>✓</td>
+      <td class="num">4235</td>
+      <td>Band Assisted Pull-Up </td><td>弹力带辅助引体向上</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2558</td>
+      <td>Suspension Pull-up </td><td>悬吊引体向上</td>
+      <td>✓</td>
+      <td class="num">2519</td>
+      <td>Suspension Pull-up</td><td>悬吊引体向上</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2530</td>
+      <td>Suspension Single Leg Split Squat </td><td>悬吊单腿分腿蹲</td>
+      <td>✓</td>
+      <td class="num">2531</td>
+      <td>Suspension Single Leg Split Squat</td><td>悬吊单腿分腿蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2572</td>
+      <td>Suspension Squat </td><td>悬吊深蹲</td>
+      <td>✓</td>
+      <td class="num">2574</td>
+      <td>Suspension Squat</td><td>悬吊深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2603</td>
+      <td>Dumbbell Standing Single Leg Calf Raise</td><td>哑铃单腿站立提踵</td>
+      <td>✓</td>
+      <td class="num">4943</td>
+      <td>Dumbbell Standing Single Leg Calf Raise</td><td>哑铃单腿提踵</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4190</td>
+      <td>Smith kneeling rear kick </td><td>史密斯跪姿后踢</td>
+      <td>✓</td>
+      <td class="num">2607</td>
+      <td>Smith kneeling rear kick</td><td>史密斯跪姿后踢</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2712</td>
+      <td>Exercise Ball Back Extension With Hands Behind Head</td><td>健身球双手抱头背部伸展</td>
+      <td>✓</td>
+      <td class="num">4059</td>
+      <td>Exercise Ball Back Extension With Hands Behind Head </td><td>双手背后健身球背部伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5550</td>
+      <td>Bench Dip on floor </td><td>地板长凳臂屈伸</td>
+      <td>✓</td>
+      <td class="num">2762</td>
+      <td>Bench dip on floor</td><td>地面俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2772</td>
+      <td>Barbell Glute Bridge</td><td>杠铃臀桥</td>
+      <td>✓</td>
+      <td class="num">4202</td>
+      <td>Barbell Glute Bridge </td><td>杠铃臀桥</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3919</td>
+      <td>Barbell Palms Down Wrist Curl Over A Bench </td><td>杠铃掌心向下腕弯举（过长凳）</td>
+      <td>✓</td>
+      <td class="num">2774</td>
+      <td>Barbell Palms Down Wrist Curl Over A Bench</td><td>杠铃掌心向下腕屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3920</td>
+      <td>Barbell Palms Up Wrist Curl Over A Bench </td><td>杠铃掌心向上腕弯举（过长凳）</td>
+      <td>✓</td>
+      <td class="num">2775</td>
+      <td>Barbell Palms Up Wrist Curl Over A Bench</td><td>杠铃掌心向上腕屈伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5735</td>
+      <td>Seated Glute Stretch </td><td>坐姿臀部拉伸</td>
+      <td>✓</td>
+      <td class="num">2785</td>
+      <td>Seated Glute Stretch</td><td>坐姿臀部拉伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4928</td>
+      <td>Inchworm </td><td>尺蠖</td>
+      <td>✓</td>
+      <td class="num">2814</td>
+      <td>Inchworm</td><td>尺蠖</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3681</td>
+      <td>Oblique Crunch </td><td>侧腹卷腹</td>
+      <td>✓</td>
+      <td class="num">2837</td>
+      <td>Oblique Crunch </td><td>侧腹卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4302</td>
+      <td>Cable Seated One Arm Concentration Curl </td><td>绳索单臂集中弯举</td>
+      <td>✓</td>
+      <td class="num">2950</td>
+      <td>Cable Seated One Arm Concentration Curl</td><td>固定器械坐姿单臂集中弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4303</td>
+      <td>Cable Seated Overhead Curl </td><td>绳索坐姿过顶弯举</td>
+      <td>✓</td>
+      <td class="num">2951</td>
+      <td>Cable Seated Overhead Curl</td><td>固定器械坐姿头顶弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4305</td>
+      <td>Cable Squatting Curl </td><td>绳索深蹲弯举</td>
+      <td>✓</td>
+      <td class="num">2952</td>
+      <td>Cable Squatting Curl</td><td>固定器械深蹲弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3872</td>
+      <td>Barbell Single Leg Deadlift </td><td>哑铃单腿硬拉</td>
+      <td>✓</td>
+      <td class="num">3047</td>
+      <td>Barbell Single Leg Deadlift</td><td>杠铃单腿硬拉</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3217</td>
+      <td>Lying Leg Tuck Hip Stretch</td><td>仰卧腿卷曲髋部拉伸</td>
+      <td>✓</td>
+      <td class="num">4702</td>
+      <td>Lying Leg Tuck Hip Stretch </td><td>仰卧腿收髋拉伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3222</td>
+      <td>Flexion And Extension Hip Stretch</td><td>屈伸髋部拉伸</td>
+      <td>✓</td>
+      <td class="num">4626</td>
+      <td>Flexion And Extension Hip Stretch </td><td>髋关节屈伸拉伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3422</td>
+      <td>Resistance Band One Leg Glute Bridge</td><td>单腿弹力带臀桥</td>
+      <td>✓</td>
+      <td class="num">3794</td>
+      <td>Resistance Band One Leg Glute Bridge </td><td>单腿弹力带臀桥</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3424</td>
+      <td>Resistance Band One Leg Kickback</td><td>单腿弹力带后踢</td>
+      <td>✓</td>
+      <td class="num">3423</td>
+      <td>Resistance Band One Leg Kickback </td><td>单腿弹力带后踢</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3441</td>
+      <td>Roll Recumbent Hip External Rotator and Hip Extensor Stretch </td><td>仰卧髋外旋和髋伸展拉伸</td>
+      <td>✓</td>
+      <td class="num">4797</td>
+      <td>Roll Recumbent Hip External Rotator and Hip Extensor Stretch </td><td>仰卧髋外旋肌和髋伸肌拉伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4106</td>
+      <td>Spine Twist </td><td>脊柱扭转</td>
+      <td>✓</td>
+      <td class="num">3567</td>
+      <td>Spine Twist</td><td>脊柱扭转</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3615</td>
+      <td>Lever Horizontal Leg Press </td><td>杠杆水平腿举</td>
+      <td>✓</td>
+      <td class="num">4189</td>
+      <td>Lever Horizontal Leg Press</td><td>杠杆水平腿举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4660</td>
+      <td>Dumbbell Scott Press </td><td>哑铃斯科特推举</td>
+      <td>✓</td>
+      <td class="num">3635</td>
+      <td>Dumbbell Scott Press</td><td>哑铃斯科特推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3644</td>
+      <td>Cable Reverse Grip Triceps Pushdown </td><td>反握绳索三头肌下压</td>
+      <td>✓</td>
+      <td class="num">47672</td>
+      <td>Cable Reverse Grip Triceps Pushdown</td><td>固定器械反握三头肌下压</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3713</td>
+      <td>Glute Bridge One Leg on Floor </td><td>单腿地面臀桥</td>
+      <td>✓</td>
+      <td class="num">3714</td>
+      <td>Glute Bridge One Leg on Floor </td><td>单腿地面臀桥</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3895</td>
+      <td>Cable One Arm Biceps Curl </td><td>绳索单臂肱二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">3894</td>
+      <td>Cable One Arm Biceps Curl </td><td>绳索单臂肱二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3977</td>
+      <td>Dumbbell Side Bridge </td><td>哑铃侧桥</td>
+      <td>✓</td>
+      <td class="num">4568</td>
+      <td>Dumbbell Side Bridge</td><td>哑铃侧桥</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4053</td>
+      <td>V-Up Down </td><td>V形起身下放</td>
+      <td>✓</td>
+      <td class="num">4054</td>
+      <td>V-Up Down </td><td>V形起身下放</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4127</td>
+      <td>Starfish Crunch </td><td>星鱼卷腹</td>
+      <td>✓</td>
+      <td class="num">4126</td>
+      <td>Starfish Crunch </td><td>星鱼卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4133</td>
+      <td>Front Plank with Arm Lift </td><td>手臂抬起的平板支撑</td>
+      <td>✓</td>
+      <td class="num">4132</td>
+      <td>Front Plank with Arm Lift </td><td>手臂抬起的平板支撑</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4195</td>
+      <td>Dumbbell Split Squat Front Foot Elevanted</td><td>哑铃分腿深蹲（前脚抬高）</td>
+      <td>✓</td>
+      <td class="num">4196</td>
+      <td>Dumbbell Split Squat Front Foot Elevanted </td><td>哑铃分腿深蹲（前脚抬高）</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4208</td>
+      <td>Band Thruster</td><td>弹力带推举</td>
+      <td>✓</td>
+      <td class="num">4209</td>
+      <td>Band Thruster </td><td>弹力带推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4215</td>
+      <td>Landmine Squat and Press </td><td>地锚深蹲与推举</td>
+      <td>✓</td>
+      <td class="num">4214</td>
+      <td>Landmine Squat and Press</td><td>地锚深蹲与推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4233</td>
+      <td>Band Single Arm Shoulder Press </td><td>弹力带单臂肩推</td>
+      <td>✓</td>
+      <td class="num">4234</td>
+      <td>Band Single Arm Shoulder Press</td><td>弹力带单臂肩推</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4387</td>
+      <td>Chin Tuck</td><td>下巴收回</td>
+      <td>✓</td>
+      <td class="num">4389</td>
+      <td>Chin Tuck </td><td>下巴收回</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4392</td>
+      <td>Bodyweight Standing Close-grip One Arm Row </td><td>徒手站立窄握单臂划船</td>
+      <td>✓</td>
+      <td class="num">4393</td>
+      <td>Bodyweight Standing Close-grip One Arm Row</td><td>徒手站立窄握单臂划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5090</td>
+      <td>Frog Reverse Hyperextension </td><td>青蛙反向超伸</td>
+      <td>✓</td>
+      <td class="num">4416</td>
+      <td>Frog Reverse Hyperextension </td><td>青蛙反向超伸</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4567</td>
+      <td>Dumbbell V-up</td><td>哑铃V型起身</td>
+      <td>✓</td>
+      <td class="num">4676</td>
+      <td>Dumbbell V-up </td><td>哑铃V形起身</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4579</td>
+      <td>Cable Front Squat</td><td>绳索前深蹲</td>
+      <td>✓</td>
+      <td class="num">4584</td>
+      <td>Cable Front Squat </td><td>绳索前深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4675</td>
+      <td>Dumbbell Swing </td><td>哑铃摆动</td>
+      <td>✓</td>
+      <td class="num">4598</td>
+      <td>Dumbbell Swing</td><td>哑铃摆动</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4653</td>
+      <td>Crunch with Medicine Ball </td><td>药球卷腹</td>
+      <td>✓</td>
+      <td class="num">4652</td>
+      <td>Crunch with Medicine Ball</td><td>药球卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4683</td>
+      <td>Dumbbell Svend Press </td><td>哑铃斯文举</td>
+      <td>✓</td>
+      <td class="num">4682</td>
+      <td>Dumbbell Svend Press</td><td>哑铃斯文举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4687</td>
+      <td>Burpee with Push-up </td><td>俯卧撑波比跳</td>
+      <td>✓</td>
+      <td class="num">4686</td>
+      <td>Burpee with Push-up </td><td>俯卧撑波比跳</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4765</td>
+      <td>Bodyweight Pulse Squat</td><td>自重脉冲深蹲</td>
+      <td>✓</td>
+      <td class="num">5032</td>
+      <td>Bodyweight Pulse Squat </td><td>自重脉冲深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4791</td>
+      <td>Glute Bridge March</td><td>臀桥踏步</td>
+      <td>✓</td>
+      <td class="num">5039</td>
+      <td>Glute Bridge March </td><td>臀桥踏步</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5710</td>
+      <td>Kettlebell Forward Lunge </td><td>壶铃前蹲</td>
+      <td>✓</td>
+      <td class="num">4804</td>
+      <td>Kettlebell Forward Lunge</td><td>壶铃前弓步</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4921</td>
+      <td>Dumbbell Goblet Split Squat</td><td>哑铃壶式分腿蹲</td>
+      <td>✓</td>
+      <td class="num">27374</td>
+      <td>Dumbbell Goblet Split Squat</td><td>哑铃壶铃分腿蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5250</td>
+      <td>Landmine Rear Lunge </td><td>杠铃后撤步深蹲</td>
+      <td>✓</td>
+      <td class="num">5137</td>
+      <td>Landmine Rear Lunge</td><td>地桩后弓步</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5555</td>
+      <td>Band Biceps Curl </td><td>弹力带二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">5273</td>
+      <td>Band Biceps Curl</td><td>弹力带二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5711</td>
+      <td>Kettlebell Side Lunge </td><td>壶铃侧蹲</td>
+      <td>✓</td>
+      <td class="num">5308</td>
+      <td>Kettlebell Side Lunge </td><td>壶铃侧向深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5864</td>
+      <td>Band Assisted Chin-Up </td><td>弹力带辅助引体向上</td>
+      <td>✓</td>
+      <td class="num">5415</td>
+      <td>Band Assisted Chin-Up </td><td>弹力带辅助引体向上</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5594</td>
+      <td>Kettlebell Side Bend </td><td>壶铃侧弯</td>
+      <td>✓</td>
+      <td class="num">47848</td>
+      <td>Kettlebell Side Bend</td><td>壶铃侧弯</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5598</td>
+      <td>Kettlebell Step-Up</td><td>壶铃台阶上举</td>
+      <td>✓</td>
+      <td class="num">5632</td>
+      <td>Kettlebell Step-Up </td><td>壶铃台阶上举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5708</td>
+      <td>Kettlebell Single Leg Deadlift </td><td>单腿壶铃硬拉</td>
+      <td>✓</td>
+      <td class="num">47247</td>
+      <td>Kettlebell Single Leg Deadlift</td><td>壶铃单腿硬拉</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5716</td>
+      <td>Kettlebell Single Arm Clean and Press </td><td>单臂壶铃挺举并推举</td>
+      <td>✓</td>
+      <td class="num">46898</td>
+      <td>Kettlebell Single Arm Clean and Press</td><td>单臂壶铃抓举和推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5722</td>
+      <td>Kettlebell Bent-Over Row </td><td>壶铃弯腰划船</td>
+      <td>✓</td>
+      <td class="num">47226</td>
+      <td>Kettlebell Bent-over Row</td><td>壶铃弯举划船</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5778</td>
+      <td>Hook Kick Kickboxing </td><td>钩踢</td>
+      <td>✓</td>
+      <td class="num">5769</td>
+      <td>Hook Kick Kickboxing </td><td>钩踢</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3751</td>
+      <td>Cable One Arm Lateral Bent over </td><td>单臂侧向弯体绳索拉力</td>
+      <td>✓</td>
+      <td class="num">1642</td>
+      <td>Cable One Arm Lateral Bent-over</td><td>绳索单臂侧弯举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3743</td>
+      <td>Dumbbell Incline Palm in Press </td><td>倾斜哑铃掌心向内推举</td>
+      <td>✓</td>
+      <td class="num">1775</td>
+      <td>Dumbbell Incline Palm-in Press</td><td>上斜哑铃掌心向内推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3603</td>
+      <td>Dumbbells Straight Arm Pullover </td><td>哑铃直臂下拉</td>
+      <td>✓</td>
+      <td class="num">1884</td>
+      <td>Dumbbell Straight Arm Pullover</td><td>哑铃直臂下拉</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3561</td>
+      <td>Dumbbells Sumo Squat </td><td>哑铃sumo深蹲</td>
+      <td>✓</td>
+      <td class="num">3560</td>
+      <td>Dumbbell Sumo Squat </td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">4324</td>
+      <td>Elbow To Knee Twists </td><td>肘膝转体</td>
+      <td>✓</td>
+      <td class="num">1893</td>
+      <td>Elbow-To-Knee Twists</td><td>肘膝扭转</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">1932</td>
+      <td>High knees butt kicks</td><td>高抬腿脚跟击臀</td>
+      <td>✓</td>
+      <td class="num">46756</td>
+      <td>High Knee to Butt Kick</td><td>高抬腿至踢臀</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3942</td>
+      <td>Rocky Pull Up Pulldown </td><td>岩石引体向上下拉</td>
+      <td>✓</td>
+      <td class="num">2129</td>
+      <td>Rocky Pull-Up Pulldown</td><td>岩石引体向上下拉</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3779</td>
+      <td>Band jack knife sit up </td><td>弹力带折叠式仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">2432</td>
+      <td>Band jack knife sit-up</td><td>弹力带折叠剪刀式卷腹</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">2635</td>
+      <td>Assisted Close-grip Underhand Chin-up</td><td>辅助窄距反握引体向上</td>
+      <td>✓</td>
+      <td class="num">3781</td>
+      <td>Assisted Close grip Underhand Chin up </td><td>辅助窄握正握引体向上</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">4430</td>
+      <td>Glute-Ham Raise</td><td>臀腿提升</td>
+      <td>✓</td>
+      <td class="num">5648</td>
+      <td>Glute Ham Raise </td><td>臀腿伸展</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">27712</td>
+      <td>Dumbbell Z Press</td><td>哑铃Z式推举</td>
+      <td>✓</td>
+      <td class="num">28166</td>
+      <td>Dumbbell Z-Press</td><td>哑铃Z推举</td>
+      <td>✓</td>
+      <td class="bad">—</td>
+    </tr></tbody>
+  </table>
+
+<h2>⚠️ 需人工判断（48 条，本次不删）</h2>
+  <table class="warn">
+    <thead><tr>
+      <th>层级</th><th>待删 id</th><th>待删名称</th><th>中文名</th><th>待删有图</th>
+      <th>保留 id</th><th>保留名称</th><th>保留中文名</th><th>保留有图</th><th>阻塞原因</th>
+    </tr></thead>
+    <tbody><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">434</td>
+      <td>Upright Row</td><td>直立划船</td>
+      <td>✓</td>
+      <td class="num">52</td>
+      <td>Upright Row</td><td>直立划船</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(4 vs 1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">266</td>
+      <td>Bench Dip</td><td>长凳臂屈伸</td>
+      <td>✓</td>
+      <td class="num">56</td>
+      <td>Bench Dip</td><td>凳子臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(9 vs 2)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2149</td>
+      <td>Shoulder Press </td><td>肩推</td>
+      <td>✓</td>
+      <td class="num">97</td>
+      <td>Shoulder Press</td><td>肩部推举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(11 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1729</td>
+      <td>Decline Push-up </td><td>下斜俯卧撑</td>
+      <td>✓</td>
+      <td class="num">114</td>
+      <td>Decline Push-Up</td><td>下斜俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(23 vs 2)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1456</td>
+      <td>Alternate Biceps Curl </td><td>交替肱二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">115</td>
+      <td>Alternate Biceps Curl</td><td>交替二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(11 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">410</td>
+      <td>Concentration Curl</td><td>集中弯举</td>
+      <td>✓</td>
+      <td class="num">124</td>
+      <td>Concentration Curl</td><td>集中弯举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(3 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">440</td>
+      <td>Lever Seated Hip Adduction</td><td>坐姿髋内收</td>
+      <td>✓</td>
+      <td class="num">221</td>
+      <td>Lever Seated Hip Adduction</td><td>杠杆坐姿髋内收</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4542</td>
+      <td>Barbell Front Squat </td><td>杠铃前深蹲</td>
+      <td>✓</td>
+      <td class="num">1493</td>
+      <td>Barbell Front Squat</td><td>杠铃前蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3876</td>
+      <td>Barbell Hack Squat </td><td>壶铃前蹲</td>
+      <td>✓</td>
+      <td class="num">1497</td>
+      <td>Barbell Hack Squat</td><td>杠铃哈克深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3937</td>
+      <td>Barbell Rollout </td><td>杠铃滚出</td>
+      <td>✓</td>
+      <td class="num">1535</td>
+      <td>Barbell Rollout</td><td>杠铃罗马尼亚硬拉</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1551</td>
+      <td>Barbell Skier</td><td>杠铃滑雪者</td>
+      <td>✓</td>
+      <td class="num">4055</td>
+      <td>Barbell Skier </td><td>杠铃滑雪者</td>
+      <td>✓</td>
+      <td class="bad">有训练记录 / 有收藏/练过标记</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1586</td>
+      <td>Bird Dog</td><td>鸟狗式</td>
+      <td>✓</td>
+      <td class="num">2648</td>
+      <td>Bird Dog </td><td>鸟狗式</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3753</td>
+      <td>Cable Front Raise </td><td>绳索前平举</td>
+      <td>✓</td>
+      <td class="num">1613</td>
+      <td>Cable Front Raise</td><td>固定器械前平举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1732</td>
+      <td>Decline Sit-up </td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">1733</td>
+      <td>Decline Sit-up</td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4572</td>
+      <td>Dumbbell Lunge </td><td>哑铃弓步</td>
+      <td>✓</td>
+      <td class="num">1787</td>
+      <td>Dumbbell Lunge</td><td>哑铃弓步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1852</td>
+      <td>Dumbbell Seated Palms Up Wrist Curl</td><td>坐姿掌心向上腕弯举</td>
+      <td>✓</td>
+      <td class="num">3871</td>
+      <td>Dumbbell Seated Palms Up Wrist Curl </td><td>杠铃单腿硬拉</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(坐姿掌心向上腕弯举 vs 杠铃单腿硬拉)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4996</td>
+      <td>Dumbbell Single Leg Squat </td><td>哑铃单腿深蹲</td>
+      <td>✓</td>
+      <td class="num">1862</td>
+      <td>Dumbbell Single Leg Squat</td><td>单腿深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1863</td>
+      <td>Dumbbell Squat </td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="num">1864</td>
+      <td>Dumbbell Squat</td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4880</td>
+      <td>Jump Box </td><td>跳箱</td>
+      <td>✓</td>
+      <td class="num">1960</td>
+      <td>Jump Box</td><td>跳箱</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3772</td>
+      <td>Kettlebell Double Push Press </td><td>双壶铃推举</td>
+      <td>✓</td>
+      <td class="num">1979</td>
+      <td>Kettlebell Double Push Press</td><td>双壶铃推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5702</td>
+      <td>Kettlebell Thruster </td><td>壶铃推举</td>
+      <td>✓</td>
+      <td class="num">2001</td>
+      <td>Kettlebell Thruster</td><td>壶铃推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(14 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4102</td>
+      <td>Side Bend</td><td>侧弯</td>
+      <td>✓</td>
+      <td class="num">2151</td>
+      <td>Side Bend </td><td>侧弯</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(2 vs 23)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3878</td>
+      <td>Cable kickback </td><td>哑铃交替锤式牧师弯举</td>
+      <td>✓</td>
+      <td class="num">2311</td>
+      <td>Cable kickback</td><td>固定器械后踢</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(哑铃交替锤式牧师弯举 vs 固定器械后踢)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2532</td>
+      <td>Suspension Single Leg Squat</td><td>悬吊单腿深蹲</td>
+      <td>✓</td>
+      <td class="num">2567</td>
+      <td>Suspension Single Leg Squat </td><td>悬吊单腿深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 19/1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3780</td>
+      <td>Cable twisting overhead press </td><td>绳索扭转过顶推举</td>
+      <td>✓</td>
+      <td class="num">2626</td>
+      <td>Cable twisting overhead press</td><td>固定器械扭转过顶推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3785</td>
+      <td>Barbell Power Jerk </td><td>杠铃挺举</td>
+      <td>✓</td>
+      <td class="num">2869</td>
+      <td>Barbell Power Jerk</td><td>杠铃力量挺举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 14)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3786</td>
+      <td>Standing Long Jump </td><td>立定跳远</td>
+      <td>✓</td>
+      <td class="num">2928</td>
+      <td>Standing Long Jump</td><td>站立跳远</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3881</td>
+      <td>Dumbbell Alternate Seated Hammer Curl </td><td>哑铃坐姿交替锤式弯举</td>
+      <td>✓</td>
+      <td class="num">2956</td>
+      <td>Dumbbell Alternate Seated Hammer Curl</td><td>哑铃坐姿交替锤式弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(7 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3787</td>
+      <td>Dumbbell Lunge with Bicep Curl </td><td>哑铃弓步配合二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">2964</td>
+      <td>Dumbbell Lunge with Bicep Curl</td><td>哑铃弓步二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3788</td>
+      <td>Cable Squat Row </td><td>绳索深蹲划船</td>
+      <td>✓</td>
+      <td class="num">3018</td>
+      <td>Cable Squat Row </td><td>绳索深蹲划船</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4313</td>
+      <td>Dumbbell Close grip Press </td><td>哑铃窄距推举</td>
+      <td>✓</td>
+      <td class="num">3025</td>
+      <td>Dumbbell Close Grip Press</td><td>哑铃窄距推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2 vs 18/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3401</td>
+      <td>Stationary Bike Run </td><td>固定自行车跑步</td>
+      <td>✓</td>
+      <td class="num">3504</td>
+      <td>Stationary Bike Run </td><td>固定自行车跑步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3425</td>
+      <td>Resistance Band Plank March</td><td>弹力带平板踏步</td>
+      <td>✓</td>
+      <td class="num">3795</td>
+      <td>Resistance Band Plank March </td><td>弹力带平板踏步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(20/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4048</td>
+      <td>Barbell Split Squat </td><td>杠铃分腿蹲</td>
+      <td>✓</td>
+      <td class="num">3608</td>
+      <td>Barbell Split Squat </td><td>杠铃分腿蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 19/1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3983</td>
+      <td>Smith Reverse Hyperextension </td><td>史密斯机反向超伸</td>
+      <td>✓</td>
+      <td class="num">47180</td>
+      <td>Smith Reverse Hyperextension</td><td>后摆膝驱动</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(史密斯机反向超伸 vs 后摆膝驱动)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4611</td>
+      <td>Inverted Row under Table </td><td>桌下倒立划船</td>
+      <td>✓</td>
+      <td class="num">48220</td>
+      <td>Inverted Row under Table</td><td>固定单臂卧推</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(桌下倒立划船 vs 固定单臂卧推)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4971</td>
+      <td>Sliding Leg Curl on Floor with Towel</td><td>毛巾滑动腿弯举</td>
+      <td>✓</td>
+      <td class="num">4625</td>
+      <td>Sliding Leg Curl on Floor with Towel</td><td>毛巾滑动腿弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(20/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4761</td>
+      <td>Alternate Punching</td><td>交替出拳</td>
+      <td>✓</td>
+      <td class="num">5031</td>
+      <td>Alternate Punching </td><td>交替出拳</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2/6 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4786</td>
+      <td>High Knee Run</td><td>高膝跑</td>
+      <td>✓</td>
+      <td class="num">5040</td>
+      <td>High Knee Run </td><td>高膝跑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5714</td>
+      <td>Kettlebell Unilateral Farmers Walk </td><td>单侧壶铃农夫行走</td>
+      <td>✓</td>
+      <td class="num">46812</td>
+      <td>Kettlebell Unilateral Farmers Walk</td><td>壶铃单侧农夫行走</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(13 vs 14)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">413</td>
+      <td>Seated Curl</td><td>坐姿弯举</td>
+      <td>✓</td>
+      <td class="num">375</td>
+      <td>Seated Curls</td><td>坐姿弯举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(3 vs 5)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">1453</td>
+      <td>45 Degree Side Bend</td><td>45度侧弯</td>
+      <td>✓</td>
+      <td class="num">3673</td>
+      <td>45 degrees Side Bend </td><td>45度侧弯</td>
+      <td>✓</td>
+      <td class="bad">有训练记录 / 有收藏/练过标记</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3687</td>
+      <td>Decline Sit up </td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">1733</td>
+      <td>Decline Sit-up</td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">1941</td>
+      <td>Incline Close-Grip Push-Up</td><td>上斜窄距俯卧撑</td>
+      <td>✓</td>
+      <td class="num">27475</td>
+      <td>Incline Close Grip Push-up</td><td>倾斜窄距俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(6 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">2764</td>
+      <td>Muscle-up </td><td>引体向上</td>
+      <td>✓</td>
+      <td class="num">2082</td>
+      <td>Muscle Up</td><td>窄腿板凳桥式</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(引体向上 vs 窄腿板凳桥式)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">2932</td>
+      <td>World Greatest Stretch</td><td>世界最伟大拉伸</td>
+      <td>✓</td>
+      <td class="num">27114</td>
+      <td>Worlds Greatest Stretch</td><td>世界上最伟大的伸展</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 16)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">4456</td>
+      <td>Scissor Jumps </td><td>剪刀跳</td>
+      <td>✓</td>
+      <td class="num">47083</td>
+      <td>Scissors Jump</td><td>剪刀跳</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">5466</td>
+      <td>Backwards Run</td><td>后跑</td>
+      <td>✓</td>
+      <td class="num">47910</td>
+      <td>Backward Run</td><td>后跑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr></tbody>
+  </table>
+
+
+<h2 style="color:var(--ok)">✅ 执行结果（2026-11-13 21:22 已执行）</h2>
+<div class="note" style="border-left-color:var(--ok)">
+用户确认后已删除 <b>161 条</b>「同名 + 同器械 + 同部位 + 中文名有交集 + 从未被使用 + 非精选」的缺视频重复行，
+每条都在组内保留了<b>带图带视频的兄弟行</b>。<br>
+<b>复核链路</b>：临删前 161/161 通过 → 备份 <code>gfit_backup_dupdelete-1794619332971.json</code> →
+走 <code>POST /admin/library/delete</code>（事务内级联 + 写审计）→ 删后复核全绿。<br>
+<b>终态</b>：库 6923 → <b>6762</b>（-161）· 残留 0 · 守护者 160/160 仍在库且仍有视频 ·
+孤儿 exercises 0 / user_exercise_stats 0 · 缺视频 1728 → <b>1567</b> ·
+删除接口 <code>deleted=161 removedExerciseRows=0 affectedUsers=0</code>（<b>零训练数据被毁</b>）·
+审计 <code>admin_operation_log #459 library.delete affected=161</code>。<br>
+<b>磁盘影响</b>：删掉的行不带视频，所以只产生 <b>160 个图片孤儿文件</b>（物理文件未删，磁盘图片 6852 个不变）。
+连同历史遗留，磁盘当前共 <b>438 张孤儿图片 + 64 个孤儿视频</b>没人引用 —— 后台「数据体检」只扫描不清理，需手动处理。<br>
+<b>另发现 2 条既有坏引用</b>（与本次删除无关，删行只会减少引用不会制造坏引用）：
+<code>47382 Side to Side Bicep Curl</code> 与 <code>48277 Resistance Band Wide Stance Anti Rotation Chop</code>
+指向的 png 在生产机上不存在。
+</div>
+
+<h2>说明</h2>
+<ul>
+<li>本报告<b>没有执行任何删除</b>。可删 id 清单另存于 <code>gfit_dup_deletable_20261113.json</code>，确认后再走 <code>POST /admin/library/delete</code>（事务内级联删 exercises / user_exercise_stats，并写 admin_operation_log 审计）。</li>
+<li>删库行<b>不会删物理媒体文件</b>（文件可能被其他 id 复用），需另行按「数据体检」清理磁盘孤儿。</li>
+<li>缺视频总数 1728 里，只有 161 条能用这个方式消掉；其余是库内独一份、别处没有对应动作的条目。</li>
+</ul>
+</body></html>

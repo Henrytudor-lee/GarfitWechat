@@ -1,0 +1,2901 @@
+{
+  "createdAt": "2026-11-14T01:22:12.972Z",
+  "reason": "删除完全同义的缺视频重复行(同名+同器械+同部位+零使用), 保留带视频的兄弟行",
+  "count": 161,
+  "libraryCountBefore": 6923,
+  "deletedRows": [
+    {
+      "id": 55,
+      "name": "Wrist Curl",
+      "name_zh": "腕弯举",
+      "image_name": "01261101-Barbell-Wrist-Curl_Forearm_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 279,
+      "name": "Lever Side Hip Abduction",
+      "name_zh": "杠杆侧髋外展",
+      "image_name": "10341101-Lever-Side-Hip-Abduction_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 309,
+      "name": "Lever Shrug",
+      "name_zh": "杠杆耸肩",
+      "image_name": "12211101-Lever-Shrug-(bench-press-machine)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 315,
+      "name": "Seated Row",
+      "name_zh": "坐姿划船",
+      "image_name": "12381101-Cable-Seated-Row-(Bent-bar)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 368,
+      "name": "Lever Gripless Shrug",
+      "name_zh": "杠杆无握耸肩",
+      "image_name": "14391101-Lever-Gripless-Shrug-(VERSION-2)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 442,
+      "name": "Lever Seated Hip Abduction",
+      "name_zh": "坐姿髋外展",
+      "image_name": "18691101-Lever-Seated-Hip-Abduction-(VERSION-2)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 446,
+      "name": "Lever Leg Extension",
+      "name_zh": "杠杆腿伸展",
+      "image_name": "18731101-Lever-Leg-Extension-(plate-loaded)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1512,
+      "name": "Barbell Lying Triceps Extension",
+      "name_zh": "杠铃仰卧肱三头肌伸展",
+      "image_name": "00611101-Barbell-Lying-Triceps-Extension_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1514,
+      "name": "Barbell Narrow Stance Squat",
+      "name_zh": "杠铃窄距深蹲",
+      "image_name": "00631101-Barbell-Narrow-Stance-Squat_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1524,
+      "name": "Barbell Pullover",
+      "name_zh": "杠铃划船",
+      "image_name": "00731101-Barbell-Pullover_Back_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1549,
+      "name": "Barbell Side Split Squat",
+      "name_zh": "杠铃站立腿部提踵",
+      "image_name": "00981101-Barbell-Side-Split-Squat_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1577,
+      "name": "Barbell Wrist Curl",
+      "name_zh": "杠铃手腕弯举",
+      "image_name": "01261101-Barbell-Wrist-Curl_Forearm_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1625,
+      "name": "Cable Judo Flip",
+      "name_zh": "固定器械柔道翻转",
+      "image_name": "01741101-Cable-Judo-Flip_waist_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1637,
+      "name": "Cable Lying Triceps Extension ",
+      "name_zh": "固定器械仰卧臂屈伸",
+      "image_name": "01861101-Cable-Lying-Triceps-Extension-II_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1668,
+      "name": "Cable Seated Supine-grip Row",
+      "name_zh": "绳索坐姿仰卧握把划船",
+      "image_name": "02171101-Cable-Seated-Supine-grip-Row_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1685,
+      "name": "Cable Standing Row ",
+      "name_zh": "绳索站立划船",
+      "image_name": "02341101-Cable-Standing-Row-(V-bar)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1750,
+      "name": "Dumbbell Cuban Press",
+      "name_zh": "哑铃古巴推举",
+      "image_name": "02991101-Dumbbell-Cuban-Press_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1755,
+      "name": "Dumbbell Decline Shrug ",
+      "name_zh": "下斜哑铃耸肩",
+      "image_name": "03041101-Dumbbell-Decline-Shrug-(VERSION-2)_Back-FIX_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1793,
+      "name": "Dumbbell Lying One Arm Press ",
+      "name_zh": "哑铃仰卧单臂推举",
+      "image_name": "03421101-Dumbbell-Lying-One-Arm-Press-II_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1812,
+      "name": "Dumbbell One Arm Shoulder Press",
+      "name_zh": "哑铃单臂肩推",
+      "image_name": "03611101-Dumbbell-One-Arm-Shoulder-Press_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1886,
+      "name": "Dumbbell Sumo Squat ",
+      "name_zh": "哑铃深蹲（宽距）",
+      "image_name": "04351101-Dumbbell-Sumo-Squat-(back-on-stability-ball-wall)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1905,
+      "name": "EZ Barbell Spider Curl",
+      "name_zh": "EZ杆蜘蛛弯举",
+      "image_name": "04541101-EZ-Barbell-Spider-Curl_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "5",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1907,
+      "name": "Flexion Leg Sit up ",
+      "name_zh": "屈腿仰卧起坐",
+      "image_name": "04561101-Flexion-Leg-Sit-up-(bent-knee)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1932,
+      "name": "High knees butt kicks",
+      "name_zh": "高抬腿脚跟击臀",
+      "image_name": "04811101-High-knees-butt-kicks_Cardio_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "10",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1933,
+      "name": "Hip Crunch ",
+      "name_zh": "髋部卷腹",
+      "image_name": "04821101-Hip-Crunch-(knees-bent)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1936,
+      "name": "Hip Raise Bridge ",
+      "name_zh": "髋部提升桥式",
+      "image_name": "04851101-Hip-Raise-Bridge-II_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1947,
+      "name": "Inverse Leg Curl ",
+      "name_zh": "倒立腿弯举",
+      "image_name": "04961101-Inverse-Leg-Curl-(bench-support)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "20,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 1948,
+      "name": "Inverted Row ",
+      "name_zh": "倒立划船",
+      "image_name": "04971101-Inverted-Row-II_Back_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2054,
+      "name": "Lever Shoulder Press ",
+      "name_zh": "杠铃耸肩",
+      "image_name": "06031101-Lever-Shoulder-Press-(plate-loaded)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2132,
+      "name": "Rotate Push-up ",
+      "name_zh": "旋转俯卧撑",
+      "image_name": "06811101-Rotate-Push-up-(on-knees)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2186,
+      "name": "Sit-Up ",
+      "name_zh": "仰卧起坐",
+      "image_name": "07351101-Sit-Up-II_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2241,
+      "name": "Standing Hip Abduction ",
+      "name_zh": "站姿髋外展",
+      "image_name": "07901101-Standing-Hip-Abduction-(bent-knee)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2264,
+      "name": "Triceps Dip ",
+      "name_zh": "肱三头肌臂屈伸",
+      "image_name": "08131101-Triceps-Dip-(between-benches)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2275,
+      "name": "Twisting Crunch",
+      "name_zh": "扭转卷腹",
+      "image_name": "08241101-Twisting-Crunch_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2314,
+      "name": "Dumbbell lying external shoulder rotation",
+      "name_zh": "哑铃仰卧肩外旋",
+      "image_name": "08631101-Dumbbell-lying-external-shoulder-rotation_Back_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2385,
+      "name": "Band upright row",
+      "name_zh": "弹力带直立划船",
+      "image_name": "09341101-Band-upright-row_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2421,
+      "name": "Band assisted pull-up",
+      "name_zh": "弹力带辅助引体向上",
+      "image_name": "09701101-Band-assisted-pull-up_Back_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2480,
+      "name": "Dumbbell Lying One Arm Rear Lateral Raise",
+      "name_zh": "哑铃仰卧单臂后侧平举",
+      "image_name": "10481101-Dumbbell-Lying-One-Arm-Rear-Lateral-Raise_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2482,
+      "name": "Smith Calf Raise ",
+      "name_zh": "史密斯机提踵",
+      "image_name": "10501101-Smith-Calf-Raise-(with-block)_Calves_small.png",
+      "video_name": null,
+      "equipment_id": "8",
+      "body_part_id": "8",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2500,
+      "name": "Cable twist ",
+      "name_zh": "绳索扭转",
+      "image_name": "10691101-Cable-twist-II_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2530,
+      "name": "Suspension Single Leg Split Squat ",
+      "name_zh": "悬吊单腿分腿蹲",
+      "image_name": "10991101-Suspender-Single-Leg-Split-Squat-(self-assisted)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "25",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2558,
+      "name": "Suspension Pull-up ",
+      "name_zh": "悬吊引体向上",
+      "image_name": "11271101-Suspender-Pull-up-(version-2)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "25",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2572,
+      "name": "Suspension Squat ",
+      "name_zh": "悬吊深蹲",
+      "image_name": "11411101-Suspender-Squat-(Arms-Overhead)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "25",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2603,
+      "name": "Dumbbell Standing Single Leg Calf Raise",
+      "name_zh": "哑铃单腿站立提踵",
+      "image_name": "11781101-Dumbbell-Standing-Single-Leg-Calf-Raise_Calves_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "8",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2635,
+      "name": "Assisted Close-grip Underhand Chin-up",
+      "name_zh": "辅助窄距反握引体向上",
+      "image_name": "12221101-Assisted-Close-grip-Underhand-Chin-up_Back_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2650,
+      "name": "Dead Bug ",
+      "name_zh": "死虫式",
+      "image_name": "12431101-Dead-Bug-(version-2)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2712,
+      "name": "Exercise Ball Back Extension With Hands Behind Head",
+      "name_zh": "健身球双手抱头背部伸展",
+      "image_name": "13341101-Exercise-Ball-Back-Extension-With-Hands-Behind-Head_Back_small.png",
+      "video_name": null,
+      "equipment_id": "23",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2740,
+      "name": "Barbell Seated Calf Raise",
+      "name_zh": "杠铃坐姿提踵",
+      "image_name": "13711101-Barbell-Seated-Calf-Raise_Calves_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "8",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 2772,
+      "name": "Barbell Glute Bridge",
+      "name_zh": "杠铃臀桥",
+      "image_name": "14091101-Barbell-Glute-Bridge_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3217,
+      "name": "Lying Leg Tuck Hip Stretch",
+      "name_zh": "仰卧腿卷曲髋部拉伸",
+      "image_name": "19451101-Lying-Leg-Tuck-Hip-Stretch_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3222,
+      "name": "Flexion And Extension Hip Stretch",
+      "name_zh": "屈伸髋部拉伸",
+      "image_name": "19501101-Flexion-And-Extension-Hip-Stretch_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3376,
+      "name": "Cat Stretch ",
+      "name_zh": "猫式拉伸",
+      "image_name": "21061101-Cat-Stretch-(Version-2)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3,12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3422,
+      "name": "Resistance Band One Leg Glute Bridge",
+      "name_zh": "单腿弹力带臀桥",
+      "image_name": "21591101-Resistance-Band-One-Leg-Glute-Bridge_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "19",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3424,
+      "name": "Resistance Band One Leg Kickback",
+      "name_zh": "单腿弹力带后踢",
+      "image_name": "21611101-Resistance-Band-One-Leg-Kickback_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "19",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3441,
+      "name": "Roll Recumbent Hip External Rotator and Hip Extensor Stretch ",
+      "name_zh": "仰卧髋外旋和髋伸展拉伸",
+      "image_name": "22011101-Roll-Recumbent-Hip-External-Rotator-and-Hip-Extensor-Stretch-(CrossedLeg)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "20",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3483,
+      "name": "Cable Pulldown ",
+      "name_zh": "高位下拉",
+      "image_name": "22431101-Cable-Pulldown-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3485,
+      "name": "Cable Seated Row ",
+      "name_zh": "坐姿划船",
+      "image_name": "22451101-Cable-Seated-Row-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3561,
+      "name": "Dumbbells Sumo Squat ",
+      "name_zh": "哑铃sumo深蹲",
+      "image_name": "23231101-Dumbbells-Sumo-Squat-(female)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3603,
+      "name": "Dumbbells Straight Arm Pullover ",
+      "name_zh": "哑铃直臂下拉",
+      "image_name": "23651101-Dumbbells-Straight-Arm-Pullover-(VERSION-2)-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3615,
+      "name": "Lever Horizontal Leg Press ",
+      "name_zh": "杠杆水平腿举",
+      "image_name": "23771101-Lever-Horizontal-Leg-Press-(female)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3641,
+      "name": "Dumbbell Alternate Biceps Curl ",
+      "name_zh": "哑铃交替二头肌弯举",
+      "image_name": "24031101-Dumbbell-Alternate-Biceps-Curl-(with-arm-blaster)_Upper-arms_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3644,
+      "name": "Cable Reverse Grip Triceps Pushdown ",
+      "name_zh": "反握绳索三头肌下压",
+      "image_name": "24061101-Cable-Reverse-Grip-Triceps-Pushdown-(with-arm-blaster)_Upper-arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3677,
+      "name": "Cable Middle Fly ",
+      "name_zh": "绳索中段飞鸟",
+      "image_name": "24391101-Cable-Middle-Fly-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3681,
+      "name": "Oblique Crunch ",
+      "name_zh": "侧腹卷腹",
+      "image_name": "24431101-Oblique-Crunch-(Version-2)-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3686,
+      "name": "Vertical Leg Raise ",
+      "name_zh": "垂直腿抬升",
+      "image_name": "24481101-Vertical-Leg-Raise-(on-parallel-bars)-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3,12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3688,
+      "name": "Decline Crunch ",
+      "name_zh": "下斜卷腹",
+      "image_name": "24501101-Decline-Crunch-(female)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3692,
+      "name": "Lever Decline Chest Press ",
+      "name_zh": "下斜杠杆胸部推举",
+      "image_name": "24541101-Lever-Decline-Chest-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3693,
+      "name": "Lever Incline Chest Press ",
+      "name_zh": "上斜杠杆胸部推举",
+      "image_name": "24551101-Lever-Incline-Chest-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3713,
+      "name": "Glute Bridge One Leg on Floor ",
+      "name_zh": "单腿地面臀桥",
+      "image_name": "24741101-Glute-Bridge-One-Leg-on-Floor-(straight-leg)-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3743,
+      "name": "Dumbbell Incline Palm in Press ",
+      "name_zh": "倾斜哑铃掌心向内推举",
+      "image_name": "25051101-Dumbbell-Incline-Palm-in-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3746,
+      "name": "Barbell Reverse Preacher Curl ",
+      "name_zh": "杠铃反向 preacher 弯举",
+      "image_name": "25081101-Barbell-Reverse-Preacher-Curl-(female)_Forearm_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3751,
+      "name": "Cable One Arm Lateral Bent over ",
+      "name_zh": "单臂侧向弯体绳索拉力",
+      "image_name": "25131101-Cable-One-Arm-Lateral-Bent-over-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3754,
+      "name": "Dumbbell Incline Raise ",
+      "name_zh": "倾斜哑铃侧平举",
+      "image_name": "25161101-Dumbbell-Incline-Raise-(female)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3759,
+      "name": "Dumbbell Incline Inner Biceps Curl ",
+      "name_zh": "倾斜哑铃内侧二头肌弯举",
+      "image_name": "25211101-Dumbbell-Incline-Inner-Biceps-Curl-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3770,
+      "name": "Kettlebell Alternating Press on Floor ",
+      "name_zh": "地面交替壶铃推举",
+      "image_name": "25321101-Kettlebell-Alternating-Press-on-Floor-(female)_chest-FIX_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3771,
+      "name": "Kettlebell Alternating Renegade Row ",
+      "name_zh": "交替壶铃叛徒划船",
+      "image_name": "25331101-Kettlebell-Alternating-Renegade-Row-(female)_back_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3773,
+      "name": "Kettlebell Figure 8 ",
+      "name_zh": "壶铃8字运动",
+      "image_name": "25351101-Kettlebell-Figure-8-(female)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3774,
+      "name": "Kettlebell Lunge Pass Through ",
+      "name_zh": "壶铃弓步穿刺",
+      "image_name": "25361101-Kettlebell-Lunge-Pass-Through-(female)_thighs_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3777,
+      "name": "Seated Leg Raise ",
+      "name_zh": "坐姿抬腿",
+      "image_name": "25391101-Seated-Leg-Raise-(female)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3,12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3779,
+      "name": "Band jack knife sit up ",
+      "name_zh": "弹力带折叠式仰卧起坐",
+      "image_name": "25411101-Band-jack-knife-sit-up-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "3,12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3792,
+      "name": "Sled Full Hack Squat ",
+      "name_zh": "雪橇全深蹲",
+      "image_name": "25541101-Sled-Full-Hack-Squat-(female)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "7",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3817,
+      "name": "Cable Shrug ",
+      "name_zh": "缆绳耸肩",
+      "image_name": "25791101-Cable-Shrug-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3826,
+      "name": "Dumbbell Lying One Arm Pronated Triceps Extension ",
+      "name_zh": "哑铃仰卧单臂正握肱三头肌伸展",
+      "image_name": "25881101-Dumbbell-Lying-One-Arm-Pronated-Triceps-Extension-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3833,
+      "name": "Dumbbell Seated Alternate Front Raise ",
+      "name_zh": "哑铃坐姿交替前平举",
+      "image_name": "25951101-Dumbbell-Seated-Alternate-Front-Raise-(female)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3862,
+      "name": "Dumbbell Single Leg Calf Raise ",
+      "name_zh": "单腿地面提踵",
+      "image_name": "26241101-Dumbbell-Single-Leg-Calf-Raise-(female)_Calves_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "8",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3872,
+      "name": "Barbell Single Leg Deadlift ",
+      "name_zh": "哑铃单腿硬拉",
+      "image_name": "26341101-Barbell-Single-Leg-Deadlift-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3890,
+      "name": "Hanging Pike ",
+      "name_zh": "悬垂尖峰",
+      "image_name": "26521101-Hanging-Pike-(female)_waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3895,
+      "name": "Cable One Arm Biceps Curl ",
+      "name_zh": "绳索单臂肱二头肌弯举",
+      "image_name": "26571101-Cable-One-Arm-Biceps-Curl-(VERSION-2)-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3909,
+      "name": "Smith Narrow Row ",
+      "name_zh": "史密斯机窄距划船",
+      "image_name": "26711101-Smith-Narrow-Row-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "8",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3913,
+      "name": "Cable Standing Shoulder External Rotation ",
+      "name_zh": "绳索站立肩部外旋",
+      "image_name": "26751101-Cable-Standing-Shoulder-External-Rotation-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3916,
+      "name": "Cable Bench Press ",
+      "name_zh": "绳索卧推",
+      "image_name": "26781101-Cable-Bench-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3919,
+      "name": "Barbell Palms Down Wrist Curl Over A Bench ",
+      "name_zh": "杠铃掌心向下腕弯举（过长凳）",
+      "image_name": "26811101-Barbell-Palms-Down-Wrist-Curl-Over-A-Bench-(female)_Forearms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3920,
+      "name": "Barbell Palms Up Wrist Curl Over A Bench ",
+      "name_zh": "杠铃掌心向上腕弯举（过长凳）",
+      "image_name": "26821101-Barbell-Palms-Up-Wrist-Curl-Over-A-Bench-(female)_Forearms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3921,
+      "name": "Barbell Revers Wrist Curl ",
+      "name_zh": "杠铃反向腕弯举",
+      "image_name": "26831101-Barbell-Revers-Wrist-Curl-(VERSION-2)-(female)_Forearms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3922,
+      "name": "Dumbbell One arm Revers Wrist Curl ",
+      "name_zh": "哑铃单臂反向腕弯举",
+      "image_name": "26841101-Dumbbell-One-arm-Revers-Wrist-Curl-(female)_Forearms_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3924,
+      "name": "Dumbbell One arm Wrist Curl ",
+      "name_zh": "哑铃单臂腕弯举",
+      "image_name": "26861101-Dumbbell-One-arm-Wrist-Curl-(female)_Forearm_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "7",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3928,
+      "name": "Dumbbell One Arm Lateral Raise ",
+      "name_zh": "哑铃单臂侧平举",
+      "image_name": "26901101-Dumbbell-One-Arm-Lateral-Raise-(female)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3942,
+      "name": "Rocky Pull Up Pulldown ",
+      "name_zh": "岩石引体向上下拉",
+      "image_name": "27041101-Rocky-Pull-Up-Pulldown-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 3977,
+      "name": "Dumbbell Side Bridge ",
+      "name_zh": "哑铃侧桥",
+      "image_name": "27391101-Dumbbell-Side-Bridge-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4053,
+      "name": "V-Up Down ",
+      "name_zh": "V形起身下放",
+      "image_name": "28151101-V-Up-Down-(with-Stability-ball)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "23",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4106,
+      "name": "Spine Twist ",
+      "name_zh": "脊柱扭转",
+      "image_name": "28681101-Spine-Twist-(VERSION-2)_Pilates_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4127,
+      "name": "Starfish Crunch ",
+      "name_zh": "星鱼卷腹",
+      "image_name": "28891101-Starfish-Crunch-(advanced)-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4129,
+      "name": "Flutter Kicks ",
+      "name_zh": "交替踢腿",
+      "image_name": "28911101-Flutter-Kicks-(hands-under---hips-head-up)-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4133,
+      "name": "Front Plank with Arm Lift ",
+      "name_zh": "手臂抬起的平板支撑",
+      "image_name": "28951101-Front-Plank-with-Arm-Lift-(push-up-position)-(female)_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4190,
+      "name": "Smith kneeling rear kick ",
+      "name_zh": "史密斯跪姿后踢",
+      "image_name": "29521101-Smith-kneeling-rear-kick-(with-Partner)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "8",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4195,
+      "name": "Dumbbell Split Squat Front Foot Elevanted",
+      "name_zh": "哑铃分腿深蹲（前脚抬高）",
+      "image_name": "29571101-Dumbbell-Split-Squat-Front-Foot-Elevanted_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4208,
+      "name": "Band Thruster",
+      "name_zh": "弹力带推举",
+      "image_name": "29701101-Band-Thruster_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4215,
+      "name": "Landmine Squat and Press ",
+      "name_zh": "地锚深蹲与推举",
+      "image_name": "29771101-Landmine-Squat-and-Press-(female)_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4233,
+      "name": "Band Single Arm Shoulder Press ",
+      "name_zh": "弹力带单臂肩推",
+      "image_name": "29951101-Band-Single-Arm-Shoulder-Press-(female)_Shoulder_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4240,
+      "name": "Single Arm Push-up ",
+      "name_zh": "单臂俯卧撑",
+      "image_name": "30021101-Single-Arm-Push-up-(on-knees)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4266,
+      "name": "Barbell JM Bench Press ",
+      "name_zh": "杠铃JM平板卧推",
+      "image_name": "30281101-Barbell-JM-Bench-Press-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4277,
+      "name": "Cable Alternate Triceps Extension ",
+      "name_zh": "绳索交替肱三头肌伸展",
+      "image_name": "30391101-Cable-Alternate-Triceps-Extension-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4287,
+      "name": "Cable Incline Bench Press ",
+      "name_zh": "绳索上斜卧推",
+      "image_name": "30491101-Cable-Incline-Bench-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4290,
+      "name": "Cable Incline Triceps Extension ",
+      "name_zh": "绳索上斜臂屈伸",
+      "image_name": "30521101-Cable-Incline-Triceps-Extension-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4294,
+      "name": "Cable Lying Extension Pullover ",
+      "name_zh": "绳索仰卧伸展划船",
+      "image_name": "30561101-Cable-Lying-Extension-Pullover-(with-rope-attachment)-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4302,
+      "name": "Cable Seated One Arm Concentration Curl ",
+      "name_zh": "绳索单臂集中弯举",
+      "image_name": "30641101-Cable-Seated-One-Arm-Concentration-Curl-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4303,
+      "name": "Cable Seated Overhead Curl ",
+      "name_zh": "绳索坐姿过顶弯举",
+      "image_name": "30651101-Cable-Seated-Overhead-Curl-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4304,
+      "name": "Cable Shoulder Press ",
+      "name_zh": "绳索肩推",
+      "image_name": "30661101-Cable-Shoulder-Press-(female)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4305,
+      "name": "Cable Squatting Curl ",
+      "name_zh": "绳索深蹲弯举",
+      "image_name": "30671101-Cable-Squatting-Curl-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4323,
+      "name": "Dumbbell Standing One Arm Curl ",
+      "name_zh": "哑铃站姿单臂弯举",
+      "image_name": "30851101-Dumbbell-Standing-One-Arm-Curl-(over-incline-bench)-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4324,
+      "name": "Elbow To Knee Twists ",
+      "name_zh": "肘膝转体",
+      "image_name": "30861101-Elbow-To-Knee-Twists-(male)_Cardio_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "10",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4327,
+      "name": "Groin Crunch ",
+      "name_zh": "腹股沟卷腹",
+      "image_name": "30891101-Groin-Crunch-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4334,
+      "name": "Lever Alternating Narrow Grip Seated Row ",
+      "name_zh": "杠杆交替窄握坐姿划船",
+      "image_name": "30961101-Lever-Alternating-Narrow-Grip-Seated-Row-(plate-loaded)-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4336,
+      "name": "Lever Bicep Curl ",
+      "name_zh": "杠杆二头肌弯举",
+      "image_name": "30981101-Lever-Bicep-Curl-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4340,
+      "name": "Lever Narrow Grip Seated Row ",
+      "name_zh": "杠杆窄握坐姿划船",
+      "image_name": "31021101-Lever-Narrow-Grip-Seated-Row-(plate-loaded)-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4341,
+      "name": "Lever Preacher Curl ",
+      "name_zh": "杠杆preacher弯举",
+      "image_name": "31031101-Lever-Preacher-Curl-(plate-loaded)-(female)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4387,
+      "name": "Chin Tuck",
+      "name_zh": "下巴收回",
+      "image_name": "31491101-Chin-Tuck_Neck_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "9",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4392,
+      "name": "Bodyweight Standing Close-grip One Arm Row ",
+      "name_zh": "徒手站立窄握单臂划船",
+      "image_name": "31551101-Bodyweight-Standing-Close-grip-One-Arm-Row-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4412,
+      "name": "Dumbbell Fly ",
+      "name_zh": "哑铃飞鸟",
+      "image_name": "31751101-Dumbbell-Fly-(knees-at-90-degrees)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4421,
+      "name": "Barbell Squat ",
+      "name_zh": "杠铃深蹲",
+      "image_name": "31841101-Barbell-Squat-(with-hanging-band-technique)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "1",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4430,
+      "name": "Glute-Ham Raise",
+      "name_zh": "臀腿提升",
+      "image_name": "31931101-Glute-Ham-Raise_Thighs-FIX_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "20,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4567,
+      "name": "Dumbbell V-up",
+      "name_zh": "哑铃V型起身",
+      "image_name": "33361101-Dumbbell-V-up_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4579,
+      "name": "Cable Front Squat",
+      "name_zh": "绳索前深蹲",
+      "image_name": "33491101-Cable-Front-Squat_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "3",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4653,
+      "name": "Crunch with Medicine Ball ",
+      "name_zh": "药球卷腹",
+      "image_name": "34231101-Crunch-with-Medicine-Ball-(female)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "16",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4660,
+      "name": "Dumbbell Scott Press ",
+      "name_zh": "哑铃斯科特推举",
+      "image_name": "34301101-Dumbbell-Scott-Press-(female)_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4675,
+      "name": "Dumbbell Swing ",
+      "name_zh": "哑铃摆动",
+      "image_name": "34451101-Dumbbell-Swing-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "20,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4683,
+      "name": "Dumbbell Svend Press ",
+      "name_zh": "哑铃斯文举",
+      "image_name": "34531101-Dumbbell-Svend-Press-(female)_Chest_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "2",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4687,
+      "name": "Burpee with Push-up ",
+      "name_zh": "俯卧撑波比跳",
+      "image_name": "34571101-Burpee-with-Push-up-(male)_Cardio_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "10",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4765,
+      "name": "Bodyweight Pulse Squat",
+      "name_zh": "自重脉冲深蹲",
+      "image_name": "35351101-Bodyweight-Pulse-Squat_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4791,
+      "name": "Glute Bridge March",
+      "name_zh": "臀桥踏步",
+      "image_name": "35611101-Glute-Bridge-March_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3,12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4921,
+      "name": "Dumbbell Goblet Split Squat",
+      "name_zh": "哑铃壶式分腿蹲",
+      "image_name": "36911101-Dumbbell-Goblet-Split-Squat_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4928,
+      "name": "Inchworm ",
+      "name_zh": "尺蠖",
+      "image_name": "36981101-Inchworm-(VERSION-2)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 4989,
+      "name": "Lever Seated Crunch ",
+      "name_zh": "杠杆坐姿卷腹",
+      "image_name": "37601101-Lever-Seated-Crunch-(VERSION-2)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5090,
+      "name": "Frog Reverse Hyperextension ",
+      "name_zh": "青蛙反向超伸",
+      "image_name": "38701101-Frog-Reverse-Hyperextension-(on-a-bench)-(male)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5172,
+      "name": "High Knee Squat ",
+      "name_zh": "高膝深蹲",
+      "image_name": "39571101-High-Knee-Squat-(VERSION-2)-(female)_Cardio_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "10",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5250,
+      "name": "Landmine Rear Lunge ",
+      "name_zh": "杠铃后撤步深蹲",
+      "image_name": "40401101-Landmine-Rear-Lunge-(VERSION-2)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "6",
+      "body_part_id": "19,1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5533,
+      "name": "Dumbbell Side Bend ",
+      "name_zh": "哑铃侧弯",
+      "image_name": "43351101-Dumbbell-Side-Bend-(VERSION-2)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5550,
+      "name": "Bench Dip on floor ",
+      "name_zh": "地板长凳臂屈伸",
+      "image_name": "43521101-Bench-Dip-on-floor-(VERSION-2)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5555,
+      "name": "Band Biceps Curl ",
+      "name_zh": "弹力带二头肌弯举",
+      "image_name": "43571101-Band-Biceps-Curl-(VERSION-2)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "17,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5557,
+      "name": "Band overhead triceps extension ",
+      "name_zh": "弹力带过顶肱三头肌伸展",
+      "image_name": "43591101-Band-overhead-triceps-extension-(VERSION-2)-(male)_Upper-Arms_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "18,5",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5594,
+      "name": "Kettlebell Side Bend ",
+      "name_zh": "壶铃侧弯",
+      "image_name": "43961101-Kettlebell-Side-Bend-(VERSION-2)_Waist_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "12",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5598,
+      "name": "Kettlebell Step-Up",
+      "name_zh": "壶铃台阶上举",
+      "image_name": "44001101-Kettlebell-Step-up_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5708,
+      "name": "Kettlebell Single Leg Deadlift ",
+      "name_zh": "单腿壶铃硬拉",
+      "image_name": "45231101-Kettlebell-Single-Leg-Deadlift-(female)_Hips_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5710,
+      "name": "Kettlebell Forward Lunge ",
+      "name_zh": "壶铃前蹲",
+      "image_name": "45251101-Kettlebell-Forward-Lunge-(female)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5711,
+      "name": "Kettlebell Side Lunge ",
+      "name_zh": "壶铃侧蹲",
+      "image_name": "45261101-Kettlebell-Side-Lunge-(female)_Thighs_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "1",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5716,
+      "name": "Kettlebell Single Arm Clean and Press ",
+      "name_zh": "单臂壶铃挺举并推举",
+      "image_name": "45311101-Kettlebell-Single-Arm-Clean-and-Press-(female)_Weightlifts_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "14",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5722,
+      "name": "Kettlebell Bent-Over Row ",
+      "name_zh": "壶铃弯腰划船",
+      "image_name": "45371101-Kettlebell-Bent-Over-Row-(female)_Back_small.png",
+      "video_name": null,
+      "equipment_id": "15",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5735,
+      "name": "Seated Glute Stretch ",
+      "name_zh": "坐姿臀部拉伸",
+      "image_name": "45541101-Seated-Glute-Stretch-(VERSION-2)_Stretching_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "3",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5778,
+      "name": "Hook Kick Kickboxing ",
+      "name_zh": "钩踢",
+      "image_name": "45971101-Hook-Kick-Kickboxing-(with-partner)_Fighting_small.png",
+      "video_name": null,
+      "equipment_id": "2",
+      "body_part_id": "13",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 5864,
+      "name": "Band Assisted Chin-Up ",
+      "name_zh": "弹力带辅助引体向上",
+      "image_name": "47181101-Band-Assisted-Chin-Up-(female)_Back-FIX_small.png",
+      "video_name": null,
+      "equipment_id": "11",
+      "body_part_id": "4",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    },
+    {
+      "id": 27712,
+      "name": "Dumbbell Z Press",
+      "name_zh": "哑铃Z式推举",
+      "image_name": "56671101-Dumbbell-Z-Press_Shoulders_small.png",
+      "video_name": null,
+      "equipment_id": "4",
+      "body_part_id": "6",
+      "exercise_type": "weight_reps",
+      "is_favorite": 0
+    }
+  ],
+  "keptKeeperRows": [
+    {
+      "id": 54,
+      "name": "Wrist Curl",
+      "name_zh": "腕弯举",
+      "image_name": "01251101-Barbell-Wrist-Curl-II_Forearms_small.png",
+      "video_name": "01251201-Barbell-Wrist-Curl-(VERSION-2)_Forearms-FIX_.mp4"
+    },
+    {
+      "id": 59,
+      "name": "Cable Bench Press",
+      "name_zh": "固定器械卧推",
+      "image_name": "01511101-Cable-Bench-Press_Chest_small.png",
+      "video_name": "01511201-Cable-Bench-Press_Chest.mp4"
+    },
+    {
+      "id": 199,
+      "name": "Flutter Kicks",
+      "name_zh": "蛙跳踢",
+      "image_name": "04591101-Flutter-Kicks_hips_small.png",
+      "video_name": "04591201-Flutter-Kicks_Hips_.mp4"
+    },
+    {
+      "id": 201,
+      "name": "Inverted Row",
+      "name_zh": "倒立划船",
+      "image_name": "04991101-Inverted-Row_Back-FIX_small.png",
+      "video_name": "04991201-Inverted-Row_Back-FIX_.mp4"
+    },
+    {
+      "id": 202,
+      "name": "Lever Alternating Narrow Grip Seated Row",
+      "name_zh": "杠杆交替窄握坐姿划船",
+      "image_name": "05711101-Lever-Alternating-Narrow-Grip-Seated-Row-(plate-loaded)_Back_small.png",
+      "video_name": "05711201-Lever-Single-Arm-Neutral-Grip-Seated-Row-(plate-lo.mp4"
+    },
+    {
+      "id": 203,
+      "name": "Lever Bicep Curl",
+      "name_zh": "杠杆二头肌弯举",
+      "image_name": "05751101-Lever-Bicep-Curl_Upper-Arms_small.png",
+      "video_name": "05751201-Lever-Bicep-Curl_Upper-Arms_.mp4"
+    },
+    {
+      "id": 208,
+      "name": "Lever Gripless Shrug",
+      "name_zh": "杠杆无握耸肩",
+      "image_name": "05801101-Lever-Gripless-Shrug_Back_small.png",
+      "video_name": "05801201-Lever-Gripless-Shrug_Back.mp4"
+    },
+    {
+      "id": 212,
+      "name": "Lever Leg Extension",
+      "name_zh": "杠杆腿伸展",
+      "image_name": "05851101-Lever-Leg-Extension_Thighs_small.png",
+      "video_name": "05851201-Lever-Leg-Extension_Thighs.mp4"
+    },
+    {
+      "id": 215,
+      "name": "Lever Narrow Grip Seated Row",
+      "name_zh": "杠杆窄握坐姿划船",
+      "image_name": "05881101-Lever-Narrow-Grip-Seated-Row-(plate-loaded)_Back_small.png",
+      "video_name": "05881201-Lever-Neutral-Grip-Seated-Row-(plate-loaded)_Back_.mp4"
+    },
+    {
+      "id": 217,
+      "name": "Lever Preacher Curl",
+      "name_zh": "杠杆臂屈伸弯举",
+      "image_name": "05921101-Lever-Preacher-Curl_Upper-Arms_small.png",
+      "video_name": "05921201-Lever-Preacher-Curl_Upper-Arms-FIX_.mp4"
+    },
+    {
+      "id": 220,
+      "name": "Lever Seated Hip Abduction",
+      "name_zh": "杠杆坐姿髋外展",
+      "image_name": "05971101-Lever-Seated-Hip-Abduction_Hips-FIX_small.png",
+      "video_name": "05971201-Lever-Seated-Hip-Abduction_Hips.mp4"
+    },
+    {
+      "id": 224,
+      "name": "Lever Shrug",
+      "name_zh": "杠杆耸肩",
+      "image_name": "06041101-Lever-Shrug-(plate-loaded)_Back_small.png",
+      "video_name": "06041201-Lever-Shrug-(plate-loaded)_Back.mp4"
+    },
+    {
+      "id": 250,
+      "name": "Smith Narrow Row",
+      "name_zh": "史密斯窄距划船",
+      "image_name": "07611101-Smith-Narrow-Row_Back-FIX_small.png",
+      "video_name": "07611201-Smith-Narrow-Row_Back.mp4"
+    },
+    {
+      "id": 262,
+      "name": "Triceps Dip",
+      "name_zh": "肱三头肌臂屈伸",
+      "image_name": "08141101-Triceps-Dip_Upper-Arms_small.png",
+      "video_name": "08141201-Triceps-Dip_Upper-Arms-FIX_.mp4"
+    },
+    {
+      "id": 265,
+      "name": "Vertical Leg Raise",
+      "name_zh": "垂直抬腿",
+      "image_name": "08261101-Vertical-Leg-Raise-(on-parallel-bars)_Hips_small.png",
+      "video_name": "08261201-Vertical-Leg-Raise-(on-parallel-bars)_Hips_.mp4"
+    },
+    {
+      "id": 270,
+      "name": "seated row",
+      "name_zh": "坐姿划船",
+      "image_name": "08611101-Cable-seated-row_Back_small.png",
+      "video_name": "08611201-Cable-Seated-Row_Back-FIX_.mp4"
+    },
+    {
+      "id": 273,
+      "name": "Lever Shoulder Press",
+      "name_zh": "杠杆肩推",
+      "image_name": "08691101-Lever-Shoulder-Press-(plate-loaded)-II_Shoulders_small.png",
+      "video_name": "08691201-Lever-Shoulder-Press-(plate-loaded)-(VERSION-2)_Shoulders_.mp4"
+    },
+    {
+      "id": 295,
+      "name": "Smith Calf Raise",
+      "name_zh": "史密斯提踵",
+      "image_name": "11641101-Smith-Calf-Raise-(version-2)_Calves_small.png",
+      "video_name": "11641201-Smith-Calf-Raise-(version-2)_Calves.mp4"
+    },
+    {
+      "id": 326,
+      "name": "Lever Incline Chest Press",
+      "name_zh": "杠杆上斜胸推",
+      "image_name": "12991101-Leverage-Incline-Chest-Press_Chest_small.png",
+      "video_name": "12991201-Lever-Incline-Chest-Press_Chest-FIX2_.mp4"
+    },
+    {
+      "id": 327,
+      "name": "Lever Decline Chest Press",
+      "name_zh": "杠杆下斜胸推",
+      "image_name": "13001101-Lever-Decline-Chest-Press_Chest_small.png",
+      "video_name": "13001201-Lever-Decline-Chest-Press_Chest-FIX_.mp4"
+    },
+    {
+      "id": 450,
+      "name": "Sled Full Hack Squat",
+      "name_zh": "雪橇全深蹲",
+      "image_name": "19921101-Sled-Full-Hack-Squat_Thighs_small.png",
+      "video_name": "19921201-Sled-Full-Hack-Squat_Thighs_.mp4"
+    },
+    {
+      "id": 1503,
+      "name": "Barbell JM Bench Press",
+      "name_zh": "杠铃JM卧推",
+      "image_name": "00521101-Barbell-JM-Bench-Press_Upper-Arms_small.png",
+      "video_name": "00521201-Barbell-JM-Bench-Press_Upper-Arms.mp4"
+    },
+    {
+      "id": 1530,
+      "name": "Barbell Revers Wrist Curl ",
+      "name_zh": "杠铃反向弯举",
+      "image_name": "00791101-Barbell-Revers-Wrist-Curl-II_Forearms_small.png",
+      "video_name": "00791201-Barbell-Revers-Wrist-Curl-II_Forearms.mp4"
+    },
+    {
+      "id": 1532,
+      "name": "Barbell Reverse Preacher Curl",
+      "name_zh": "杠铃反向腕弯举",
+      "image_name": "00811101-Barbell-Reverse-Preacher-Curl_Forearm_small.png",
+      "video_name": "00811201-Barbell-Reverse-Preacher-Curl_Forearms_.mp4"
+    },
+    {
+      "id": 1539,
+      "name": "Barbell Seated Calf Raise",
+      "name_zh": "杠铃坐姿窄距集中弯举",
+      "image_name": "00881101-Barbell-Seated-Calf-Raise_Calves_small.png",
+      "video_name": "00881201-Barbell-Seated-Calf-Raise_Calves.mp4"
+    },
+    {
+      "id": 1548,
+      "name": "Barbell Side Split Squat ",
+      "name_zh": "杠铃站立前平举过头顶",
+      "image_name": "00971101-Barbell-Side-Split-Squat-II_Thighs_small.png",
+      "video_name": "00971201-Barbell-Side-Split-Squat-(version-2)_Thighs-FIX_.mp4"
+    },
+    {
+      "id": 1553,
+      "name": "Barbell Squat ",
+      "name_zh": "杠铃深蹲",
+      "image_name": "01021101-Barbell-Squat-(on-knees)_Thighs_small.png",
+      "video_name": "01021201-Barbell-Squat-(on-knees)_Thighs.mp4"
+    },
+    {
+      "id": 1576,
+      "name": "Barbell Wrist Curl ",
+      "name_zh": "杠铃手腕弯举",
+      "image_name": "01251101-Barbell-Wrist-Curl-II_Forearms_small.png",
+      "video_name": "01251201-Barbell-Wrist-Curl-(VERSION-2)_Forearms-FIX_.mp4"
+    },
+    {
+      "id": 1600,
+      "name": "Cable Alternate Triceps Extension",
+      "name_zh": "固定器械交替臂屈伸",
+      "image_name": "01491101-Cable-Alternate-Triceps-Extension_Upper-Arms_small.png",
+      "video_name": "01491201-Cable-Alternate-Triceps-Extension_Upper-Arms_.mp4"
+    },
+    {
+      "id": 1620,
+      "name": "Cable Incline Bench Press",
+      "name_zh": "固定器械上斜卧推",
+      "image_name": "01691101-Cable-Incline-Bench-Press_Chest_small.png",
+      "video_name": "01691201-Cable-Incline-Bench-Press_Chest_.mp4"
+    },
+    {
+      "id": 1624,
+      "name": "Cable Incline Triceps Extension",
+      "name_zh": "固定器械上斜臂屈伸",
+      "image_name": "01731101-Cable-Incline-Triceps-Extension_Upper-Arms_small.png",
+      "video_name": "01731201-Cable-Incline-Triceps-Extension_Upper-Arms_.mp4"
+    },
+    {
+      "id": 1635,
+      "name": "Cable Lying Extension Pullover ",
+      "name_zh": "固定器械仰卧臂伸展过顶",
+      "image_name": "01841101-Cable-Lying-Extension-Pullover-(with-rope-attachment)_Back_small.png",
+      "video_name": "01841201-Cable-Lying-Extension-Pullover-(with-rope-attachme.mp4"
+    },
+    {
+      "id": 1638,
+      "name": "Cable Lying Triceps Extension",
+      "name_zh": "固定器械仰卧臂屈伸",
+      "image_name": "01871101-Cable-Lying-Triceps-Extension_Upper-Arms_small.png",
+      "video_name": "01871201-Cable-Lying-Triceps-Extension_Upper-Arms_.mp4"
+    },
+    {
+      "id": 1639,
+      "name": "Cable Middle Fly",
+      "name_zh": "固定器械中位飞鸟",
+      "image_name": "01881101-Cable-Middle-Fly_Chest-FIX_small.png",
+      "video_name": "01881201-Cable-Middle-Fly_Chest-FIX_.mp4"
+    },
+    {
+      "id": 1642,
+      "name": "Cable One Arm Lateral Bent-over",
+      "name_zh": "绳索单臂侧弯举",
+      "image_name": "01911101-Cable-One-Arm-Lateral-Bent-over_Chest_small.png",
+      "video_name": "01911201-Cable-One-Arm-Lateral-Bent-over.mp4"
+    },
+    {
+      "id": 1648,
+      "name": "Cable Pulldown ",
+      "name_zh": "绳索下拉",
+      "image_name": "01971101-Cable-Pulldown-(pro-lat-bar)_Back_small.png",
+      "video_name": "01971201-Cable-Pulldown-(pro-lat-bar)_Back_.mp4"
+    },
+    {
+      "id": 1670,
+      "name": "Cable Shoulder Press",
+      "name_zh": "绳索肩部推举",
+      "image_name": "02191101-Cable-Shoulder-Press_Shoulders_small.png",
+      "video_name": "02191201-Cable-Shoulder-Press_Shoulders.mp4"
+    },
+    {
+      "id": 1671,
+      "name": "Cable Shrug",
+      "name_zh": "绳索耸肩",
+      "image_name": "02201101-Cable-Shrug_Back_small.png",
+      "video_name": "02201201-Cable-Shrug_Back.mp4"
+    },
+    {
+      "id": 1686,
+      "name": "Cable Standing Shoulder External Rotation",
+      "name_zh": "绳索站立肩外旋",
+      "image_name": "02351101-Cable-Standing-Shoulder-External-Rotation_Back_small.png",
+      "video_name": "02351201-Cable-Standing-Shoulder-External-Rotation_Back_.mp4"
+    },
+    {
+      "id": 1694,
+      "name": "Cable Twist",
+      "name_zh": "绳索扭转",
+      "image_name": "02431101-Cable-Twist_Waist_small.png",
+      "video_name": "02431201-Cable-Twist_Waist_.mp4"
+    },
+    {
+      "id": 1700,
+      "name": "Cat Stretch",
+      "name_zh": "猫式伸展",
+      "image_name": "02491101-Cat-Stretch_Waist_small.png",
+      "video_name": "02491201-Cat-Stretch-(female)_Waist_.mp4"
+    },
+    {
+      "id": 1727,
+      "name": "Dead Bug",
+      "name_zh": "死虫式",
+      "image_name": "02761101-Dead-Bug_Waist-FIX_small.png",
+      "video_name": "02761201-Dead-Bug_Waist_.mp4"
+    },
+    {
+      "id": 1728,
+      "name": "Decline Crunch",
+      "name_zh": "下斜卷腹",
+      "image_name": "02771101-Decline-Crunch_waist_small.png",
+      "video_name": "02771201-Decline-Crunch_Waist.mp4"
+    },
+    {
+      "id": 1736,
+      "name": "Dumbbell Alternate Biceps Curl",
+      "name_zh": "哑铃交替弯举",
+      "image_name": "02851101-Dumbbell-Alternate-Biceps-Curl_Upper-Arms-AFIX_small.png",
+      "video_name": "02851201-Dumbbell-Alternate-Biceps-Curl_Upper-Arms-FIX_.mp4"
+    },
+    {
+      "id": 1756,
+      "name": "Dumbbell Decline Shrug",
+      "name_zh": "下斜哑铃耸肩",
+      "image_name": "03051101-Dumbbell-Decline-Shrug_Back_small.png",
+      "video_name": "03051201-Dumbbell-Decline-Shrug_Back-FIX_.mp4"
+    },
+    {
+      "id": 1759,
+      "name": "Dumbbell Fly",
+      "name_zh": "哑铃飞鸟",
+      "image_name": "03081101-Dumbbell-Fly_Chest-FIX_small.png",
+      "video_name": "03081201-Dumbbell-Fly_Chest-FIX2_.mp4"
+    },
+    {
+      "id": 1773,
+      "name": "Dumbbell Incline Inner Biceps Curl",
+      "name_zh": "上斜哑铃内侧弯举",
+      "image_name": "03221101-Dumbbell-Incline-Inner-Biceps-Curl_Upper-Arms_small.png",
+      "video_name": "03221201-Dumbbell-Incline-Inner-Biceps-Curl_Upper-Arms-FIX_.mp4"
+    },
+    {
+      "id": 1775,
+      "name": "Dumbbell Incline Palm-in Press",
+      "name_zh": "上斜哑铃掌心向内推举",
+      "image_name": "03241101-Dumbbell-Incline-Palm-in-Press_Chest_small.png",
+      "video_name": "03241201-Dumbbell-Incline-Palm-in-Press_Chest-FIX_.mp4"
+    },
+    {
+      "id": 1776,
+      "name": "Dumbbell Incline Raise",
+      "name_zh": "上斜哑铃平举",
+      "image_name": "03251101-Dumbbell-Incline-Raise_Shoulders_small.png",
+      "video_name": "03251201-Dumbbell-Incline-Raise_Shoulders_.mp4"
+    },
+    {
+      "id": 1794,
+      "name": "Dumbbell Lying One Arm Press",
+      "name_zh": "哑铃仰卧单臂推举",
+      "image_name": "03431101-Dumbbell-Lying-One-Arm-Press_Chest_small.png",
+      "video_name": "03431201-Dumbbell-Lying-One-Arm-Press_Chest_.mp4"
+    },
+    {
+      "id": 1795,
+      "name": "Dumbbell Lying One Arm Pronated Triceps Extension",
+      "name_zh": "哑铃仰卧单臂掌心向下臂屈伸",
+      "image_name": "03441101-Dumbbell-Lying-One-Arm-Pronated-Triceps-Extension_Upper-Arms_small.png",
+      "video_name": "03441201-Dumbbell-Lying-One-Arm-Pronated-Triceps-Extension_Upper-Arms.mp4"
+    },
+    {
+      "id": 1796,
+      "name": "Dumbbell Lying One Arm Rear Lateral Raise",
+      "name_zh": "哑铃仰卧单臂后侧平举",
+      "image_name": "03451101-Dumbbell-Lying-One-Arm-Rear-Lateral-Raise_shoulder_small.png",
+      "video_name": "03451201-Dumbbell-Lying-One-Arm-Rear-Lateral-Raise_shoulder.mp4"
+    },
+    {
+      "id": 1806,
+      "name": "Dumbbell One Arm Lateral Raise",
+      "name_zh": "哑铃单臂侧平举",
+      "image_name": "03551101-Dumbbell-One-Arm-Lateral-Raise_shoulder_small.png",
+      "video_name": "03551201-Dumbbell-One-Arm-Lateral-Raise_Shoulder.mp4"
+    },
+    {
+      "id": 1809,
+      "name": "Dumbbell One arm Revers Wrist Curl",
+      "name_zh": "哑铃单臂反向腕弯举",
+      "image_name": "03581101-Dumbbell-One-arm-Revers-Wrist-Curl_Forearms_small.png",
+      "video_name": "03581201-Dumbbell-One-arm-Revers-Wrist-Curl_Forearms.mp4"
+    },
+    {
+      "id": 1811,
+      "name": "Dumbbell One Arm Shoulder Press ",
+      "name_zh": "哑铃单臂肩推",
+      "image_name": "03601101-Dumbbell-One-Arm-Shoulder-Press-II_Shoulders_small.png",
+      "video_name": "03601201-Dumbbell-One-Arm-Shoulder-Press-(VERSION-2)_Should.mp4"
+    },
+    {
+      "id": 1815,
+      "name": "Dumbbell One arm Wrist Curl",
+      "name_zh": "哑铃单臂腕弯举",
+      "image_name": "03641101-Dumbbell-One-arm-Wrist-Curl_Forearm-SFIX_small.png",
+      "video_name": "03641201-Dumbbell-One-arm-Wrist-Curl_Forearm.mp4"
+    },
+    {
+      "id": 1838,
+      "name": "Dumbbell Seated Alternate Front Raise",
+      "name_zh": "坐姿交替前平举",
+      "image_name": "03871101-Dumbbell-Seated-Alternate-Front-Raise_Shoulders_small.png",
+      "video_name": "03871201-Dumbbell-Seated-Alternate-Front-Raise_Shoulders.mp4"
+    },
+    {
+      "id": 1858,
+      "name": "Dumbbell Side Bend",
+      "name_zh": "哑铃侧弯",
+      "image_name": "04071101-Dumbbell-Side-Bend_Waist_small.png",
+      "video_name": "04071201-Dumbbell-Side-Bend_Waist.mp4"
+    },
+    {
+      "id": 1860,
+      "name": "Dumbbell Single Leg Calf Raise",
+      "name_zh": "单腿提踵",
+      "image_name": "04091101-Dumbbell-Single-Leg-Calf-Raise_Calves_small.png",
+      "video_name": "04091201-Dumbbell-Single-Leg-Calf-Raise_Calves.mp4"
+    },
+    {
+      "id": 1873,
+      "name": "Dumbbell Standing One Arm Curl ",
+      "name_zh": "站立单臂弯举",
+      "image_name": "04221101-Dumbbell-Standing-One-Arm-Curl-(over-incline-bench)_Upper-Arms_small.png",
+      "video_name": "04221201-Dumbbell-Standing-One-Arm-Curl-(over-incline-bench)_Upper-Arms.mp4"
+    },
+    {
+      "id": 1884,
+      "name": "Dumbbell Straight Arm Pullover",
+      "name_zh": "哑铃直臂下拉",
+      "image_name": "04331101-Dumbbell-Straight-Arm-Pullover_Chest-FIX_small.png",
+      "video_name": "04331201-Dumbbell-Straight-Arm-Pullover_Chest.mp4"
+    },
+    {
+      "id": 1893,
+      "name": "Elbow-To-Knee Twists",
+      "name_zh": "肘膝扭转",
+      "image_name": "04421101-Elbow-To-Knee-Twists_Cardio_small.png",
+      "video_name": "04421201-Elbow-To-Knee-Twists-(female)_Cardio_.mp4"
+    },
+    {
+      "id": 1908,
+      "name": "Flexion Leg Sit up ",
+      "name_zh": "屈腿仰卧起坐",
+      "image_name": "04571101-Flexion-Leg-Sit-up-(straight-arm)_waist_small.png",
+      "video_name": "04571201-Flexion-Leg-Sit-up-(straight-arm)_waist.mp4"
+    },
+    {
+      "id": 1920,
+      "name": "Groin Crunch",
+      "name_zh": "大腿内侧卷腹",
+      "image_name": "04691101-Groin-Crunch_waist_small.png",
+      "video_name": "04691201-Groin-Crunch_waist.mp4"
+    },
+    {
+      "id": 1924,
+      "name": "Hanging Pike",
+      "name_zh": "悬垂体前屈",
+      "image_name": "04731101-Hanging-Pike_waist_small.png",
+      "video_name": "04731201-Hanging-Pike_Waist_.mp4"
+    },
+    {
+      "id": 1929,
+      "name": "High Knee Squat",
+      "name_zh": "高抬腿深蹲",
+      "image_name": "04781101-High-Knee-Squat_Cardio_small.png",
+      "video_name": "04781201-High-Knee-Squat-(female)_Cardio-FIX_.mp4"
+    },
+    {
+      "id": 1937,
+      "name": "Hip Raise Bridge",
+      "name_zh": "髋部提升桥式",
+      "image_name": "04861101-Hip-Raise-Bridge_Waist_small.png",
+      "video_name": "04861201-Hip-Raise-Bridge_Waist.mp4"
+    },
+    {
+      "id": 1970,
+      "name": "Kettlebell Alternating Press on Floor",
+      "name_zh": "地面交替按压",
+      "image_name": "05191101-Kettlebell-Alternating-Press-on-Floor_chest_small.png",
+      "video_name": "05191201-Kettlebell-Alternating-Press-on-Floor_Chest_.mp4"
+    },
+    {
+      "id": 1972,
+      "name": "Kettlebell Alternating Renegade Row",
+      "name_zh": "交替叛逆划船",
+      "image_name": "05211101-Kettlebell-Alternating-Renegade-Row_back_small.png",
+      "video_name": "05211201-Kettlebell-Alternating-Renegade-Row_Back_.mp4"
+    },
+    {
+      "id": 1983,
+      "name": "Kettlebell Figure 8",
+      "name_zh": "壶铃8字运动",
+      "image_name": "05321101-Kettlebell-Figure-8_waist_small.png",
+      "video_name": "05321201-Kettlebell-Figure-8_Waist_.mp4"
+    },
+    {
+      "id": 1987,
+      "name": "Kettlebell Lunge Pass Through",
+      "name_zh": "壶铃箭步穿过",
+      "image_name": "05361101-Kettlebell-Lunge-Pass-Through_thighs_small.png",
+      "video_name": "05361201-Kettlebell-Lunge-Pass-Through_Thighs_.mp4"
+    },
+    {
+      "id": 2046,
+      "name": "Lever Seated Crunch ",
+      "name_zh": "坐姿卷腹",
+      "image_name": "05951101-Lever-Seated-Crunch-(chest-pad)_Waist_small.png",
+      "video_name": "05951201-Lever-Seated-Crunch-(chest-pad).mp4"
+    },
+    {
+      "id": 2129,
+      "name": "Rocky Pull-Up Pulldown",
+      "name_zh": "岩石引体向上下拉",
+      "image_name": "06781101-Rocky-Pull-Up-Pulldown_Back_small.png",
+      "video_name": "06781201-Rocky-Pull-Up-Pulldown_Back_.mp4"
+    },
+    {
+      "id": 2133,
+      "name": "Rotate Push-up",
+      "name_zh": "旋转俯卧撑",
+      "image_name": "06821101-Rotate-Push-up_Waist_small.png",
+      "video_name": "06821201-Rotate-Push-up-(female)_Waist_.mp4"
+    },
+    {
+      "id": 2140,
+      "name": "Seated Leg Raise",
+      "name_zh": "坐姿抬腿",
+      "image_name": "06891101-Seated-Leg-Raise_waist_small.png",
+      "video_name": "06891201-Seated-Leg-Raise_waist.mp4"
+    },
+    {
+      "id": 2176,
+      "name": "Single Arm Push-up",
+      "name_zh": "单臂俯卧撑",
+      "image_name": "07251101-Single-Arm-Push-up_Chest_small.png",
+      "video_name": "07251201-Single-Arm-Push-up_Chest-FIX_.mp4"
+    },
+    {
+      "id": 2187,
+      "name": "Sit-Up",
+      "name_zh": "仰卧起坐",
+      "image_name": "07361101-Sit-up_waist_small.png",
+      "video_name": "07361201-Sit-Up_Waist-FIX_.mp4"
+    },
+    {
+      "id": 2242,
+      "name": "Standing Hip Abduction",
+      "name_zh": "站姿髋外展",
+      "image_name": "07911101-Standing-Hip-Abduction_Hips_small.png",
+      "video_name": "07911201-Standing-Hip-Abduction-(female)_Hips_.mp4"
+    },
+    {
+      "id": 2274,
+      "name": "Twisting Crunch ",
+      "name_zh": "扭转卷腹",
+      "image_name": "08231101-Twisting-Crunch-(arms-straight)_waist_small.png",
+      "video_name": "08231201-Twisting-Crunch-(arms-straight)_Waist.mp4"
+    },
+    {
+      "id": 2312,
+      "name": "Cable seated row",
+      "name_zh": "固定器械坐姿划船",
+      "image_name": "08611101-Cable-seated-row_Back_small.png",
+      "video_name": "08611201-Cable-Seated-Row_Back-FIX_.mp4"
+    },
+    {
+      "id": 2365,
+      "name": "Band overhead triceps extension",
+      "name_zh": "弹力带过顶三头肌伸展",
+      "image_name": "09141101-Band-overhead-triceps-extension_Upper-Arms_small.png",
+      "video_name": "09141201-Band-overhead-triceps-extension-(female)_Upper-Arms.mp4"
+    },
+    {
+      "id": 2432,
+      "name": "Band jack knife sit-up",
+      "name_zh": "弹力带折叠剪刀式卷腹",
+      "image_name": "09811101-Band-jack-knife-sit-up_Waist_small.png",
+      "video_name": "09811201-Band-Jackknife-Sit-Up_Waist_.mp4"
+    },
+    {
+      "id": 2519,
+      "name": "Suspension Pull-up",
+      "name_zh": "悬吊引体向上",
+      "image_name": "10881101-Suspender-Pull-up_Back_small.png",
+      "video_name": "10881201-Suspender-Pull-up-(female)_Back_.mp4"
+    },
+    {
+      "id": 2531,
+      "name": "Suspension Single Leg Split Squat",
+      "name_zh": "悬吊单腿分腿蹲",
+      "image_name": "11001101-Suspender-Single-Leg-Split-Squat_Hips_small.png",
+      "video_name": "11001201-Suspender-Single-Leg-Split-Squat-(female)_Hips_.mp4"
+    },
+    {
+      "id": 2574,
+      "name": "Suspension Squat",
+      "name_zh": "悬吊深蹲",
+      "image_name": "11431101-Suspender-Squat_Thighs_small.png",
+      "video_name": "11431201-Suspender-Squat-(female)_Thighs_.mp4"
+    },
+    {
+      "id": 2607,
+      "name": "Smith kneeling rear kick",
+      "name_zh": "史密斯跪姿后踢",
+      "image_name": "11831101-Smith-kneeling-rear-kick_Hips_small.png",
+      "video_name": "11831201-Smith-kneeling-rear-kick_Hips.mp4"
+    },
+    {
+      "id": 2762,
+      "name": "Bench dip on floor",
+      "name_zh": "地面俯卧撑",
+      "image_name": "13991101-Bench-dip-on-floor_Upper-Arms_small.png",
+      "video_name": "13991201-Bench-dip-on-floor_Upper-Arms.mp4"
+    },
+    {
+      "id": 2774,
+      "name": "Barbell Palms Down Wrist Curl Over A Bench",
+      "name_zh": "杠铃掌心向下腕屈伸",
+      "image_name": "14111101-Barbell-Palms-Down-Wrist-Curl-Over-A-Bench_Forearms_small.png",
+      "video_name": "14111201-Barbell-Palms-Down-Wrist-Curl-Over-A-Bench_Forearms.mp4"
+    },
+    {
+      "id": 2775,
+      "name": "Barbell Palms Up Wrist Curl Over A Bench",
+      "name_zh": "杠铃掌心向上腕屈伸",
+      "image_name": "14121101-Barbell-Palms-Up-Wrist-Curl-Over-A-Bench_Forearms_small.png",
+      "video_name": "14121201-Barbell-Palms-Up-Wrist-Curl-Over-a-Bench_Forearms_.mp4"
+    },
+    {
+      "id": 2785,
+      "name": "Seated Glute Stretch",
+      "name_zh": "坐姿臀部拉伸",
+      "image_name": "14241101-Seated-Glute-Stretch_Hips_small.png",
+      "video_name": "14241201-Seated-Glute-Stretch_Hips_.mp4"
+    },
+    {
+      "id": 2814,
+      "name": "Inchworm",
+      "name_zh": "尺蠖",
+      "image_name": "14711101-Inchworm_Waist_small.png",
+      "video_name": "14711201-Inchworm_Waist.mp4"
+    },
+    {
+      "id": 2837,
+      "name": "Oblique Crunch ",
+      "name_zh": "侧腹卷腹",
+      "image_name": "14951101-Oblique-Crunch-(Version-2)_Waist_small.png",
+      "video_name": "14951201-Oblique-Crunch-(Version-2)_Waist.mp4"
+    },
+    {
+      "id": 2842,
+      "name": "Band Upright Row ",
+      "name_zh": "弹力带直立划船",
+      "image_name": "15001101-Band-Upright-Row-(Under-two-feet)_Shoulders_small.png",
+      "video_name": "15001201-Band-Upright-Row-(Under-two-feet)_Shoulders_.mp4"
+    },
+    {
+      "id": 2942,
+      "name": "EZ Barbell Spider Curl",
+      "name_zh": "EZ杠铃蜘蛛弯举",
+      "image_name": "16281101-EZ-Barbell-Spider-Curl_Upper-Arms_small.png",
+      "video_name": "16281201-EZ-Barbell-Spider-Curl_Upper-Arms.mp4"
+    },
+    {
+      "id": 2950,
+      "name": "Cable Seated One Arm Concentration Curl",
+      "name_zh": "固定器械坐姿单臂集中弯举",
+      "image_name": "16421101-Cable-Seated-One-Arm-Concentration-Curl_Upper-Arms_small.png",
+      "video_name": "16421201-Cable-Seated-One-Arm-Concentration-Curl_Upper-Arms.mp4"
+    },
+    {
+      "id": 2951,
+      "name": "Cable Seated Overhead Curl",
+      "name_zh": "固定器械坐姿头顶弯举",
+      "image_name": "16431101-Cable-Seated-Overhead-Curl_Upper-Arms_small.png",
+      "video_name": "16431201-Cable-Seated-Overhead-Curl_Upper-Arms_.mp4"
+    },
+    {
+      "id": 2952,
+      "name": "Cable Squatting Curl",
+      "name_zh": "固定器械深蹲弯举",
+      "image_name": "16441101-Cable-Squatting-Curl_Upper-Arms_small.png",
+      "video_name": "16441201-Cable-Squatting-Curl_Upper-Arms.mp4"
+    },
+    {
+      "id": 3047,
+      "name": "Barbell Single Leg Deadlift",
+      "name_zh": "杠铃单腿硬拉",
+      "image_name": "17561101-Barbell-Single-Leg-Deadlift_Hips_small.png",
+      "video_name": "17561201-Barbell-Single-Leg-Deadlift_Hips_.mp4"
+    },
+    {
+      "id": 3399,
+      "name": "Dumbbell Cuban Press ",
+      "name_zh": "哑铃古巴推举",
+      "image_name": "21361101-Dumbbell-Cuban-Press-(version-2)_Shoulders_small.png",
+      "video_name": "21361201-Dumbbell-Cuban-Press-(version-2)_Shoulders.mp4"
+    },
+    {
+      "id": 3423,
+      "name": "Resistance Band One Leg Kickback ",
+      "name_zh": "单腿弹力带后踢",
+      "image_name": "21601101-Resistance-Band-One-Leg-Kickback-(Bent-Position)_Hips_small.png",
+      "video_name": "21601201-Resistance-Band-One-Leg-Kickback-(Bent-Position)-(female)_Hips.mp4"
+    },
+    {
+      "id": 3560,
+      "name": "Dumbbell Sumo Squat ",
+      "name_zh": "哑铃深蹲",
+      "image_name": "23221101-Dumbbell-Sumo-Squat-(female)_Thighs-FIX_small.png",
+      "video_name": "23221201-Dumbbell-Sumo-Squat-(female)_Thighs_.mp4"
+    },
+    {
+      "id": 3567,
+      "name": "Spine Twist",
+      "name_zh": "脊柱扭转",
+      "image_name": "23291101-Spine-Twist_Waist_small.png",
+      "video_name": "23291201-Spine-Twist_Waist_.mp4"
+    },
+    {
+      "id": 3627,
+      "name": "Barbell Narrow Stance Squat ",
+      "name_zh": "杠铃窄距深蹲",
+      "image_name": "23891101-Barbell-Narrow-Stance-Squat-(female)_Thighs_small.png",
+      "video_name": "23891201-Barbell-Narrow-Stance-Squat-(female)_Thighs_.mp4"
+    },
+    {
+      "id": 3635,
+      "name": "Dumbbell Scott Press",
+      "name_zh": "哑铃斯科特推举",
+      "image_name": "23971101-Dumbbell-Scott-Press_Shoulders_small.png",
+      "video_name": "23971201-Dumbbell-Scott-Press_Shoulders_360-degrees.mp4"
+    },
+    {
+      "id": 3638,
+      "name": "Inverse Leg Curl ",
+      "name_zh": "反向腿弯举",
+      "image_name": "24001101-Inverse-Leg-Curl-(on-pull-up-cable-machine)_Thighs_small.png",
+      "video_name": "24001201-Inverse-Leg-Curl-(on-pull-up-cable-machine)_Thighs.mp4"
+    },
+    {
+      "id": 3714,
+      "name": "Glute Bridge One Leg on Floor ",
+      "name_zh": "单腿地面臀桥",
+      "image_name": "24751101-Glute-Bridge-One-Leg-on-Floor-(bent-knee)-(female)_Hips_small.png",
+      "video_name": "24751201-Glute-Bridge-One-Leg-on-Floor-(bent-knee)-(female).mp4"
+    },
+    {
+      "id": 3781,
+      "name": "Assisted Close grip Underhand Chin up ",
+      "name_zh": "辅助窄握正握引体向上",
+      "image_name": "25431101-Assisted-Close-grip-Underhand-Chin-up-(female)_Back_small.png",
+      "video_name": "25431201-Assisted-Close-grip-Underhand-Chin-up-(female)_Back.mp4"
+    },
+    {
+      "id": 3794,
+      "name": "Resistance Band One Leg Glute Bridge ",
+      "name_zh": "单腿弹力带臀桥",
+      "image_name": "25561101-Resistance-Band-One-Leg-Glute-Bridge-(female)_Hips_small.png",
+      "video_name": "25561201-Resistance-Band-One-Leg-Glute-Bridge-(female)_Hips.mp4"
+    },
+    {
+      "id": 3894,
+      "name": "Cable One Arm Biceps Curl ",
+      "name_zh": "绳索单臂肱二头肌弯举",
+      "image_name": "26561101-Cable-One-Arm-Biceps-Curl-(VERSION-2)_Upper-Arms_small.png",
+      "video_name": "26561201-Cable-One-Arm-Biceps-Curl-(VERSION-2)_Upper-Arms_.mp4"
+    },
+    {
+      "id": 3930,
+      "name": "Barbell Lying Triceps Extension ",
+      "name_zh": "杠铃仰卧三头肌伸展",
+      "image_name": "26921101-Barbell-Lying-Triceps-Extension-(female)_Upper-Arms_small.png",
+      "video_name": "26921201-Barbell-Lying-Triceps-Extension-(female)_Upper-Arms_.mp4"
+    },
+    {
+      "id": 3997,
+      "name": "Lever Side Hip Abduction ",
+      "name_zh": "杠杆侧髋外展",
+      "image_name": "27591101-Lever-Side-Hip-Abduction-(female)_Hips_small.png",
+      "video_name": "27591201-Lever-Side-Hip-Abduction-(female)_Hips_.mp4"
+    },
+    {
+      "id": 4054,
+      "name": "V-Up Down ",
+      "name_zh": "V形起身下放",
+      "image_name": "28161101-V-Up-Down-(with-Stability-ball)-(female)_Waist_small.png",
+      "video_name": "28161201-V-Up-Down-(with-Stability-ball)-(female)_Waist_.mp4"
+    },
+    {
+      "id": 4059,
+      "name": "Exercise Ball Back Extension With Hands Behind Head ",
+      "name_zh": "双手背后健身球背部伸展",
+      "image_name": "28211101-Exercise-Ball-Back-Extension-With-Hands-Behind-Head-(female)_Back_small.png",
+      "video_name": "28211201-Exercise-Ball-Back-Extension-With-Hands-Behind-Hea.mp4"
+    },
+    {
+      "id": 4126,
+      "name": "Starfish Crunch ",
+      "name_zh": "星鱼卷腹",
+      "image_name": "28881101-Starfish-Crunch-(beginner)-(female)_Waist_small.png",
+      "video_name": "28881201-Starfish-Crunch-(beginner)-(female).mp4"
+    },
+    {
+      "id": 4132,
+      "name": "Front Plank with Arm Lift ",
+      "name_zh": "手臂抬起的平板支撑",
+      "image_name": "28941101-Front-Plank-with-Arm-Lift-(female)_small.png",
+      "video_name": "28941201-Front-Plank-with-Arm-Lift-(female)_Waist_.mp4"
+    },
+    {
+      "id": 4189,
+      "name": "Lever Horizontal Leg Press",
+      "name_zh": "杠杆水平腿举",
+      "image_name": "29511101-Lever-Horizontal-Leg-Press_Thighs_small.png",
+      "video_name": "29511201-Lever-Horizontal-Leg-Press_Thighs_.mp4"
+    },
+    {
+      "id": 4196,
+      "name": "Dumbbell Split Squat Front Foot Elevanted ",
+      "name_zh": "哑铃分腿深蹲（前脚抬高）",
+      "image_name": "29581101-Dumbbell-Split-Squat-Front-Foot-Elevanted-(female)_Thighs_small.png",
+      "video_name": "29581201-Dumbbell-Split-Squat-Front-Foot-Elevanted-(female).mp4"
+    },
+    {
+      "id": 4202,
+      "name": "Barbell Glute Bridge ",
+      "name_zh": "杠铃臀桥",
+      "image_name": "29641101-Barbell-Glute-Bridge-(hands-on-bar)_Hips_small.png",
+      "video_name": "29641201-Barbell-Glute-Bridge-(hands-on-bar)_Hips_.mp4"
+    },
+    {
+      "id": 4209,
+      "name": "Band Thruster ",
+      "name_zh": "弹力带推举",
+      "image_name": "29711101-Band-Thruster-(female)_small.png",
+      "video_name": "29711201-Band-Thruster-(female)_Thighs_.mp4"
+    },
+    {
+      "id": 4214,
+      "name": "Landmine Squat and Press",
+      "name_zh": "地锚深蹲与推举",
+      "image_name": "29761101-Landmine-Squat-and-Press_small.png",
+      "video_name": "29761201-Landmine-Squat-and-Press_.mp4"
+    },
+    {
+      "id": 4234,
+      "name": "Band Single Arm Shoulder Press",
+      "name_zh": "弹力带单臂肩推",
+      "image_name": "29961101-Band-Single-Arm-Shoulder-Press_Shoulder_small.png",
+      "video_name": "29961201-Band-Single-Arm-Shoulder-Press_Shoulders_.mp4"
+    },
+    {
+      "id": 4235,
+      "name": "Band Assisted Pull-Up ",
+      "name_zh": "弹力带辅助引体向上",
+      "image_name": "29971101-Band-Assisted-Pull-Up-(VERSION-3)_Back_small.png",
+      "video_name": "29971201-Band-Assisted-Pull-Up-(VERSION-3)_Back.mp4"
+    },
+    {
+      "id": 4291,
+      "name": "Cable Judo Flip ",
+      "name_zh": "绳索柔道翻转",
+      "image_name": "30531101-Cable-Judo-Flip-(female)_waist_small.png",
+      "video_name": "30531201-Cable-Judo-Flip-(female)_Waist_.mp4"
+    },
+    {
+      "id": 4317,
+      "name": "Dumbbell lying external shoulder rotation ",
+      "name_zh": "哑铃仰卧肩外旋",
+      "image_name": "30791101-Dumbbell-lying-external-shoulder-rotation-(female)_Back_small.png",
+      "video_name": "30791201-Dumbbell-Lying-External-Shoulder-Rotation-(female).mp4"
+    },
+    {
+      "id": 4389,
+      "name": "Chin Tuck ",
+      "name_zh": "下巴收回",
+      "image_name": "31511101-Chin-Tuck-(female)_Neck_small.png",
+      "video_name": "31511201-Chin-Tuck-(female)_Neck_.mp4"
+    },
+    {
+      "id": 4393,
+      "name": "Bodyweight Standing Close-grip One Arm Row",
+      "name_zh": "徒手站立窄握单臂划船",
+      "image_name": "31561101-Bodyweight-Standing-Close-grip-One-Arm-Row_Back_small.png",
+      "video_name": "31561201-Bodyweight-Standing-Close-grip-One-Arm-Row_Back_.mp4"
+    },
+    {
+      "id": 4416,
+      "name": "Frog Reverse Hyperextension ",
+      "name_zh": "青蛙反向超伸",
+      "image_name": "31791101-Frog-Reverse-Hyperextension-(on-a-bench)-(female)_Hips_small.png",
+      "video_name": "31791201-Frog-Reverse-Hyperextension-(on-a-bench)-(female)_.mp4"
+    },
+    {
+      "id": 4464,
+      "name": "Cable Seated Supine-grip Row ",
+      "name_zh": "固定器械坐姿反握划船",
+      "image_name": "32331101-Cable-Seated-Supine-grip-Row-(male)_Back_small.png",
+      "video_name": "32331201-Cable-Seated-Supine-grip-Row-(male)_Back_.mp4"
+    },
+    {
+      "id": 4568,
+      "name": "Dumbbell Side Bridge",
+      "name_zh": "哑铃侧桥",
+      "image_name": "33371101-Dumbbell-Side-Bridge_Hips_small.png",
+      "video_name": "33371201-Dumbbell-Side-Bridge_Hips_.mp4"
+    },
+    {
+      "id": 4584,
+      "name": "Cable Front Squat ",
+      "name_zh": "绳索前深蹲",
+      "image_name": "33541101-Cable-Front-Squat-(VERSION-2)_Thighs_small.png",
+      "video_name": "33541201-Cable-Front-Squat-(VERSION-2)_Thighs_.mp4"
+    },
+    {
+      "id": 4598,
+      "name": "Dumbbell Swing",
+      "name_zh": "哑铃摆动",
+      "image_name": "33681101-Dumbbell-Swing_Hips_small.png",
+      "video_name": "33681201-Dumbbell-Swing_Hips.mp4"
+    },
+    {
+      "id": 4626,
+      "name": "Flexion And Extension Hip Stretch ",
+      "name_zh": "髋关节屈伸拉伸",
+      "image_name": "33961301-Flexion-And-Extension-Hip-Stretch-(male)_Hips_720_small.png",
+      "video_name": "33961201-Flexion-And-Extension-Hip-Stretch-(male)_Hips.mp4"
+    },
+    {
+      "id": 4652,
+      "name": "Crunch with Medicine Ball",
+      "name_zh": "药球卷腹",
+      "image_name": "34221101-Crunch-with-Medicine-Ball_Waist_small.png",
+      "video_name": "34221201-Crunch-with-Medicine-Ball_Waist_.mp4"
+    },
+    {
+      "id": 4676,
+      "name": "Dumbbell V-up ",
+      "name_zh": "哑铃V形起身",
+      "image_name": "34461101-Dumbbell-V-up-(female)_Waist_small.png",
+      "video_name": "34461201-Dumbbell-V-up-(female)_Waist_.mp4"
+    },
+    {
+      "id": 4682,
+      "name": "Dumbbell Svend Press",
+      "name_zh": "哑铃斯文举",
+      "image_name": "34521101-Dumbbell-Svend-Press_Chest_small.png",
+      "video_name": "34521201-Dumbbell-Svend-Press_Chest_.mp4"
+    },
+    {
+      "id": 4686,
+      "name": "Burpee with Push-up ",
+      "name_zh": "俯卧撑波比跳",
+      "image_name": "34561101-Burpee-with-Push-up-(female)_Cardio_small.png",
+      "video_name": "34561201-Burpee-with-Push-up-(female)_Cardio_.mp4"
+    },
+    {
+      "id": 4702,
+      "name": "Lying Leg Tuck Hip Stretch ",
+      "name_zh": "仰卧腿收髋拉伸",
+      "image_name": "34721101-Lying-Leg-Tuck-Hip-Stretch-(male)_Stretching_small.png",
+      "video_name": "34721201-Lying-Leg-Tuck-Hip-Stretch-(male)_Stretching_.mp4"
+    },
+    {
+      "id": 4797,
+      "name": "Roll Recumbent Hip External Rotator and Hip Extensor Stretch ",
+      "name_zh": "仰卧髋外旋肌和髋伸肌拉伸",
+      "image_name": "35671101-Roll-Recumbent-Hip-External-Rotator-and-Hip-Extensor-Stretch-(CrossedLeg)-(male)_Hips_small.png",
+      "video_name": "35671201-Roll-Recumbent-Hip-External-Rotator-and-Hip-Extens.mp4"
+    },
+    {
+      "id": 4804,
+      "name": "Kettlebell Forward Lunge",
+      "name_zh": "壶铃前弓步",
+      "image_name": "35741101-Kettlebell-Forward-Lunge_Thighs_small.png",
+      "video_name": "35741201-Kettlebell-Forward-Lunge_Thighs_.mp4"
+    },
+    {
+      "id": 4943,
+      "name": "Dumbbell Standing Single Leg Calf Raise",
+      "name_zh": "哑铃单腿提踵",
+      "image_name": "37131101-Dumbbell-Standing-Single-Leg-Calf-Raise_Calves_small.png",
+      "video_name": "37131201-Dumbbell-Standing-Single-Leg-Calf-Raise_Calves_.mp4"
+    },
+    {
+      "id": 5032,
+      "name": "Bodyweight Pulse Squat ",
+      "name_zh": "自重脉冲深蹲",
+      "image_name": "38031301-Bodyweight-Pulse-Squat-(female)_Thighs_720_small.png",
+      "video_name": "38031201-Bodyweight-Pulse-Squat-(female)_Thighs.mp4"
+    },
+    {
+      "id": 5039,
+      "name": "Glute Bridge March ",
+      "name_zh": "臀桥踏步",
+      "image_name": "38161301-Glute-Bridge-March-(female)_Hips_720_small.png",
+      "video_name": "38161201-Glute-Bridge-March-(female)_Hips_.mp4"
+    },
+    {
+      "id": 5137,
+      "name": "Landmine Rear Lunge",
+      "name_zh": "地桩后弓步",
+      "image_name": "39191101-Landmine-Rear-Lunge_Thighs_small.png",
+      "video_name": "39191201-Landmine-Rear-Lunge_Thighs_.mp4"
+    },
+    {
+      "id": 5273,
+      "name": "Band Biceps Curl",
+      "name_zh": "弹力带二头肌弯举",
+      "image_name": "40631101-Band-Biceps-Curl_Upper-Arms_small.png",
+      "video_name": "40631201-Band-Biceps-Curl_Upper-Arms_.mp4"
+    },
+    {
+      "id": 5308,
+      "name": "Kettlebell Side Lunge ",
+      "name_zh": "壶铃侧向深蹲",
+      "image_name": "40981101-Kettlebell-Side-Lunge-(male)_Thighs_small.png",
+      "video_name": "40981201-Kettlebell-Side-Lunge-(male)_Thighs_.mp4"
+    },
+    {
+      "id": 5415,
+      "name": "Band Assisted Chin-Up ",
+      "name_zh": "弹力带辅助引体向上",
+      "image_name": "42061101-Band-Assisted-Chin-Up-(From-Knee)_Back_small.png",
+      "video_name": "42061201-Band-Assisted-Chin-Up-(From-Knee)_Back_.mp4"
+    },
+    {
+      "id": 5537,
+      "name": "Barbell Pullover",
+      "name_zh": "杠铃划船",
+      "image_name": "43391101-Barbell-Pullover_Back_small.png",
+      "video_name": "43391201-Barbell-Pullover_Back_.mp4"
+    },
+    {
+      "id": 5632,
+      "name": "Kettlebell Step-Up ",
+      "name_zh": "壶铃台阶上举",
+      "image_name": "44401101-Kettlebell-Step-up-(VERSION-2)_Thighs_small.png",
+      "video_name": "44401201-Kettlebell-Step-up-(VERSION-2)_Thighs_.mp4"
+    },
+    {
+      "id": 5648,
+      "name": "Glute Ham Raise ",
+      "name_zh": "臀腿伸展",
+      "image_name": "44561101-Glute-Ham-Raise-(VERSION-2)_Thighs_small.png",
+      "video_name": "44561201-Glute-Ham-Raise-(VERSION-2)_Thighs_.mp4"
+    },
+    {
+      "id": 5769,
+      "name": "Hook Kick Kickboxing ",
+      "name_zh": "钩踢",
+      "image_name": "45881101-Hook-Kick-Kickboxing-(with-boxing-bag)_Fighting_small.png",
+      "video_name": "45881201-Hook-Kick-Kickboxing-(with-boxing-bag)_Plyometrics.mp4"
+    },
+    {
+      "id": 27374,
+      "name": "Dumbbell Goblet Split Squat",
+      "name_zh": "哑铃壶铃分腿蹲",
+      "image_name": "50281101-Dumbbell-Goblet-Split-Squat_Thighs_small.png",
+      "video_name": "50281201-Dumbbell-Goblet-Split-Squat_Thighs_.mp4"
+    },
+    {
+      "id": 27429,
+      "name": "Cable Standing Row",
+      "name_zh": "固定器械站立划船",
+      "image_name": "50901101-Cable-Standing-Row_Back_small.png",
+      "video_name": "50901201-Cable-Standing-Row_Back_.mp4"
+    },
+    {
+      "id": 28166,
+      "name": "Dumbbell Z-Press",
+      "name_zh": "哑铃Z推举",
+      "image_name": "68901101-Dumbbell-Z-Press_Shoulders_small.png",
+      "video_name": "68901201-Dumbbell-Z-Press_Shoulders_.mp4"
+    },
+    {
+      "id": 46756,
+      "name": "High Knee to Butt Kick",
+      "name_zh": "高抬腿至踢臀",
+      "image_name": "46341201-High-Knee-to-Butt-Kick_Cardio_.png",
+      "video_name": "46341201-High-Knee-to-Butt-Kick_Cardio.mp4"
+    },
+    {
+      "id": 46827,
+      "name": "Hip Crunch",
+      "name_zh": "髋部卷曲",
+      "image_name": "51361201-Hip-Crunch-(female)_Waist_.png",
+      "video_name": "51361201-Hip-Crunch-(female)_Waist_.mp4"
+    },
+    {
+      "id": 46898,
+      "name": "Kettlebell Single Arm Clean and Press",
+      "name_zh": "单臂壶铃抓举和推举",
+      "image_name": "53061201-Kettlebell-Single-Arm-Clean-and-Press-(male)_Weigh.png",
+      "video_name": "53061201-Kettlebell-Single-Arm-Clean-and-Press-(male)_Weigh.mp4"
+    },
+    {
+      "id": 47226,
+      "name": "Kettlebell Bent-over Row",
+      "name_zh": "壶铃弯举划船",
+      "image_name": "61561201-Kettlebell-Bent-over-Row_Back__GREEN.png",
+      "video_name": "61561201-Kettlebell-Bent-over-Row_Back_.mp4"
+    },
+    {
+      "id": 47247,
+      "name": "Kettlebell Single Leg Deadlift",
+      "name_zh": "壶铃单腿硬拉",
+      "image_name": "61871201-Kettlebell-Single-Leg-Deadlift_Hips__GREEN.png",
+      "video_name": "61871201-Kettlebell-Single-Leg-Deadlift_Hips_.mp4"
+    },
+    {
+      "id": 47672,
+      "name": "Cable Reverse Grip Triceps Pushdown",
+      "name_zh": "固定器械反握三头肌下压",
+      "image_name": "51711201-Full-Arm-Rotation_Shoulders_.png",
+      "video_name": "71121201-Cable-Reverse-Grip-Triceps-Pushdown-(SZ-bar)-(fema.mp4"
+    },
+    {
+      "id": 47848,
+      "name": "Kettlebell Side Bend",
+      "name_zh": "壶铃侧弯",
+      "image_name": "73591201-Kettlebell-Side-Bend_Waist_GREEN.png",
+      "video_name": "73591201-Kettlebell-Side-Bend_Waist_.mp4"
+    }
+  ]
+}

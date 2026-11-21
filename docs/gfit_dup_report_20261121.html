@@ -1,0 +1,479 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<title>GFit 动作库 · 缺视频重复项分析 20261121</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--fg:#e8eaf0;--dim:#9aa3b2;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#58a6ff}
+*{box-sizing:border-box}body{margin:0;padding:32px;background:var(--bg);color:var(--fg);
+font:14px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card .n{font-size:26px;font-weight:600;letter-spacing:-.5px}
+.card .l{color:var(--dim);font-size:12px;margin-top:2px}
+.card.hl .n{color:var(--ok)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+th{background:#1e222b;text-align:left;padding:9px 10px;color:var(--dim);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #20242e;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#1c2029}
+.num{font-variant-numeric:tabular-nums;color:var(--acc)}
+.bad{color:var(--warn);font-size:12px}
+.tag{display:inline-block;padding:1px 7px;border-radius:99px;font-size:11px;font-weight:600}
+.tA{background:#12331f;color:var(--ok)}.tB{background:#12324a;color:var(--acc)}
+.note{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:8px;padding:12px 16px;color:var(--dim);font-size:13px}
+.note b{color:var(--fg)}
+ul{color:var(--dim);font-size:13px}li{margin:3px 0}
+code{background:#20242e;padding:1px 5px;border-radius:4px;font-size:12px}
+</style></head><body>
+<h1>GFit 动作库 · 缺视频重复项分析</h1>
+<div class="sub">生成时间 2026/11/21 09:32:57 · 只读分析，未改动任何数据</div>
+
+<div class="cards">
+  <div class="card"><div class="n">6762</div><div class="l">动作库总数</div></div>
+  <div class="card"><div class="n">1557</div><div class="l">缺视频</div></div>
+  <div class="card"><div class="n">1543</div><div class="l">缺视频且从未被用过</div></div>
+  <div class="card"><div class="n">809</div><div class="l">相似组数</div></div>
+  <div class="card hl"><div class="n">0</div><div class="l">✅ 可删候选</div></div>
+  <div class="card"><div class="n" style="color:var(--warn)">46</div><div class="l">⚠️ 需人工判断</div></div>
+</div>
+
+<h2>判定规则</h2>
+<div class="note">
+<b>A 级</b> = 英文名 trim+小写后完全一致；<b>B 级</b> = 归一化（去标点/连字符/空格、&→and、复数折叠）后一致。<br>
+只有同时满足以下条件才列为可删：① 自己无视频；② 组内有<b>有视频</b>的兄弟；③ 从未被用户训练/收藏/分享引用；④ 不是精选；
+⑤ 器械与部位不冲突（双方非空且完全不相交即判为不同动作）；⑥ 中文名有共同汉字；⑦ 守护者不比候选取长（候选取长而守护者缺 → 删了是净损失）。
+</div>
+
+<h2>✅ 可删候选（0 条）</h2>
+<div class="note">无</div>
+
+<h2>⚠️ 需人工判断（46 条，本次不删）</h2>
+  <table class="warn">
+    <thead><tr>
+      <th>层级</th><th>待删 id</th><th>待删名称</th><th>中文名</th><th>待删有图</th>
+      <th>保留 id</th><th>保留名称</th><th>保留中文名</th><th>保留有图</th><th>阻塞原因</th>
+    </tr></thead>
+    <tbody><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">266</td>
+      <td>Bench Dip</td><td>长凳臂屈伸</td>
+      <td>✓</td>
+      <td class="num">56</td>
+      <td>Bench Dip</td><td>凳子臂屈伸</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(9 vs 2)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2149</td>
+      <td>Shoulder Press </td><td>肩推</td>
+      <td>✓</td>
+      <td class="num">97</td>
+      <td>Shoulder Press</td><td>肩部推举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(11 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1729</td>
+      <td>Decline Push-up </td><td>下斜俯卧撑</td>
+      <td>✓</td>
+      <td class="num">114</td>
+      <td>Decline Push-Up</td><td>下斜俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(23 vs 2)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1456</td>
+      <td>Alternate Biceps Curl </td><td>交替肱二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">115</td>
+      <td>Alternate Biceps Curl</td><td>交替二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(11 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">440</td>
+      <td>Lever Seated Hip Adduction</td><td>坐姿髋内收</td>
+      <td>✓</td>
+      <td class="num">221</td>
+      <td>Lever Seated Hip Adduction</td><td>杠杆坐姿髋内收</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4542</td>
+      <td>Barbell Front Squat </td><td>杠铃前深蹲</td>
+      <td>✓</td>
+      <td class="num">1493</td>
+      <td>Barbell Front Squat</td><td>杠铃前蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3876</td>
+      <td>Barbell Hack Squat </td><td>壶铃前蹲</td>
+      <td>✓</td>
+      <td class="num">1497</td>
+      <td>Barbell Hack Squat</td><td>杠铃哈克深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3937</td>
+      <td>Barbell Rollout </td><td>杠铃滚出</td>
+      <td>✓</td>
+      <td class="num">1535</td>
+      <td>Barbell Rollout</td><td>杠铃罗马尼亚硬拉</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1551</td>
+      <td>Barbell Skier</td><td>杠铃滑雪者</td>
+      <td>✓</td>
+      <td class="num">4055</td>
+      <td>Barbell Skier </td><td>杠铃滑雪者</td>
+      <td>✓</td>
+      <td class="bad">有训练记录 / 有收藏/练过标记</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1586</td>
+      <td>Bird Dog</td><td>鸟狗式</td>
+      <td>✓</td>
+      <td class="num">2648</td>
+      <td>Bird Dog </td><td>鸟狗式</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3753</td>
+      <td>Cable Front Raise </td><td>绳索前平举</td>
+      <td>✓</td>
+      <td class="num">1613</td>
+      <td>Cable Front Raise</td><td>固定器械前平举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1732</td>
+      <td>Decline Sit-up </td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">1733</td>
+      <td>Decline Sit-up</td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4572</td>
+      <td>Dumbbell Lunge </td><td>哑铃弓步</td>
+      <td>✓</td>
+      <td class="num">1787</td>
+      <td>Dumbbell Lunge</td><td>哑铃弓步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1852</td>
+      <td>Dumbbell Seated Palms Up Wrist Curl</td><td>坐姿掌心向上腕弯举</td>
+      <td>✓</td>
+      <td class="num">3871</td>
+      <td>Dumbbell Seated Palms Up Wrist Curl </td><td>杠铃单腿硬拉</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(坐姿掌心向上腕弯举 vs 杠铃单腿硬拉)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4996</td>
+      <td>Dumbbell Single Leg Squat </td><td>哑铃单腿深蹲</td>
+      <td>✓</td>
+      <td class="num">1862</td>
+      <td>Dumbbell Single Leg Squat</td><td>单腿深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">1863</td>
+      <td>Dumbbell Squat </td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="num">1864</td>
+      <td>Dumbbell Squat</td><td>哑铃深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(19/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4880</td>
+      <td>Jump Box </td><td>跳箱</td>
+      <td>✓</td>
+      <td class="num">1960</td>
+      <td>Jump Box</td><td>跳箱</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3772</td>
+      <td>Kettlebell Double Push Press </td><td>双壶铃推举</td>
+      <td>✓</td>
+      <td class="num">1979</td>
+      <td>Kettlebell Double Push Press</td><td>双壶铃推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5702</td>
+      <td>Kettlebell Thruster </td><td>壶铃推举</td>
+      <td>✓</td>
+      <td class="num">2001</td>
+      <td>Kettlebell Thruster</td><td>壶铃推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(14 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4102</td>
+      <td>Side Bend</td><td>侧弯</td>
+      <td>✓</td>
+      <td class="num">2151</td>
+      <td>Side Bend </td><td>侧弯</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(2 vs 23)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3878</td>
+      <td>Cable kickback </td><td>哑铃交替锤式牧师弯举</td>
+      <td>✓</td>
+      <td class="num">2311</td>
+      <td>Cable kickback</td><td>固定器械后踢</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(哑铃交替锤式牧师弯举 vs 固定器械后踢)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">2532</td>
+      <td>Suspension Single Leg Squat</td><td>悬吊单腿深蹲</td>
+      <td>✓</td>
+      <td class="num">2567</td>
+      <td>Suspension Single Leg Squat </td><td>悬吊单腿深蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 19/1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3780</td>
+      <td>Cable twisting overhead press </td><td>绳索扭转过顶推举</td>
+      <td>✓</td>
+      <td class="num">2626</td>
+      <td>Cable twisting overhead press</td><td>固定器械扭转过顶推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 6)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3785</td>
+      <td>Barbell Power Jerk </td><td>杠铃挺举</td>
+      <td>✓</td>
+      <td class="num">2869</td>
+      <td>Barbell Power Jerk</td><td>杠铃力量挺举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 14)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3786</td>
+      <td>Standing Long Jump </td><td>立定跳远</td>
+      <td>✓</td>
+      <td class="num">2928</td>
+      <td>Standing Long Jump</td><td>站立跳远</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3881</td>
+      <td>Dumbbell Alternate Seated Hammer Curl </td><td>哑铃坐姿交替锤式弯举</td>
+      <td>✓</td>
+      <td class="num">2956</td>
+      <td>Dumbbell Alternate Seated Hammer Curl</td><td>哑铃坐姿交替锤式弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(7 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3787</td>
+      <td>Dumbbell Lunge with Bicep Curl </td><td>哑铃弓步配合二头肌弯举</td>
+      <td>✓</td>
+      <td class="num">2964</td>
+      <td>Dumbbell Lunge with Bicep Curl</td><td>哑铃弓步二头肌弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3788</td>
+      <td>Cable Squat Row </td><td>绳索深蹲划船</td>
+      <td>✓</td>
+      <td class="num">3018</td>
+      <td>Cable Squat Row </td><td>绳索深蹲划船</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 4)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4313</td>
+      <td>Dumbbell Close grip Press </td><td>哑铃窄距推举</td>
+      <td>✓</td>
+      <td class="num">3025</td>
+      <td>Dumbbell Close Grip Press</td><td>哑铃窄距推举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2 vs 18/5)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3401</td>
+      <td>Stationary Bike Run </td><td>固定自行车跑步</td>
+      <td>✓</td>
+      <td class="num">3504</td>
+      <td>Stationary Bike Run </td><td>固定自行车跑步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3425</td>
+      <td>Resistance Band Plank March</td><td>弹力带平板踏步</td>
+      <td>✓</td>
+      <td class="num">3795</td>
+      <td>Resistance Band Plank March </td><td>弹力带平板踏步</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(20/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4048</td>
+      <td>Barbell Split Squat </td><td>杠铃分腿蹲</td>
+      <td>✓</td>
+      <td class="num">3608</td>
+      <td>Barbell Split Squat </td><td>杠铃分腿蹲</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(3 vs 19/1)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">3983</td>
+      <td>Smith Reverse Hyperextension </td><td>史密斯机反向超伸</td>
+      <td>✓</td>
+      <td class="num">47180</td>
+      <td>Smith Reverse Hyperextension</td><td>后摆膝驱动</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(史密斯机反向超伸 vs 后摆膝驱动)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4611</td>
+      <td>Inverted Row under Table </td><td>桌下倒立划船</td>
+      <td>✓</td>
+      <td class="num">48220</td>
+      <td>Inverted Row under Table</td><td>固定单臂卧推</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(桌下倒立划船 vs 固定单臂卧推)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4971</td>
+      <td>Sliding Leg Curl on Floor with Towel</td><td>毛巾滑动腿弯举</td>
+      <td>✓</td>
+      <td class="num">4625</td>
+      <td>Sliding Leg Curl on Floor with Towel</td><td>毛巾滑动腿弯举</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(20/1 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4761</td>
+      <td>Alternate Punching</td><td>交替出拳</td>
+      <td>✓</td>
+      <td class="num">5031</td>
+      <td>Alternate Punching </td><td>交替出拳</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(2/6 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">4786</td>
+      <td>High Knee Run</td><td>高膝跑</td>
+      <td>✓</td>
+      <td class="num">5040</td>
+      <td>High Knee Run </td><td>高膝跑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 10)</td>
+    </tr><tr>
+      <td><span class="tag tA">A</span></td>
+      <td class="num">5714</td>
+      <td>Kettlebell Unilateral Farmers Walk </td><td>单侧壶铃农夫行走</td>
+      <td>✓</td>
+      <td class="num">46812</td>
+      <td>Kettlebell Unilateral Farmers Walk</td><td>壶铃单侧农夫行走</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(13 vs 14)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">413</td>
+      <td>Seated Curl</td><td>坐姿弯举</td>
+      <td>✓</td>
+      <td class="num">375</td>
+      <td>Seated Curls</td><td>坐姿弯举</td>
+      <td>✓</td>
+      <td class="bad">器械不一致(3 vs 5)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">1453</td>
+      <td>45 Degree Side Bend</td><td>45度侧弯</td>
+      <td>✓</td>
+      <td class="num">3673</td>
+      <td>45 degrees Side Bend </td><td>45度侧弯</td>
+      <td>✓</td>
+      <td class="bad">有训练记录 / 有收藏/练过标记</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">3687</td>
+      <td>Decline Sit up </td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="num">1733</td>
+      <td>Decline Sit-up</td><td>下斜仰卧起坐</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(12 vs 3)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">1941</td>
+      <td>Incline Close-Grip Push-Up</td><td>上斜窄距俯卧撑</td>
+      <td>✓</td>
+      <td class="num">27475</td>
+      <td>Incline Close Grip Push-up</td><td>倾斜窄距俯卧撑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(6 vs 17/5)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">2764</td>
+      <td>Muscle-up </td><td>引体向上</td>
+      <td>✓</td>
+      <td class="num">2082</td>
+      <td>Muscle Up</td><td>窄腿板凳桥式</td>
+      <td>✓</td>
+      <td class="bad">中文名无交集(引体向上 vs 窄腿板凳桥式)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">2932</td>
+      <td>World Greatest Stretch</td><td>世界最伟大拉伸</td>
+      <td>✓</td>
+      <td class="num">27114</td>
+      <td>Worlds Greatest Stretch</td><td>世界上最伟大的伸展</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(1 vs 16)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">4456</td>
+      <td>Scissor Jumps </td><td>剪刀跳</td>
+      <td>✓</td>
+      <td class="num">47083</td>
+      <td>Scissors Jump</td><td>剪刀跳</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr><tr>
+      <td><span class="tag tB">B</span></td>
+      <td class="num">5466</td>
+      <td>Backwards Run</td><td>后跑</td>
+      <td>✓</td>
+      <td class="num">47910</td>
+      <td>Backward Run</td><td>后跑</td>
+      <td>✓</td>
+      <td class="bad">部位不一致(10 vs 13)</td>
+    </tr></tbody>
+  </table>
+
+<h2>说明</h2>
+<ul>
+<li>本报告<b>没有执行任何删除</b>。可删 id 清单另存于 <code>gfit_dup_deletable_20261121.json</code>，确认后再走 <code>POST /admin/library/delete</code>（事务内级联删 exercises / user_exercise_stats，并写 admin_operation_log 审计）。</li>
+<li>删库行<b>不会删物理媒体文件</b>（文件可能被其他 id 复用），需另行按「数据体检」清理磁盘孤儿。</li>
+<li>缺视频总数 1557 里，只有 0 条能用这个方式消掉；其余是库内独一份、别处没有对应动作的条目。</li>
+</ul>
+</body></html>

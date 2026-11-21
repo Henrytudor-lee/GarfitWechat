@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GFit 动作库 · 无视频未训练动作的重名清理分析</title>
+<style>
+:root{
+  --bg:#131313; --surface:#1c1c1c; --card:#1a1a1a; --border:rgba(255,255,255,.09);
+  --primary:#ccf200; --text:#f2f2f2; --text2:#b9b9b9; --muted:#8a8a8a;
+  --red:#ff6b6b; --amber:#ffb454; --green:#5ddc8a; --blue:#6bb8ff; --dim:#5a5a5a;
+  --mono:'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.hero{padding:64px 0 36px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.kicker{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:16px}
+h1{font-size:38px;line-height:1.2;font-weight:900;letter-spacing:-.02em;margin-bottom:16px}
+h1 .hl{color:var(--primary)}
+.lede{font-size:16px;color:var(--text2);max-width:840px}
+.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.chip{font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.chip b{color:var(--primary);font-weight:700}
+section{margin:52px 0}
+h2{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--primary);font-weight:800;margin-bottom:24px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+h3{font-size:19px;font-weight:800;margin:30px 0 12px}
+p{color:var(--text2);margin-bottom:13px} p strong{color:var(--text)}
+ul{margin:0 0 14px 20px;color:var(--text2)} li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:.87em;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;color:var(--primary)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:13px;margin:26px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.stat .v{font-size:34px;font-weight:900;letter-spacing:-.03em;line-height:1;font-family:var(--mono)}
+.stat .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;font-weight:700}
+.stat .s{font-size:12px;color:var(--text2);margin-top:5px}
+.ok .v{color:var(--primary)} .warn .v{color:var(--amber)} .red .v{color:var(--red)} .blue .v{color:var(--blue)} .dim .v{color:var(--dim)}
+.callout{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:0 14px 14px 0;padding:20px 24px;margin:20px 0}
+.callout.red{border-left-color:var(--red)} .callout.amber{border-left-color:var(--amber)} .callout.blue{border-left-color:var(--blue)}
+.callout p:last-child{margin-bottom:0}
+.tier{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:16px}
+.tier-h{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:12px;font-weight:800;padding:5px 12px;border-radius:7px;letter-spacing:.06em}
+.badge.t1{background:rgba(204,242,0,.13);color:var(--primary);border:1px solid rgba(204,242,0,.3)}
+.badge.t2{background:rgba(107,184,255,.13);color:var(--blue);border:1px solid rgba(107,184,255,.3)}
+.badge.t3{background:rgba(255,180,84,.13);color:var(--amber);border:1px solid rgba(255,180,84,.3)}
+.tier h3{margin:0;font-size:17px}
+.tier .cnt{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:auto}
+.grp{border:1px solid var(--border);border-radius:11px;margin-bottom:10px;overflow:hidden;background:#171717}
+.grp-h{display:flex;align-items:baseline;gap:12px;padding:11px 15px;background:rgba(255,255,255,.03);flex-wrap:wrap}
+.grp-h b{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:600}
+.grp-meta{font-size:11.5px;color:var(--muted)}
+.grp-meta .hl{color:var(--amber)}
+.g-t1{border-left:3px solid var(--primary)} .g-t2{border-left:3px solid var(--blue)} .g-t3{border-left:3px solid var(--amber)}
+.memlist{padding:5px 0}
+.mem{display:flex;gap:12px;align-items:center;padding:7px 15px;font-size:13px;flex-wrap:wrap}
+.mem.del-row{background:rgba(204,242,0,.05)}
+.mem.keep-row{background:rgba(255,107,107,.05)}
+.mid{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:52px}
+.mzh{min-width:170px;color:var(--text);font-weight:600}
+.men{flex:1;min-width:200px;color:var(--text2);font-size:12.5px;font-family:var(--mono)}
+.mtags{display:flex;gap:5px;flex-wrap:wrap}
+.t{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--muted)}
+.t.ok{background:rgba(93,220,138,.12);color:var(--green)}
+.t.no{background:rgba(255,180,84,.12);color:var(--amber)}
+.t.dead{background:rgba(255,107,107,.14);color:var(--red)}
+.t.share{background:rgba(107,184,255,.12);color:var(--blue)}
+.t.use{background:rgba(204,242,0,.13);color:var(--primary)}
+.t.del{background:var(--primary);color:#2a3500;font-weight:700}
+.t.keep{background:rgba(255,107,107,.2);color:var(--red);font-weight:700}
+.mem i{color:var(--dim);font-style:normal}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13.5px}
+th{text-align:left;padding:10px 13px;background:#242424;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;border-bottom:1px solid var(--border)}
+td{padding:10px 13px;border-bottom:1px solid rgba(255,255,255,.07);color:var(--text2)}
+td strong{color:var(--text)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.idlist{font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:2;word-spacing:2px;background:#151515;border:1px solid var(--border);border-radius:9px;padding:13px 16px;margin:14px 0;max-height:230px;overflow-y:auto}
+footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="kicker">Data Cleanup Analysis</div>
+  <h1>无视频 + 未被训练的动作<br><span class="hl">重名清理可行性分析</span></h1>
+  <p class="lede">
+    目标集合 = 动作库里 <strong>没有演示视频</strong> 且 <strong>从未被任何用户训练过</strong> 的动作。
+    逐组检查重名情况，并<strong>逐条模拟删除后是否还有同名/同中文名存活</strong>，得出可安全删除的精确清单。
+    <strong>本次分析全程只读，未删除任何数据。</strong>
+  </p>
+  <div class="meta">
+    <span class="chip">目标集合 <b>2658</b> 条</span>
+    <span class="chip">落在重名组 <b>308</b> 条</span>
+    <span class="chip">重名组 <b>142</b> 组</span>
+    <span class="chip">可安全删 <b>134</b></span>
+    <span class="chip">必须保留 <b>174</b></span>
+    <span class="chip">生成于 <b>2026-11-08 01:47</b></span>
+  </div>
+</div>
+
+<section>
+  <h2>核心结论</h2>
+
+  <div class="callout amber">
+    <p><strong>「重名」≠「重复」。</strong>142 个重名组里，只有 <strong>14 组</strong>连图片文件名都完全相同（真重复）；
+    剩下 <strong>128 组图片各不相同</strong> —— 那是<strong>不同变体</strong>（不同器械/角度/握法），不是冗余条目。</p>
+    <p>按 2026-11-04 那次评估的结论：<strong>同名不同 id 是合法数据</strong>，强行归组反而会误标。删掉一个变体 = 删掉一个真实存在的动作。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat ok"><div class="v">134</div><div class="k">可安全删除</div><div class="s">删后英文名/中文名均仍有存活者，小程序搜索不受影响</div></div>
+    <div class="stat red"><div class="v">174</div><div class="k">必须保留</div><div class="s">删掉后该中文名在全库消失，用户就搜不到了</div></div>
+    <div class="stat dim"><div class="v">2350</div><div class="k">不在重名组</div><div class="s">无重复可言，不在本次清理范围</div></div>
+    <div class="stat warn"><div class="v">363</div><div class="k">彻底死条目</div><div class="s">图片也不在磁盘上，任何人搜到都是 404</div></div>
+  </div>
+
+  <h3>判定方法</h3>
+  <p>
+    不是"组内有没有更好的版本"这种粗判，而是<strong>逐条模拟</strong>：把候选动作按 id 升序，
+    对每一条假设"如果删它"，检查<strong>全库</strong>是否还有同英文名 / 同中文名的存活者；
+    有就删，没有就保留并记下原因。校验结果：<strong>零孤立、零引用、零有视频</strong>。
+  </p>
+
+  <h3>保留的 174 条 —— 为什么不删</h3>
+  <p>
+    它们的英文名虽然是重复的，但<strong>组内每个成员挂着不同的中文名</strong>
+    （如 Finger Curls 组下有「手指弯举」「指屈伸」「手指卷曲」三个不同中文名）。
+    删掉任一条，那个中文名就在全库消失了 —— 而小程序是中文界面，
+    用户搜「指屈伸」会搜不到。
+  </p>
+  <div class="idlist"><span title="删后中文名「站立臀部伸展」全库消失">3975</span> <span title="删后中文名「手指弯举」全库消失">198</span> <span title="删后中文名「指屈伸」全库消失">367</span> <span title="删后中文名「手指卷曲」全库消失">1906</span> <span title="删后中文名「上斜反握俯卧撑」全库消失">200</span> <span title="删后中文名「上斜反向俯卧撑」全库消失">1945</span> <span title="删后中文名「杠杆正握臂屈伸」全库消失">216</span> <span title="删后中文名「正握臂屈伸」全库消失">2042</span> <span title="删后中文名「雪橇前倾提踵」全库消失">237</span> <span title="删后中文名「前倾雪橇小腿提踵」全库消失">2193</span> <span title="删后英文名全库消失">2205</span> <span title="删后英文名全库消失">2209</span> <span title="删后中文名「史密斯机反向提踵」全库消失">3905</span> <span title="删后英文名全库消失">2215</span> <span title="删后中文名「史密斯站姿过头军事推举」全库消失">259</span> <span title="删后中文名「史密斯站姿过顶肩推」全库消失">2223</span> <span title="删后中文名「杠杆反握垂直划船」全库消失">345</span> <span title="删后英文名全库消失">4350</span> <span title="删后中文名「杠杆胸推」全库消失">372</span> <span title="删后中文名「辅助胸部俯身撑」全库消失">1460</span> <span title="删后中文名「辅助胸部下压」全库消失">3766</span> <span title="删后英文名全库消失">4263</span> <span title="删后中文名「杠铃下斜窄距推头」全库消失">1486</span> <span title="删后中文名「杠铃下斜窄距头顶推」全库消失">4264</span> <span title="删后中文名「杠铃站立卷腹」全库消失">1554</span> <span title="删后中文名「杠铃站立腹部滚离」全库消失">4064</span> <span title="删后英文名全库消失">1594</span> <span title="删后中文名「固定器械交替肩推」全库消失">1599</span> <span title="删后中文名「绳索交替肩推」全库消失">4276</span> <span title="删后中文名「固定器械高位划船」全库消失">1618</span> <span title="删后英文名全库消失">1633</span> <span title="删后英文名全库消失">4298</span> <span title="删后中文名「绳索侧卷腹」全库消失">1674</span> <span title="删后中文名「缆绳侧卷腹」全库消失">3815</span> <span title="删后中文名「绳索站立后腕屈伸」全库消失">1675</span> <span title="删后中文名「固定绳索站立后腕弯举」全库消失">28018</span> <span title="删后中文名「站立缆绳卷腹」全库消失">3816</span> <span title="删后英文名全库消失">3821</span> <span title="删后英文名全库消失">3828</span> <span title="删后中文名「哑铃单臂反向飞鸟」全库消失">1810</span> <span title="删后中文名「哑铃单臂反飞鸟」全库消失">5447</span> <span title="删后英文名全库消失">3838</span> <span title="删后中文名「过杠中握腕弯举」全库消失">1816</span> <span title="删后中文名「哑铃过凳单臂中性腕屈伸」全库消失">3866</span> <span title="删后中文名「过杠单臂腕弯举」全库消失">1818</span> <span title="删后中文名「哑铃过长凳单臂腕弯举」全库消失">3925</span> <span title="删后英文名全库消失">4326</span> <span title="删后中文名「大猩猩下颌牵引」全库消失">1918</span> <span title="删后中文名「大猩猩引体向上」全库消失">3889</span> <span title="删后中文名「悬垂直腿扭转髋部提升」全库消失">1927</span> <span title="删后中文名「悬垂直腿扭转臀部抬升」全库消失">3940</span> <span title="删后中文名「双壶铃风车」全库消失">1981</span> <span title="删后中文名「双臂壶铃风车式」全库消失">5705</span> <span title="删后英文名全库消失">4333</span> <span title="删后英文名全库消失">4346</span> <span title="删后中文名「哑铃窄距俯卧撑」全库消失">2110</span> <span title="删后英文名全库消失">4665</span> <span title="删后中文名「滑冰者」全库消失">2188</span> <span title="删后中文名「滑步」全库消失">4347</span> <span title="删后中文名「分腿跳」全库消失">2231</span> <span title="删后中文名「分腿开合跳」全库消失">4351</span> <span title="删后英文名全库消失">2280</span> <span title="删后中文名「固定器械反向卷腹」全库消失">2324</span> <span title="删后中文名「绳索反卷腹」全库消失">3888</span> <span title="删后英文名全库消失">2847</span> <span title="删后中文名「弹力带辅助滚轮展开」全库消失">2422</span> <span title="删后中文名「弹力带辅助轮滚出」全库消失">3887</span> <span title="删后中文名「弹力带仰卧臀部外旋」全库消失">2433</span> <span title="删后中文名「弹力带仰卧髋外旋」全库消失">4260</span> <span title="删后中文名「弹力带仰卧臀部内旋」全库消失">2435</span> <span title="删后中文名「弹力带仰卧髋内旋」全库消失">4261</span> <span title="删后英文名全库消失">3684</span> <span title="删后中文名「坐姿大腿内侧伸展」全库消失">2489</span> <span title="删后中文名「坐姿大腿内侧拉伸」全库消失">2597</span> <span title="删后英文名全库消失">5707</span> <span title="删后英文名全库消失">4391</span> <span title="删后中文名「哑铃在健身球上倾斜推举」全库消失">2679</span> <span title="删后中文名「哑铃过凳中性腕屈伸」全库消失">3865</span> <span title="删后英文名全库消失">4319</span> <span title="删后中文名「哑铃反握上斜卧推单臂划船」全库消失">2709</span> <span title="删后英文名全库消失">4472</span> <span title="删后中文名「高位绳索反向单臂弯举」全库消失">2776</span> <span title="删后中文名「绳索单臂反向弯举」全库消失">3933</span> <span title="删后英文名全库消失">2813</span> <span title="删后中文名「杠铃膝下悬垂挺举」全库消失">2862</span> <span title="删后中文名「杠铃膝下挺举」全库消失">4420</span> <span title="删后中文名「固定器械下拉二头肌弯举」全库消失">2947</span> <span title="删后中文名「绳索下拉二头肌弯举」全库消失">4295</span> <span title="删后中文名「哑铃交替锤式 preacher 弯举」全库消失">2954</span> <span title="删后中文名「哑铃交替牧师弯举」全库消失">3879</span> <span title="删后中文名「哑铃交替 preacher 弯举」全库消失">2955</span> <span title="删后中文名「哑铃交替式前平举弯举」全库消失">3880</span> <span title="删后中文名「哑铃坐姿交替二头肌弯举（健身球）」全库消失">2958</span> <span title="删后中文名「健身球上哑铃坐姿交替肱二头肌弯举」全库消失">3936</span> <span title="删后中文名「哑铃锤式弯举（健身球）」全库消失">2965</span> <span title="删后中文名「健身球上的哑铃锤式弯举」全库消失">3885</span> <span title="删后英文名全库消失">2992</span> <span title="删后中文名「哑铃单臂法式推举（健身球）」全库消失">3029</span> <span title="删后中文名「健身球上单臂法式推举」全库消失">3886</span> <span title="删后中文名「仰卧髋外旋与髋伸展拉伸」全库消失">3211</span> <span title="删后中文名「仰卧位髋外旋和伸展拉伸」全库消失">3369</span> <span title="删后中文名「坐姿绳索胸推」全库消失">3407</span> <span title="删后中文名「绳索坐姿胸推」全库消失">4299</span> <span title="删后英文名全库消失">3435</span> <span title="删后中文名「哑铃坐姿弯举」全库消失">4321</span> <span title="删后英文名全库消失">4315</span> <span title="删后中文名「绳索三头肌下压」全库消失">3643</span> <span title="删后中文名「固定器械肱三头肌下压」全库消失">5553</span> <span title="删后英文名全库消失">4119</span> <span title="删后英文名全库消失">4034</span> <span title="删后英文名全库消失">4036</span> <span title="删后英文名全库消失">4038</span> <span title="删后英文名全库消失">4044</span> <span title="删后英文名全库消失">4051</span> <span title="删后英文名全库消失">4066</span> <span title="删后中文名「力量雪橇后撤步弓步」全库消失">4068</span> <span title="删后中文名「力量雪橇后弓步」全库消失">4141</span> <span title="删后中文名「尖顶俯卧撑」全库消失">4070</span> <span title="删后英文名全库消失">4072</span> <span title="删后英文名全库消失">4125</span> <span title="删后中文名「剪刀腿」全库消失">4131</span> <span title="删后中文名「自重站立二头肌弯举」全库消失">4160</span> <span title="删后中文名「徒手站立二头肌弯举」全库消失">5567</span> <span title="删后英文名全库消失">5610</span> <span title="删后英文名全库消失">4213</span> <span title="删后英文名全库消失">4246</span> <span title="删后英文名全库消失">4252</span> <span title="删后英文名全库消失">4254</span> <span title="删后英文名全库消失">4372</span> <span title="删后英文名全库消失">4373</span> <span title="删后中文名「垫子后仰静态姿势」全库消失">4374</span> <span title="删后中文名「垫子仰卧静态姿势」全库消失">4887</span> <span title="删后中文名「垫子后仰坐姿静态」全库消失">4375</span> <span title="删后中文名「垫子坐姿背部静态」全库消失">4888</span> <span title="删后英文名全库消失">4889</span> <span title="删后中文名「前倾躺姿静态」全库消失">4377</span> <span title="删后中文名「仰卧前部静态」全库消失">4890</span> <span title="删后中文名「坐姿后仰静态」全库消失">4378</span> <span title="删后中文名「坐姿背部静态」全库消失">4891</span> <span title="删后英文名全库消失">4382</span> <span title="删后英文名全库消失">4390</span> <span title="删后英文名全库消失">4395</span> <span title="删后英文名全库消失">4399</span> <span title="删后英文名全库消失">4403</span> <span title="删后英文名全库消失">4407</span> <span title="删后中文名「哑铃直臂下压」全库消失">4425</span> <span title="删后英文名全库消失">4429</span> <span title="删后英文名全库消失">4428</span> <span title="删后英文名全库消失">4506</span> <span title="删后英文名全库消失">4509</span> <span title="删后英文名全库消失">4543</span> <span title="删后英文名全库消失">4585</span> <span title="删后英文名全库消失">4685</span> <span title="删后英文名全库消失">4697</span> <span title="删后英文名全库消失">4904</span> <span title="删后中文名「空手深蹲」全库消失">5164</span> <span title="删后中文名「空气深蹲」全库消失">5860</span> <span title="删后英文名全库消失">5259</span> <span title="删后英文名全库消失">5652</span> <span title="删后英文名全库消失">5666</span> <span title="删后英文名全库消失">5678</span> <span title="删后英文名全库消失">5680</span> <span title="删后英文名全库消失">5684</span> <span title="删后中文名「哑铃科萨克深蹲」全库消失">5743</span> <span title="删后中文名「哑铃俄罗斯式深蹲」全库消失">5878</span> <span title="删后英文名全库消失">5770</span> <span title="删后英文名全库消失">5772</span> <span title="删后英文名全库消失">5773</span> <span title="删后英文名全库消失">5775</span> <span title="删后英文名全库消失">5777</span> <span title="删后中文名「哑铃单腿臀部推举」全库消失">27139</span> <span title="删后中文名「哑铃单腿臀桥」全库消失">28301</span> <span title="删后中文名「地面反向踢腿（手在头下）」全库消失">27163</span> <span title="删后中文名「仰卧反蛙跳（手垫头）」全库消失">27341</span></div>
+  <p style="font-size:12.5px;color:var(--muted);">
+    这 174 条的正确处理是<strong>补中文名 / 改中文名做区分</strong>，以及补演示视频 —— 而不是删掉。
+  </p>
+</section>
+
+<section>
+  <h2>可安全删除的 134 条 · 完整 id 清单</h2>
+  <p>这批满足全部条件：<strong>无视频 + 从未被训练 + 无收藏标记 + 删除后英文名与中文名仍有存活者</strong>。</p>
+  <div class="idlist"><span>101</span> <span>246</span> <span>248</span> <span>251</span> <span>2214</span> <span>252</span> <span>3857</span> <span>354</span> <span>3616</span> <span>358</span> <span>3695</span> <span>1475</span> <span>1570</span> <span>3469</span> <span>1593</span> <span>3484</span> <span>1632</span> <span>1653</span> <span>4296</span> <span>1662</span> <span>1677</span> <span>1723</span> <span>5873</span> <span>1762</span> <span>1804</span> <span>3929</span> <span>1814</span> <span>1911</span> <span>1939</span> <span>3769</span> <span>2014</span> <span>2096</span> <span>2105</span> <span>2106</span> <span>2107</span> <span>2108</span> <span>2828</span> <span>2147</span> <span>2148</span> <span>3053</span> <span>2153</span> <span>2156</span> <span>2180</span> <span>2234</span> <span>2235</span> <span>2279</span> <span>2282</span> <span>2283</span> <span>2297</span> <span>3797</span> <span>2345</span> <span>2424</span> <span>2462</span> <span>2611</span> <span>2634</span> <span>2689</span> <span>3861</span> <span>2749</span> <span>4471</span> <span>2812</span> <span>2991</span> <span>3434</span> <span>3480</span> <span>3639</span> <span>4312</span> <span>3640</span> <span>3917</span> <span>3980</span> <span>3981</span> <span>3993</span> <span>3994</span> <span>4033</span> <span>4035</span> <span>4037</span> <span>4043</span> <span>4050</span> <span>4065</span> <span>4067</span> <span>4069</span> <span>4631</span> <span>4632</span> <span>4071</span> <span>4124</span> <span>4130</span> <span>4168</span> <span>4212</span> <span>4245</span> <span>4251</span> <span>4253</span> <span>4361</span> <span>4362</span> <span>4376</span> <span>4381</span> <span>4388</span> <span>4394</span> <span>4396</span> <span>4397</span> <span>4398</span> <span>4400</span> <span>4401</span> <span>4402</span> <span>4404</span> <span>4405</span> <span>4406</span> <span>4411</span> <span>4422</span> <span>4413</span> <span>4426</span> <span>4427</span> <span>4505</span> <span>4508</span> <span>4517</span> <span>4580</span> <span>4680</span> <span>5251</span> <span>4684</span> <span>4691</span> <span>4692</span> <span>4693</span> <span>4694</span> <span>4695</span> <span>4696</span> <span>4903</span> <span>5253</span> <span>5651</span> <span>5665</span> <span>5677</span> <span>5679</span> <span>5683</span> <span>5763</span> <span>5764</span> <span>5765</span> <span>5767</span> <span>5768</span></div>
+  <p style="font-size:12.5px;color:var(--muted);">
+    删除后会有 <strong>49 个图片文件</strong>变成孤儿（磁盘上存在但无人引用）——
+    按既定策略<strong>不删物理文件</strong>，由「数据体检 → 扫描磁盘」统一识别与清理。
+  </p>
+</section>
+
+<section>
+  <h2>逐组明细</h2>
+  <p>
+    绿标=可删，红标=保留。每组列出全库所有同名成员，
+    便于人工判断「组内是否确实是同一动作的不同变体」。
+  </p>
+  <div class="grp g-t1">
+    <div class="grp-h">
+      <b>standing hip extension</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">101</span>
+      <span class="mzh">站立臀部伸展</span>
+      <span class="men">Standing Hip Extension</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2243</span>
+      <span class="mzh">站姿髋伸展</span>
+      <span class="men">Standing Hip Extension </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3975</span>
+      <span class="mzh">站立臀部伸展</span>
+      <span class="men">Standing Hip Extension </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>smith reverse calf raises</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">251</span>
+      <span class="mzh">史密斯反向提踵</span>
+      <span class="men">Smith Reverse Calf Raises</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">357</span>
+      <span class="mzh">史密斯反向提踵</span>
+      <span class="men">Smith Reverse Calf Raises</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2214</span>
+      <span class="mzh">史密斯反向提踵</span>
+      <span class="men">Smith Reverse Calf Raises</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3905</span>
+      <span class="mzh">史密斯机反向提踵</span>
+      <span class="men">Smith Reverse Calf Raises </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>standing calf raise</b>
+      <span class="grp-meta">全库 5 个 · 更好版本 3 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">182</span>
+      <span class="mzh">站立提踵</span>
+      <span class="men">Standing Calf Raise</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">354</span>
+      <span class="mzh">站立提踵</span>
+      <span class="men">Standing Calf Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2832</span>
+      <span class="mzh">站立提踵</span>
+      <span class="men">Standing Calf Raise </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3616</span>
+      <span class="mzh">站姿提踵</span>
+      <span class="men">Standing Calf Raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">4256</span>
+      <span class="mzh">站姿提踵</span>
+      <span class="men">Standing Calf Raise </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>lever chest press</b>
+      <span class="grp-meta">全库 8 个 · 更好版本 6 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">204</span>
+      <span class="mzh">杠杆胸部推举</span>
+      <span class="men">Lever Chest Press</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t use">训练 57</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">205</span>
+      <span class="mzh">杠杆胸部推举</span>
+      <span class="men">Lever Chest Press</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t use">训练 20</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">372</span>
+      <span class="mzh">杠杆胸推</span>
+      <span class="men">Lever Chest Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2027</span>
+      <span class="mzh">胸推</span>
+      <span class="men">Lever Chest Press </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2028</span>
+      <span class="mzh">胸推</span>
+      <span class="men">Lever Chest Press</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3516</span>
+      <span class="mzh">胸部推举</span>
+      <span class="men">Lever Chest Press </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t use">训练 20</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3694</span>
+      <span class="mzh">杠杆胸部推举</span>
+      <span class="men">Lever Chest Press </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3695</span>
+      <span class="mzh">杠杆胸部推举</span>
+      <span class="men">Lever Chest Press </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>barbell upright row</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1570</span>
+      <span class="mzh">杠铃直立划船</span>
+      <span class="men">Barbell Upright Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1571</span>
+      <span class="mzh">杠铃直立划船</span>
+      <span class="men">Barbell Upright Row</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1572</span>
+      <span class="mzh">杠铃直立划船</span>
+      <span class="men">Barbell Upright Row </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3469</span>
+      <span class="mzh">杠铃直立划船</span>
+      <span class="men">Barbell Upright Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>cable rear delt row</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1653</span>
+      <span class="mzh">绳索后三角肌划船</span>
+      <span class="men">Cable Rear Delt Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1654</span>
+      <span class="mzh">绳索后三角肌划船</span>
+      <span class="men">Cable Rear Delt Row </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4296</span>
+      <span class="mzh">绳索后三角肌划船</span>
+      <span class="men">Cable Rear Delt Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">5132</span>
+      <span class="mzh">绳索后三角肌划船</span>
+      <span class="men">Cable Rear Delt Row</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>cable standing crunch</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1677</span>
+      <span class="mzh">绳索站立卷腹</span>
+      <span class="men">Cable Standing Crunch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2325</span>
+      <span class="mzh">固定器械站立卷腹</span>
+      <span class="men">Cable Standing Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3816</span>
+      <span class="mzh">站立缆绳卷腹</span>
+      <span class="men">Cable Standing Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3912</span>
+      <span class="mzh">绳索站立卷腹</span>
+      <span class="men">Cable Standing Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>crunch</b>
+      <span class="grp-meta">全库 13 个 · 更好版本 11 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1717</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1718</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1719</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1720</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1721</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1722</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">1723</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1724</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2649</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3939</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">5043</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">5060</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">5873</span>
+      <span class="mzh">卷腹</span>
+      <span class="men">Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>hyperextension</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">436</span>
+      <span class="mzh">超伸</span>
+      <span class="men">Hyperextension</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">1939</span>
+      <span class="mzh">超伸展</span>
+      <span class="men">Hyperextension </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">1940</span>
+      <span class="mzh">超伸展</span>
+      <span class="men">Hyperextension</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t use">训练 40</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3769</span>
+      <span class="mzh">超伸</span>
+      <span class="men">Hyperextension </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>push-up</b>
+      <span class="grp-meta">全库 13 个 · 更好版本 7 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">230</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2104</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2105</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2106</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2107</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-Up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2108</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2109</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2110</span>
+      <span class="mzh">哑铃窄距俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2113</span>
+      <span class="mzh">药球俯卧撑</span>
+      <span class="men">Push-up</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2116</span>
+      <span class="mzh">单臂俯卧撑</span>
+      <span class="men">Push-up</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2606</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2828</span>
+      <span class="mzh">俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3852</span>
+      <span class="mzh">窄距俯卧撑</span>
+      <span class="men">Push-up </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>self assisted inverse leg curl</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2147</span>
+      <span class="mzh">自重反向腿弯举</span>
+      <span class="men">Self assisted Inverse Leg Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2148</span>
+      <span class="mzh">自重反向腿弯举</span>
+      <span class="men">Self assisted Inverse Leg Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3053</span>
+      <span class="mzh">自重反向腿弯举</span>
+      <span class="men">Self assisted Inverse Leg Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">47533</span>
+      <span class="mzh">自重反向腿弯举</span>
+      <span class="men">Self Assisted Inverse Leg Curl</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>side bridge</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">2152</span>
+      <span class="mzh">侧桥</span>
+      <span class="men">Side Bridge </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2153</span>
+      <span class="mzh">侧桥</span>
+      <span class="men">Side Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2156</span>
+      <span class="mzh">侧桥</span>
+      <span class="men">Side Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2157</span>
+      <span class="mzh">侧桥</span>
+      <span class="men">Side Bridge</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>squat</b>
+      <span class="grp-meta">全库 6 个 · 更好版本 4 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">179</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">303</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">384</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2234</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2235</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">2238</span>
+      <span class="mzh">深蹲</span>
+      <span class="men">Squat</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>weighted crunch</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2282</span>
+      <span class="mzh">负重卷腹</span>
+      <span class="men">Weighted Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2283</span>
+      <span class="mzh">负重卷腹</span>
+      <span class="men">Weighted Crunch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3778</span>
+      <span class="mzh">负重卷腹</span>
+      <span class="men">Weighted Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">5460</span>
+      <span class="mzh">负重卷腹</span>
+      <span class="men">Weighted Crunch </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>weighted russian twist</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">2296</span>
+      <span class="mzh">负重俄罗斯转体</span>
+      <span class="men">Weighted Russian Twist </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2297</span>
+      <span class="mzh">负重俄罗斯转体</span>
+      <span class="men">Weighted Russian Twist</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3609</span>
+      <span class="mzh">负重俄罗斯转体</span>
+      <span class="men">Weighted Russian Twist </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3797</span>
+      <span class="mzh">负重俄罗斯转体</span>
+      <span class="men">Weighted Russian Twist </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>recumbent hip external rotator and hip extensor stretch</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">3211</span>
+      <span class="mzh">仰卧髋外旋与髋伸展拉伸</span>
+      <span class="men">Recumbent Hip External Rotator And Hip Extensor Stretch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3369</span>
+      <span class="mzh">仰卧位髋外旋和伸展拉伸</span>
+      <span class="men">Recumbent Hip External Rotator And Hip Extensor Stretch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  ">
+      <span class="mid">47230</span>
+      <span class="mzh">仰卧髋外旋和髋伸展拉伸</span>
+      <span class="men">Recumbent Hip External Rotator and Hip Extensor Stretch</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>dumbbell seated curl</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1842</span>
+      <span class="mzh">坐姿弯举</span>
+      <span class="men">Dumbbell Seated Curl</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3480</span>
+      <span class="mzh">哑铃坐姿弯举</span>
+      <span class="men">Dumbbell Seated Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4321</span>
+      <span class="mzh">哑铃坐姿弯举</span>
+      <span class="men">Dumbbell Seated Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>dumbbell biceps curl</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1745</span>
+      <span class="mzh">哑铃弯举</span>
+      <span class="men">Dumbbell Biceps Curl</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3639</span>
+      <span class="mzh">哑铃二头肌弯举</span>
+      <span class="men">Dumbbell Biceps Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3722</span>
+      <span class="mzh">哑铃二头肌弯举</span>
+      <span class="men">Dumbbell Biceps Curl </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4312</span>
+      <span class="mzh">哑铃二头肌弯举</span>
+      <span class="men">Dumbbell Biceps Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>cable triceps pushdown</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1692</span>
+      <span class="mzh">绳索肱三头肌推压</span>
+      <span class="men">Cable Triceps Pushdown </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3489</span>
+      <span class="mzh">绳索臂屈伸</span>
+      <span class="men">Cable Triceps Pushdown </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3643</span>
+      <span class="mzh">绳索三头肌下压</span>
+      <span class="men">Cable Triceps Pushdown </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">5553</span>
+      <span class="mzh">固定器械肱三头肌下压</span>
+      <span class="men">Cable Triceps Pushdown </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>lever hip thrust</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">3409</span>
+      <span class="mzh">杠杆臀推</span>
+      <span class="men">Lever Hip Thrust</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3980</span>
+      <span class="mzh">杠杆臀部推举</span>
+      <span class="men">Lever Hip Thrust </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3981</span>
+      <span class="mzh">杠杆臀部推举</span>
+      <span class="men">Lever Hip Thrust </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">4779</span>
+      <span class="mzh">杠杆臀部推举</span>
+      <span class="men">Lever Hip Thrust </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>cable hip abduction</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">2330</span>
+      <span class="mzh">固定器械髋外展</span>
+      <span class="men">Cable hip abduction </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3993</span>
+      <span class="mzh">固定器械髋外展</span>
+      <span class="men">Cable Hip Abduction </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3994</span>
+      <span class="mzh">固定器械髋外展</span>
+      <span class="men">Cable Hip Abduction </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">4286</span>
+      <span class="mzh">绳索髋外展</span>
+      <span class="men">Cable hip abduction </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>pike push-up</b>
+      <span class="grp-meta">全库 6 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">4069</span>
+      <span class="mzh">尖顶俯卧撑</span>
+      <span class="men">Pike Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4070</span>
+      <span class="mzh">尖顶俯卧撑</span>
+      <span class="men">Pike Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4631</span>
+      <span class="mzh">顶峰俯卧撑</span>
+      <span class="men">Pike Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4632</span>
+      <span class="mzh">顶峰俯卧撑</span>
+      <span class="men">Pike Push-up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  ">
+      <span class="mid">5041</span>
+      <span class="mzh">倒立俯卧撑</span>
+      <span class="men">Pike Push-up </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">47885</span>
+      <span class="mzh">倒立俯卧撑</span>
+      <span class="men">Pike Push-up</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>scissors</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">4100</span>
+      <span class="mzh">剪刀</span>
+      <span class="men">Scissors</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4130</span>
+      <span class="mzh">剪刀腿</span>
+      <span class="men">Scissors </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4131</span>
+      <span class="mzh">剪刀腿</span>
+      <span class="men">Scissors </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  ">
+      <span class="mid">4816</span>
+      <span class="mzh">剪刀步</span>
+      <span class="men">Scissors </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>barbell bench press</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1476</span>
+      <span class="mzh">杠铃卧推</span>
+      <span class="men">Barbell Bench Press</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3678</span>
+      <span class="mzh">杠铃卧推</span>
+      <span class="men">Barbell Bench Press </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4411</span>
+      <span class="mzh">杠铃卧推</span>
+      <span class="men">Barbell Bench Press </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4422</span>
+      <span class="mzh">杠铃卧推</span>
+      <span class="men">Barbell Bench Press </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>dumbbell straight arm pullover</b>
+      <span class="grp-meta">全库 4 个 · 更好版本 2 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">1884</span>
+      <span class="mzh">哑铃直臂下拉</span>
+      <span class="men">Dumbbell Straight Arm Pullover</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span><span class="t share">图片共享</span></span>
+    </div><div class="mem  ">
+      <span class="mid">3481</span>
+      <span class="mzh">哑铃伸展式划船</span>
+      <span class="men">Dumbbell Straight Arm Pullover </span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4413</span>
+      <span class="mzh">哑铃直臂下压</span>
+      <span class="men">Dumbbell Straight Arm Pullover </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4425</span>
+      <span class="mzh">哑铃直臂下压</span>
+      <span class="men">Dumbbell Straight Arm Pullover </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t1">
+    <div class="grp-h">
+      <b>dumbbell russian twist</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 1 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  ">
+      <span class="mid">4679</span>
+      <span class="mzh">哑铃俄罗斯转体</span>
+      <span class="men">Dumbbell Russian Twist</span>
+      <span class="mtags"><span class="t ok">有视频</span><span class="t none">未训练</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">4680</span>
+      <span class="mzh">哑铃俄罗斯转体</span>
+      <span class="men">Dumbbell Russian Twist </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">5251</span>
+      <span class="mzh">哑铃俄罗斯转体</span>
+      <span class="men">Dumbbell Russian Twist </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+  <div class="grp g-t2">
+    <div class="grp-h">
+      <b>incline reverse grip push-up</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">200</span>
+      <span class="mzh">上斜反握俯卧撑</span>
+      <span class="men">Incline Reverse Grip Push-Up</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">1945</span>
+      <span class="mzh">上斜反向俯卧撑</span>
+      <span class="men">Incline Reverse Grip Push-Up</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>lever overhand triceps dip</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">216</span>
+      <span class="mzh">杠杆正握臂屈伸</span>
+      <span class="men">Lever Overhand Triceps Dip</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2042</span>
+      <span class="mzh">正握臂屈伸</span>
+      <span class="men">Lever Overhand Triceps Dip</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>sled forward angled calf raise</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">237</span>
+      <span class="mzh">雪橇前倾提踵</span>
+      <span class="men">Sled Forward Angled Calf Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2193</span>
+      <span class="mzh">前倾雪橇小腿提踵</span>
+      <span class="men">Sled Forward Angled Calf Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>smith decline reverse-grip press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">246</span>
+      <span class="mzh">史密斯下斜反握推举</span>
+      <span class="men">Smith Decline Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2205</span>
+      <span class="mzh">史密斯下斜反握推举</span>
+      <span class="men">Smith Decline Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>smith incline reverse-grip press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">248</span>
+      <span class="mzh">史密斯上斜反握推举</span>
+      <span class="men">Smith Incline Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2209</span>
+      <span class="mzh">史密斯上斜反握推举</span>
+      <span class="men">Smith Incline Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>smith reverse-grip press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">252</span>
+      <span class="mzh">史密斯反握推举</span>
+      <span class="men">Smith Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2215</span>
+      <span class="mzh">史密斯反握推举</span>
+      <span class="men">Smith Reverse-grip Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>smith standing behind head military press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">259</span>
+      <span class="mzh">史密斯站姿过头军事推举</span>
+      <span class="men">Smith Standing Behind Head Military Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2223</span>
+      <span class="mzh">史密斯站姿过顶肩推</span>
+      <span class="men">Smith Standing Behind Head Military Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>body muscles</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2634</span>
+      <span class="mzh">身体肌肉</span>
+      <span class="men">Body muscles </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4391</span>
+      <span class="mzh">身体肌肉</span>
+      <span class="men">Body muscles </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>measurement</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">3434</span>
+      <span class="mzh">测量</span>
+      <span class="men">Measurement </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3435</span>
+      <span class="mzh">测量</span>
+      <span class="men">Measurement </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>bodybuilding pose male-female</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">4505</span>
+      <span class="mzh">健美男女姿势</span>
+      <span class="men">Bodybuilding pose male-female</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4506</span>
+      <span class="mzh">健美男女姿势</span>
+      <span class="men">Bodybuilding pose male-female </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>arnold pose</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">4508</span>
+      <span class="mzh">阿诺德姿势</span>
+      <span class="men">Arnold pose</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4509</span>
+      <span class="mzh">阿诺德姿势</span>
+      <span class="men">Arnold pose </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>standing pose</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">4903</span>
+      <span class="mzh">站姿</span>
+      <span class="men">Standing Pose </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4904</span>
+      <span class="mzh">站姿</span>
+      <span class="men">Standing Pose </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>dumbbell single leg hip thrust</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">27139</span>
+      <span class="mzh">哑铃单腿臀部推举</span>
+      <span class="men">Dumbbell Single Leg Hip Thrust</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">28301</span>
+      <span class="mzh">哑铃单腿臀桥</span>
+      <span class="men">Dumbbell Single Leg Hip Thrust</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t2">
+    <div class="grp-h">
+      <b>reverse flutter kick on floor (hand under head)</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · <span class="hl">图片相同=真重复</span></span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">27163</span>
+      <span class="mzh">地面反向踢腿（手在头下）</span>
+      <span class="men">Reverse Flutter Kick on Floor (hand under head)</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">27341</span>
+      <span class="mzh">仰卧反蛙跳（手垫头）</span>
+      <span class="men">Reverse Flutter Kick on Floor (hand under head)</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t dead">图片缺</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+  <div class="grp g-t3">
+    <div class="grp-h">
+      <b>finger curls</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">198</span>
+      <span class="mzh">手指弯举</span>
+      <span class="men">Finger Curls</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">367</span>
+      <span class="mzh">指屈伸</span>
+      <span class="men">finger curls</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">1906</span>
+      <span class="mzh">手指卷曲</span>
+      <span class="men">Finger Curls</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>lever reverse grip vertical row</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">345</span>
+      <span class="mzh">杠杆反握垂直划船</span>
+      <span class="men">Lever Reverse Grip Vertical Row</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3857</span>
+      <span class="mzh">哑铃在健身球上飞鸟</span>
+      <span class="men">Lever Reverse Grip Vertical Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>smith toe raise</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">358</span>
+      <span class="mzh">史密斯脚尖提踵</span>
+      <span class="men">Smith Toe Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4350</span>
+      <span class="mzh">史密斯脚尖提踵</span>
+      <span class="men">Smith Toe Raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>assisted chest dip</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1460</span>
+      <span class="mzh">辅助胸部俯身撑</span>
+      <span class="men">Assisted Chest Dip </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3766</span>
+      <span class="mzh">辅助胸部下压</span>
+      <span class="men">Assisted Chest Dip </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>barbell bench front squat</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1475</span>
+      <span class="mzh">杠铃前蹲</span>
+      <span class="men">Barbell Bench Front Squat</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4263</span>
+      <span class="mzh">杠铃凳前蹲</span>
+      <span class="men">Barbell Bench Front Squat </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>barbell decline close grip to skull press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1486</span>
+      <span class="mzh">杠铃下斜窄距推头</span>
+      <span class="men">Barbell Decline Close Grip To Skull Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4264</span>
+      <span class="mzh">杠铃下斜窄距头顶推</span>
+      <span class="men">Barbell Decline Close Grip To Skull Press </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>barbell standing ab rollout</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1554</span>
+      <span class="mzh">杠铃站立卷腹</span>
+      <span class="men">Barbell Standing AB rollout</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4064</span>
+      <span class="mzh">杠铃站立腹部滚离</span>
+      <span class="men">Barbell Standing ab rollout </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>bridge</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1593</span>
+      <span class="mzh">桥式</span>
+      <span class="men">Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">1594</span>
+      <span class="mzh">桥式</span>
+      <span class="men">Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable alternate shoulder press</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1599</span>
+      <span class="mzh">固定器械交替肩推</span>
+      <span class="men">Cable Alternate Shoulder Press</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4276</span>
+      <span class="mzh">绳索交替肩推</span>
+      <span class="men">Cable Alternate Shoulder Press </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable high row</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1618</span>
+      <span class="mzh">固定器械高位划船</span>
+      <span class="men">Cable High Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3484</span>
+      <span class="mzh">高位划船</span>
+      <span class="men">Cable High Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable lying close-grip curl</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1632</span>
+      <span class="mzh">固定器械仰卧窄距弯举</span>
+      <span class="men">Cable Lying Close-grip Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">1633</span>
+      <span class="mzh">固定器械仰卧窄距弯举</span>
+      <span class="men">Cable Lying Close-grip Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable russian twists</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1662</span>
+      <span class="mzh">绳索俄罗斯转体</span>
+      <span class="men">Cable Russian Twists </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4298</span>
+      <span class="mzh">绳索俄罗斯转体</span>
+      <span class="men">Cable Russian Twists </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable side crunch</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1674</span>
+      <span class="mzh">绳索侧卷腹</span>
+      <span class="men">Cable Side Crunch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3815</span>
+      <span class="mzh">缆绳侧卷腹</span>
+      <span class="men">Cable Side Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable standing back wrist curl</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1675</span>
+      <span class="mzh">绳索站立后腕屈伸</span>
+      <span class="men">Cable Standing Back Wrist Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">28018</span>
+      <span class="mzh">固定绳索站立后腕弯举</span>
+      <span class="men">Cable Standing Back Wrist Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell full can lateral raise</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1762</span>
+      <span class="mzh">哑铃全罐侧平举</span>
+      <span class="men">Dumbbell Full Can Lateral Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3821</span>
+      <span class="mzh">哑铃全罐侧平举</span>
+      <span class="men">Dumbbell Full Can Lateral Raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell one arm concetration curl</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1804</span>
+      <span class="mzh">哑铃单臂集中弯举</span>
+      <span class="men">Dumbbell One Arm Concetration Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3828</span>
+      <span class="mzh">哑铃单臂集中弯举</span>
+      <span class="men">Dumbbell One Arm Concetration Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell one arm reverse fly</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1810</span>
+      <span class="mzh">哑铃单臂反向飞鸟</span>
+      <span class="men">Dumbbell One Arm Reverse Fly </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">3929</span>
+      <span class="mzh">哑铃单臂反飞鸟</span>
+      <span class="men">Dumbbell One Arm Reverse Fly </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">5447</span>
+      <span class="mzh">哑铃单臂反飞鸟</span>
+      <span class="men">Dumbbell One Arm Reverse Fly </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell one arm upright row</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1814</span>
+      <span class="mzh">哑铃单臂直立划船</span>
+      <span class="men">Dumbbell One Arm Upright Row</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3838</span>
+      <span class="mzh">哑铃单臂直立划船</span>
+      <span class="men">Dumbbell One Arm Upright Row </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell over bench neutral wrist curl</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1816</span>
+      <span class="mzh">过杠中握腕弯举</span>
+      <span class="men">Dumbbell Over Bench Neutral Wrist Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3866</span>
+      <span class="mzh">哑铃过凳单臂中性腕屈伸</span>
+      <span class="men">Dumbbell Over Bench Neutral Wrist Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell over bench one arm wrist curl</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1818</span>
+      <span class="mzh">过杠单臂腕弯举</span>
+      <span class="men">Dumbbell Over Bench One Arm Wrist Curl</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t share">图片共享</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3925</span>
+      <span class="mzh">哑铃过长凳单臂腕弯举</span>
+      <span class="men">Dumbbell Over Bench One Arm Wrist Curl </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>frog hops</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">1911</span>
+      <span class="mzh">青蛙跳</span>
+      <span class="men">Frog Hops</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4326</span>
+      <span class="mzh">青蛙跳</span>
+      <span class="men">Frog Hops </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>gorilla chin</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1918</span>
+      <span class="mzh">大猩猩下颌牵引</span>
+      <span class="men">Gorilla Chin</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3889</span>
+      <span class="mzh">大猩猩引体向上</span>
+      <span class="men">Gorilla Chin </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>hanging straight twisting leg hip raise</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1927</span>
+      <span class="mzh">悬垂直腿扭转髋部提升</span>
+      <span class="men">Hanging Straight Twisting Leg Hip Raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3940</span>
+      <span class="mzh">悬垂直腿扭转臀部抬升</span>
+      <span class="men">Hanging Straight Twisting Leg Hip Raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>kettlebell double windmill</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">1981</span>
+      <span class="mzh">双壶铃风车</span>
+      <span class="men">Kettlebell Double Windmill</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">5705</span>
+      <span class="mzh">双臂壶铃风车式</span>
+      <span class="men">Kettlebell Double Windmill </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>lateral bound</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2014</span>
+      <span class="mzh">侧向跳跃</span>
+      <span class="men">Lateral Bound</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4333</span>
+      <span class="mzh">侧向跳跃</span>
+      <span class="men">Lateral Bound </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>plyo jacks</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2096</span>
+      <span class="mzh">跳跃侧弓步拉伸</span>
+      <span class="men">Plyo Jacks</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4346</span>
+      <span class="mzh">爆发式开合跳</span>
+      <span class="men">Plyo Jacks </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>single leg hip bridge</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2180</span>
+      <span class="mzh">单腿臀桥</span>
+      <span class="men">Single Leg Hip Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4665</span>
+      <span class="mzh">单腿臀桥</span>
+      <span class="men">Single Leg Hip Bridge </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>skater</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2188</span>
+      <span class="mzh">滑冰者</span>
+      <span class="men">Skater</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4347</span>
+      <span class="mzh">滑步</span>
+      <span class="men">Skater </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>split jacks</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2231</span>
+      <span class="mzh">分腿跳</span>
+      <span class="men">Split Jacks</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4351</span>
+      <span class="mzh">分腿开合跳</span>
+      <span class="men">Split Jacks </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>walk</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2279</span>
+      <span class="mzh">行走</span>
+      <span class="men">Walk </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2280</span>
+      <span class="mzh">行走</span>
+      <span class="men">Walk </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>cable reverse crunch</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2324</span>
+      <span class="mzh">固定器械反向卷腹</span>
+      <span class="men">Cable Reverse Crunch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3888</span>
+      <span class="mzh">绳索反卷腹</span>
+      <span class="men">Cable Reverse Crunch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>band calf raise</b>
+      <span class="grp-meta">全库 3 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2345</span>
+      <span class="mzh">弹力带提踵</span>
+      <span class="men">Band calf raise</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem del-row ">
+      <span class="mid">2424</span>
+      <span class="mzh">弹力带提踵</span>
+      <span class="men">Band calf raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2847</span>
+      <span class="mzh">弹力带提踵</span>
+      <span class="men">Band Calf Raise </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>band assisted wheel rollout</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2422</span>
+      <span class="mzh">弹力带辅助滚轮展开</span>
+      <span class="men">Band Assisted Wheel Rollout</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3887</span>
+      <span class="mzh">弹力带辅助轮滚出</span>
+      <span class="men">Band Assisted Wheel Rollout </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>band lying hip external rotation</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2433</span>
+      <span class="mzh">弹力带仰卧臀部外旋</span>
+      <span class="men">Band Lying Hip External Rotation</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4260</span>
+      <span class="mzh">弹力带仰卧髋外旋</span>
+      <span class="men">Band Lying Hip External Rotation </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>band lying hip internal rotation</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2435</span>
+      <span class="mzh">弹力带仰卧臀部内旋</span>
+      <span class="men">Band Lying Hip Internal Rotation</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4261</span>
+      <span class="mzh">弹力带仰卧髋内旋</span>
+      <span class="men">Band Lying Hip Internal Rotation </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>band seated twist</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2462</span>
+      <span class="mzh">弹力带坐姿扭转</span>
+      <span class="men">Band seated twist</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3684</span>
+      <span class="mzh">弹力带坐姿扭转</span>
+      <span class="men">Band seated twist </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>seated groin stretch</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2489</span>
+      <span class="mzh">坐姿大腿内侧伸展</span>
+      <span class="men">Seated Groin Stretch</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">2597</span>
+      <span class="mzh">坐姿大腿内侧拉伸</span>
+      <span class="men">Seated Groin Stretch </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>kettlebell sit-up</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2611</span>
+      <span class="mzh">壶铃仰卧起坐</span>
+      <span class="men">Kettlebell Sit-up</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">5707</span>
+      <span class="mzh">壶铃仰卧起坐</span>
+      <span class="men">Kettlebell Sit-Up </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell incline press on exercise ball</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem  keep-row">
+      <span class="mid">2679</span>
+      <span class="mzh">哑铃在健身球上倾斜推举</span>
+      <span class="men">Dumbbell Incline Press on Exercise Ball</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">3865</span>
+      <span class="mzh">哑铃过凳中性腕屈伸</span>
+      <span class="men">Dumbbell Incline Press on Exercise Ball </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+<div class="grp g-t3">
+    <div class="grp-h">
+      <b>dumbbell press on exercise ball</b>
+      <span class="grp-meta">全库 2 个 · 更好版本 0 个 · 图片不同=不同变体</span>
+    </div>
+    <div class="memlist"><div class="mem del-row ">
+      <span class="mid">2689</span>
+      <span class="mzh">哑铃在健身球上推举</span>
+      <span class="men">Dumbbell Press on Exercise Ball</span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t del">可删</span></span>
+    </div><div class="mem  keep-row">
+      <span class="mid">4319</span>
+      <span class="mzh">哑铃在健身球上推举</span>
+      <span class="men">Dumbbell Press on Exercise Ball </span>
+      <span class="mtags"><span class="t no">无视频</span><span class="t none">未训练</span><span class="t keep">保留</span></span>
+    </div></div>
+  </div>
+  <p style="text-align:center;color:var(--muted);">… 其余 62 组省略</p>
+</section>
+
+<footer>
+  <p><strong>数据来源</strong>：2026-11-08 直连生产库 <code>47.108.200.98/gfit</code> 只读查询 + 生产机 <code>/media/gfit/exer_images</code> 只读列目录。</p>
+  <p><strong>判定口径</strong>：「未被训练」= <code>exercises</code> 表无引用 <strong>且</strong> <code>user_exercise_stats</code> 表无标记；「无视频」= <code>video_name</code> 为 <code>'NULL'</code>/空；重名按 <code>LOWER(TRIM(name))</code> 归组。</p>
+  <p><strong>本次分析全程只读</strong> —— 未删除任何数据。</p>
+</footer>
+
+</div>
+</body>
+</html>
