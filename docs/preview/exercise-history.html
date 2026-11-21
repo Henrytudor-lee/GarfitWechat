@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>动作配置 · 历史配置模块 · 排版预览</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0d0d0d; color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  }
+  /* 小程序语义: view = block, text = inline */
+  view { display: block; }
+  text { display: inline; }
+  .page { max-width: 375px; margin: 0 auto; padding: 16px 0 40px; }
+  .page-head { padding: 0 16px 18px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 8px; }
+  .page-head h1 { font-size: 15px; margin: 0 0 6px; color: #f2f2f2; }
+  .page-head p { font-size: 12px; line-height: 1.7; color: #8a8a8a; margin: 0; }
+  .case { margin: 20px 0 0; }
+  .case > h3 { font-size: 12px; color: #8a8a8a; margin: 0 0 6px 16px; font-weight: 600; }
+  /* 模拟弹层外壳: 夜间 / 日间 */
+  .modal-mask { position: relative; background: rgba(0,0,0,.85); padding: 8px 0 20px; }
+  .modal-mask.theme-day { background: #e9e9e9; }
+  .modal-sheet { position: relative; background: #131313; border-radius: 16px 16px 0 0; padding-bottom: 8px; }
+  .theme-day .modal-sheet { background: #fff; }
+  /* 上面摆一个"动作配置"的头部, 让上下文完整 */
+  .fake-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .theme-day .fake-header { border-bottom-color: rgba(0,0,0,.1); }
+  .fake-title { font-size: 15px; font-weight: 700; color: #f2f2f2; }
+  .theme-day .fake-title { color: #000; }
+  .fake-btn { font-size: 13px; color: #999; }
+  /* ── 以下为 miniprogram/components/add-exercise-modal/index.wxss 的真实内容 ── */
+/* components/add-exercise-modal/index.wxss */
+/* 原项目配色: 背景 #131313, 强调色 #ccf200 黄绿色 */
+
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+}
+
+.modal-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 85vh;
+  background: #131313;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Drag Handle */
+.drag-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding: 0 16px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.header-left,
+.header-right {
+  width: 80px;
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.header-btn {
+  font-size: 13px;
+  color: var(--primary-text);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.header-btn-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.header-btn-fav {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+.header-btn-fav:active {
+  transform: scale(0.9);
+}
+.header-btn-fav.is-fav {
+  background: rgba(204, 242, 0, 0.18);
+}
+.header-btn-fav-icon {
+  width: 20px;
+  height: 20px;
+  filter: grayscale(1) brightness(1.5);
+  opacity: 0.45;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.header-btn-fav.is-fav .header-btn-fav-icon {
+  filter: none;
+  opacity: 1;
+}
+
+.header-btn-text {
+  font-size: 13px;
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+.back-btn {
+  color: var(--primary-text);
+}
+
+/* Muscle Sidebar */
+.muscle-sidebar {
+  position: absolute;
+  left: 0;
+  top: 50px;
+  bottom: 0;
+  width: 160px;
+  background: rgba(0, 0, 0, 0.95);
+  border-right: 0.5px solid rgba(255, 255, 255, 0.1);
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.muscle-item {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muscle-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.muscle-item-name {
+  flex: 1;
+}
+
+.muscle-item.active {
+  background: rgba(204, 242, 0, 0.15);
+  color: var(--primary-text);
+}
+
+.muscle-item.active .muscle-icon {
+  opacity: 1;
+}
+
+.muscle-item .muscle-icon {
+  opacity: 0.6;
+}
+
+/* Content Area */
+.modal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: #131313;
+}
+
+.search-icon-wrap {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-input {
+  flex: 1;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: #fff;
+}
+
+.search-placeholder {
+  color: #555;
+}
+
+.filter-icons-wrap {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 6px;
+}
+
+.filter-icon-btn {
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.15s;
+}
+
+.filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.2);
+}
+
+/* Filter Section */
+.filter-section {
+  padding: 0 16px 8px;
+  flex-shrink: 0;
+}
+
+.filter-scroll {
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  color: #888;
+  flex-shrink: 0;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.filter-chip.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
+
+.filter-chip .equip-name {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #888;
+}
+
+.filter-chip.active .equip-name {
+  color: #000;
+}
+
+.filter-chip .equip-icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+/* Exercise Grid - SCROLLABLE */
+.exercise-grid {
+  height: 60vh;
+  overflow-y: auto;
+  padding: 0 5px 40px 5px;
+  box-sizing: border-box;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+  padding: 40px 0;
+}
+
+.load-more {
+  text-align: center;
+  color: var(--primary-text);
+  font-size: 12px;
+  padding: 12px 0;
+}
+
+.no-more {
+  text-align: center;
+  color: #444;
+  font-size: 11px;
+  padding: 12px 0;
+}
+
+/* Scroll-to-top FAB
+   位置: session-orb (active) 底部在屏底往上 ~166px 处,
+   故此按钮贴在屏底往上 ~110px (top ~150px),
+   与 orb 底部留 ~16px 视觉间距, 形成 "右上叠两个圆按钮" 的层级 */
+.scroll-top-fab {
+  position: absolute;
+  right: 12px;
+  bottom: 110px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35),
+              0 0 12px rgba(204, 242, 0, 0.35);
+  z-index: 50;
+  opacity: 0;
+  transform: translateY(10px) scale(0.85);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.scroll-top-fab.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.scroll-top-fab-hover {
+  transform: translateY(0) scale(0.92) !important;
+  opacity: 0.85 !important;
+}
+.scroll-top-fab-arrow {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: #0a0a0a;
+  /* 微调让箭头视觉居中 (Unicode 字符 baseline 偏高) */
+  margin-top: -2px;
+}
+
+.grid-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exercise-card {
+  width: calc((100% - 16px) / 3);
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.card-img-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+}
+
+.card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 30px;
+}
+
+.card-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+.done-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--primary);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+
+.fav-icon-wrap {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+}
+
+.fav-icon-wrap image {
+  width: 14px;
+  height: 14px;
+}
+
+.fav-icon-wrap.active {
+  background: rgba(204, 242, 0, 0.3);
+}
+
+.card-footer {
+  padding: 6px;
+  padding-bottom: 32px;
+  position: relative;
+  min-height: 32px;
+}
+
+.card-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  word-break: break-word;
+}
+
+.card-icons {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.card-muscle-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+
+.card-equip-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+
+/* STEP 2: Set Weight/Reps */
+.selected-exercise-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: 8px 16px;
+}
+
+.selected-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.selected-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 24px;
+}
+
+.selected-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.selected-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.selected-tags {
+  display: flex;
+  gap: 4px;
+}
+
+.tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--primary);
+  color: #000;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.tag-neutral {
+  background: rgba(255, 255, 255, 0.1);
+  color: #888;
+}
+
+.history-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(204, 242, 0, 0.12);
+  border: 0.5px solid rgba(204, 242, 0, 0.3);
+  border-radius: 5px;
+  padding: 2px 6px;
+}
+
+.history-badge-label {
+  font-size: 8px;
+  color: #666;
+  font-weight: 500;
+}
+
+.history-badge-val {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--primary-text);
+}
+
+/* Input Section */
+.input-section {
+  padding: 0 16px 10px;
+}
+
+.input-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.input-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.input-label-row .input-label {
+  margin-bottom: 0;
+}
+
+.quick-chips-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-btn {
+  width: 40px;
+  height: 40px;
+  /* ⚠️ 必须 border-box: 小程序默认是 content-box,
+     带 0.5px border 时实际高度会变成 41px, 比输入框高 1px → 一行里不齐平 */
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #aaa;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.input-field {
+  flex: 1;
+  height: 40px;
+  line-height: 40px;     /* 文字垂直居中 */
+  padding: 0 4px;        /* 上下 padding 去掉(高度已由 line-height 承担) */
+  box-sizing: border-box; /* border 算进 40px */
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Unit Toggle */
+.unit-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ⚠️ 必须和 .input-btn / .input-field 同高(40px) —— 原来这里是 32px,
+   一行里三个控件参差不齐。 */
+.unit-btn {
+  flex: 1;
+  height: 40px;
+  box-sizing: border-box;  /* 同 .input-btn: border 算进高度, 否则多 1px */
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.unit-btn.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
+
+/* Modal Footer */
+.modal-footer {
+  /* ⚠️ 2026-11-07 修: 原来是 position:absolute; bottom:0 —— 绝对定位**脱离文档流**,
+     于是 .step2-wrap(flex:1) 的可用高度 = 整个 sheet 高度, 滚动区一直延伸到
+     按钮底下 → 最后一段内容被按钮盖住, **滚到底也看不到**
+     (计时器正好在最下面, 计时类动作最容易中招)。
+
+     改成普通流内的 flex 子项(和 edit-exercise-modal 一致):
+     .modal-sheet 本身是 display:flex; flex-direction:column,
+     .step2-wrap(flex:1) 会自动收缩, 给 footer 让出高度。 */
+  flex-shrink: 0;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirm-btn {
+  width: 100%;
+  height: 48px;
+  background: var(--primary);
+  color: #000;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.confirm-btn.disabled {
+  opacity: 0.3;
+}
+
+.confirm-btn::after {
+  border: none;
+}
+
+.step2-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.step2-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Step 2 video */
+.video-wrap {
+  margin: 0 16px 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.step2-video {
+  width: 100%;
+  height: 160px;
+  display: block;
+}
+
+.video-placeholder {
+  margin: 0 16px 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px dashed rgba(255, 255, 255, 0.15);
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+}
+
+.video-placeholder-icon {
+  font-size: 40px;
+  opacity: 0.4;
+  line-height: 1;
+}
+
+.video-placeholder-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.video-placeholder-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* Quick chips */
+.quick-chips {
+  padding: 0 16px 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quick-chips-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #555;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  width: 35px;
+}
+
+.chips-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding: 3px 8px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.chip.active {
+  background: rgba(204, 242, 0, 0.15);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+/* ========================
+   Day Theme
+   ========================
+   兜底: WeChat 自定义组件样式隔离可能阻隔 page 上定义的 --primary-text 传过来,
+   这里在组件自己的作用域内再定义一次, 保证颜色一定生效 */
+.modal-mask.theme-day {
+  --primary: #ccf200;
+  --primary-text: #3a4a00;
+  --primary-bg-soft: rgba(58, 74, 0, 0.15);
+}
+
+.modal-mask.theme-day .modal-sheet {
+  background: #ffffff;
+}
+.modal-mask.theme-day .drag-handle {
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal-mask.theme-day .modal-header {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .header-title {
+  color: #000;
+}
+.modal-mask.theme-day .header-btn-fav {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .header-btn-fav.is-fav {
+  background: rgba(58, 74, 0, 0.15);
+}
+.modal-mask.theme-day .muscle-sidebar {
+  background: #f5f5f5;
+  border-right: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .muscle-item {
+  color: #666;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .muscle-item.active {
+  background: rgba(58, 74, 0, 0.15);
+  color: var(--primary-text);
+}
+.modal-mask.theme-day .search-bar {
+  background: #ffffff;
+}
+.modal-mask.theme-day .search-input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .search-placeholder {
+  color: #999;
+}
+.modal-mask.theme-day .filter-icon-btn {
+  background: rgba(0, 0, 0, 0.06);
+}
+.modal-mask.theme-day .filter-icon-btn.active {
+  background: rgba(204, 242, 0, 0.4);
+}
+.modal-mask.theme-day .filter-chip {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .filter-chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
+.modal-mask.theme-day .filter-chip .equip-name {
+  color: #666;
+}
+.modal-mask.theme-day .loading-state,
+.modal-mask.theme-day .empty-state {
+  color: #999;
+}
+.modal-mask.theme-day .no-more {
+  color: #999;
+}
+.modal-mask.theme-day .exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .card-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .card-gradient {
+  background: linear-gradient(to top, rgba(255,255,255,0.9), transparent);
+}
+.modal-mask.theme-day .fav-icon-wrap {
+  background: rgba(255, 255, 255, 0.8);
+}
+.modal-mask.theme-day .fav-icon-wrap.active {
+  background: rgba(58, 74, 0, 0.3);
+}
+.modal-mask.theme-day .card-name {
+  color: #000;
+}
+.modal-mask.theme-day .card-muscle-icon,
+.modal-mask.theme-day .card-equip-icon {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-exercise-card {
+  background: rgba(0, 0, 0, 0.04);
+}
+.modal-mask.theme-day .selected-img-placeholder {
+  background: rgba(0, 0, 0, 0.05);
+}
+.modal-mask.theme-day .selected-name {
+  color: #000;
+}
+.modal-mask.theme-day .tag-neutral {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666;
+}
+.modal-mask.theme-day .input-label {
+  color: #666;
+}
+.modal-mask.theme-day .input-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .input-field {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+.modal-mask.theme-day .unit-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .unit-btn.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
+.modal-mask.theme-day .modal-footer {
+  background: #ffffff;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .video-placeholder {
+  background: rgba(0, 0, 0, 0.04);
+  border: 0.5px dashed rgba(0, 0, 0, 0.2);
+}
+.modal-mask.theme-day .video-placeholder-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+.modal-mask.theme-day .video-placeholder-sub {
+  color: rgba(0, 0, 0, 0.45);
+}
+.modal-mask.theme-day .quick-chips-label {
+  color: #999;
+}
+.modal-mask.theme-day .chip {
+  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.modal-mask.theme-day .chip.active {
+  background: rgba(58, 74, 0, 0.15);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
+
+/* ========================
+   Night Theme (fallback)
+   ======================== */
+.modal-mask.theme-night {
+  --primary: #ccf200;
+  --primary-text: #ccf200;
+  --primary-bg-soft: rgba(204, 242, 0, 0.15);
+}
+
+/* Timer section hint (duration 类动作的时长区) */
+.timer-unit-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 32px;
+}
+
+/* 负重提示 —— 计时/距离类动作也可以负重(手握哑铃的交叉跳跃 / 负重爬坡步行),
+   说明这个重量是"额外负重", 0 = 自重 */
+.load-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+/* ========================
+   历史配置(按日期分组)
+   ========================
+   这个动作以前每次练了什么 —— 日期一行, 下面的每一组是一个 chip。
+   没练过这个动作 → historyGroups 为空 → 整个模块不渲染(WXML wx:if)。 */
+.history-panel {
+  margin: 0 16px 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+.modal-mask.theme-day .history-panel {
+  background: rgba(0, 0, 0, 0.03);
+}
+.history-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 9px;
+}
+.history-day {
+  margin-bottom: 10px;
+}
+.history-day:last-child {
+  margin-bottom: 0;
+}
+.history-day-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin-bottom: 5px;
+}
+.history-day-sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.history-set-chip {
+  font-size: 12px;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 3px 7px;
+  line-height: 1.4;
+}
+.modal-mask.theme-day .history-set-chip {
+  color: #333;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+/* 封顶提示: "还有 3 组" / "共 30 天 · 仅显示最近 10 天"
+   —— 封顶不能静默丢弃, 必须告诉用户真实总数 */
+.history-day-more,
+.history-panel-foot {
+  font-size: 10px;
+  color: #888;
+  margin-top: 5px;
+}
+.history-panel-foot {
+  margin-top: 9px;
+  padding-top: 7px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.07);
+}
+.modal-mask.theme-day .history-panel-foot {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+
+  /* ── 预览专用覆盖(必须放在真样式**之后**才能生效) ──
+     真机上 .modal-mask 是 position:fixed; inset:0, .modal-sheet 是
+     position:absolute; bottom:0; height:85vh —— 那是"贴在屏幕底部"的弹层。
+     HTML 里 5 个 case 用同一套标签, fixed + absolute 会让它们全部叠在一起,
+     只剩最后一个可见。这里改成常规流, 好让 5 个 case 依次排下来。 */
+  .modal-mask {
+    position: relative;
+    inset: auto;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: auto;
+  }
+  .modal-mask.theme-day { background: #e9e9e9; }
+  .modal-sheet { position: relative; height: auto; bottom: auto; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>动作配置 · 历史配置模块 · 排版预览</h1>
+    <p>
+      在「动作配置」界面的下方新增: <b>这个动作以前每次练了什么(按日期分组)</b>。<br>
+      没练过这个动作 → <b>整个模块不渲染</b>, 不是显示一个空标题。<br>
+      样式直接内联自 <code>miniprogram/components/add-exercise-modal/index.wxss</code>(真实文件)。<br>
+      ⚠️ rpx 按 375px 宽折算 → 请用 375px 宽的窗口看, 1:1 还原真机。
+    </p>
+  </div>
+
+  <div class="case">
+    <h3>A · 夜间主题(默认)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+      <view class="history-panel">
+        <view class="history-panel-title">历史配置</view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月20日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">50kg × 5</text>
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">40kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月13日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月7日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 6</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年10月26日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">60kg × 12</text>
+            <text class="history-set-chip">70kg × 8</text>
+            <text class="history-set-chip">70kg × 8</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年10月13日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">40kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年9月20日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+          </view>
+        </view>
+      <view class="history-panel-foot">共 30 天 · 仅显示最近 10 天</view>
+      </view>
+      </view>
+    </view>
+  </div>
+
+  <div class="case">
+    <h3>B · 日间主题</h3>
+    <view class="modal-mask theme-day">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+      <view class="history-panel">
+        <view class="history-panel-title">历史配置</view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月20日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">50kg × 5</text>
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">40kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月13日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月7日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 6</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年10月26日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">60kg × 12</text>
+            <text class="history-set-chip">70kg × 8</text>
+            <text class="history-set-chip">70kg × 8</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年10月13日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">40kg × 10</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年9月20日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">60kg × 8</text>
+            <text class="history-set-chip">60kg × 8</text>
+          </view>
+        </view>
+      <view class="history-panel-foot">共 30 天 · 仅显示最近 10 天</view>
+      </view>
+      </view>
+    </view>
+  </div>
+
+  <div class="case">
+    <h3>C · 计时类 / 距离类动作(组文本按数据本身走)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+      <view class="history-panel">
+        <view class="history-panel-title">历史配置</view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月18日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">90秒 · 12kg</text>
+            <text class="history-set-chip">90秒 · 12kg</text>
+            <text class="history-set-chip">60秒 · 10kg</text>
+          </view>
+        </view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月11日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">5.2公里 · 90秒 · 12kg</text>
+            <text class="history-set-chip">5公里 · 1800秒</text>
+          </view>
+        </view>
+      </view>
+      </view>
+    </view>
+  </div>
+
+  <div class="case">
+    <h3>D · 单日组数超上限(封顶 12 组, 如实告诉用户还剩多少)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+      <view class="history-panel">
+        <view class="history-panel-title">历史配置</view>
+        <view class="history-day">
+          <view class="history-day-date">2026年11月8日</view>
+          <view class="history-day-sets">
+            <text class="history-set-chip">40kg × 10</text>
+            <text class="history-set-chip">45kg × 10</text>
+            <text class="history-set-chip">50kg × 10</text>
+            <text class="history-set-chip">55kg × 10</text>
+            <text class="history-set-chip">60kg × 10</text>
+            <text class="history-set-chip">65kg × 10</text>
+            <text class="history-set-chip">70kg × 10</text>
+            <text class="history-set-chip">75kg × 10</text>
+            <text class="history-set-chip">80kg × 10</text>
+            <text class="history-set-chip">85kg × 10</text>
+            <text class="history-set-chip">90kg × 10</text>
+            <text class="history-set-chip">95kg × 10</text>
+          </view>
+          <view class="history-day-more">还有 23 组</view>
+        </view>
+      </view>
+      </view>
+    </view>
+  </div>
+
+  <div class="case">
+    <h3>E · 没练过这个动作 → 整个模块不渲染(这里只有配置区, 没有历史面板)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+        <view class="selected-exercise-card">
+          <view class="selected-info">
+            <view class="selected-name">杠铃深蹲</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </div>
+</div>
+</body>
+</html>

@@ -227,6 +227,21 @@
             <set-timer value="{{durationSec}}" t="{{t}}" bindchange="onTimerChange" bindfinish="onTimerFinish" />
           </view>
 
+          <!-- 历史配置: 这个动作以前每次练了什么(按日期分组)
+               ⚠️ 没练过这个动作 → historyGroups 为空 → **整个模块不渲染**
+                  (用户要的是"没历史就不显示", 不是显示一个空的"历史配置"标题) -->
+          <view wx:if="{{historyGroups.length > 0}}" class="history-panel">
+            <view class="history-panel-title">{{t.EXERCISE_HISTORY}}</view>
+            <view class="history-day" wx:for="{{historyGroups}}" wx:for-item="d" wx:key="date">
+              <view class="history-day-date">{{d.dateText}}</view>
+              <view class="history-day-sets">
+                <text class="history-set-chip" wx:for="{{d.sets}}" wx:for-item="s" wx:key="idx">{{s.text}}</text>
+              </view>
+              <view wx:if="{{d.moreSets > 0}}" class="history-day-more">{{d.moreText}}</view>
+            </view>
+            <view wx:if="{{historyTruncated}}" class="history-panel-foot">{{historyFootText}}</view>
+          </view>
+
         </scroll-view>
 
       </view>

@@ -981,3 +981,73 @@
   opacity: 0.75;
   margin-top: 8rpx;
 }
+
+/* ========================
+   历史配置(按日期分组)
+   ========================
+   这个动作以前每次练了什么 —— 日期一行, 下面的每一组是一个 chip。
+   没练过这个动作 → historyGroups 为空 → 整个模块不渲染(WXML wx:if)。 */
+.history-panel {
+  margin: 0 32rpx 32rpx;
+  padding: 24rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16rpx;
+}
+.modal-mask.theme-day .history-panel {
+  background: rgba(0, 0, 0, 0.03);
+}
+.history-panel-title {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+  margin-bottom: 18rpx;
+}
+.history-day {
+  margin-bottom: 20rpx;
+}
+.history-day:last-child {
+  margin-bottom: 0;
+}
+.history-day-date {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--primary-text);
+  margin-bottom: 10rpx;
+}
+.history-day-sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+.history-set-chip {
+  font-size: 24rpx;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  border-radius: 8rpx;
+  padding: 6rpx 14rpx;
+  line-height: 1.4;
+}
+.modal-mask.theme-day .history-set-chip {
+  color: #333;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+/* 封顶提示: "还有 3 组" / "共 30 天 · 仅显示最近 10 天"
+   —— 封顶不能静默丢弃, 必须告诉用户真实总数 */
+.history-day-more,
+.history-panel-foot {
+  font-size: 20rpx;
+  color: #888;
+  margin-top: 10rpx;
+}
+.history-panel-foot {
+  margin-top: 18rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.07);
+}
+.modal-mask.theme-day .history-panel-foot {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}

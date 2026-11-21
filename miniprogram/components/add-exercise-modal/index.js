@@ -3,6 +3,7 @@ const app = getApp();
 const api = require('../../utils/api.js');
 const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
+const { buildHistoryGroups, buildHistoryFootText } = require('../../utils/exercise-history.js');
 
 /**
  * 取 i18n 字典, 并补齐可能缺失的 key。
@@ -134,6 +135,12 @@ Component({
     distanceStr: '0',      // 距离输入框字符串(允许小数)
     canSubmit: false,      // 派生: 提交按钮可用性(WXML 不做复杂表达式)
     historyMax: null,
+    // ── 历史配置(这个动作以前练过什么, 按日期分组) ──
+    // 没练过这个动作 → historyGroups 为空 → WXML 整个模块不渲染
+    historyGroups: [],
+    historyTotalDays: 0,
+    historyTruncated: false,
+    historyFootText: '',
     submitting: false,
     weightChips: [10, 20, 30, 40, 50],
     repsChips: [4, 8, 10, 12, 15, 20],
@@ -217,6 +224,10 @@ Component({
         countMode: 'weight_reps',
         setTitle: titleForMode(app.globalData.t || {}),
         historyMax: null,
+        historyGroups: [],
+        historyTotalDays: 0,
+        historyTruncated: false,
+        historyFootText: '',
         submitting: false,
         imgPrefix: imgPrefix || '',
         vidPrefix: vidPrefix || '',
@@ -329,6 +340,10 @@ Component({
         reps: 0,
         repsStr: '0',
         historyMax: null,
+        historyGroups: [],
+        historyTotalDays: 0,
+        historyTruncated: false,
+        historyFootText: '',
       });
       // step 切换后 step1 视图重新挂载, scroll-view 是新的, 滚动位置归零.
       // 下一帧把之前记住的位置写回 scroll-top 属性即可恢复.
@@ -512,6 +527,11 @@ Component({
         // ⚠️ 之前没重置 → 上一个动作的 LAST badge 会串到新动作上,
         // 点一下就把上一个动作的重量写进新动作。
         historyMax: null,
+        // 历史配置同理: 不重置 → 上面显示的是上一个动作的练法
+        historyGroups: [],
+        historyTotalDays: 0,
+        historyTruncated: false,
+        historyFootText: '',
         countMode: mode,
         setTitle: titleForMode(app.globalData.t || {}),
         isDuration: isDurationMode(mode),
@@ -523,6 +543,46 @@ Component({
       });
       this._syncCanSubmit();
       this._loadHistoryMax(item);
+      this._loadHistoryGroups(item);
+    },
+
+    /**
+     * 拉这个动作的历史配置(按日期分组)
+     *
+     * 口径:
+     *   - 没练过这个动作 → 后端返回空 → historyGroups = [] → 整个模块不渲染
+     *   - 归属校验同 _loadHistoryMax: 用户可能已经选了别的动作, 回包必须丢掉
+     */
+    async _loadHistoryGroups(item) {
+      if (!item || item.id == null) return;
+
+      const reqId = item.id;
+      const locale = this.data.locale || 'zh';
+
+      try {
+        const res = await api.callCloud('exercise.getHistory', { exercise_id: reqId });
+
+        // 归属校验: 动作已经换了 → 丢掉这份回包, 免得把上一个动作的历史贴上来
+        if (this._historyReqId == null || Number(this._historyReqId) !== Number(reqId)) return;
+        const cur = this.data.selectedItem;
+        if (!cur || Number(cur.id) !== Number(reqId)) return;
+
+        const data = res && res.result && res.result.data;
+        const groups = buildHistoryGroups(data || {}, {
+          isZh: locale === 'zh',
+          t: app.globalData.t || this.data.t || {},
+        });
+
+        this.setData({
+          historyGroups: groups,
+          historyTotalDays: (data && data.total_days) || 0,
+          historyTruncated: !!(data && data.truncated),
+          historyFootText: buildHistoryFootText(data || {}, app.globalData.t || this.data.t || {}),
+        });
+      } catch (err) {
+        // 历史拉不到不影响主流程(用户照样能加动作), 只留痕
+        console.error('Failed to load exercise history', err);
+      }
     },
 
     async _loadHistoryMax(item) {
