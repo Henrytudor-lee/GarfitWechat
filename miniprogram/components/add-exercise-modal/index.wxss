@@ -1035,6 +1035,12 @@
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.08);
 }
+/* 按下反馈: chip 是可点的(点了会回填) → 给一个明确的激活态 */
+.history-set-chip-active {
+  background: var(--primary-bg-soft);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
 /* 封顶提示: "还有 3 组" / "共 30 天 · 仅显示最近 10 天"
    —— 封顶不能静默丢弃, 必须告诉用户真实总数 */
 .history-day-more,

@@ -65,6 +65,7 @@ module.exports = {
   "EXERCISE_HISTORY": "PAST SETS",
   "EXERCISE_HISTORY_MORE_SETS": "+{n} more sets",
   "EXERCISE_HISTORY_DAYS": "{n} days in total · showing the latest {m}",
+  "EXERCISE_HISTORY_APPLIED": "APPLIED",
   "FEMALE": "Female",
   "FITNESS_CALENDAR": "Fitness Calendar",
   "FITNESS_GOAL": "Fitness Goal",

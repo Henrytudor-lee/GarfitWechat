@@ -65,6 +65,7 @@ module.exports = {
   "EXERCISE_HISTORY": "历史配置",
   "EXERCISE_HISTORY_MORE_SETS": "还有 {n} 组",
   "EXERCISE_HISTORY_DAYS": "共 {n} 天 · 仅显示最近 {m} 天",
+  "EXERCISE_HISTORY_APPLIED": "已填入",
   "FEMALE": "女",
   "FITNESS_CALENDAR": "训练日历",
   "FITNESS_GOAL": "运动目的",

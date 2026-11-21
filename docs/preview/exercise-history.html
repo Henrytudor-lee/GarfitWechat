@@ -1071,6 +1071,12 @@
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.08);
 }
+/* 按下反馈: chip 是可点的(点了会回填) → 给一个明确的激活态 */
+.history-set-chip-active {
+  background: var(--primary-bg-soft);
+  border-color: var(--primary-text);
+  color: var(--primary-text);
+}
 /* 封顶提示: "还有 3 组" / "共 30 天 · 仅显示最近 10 天"
    —— 封顶不能静默丢弃, 必须告诉用户真实总数 */
 .history-day-more,
@@ -1111,6 +1117,7 @@
     <p>
       在「动作配置」界面的下方新增: <b>这个动作以前每次练了什么(按日期分组)</b>。<br>
       没练过这个动作 → <b>整个模块不渲染</b>, 不是显示一个空标题。<br>
+      <b>点某一组 → 直接填进上面的输入框</b>(重量/次数/时长/距离 + 单位)。<br>
       样式直接内联自 <code>miniprogram/components/add-exercise-modal/index.wxss</code>(真实文件)。<br>
       ⚠️ rpx 按 375px 宽折算 → 请用 375px 宽的窗口看, 1:1 还原真机。
     </p>
@@ -1126,55 +1133,55 @@
         <view class="history-day">
           <view class="history-day-date">2026年11月20日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">50kg × 5</text>
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">40kg × 10</text>
+            <view class="history-set-chip">50kg × 5</view>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">40kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年11月13日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年11月7日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 6</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 6</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年10月26日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">60kg × 12</text>
-            <text class="history-set-chip">70kg × 8</text>
-            <text class="history-set-chip">70kg × 8</text>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">60kg × 12</view>
+            <view class="history-set-chip">70kg × 8</view>
+            <view class="history-set-chip">70kg × 8</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年10月13日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">40kg × 10</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">40kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年9月20日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
           </view>
         </view>
       <view class="history-panel-foot">共 30 天 · 仅显示最近 10 天</view>
@@ -1193,55 +1200,55 @@
         <view class="history-day">
           <view class="history-day-date">2026年11月20日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">50kg × 5</text>
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">40kg × 10</text>
+            <view class="history-set-chip">50kg × 5</view>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">40kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年11月13日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年11月7日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 6</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 6</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年10月26日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">60kg × 12</text>
-            <text class="history-set-chip">70kg × 8</text>
-            <text class="history-set-chip">70kg × 8</text>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">60kg × 12</view>
+            <view class="history-set-chip">70kg × 8</view>
+            <view class="history-set-chip">70kg × 8</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年10月13日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">40kg × 10</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">40kg × 10</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年9月20日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">60kg × 8</text>
-            <text class="history-set-chip">60kg × 8</text>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">60kg × 8</view>
+            <view class="history-set-chip">60kg × 8</view>
           </view>
         </view>
       <view class="history-panel-foot">共 30 天 · 仅显示最近 10 天</view>
@@ -1260,16 +1267,16 @@
         <view class="history-day">
           <view class="history-day-date">2026年11月18日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">90秒 · 12kg</text>
-            <text class="history-set-chip">90秒 · 12kg</text>
-            <text class="history-set-chip">60秒 · 10kg</text>
+            <view class="history-set-chip">90秒 · 12kg</view>
+            <view class="history-set-chip">90秒 · 12kg</view>
+            <view class="history-set-chip">60秒 · 10kg</view>
           </view>
         </view>
         <view class="history-day">
           <view class="history-day-date">2026年11月11日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">5.2公里 · 90秒 · 12kg</text>
-            <text class="history-set-chip">5公里 · 1800秒</text>
+            <view class="history-set-chip">5.2公里 · 90秒 · 12kg</view>
+            <view class="history-set-chip">5公里 · 1800秒</view>
           </view>
         </view>
       </view>
@@ -1287,18 +1294,18 @@
         <view class="history-day">
           <view class="history-day-date">2026年11月8日</view>
           <view class="history-day-sets">
-            <text class="history-set-chip">40kg × 10</text>
-            <text class="history-set-chip">45kg × 10</text>
-            <text class="history-set-chip">50kg × 10</text>
-            <text class="history-set-chip">55kg × 10</text>
-            <text class="history-set-chip">60kg × 10</text>
-            <text class="history-set-chip">65kg × 10</text>
-            <text class="history-set-chip">70kg × 10</text>
-            <text class="history-set-chip">75kg × 10</text>
-            <text class="history-set-chip">80kg × 10</text>
-            <text class="history-set-chip">85kg × 10</text>
-            <text class="history-set-chip">90kg × 10</text>
-            <text class="history-set-chip">95kg × 10</text>
+            <view class="history-set-chip">40kg × 10</view>
+            <view class="history-set-chip">45kg × 10</view>
+            <view class="history-set-chip">50kg × 10</view>
+            <view class="history-set-chip">55kg × 10</view>
+            <view class="history-set-chip">60kg × 10</view>
+            <view class="history-set-chip">65kg × 10</view>
+            <view class="history-set-chip">70kg × 10</view>
+            <view class="history-set-chip">75kg × 10</view>
+            <view class="history-set-chip">80kg × 10</view>
+            <view class="history-set-chip">85kg × 10</view>
+            <view class="history-set-chip">90kg × 10</view>
+            <view class="history-set-chip">95kg × 10</view>
           </view>
           <view class="history-day-more">还有 23 组</view>
         </view>
@@ -1315,6 +1322,25 @@
         <view class="selected-exercise-card">
           <view class="selected-info">
             <view class="selected-name">杠铃深蹲</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </div>
+  <div class="case">
+    <h3>F · chip 按下时的样子(hover-class 激活态)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+        <view class="history-panel">
+          <view class="history-panel-title">历史配置</view>
+          <view class="history-day">
+            <view class="history-day-date">2026年11月20日</view>
+            <view class="history-day-sets">
+              <view class="history-set-chip history-set-chip-active">50kg × 5</view>
+              <view class="history-set-chip">40kg × 10</view>
+              <view class="history-set-chip">40kg × 10</view>
+            </view>
           </view>
         </view>
       </view>

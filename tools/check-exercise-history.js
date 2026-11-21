@@ -100,6 +100,48 @@ ck('封顶时给出真实总数', hist.buildHistoryFootText(payload, footT) === 
   hist.buildHistoryFootText(payload, footT));
 ck('没封顶 → 空(不显示这行)', hist.buildHistoryFootText({ truncated: false, total_days: 3 }, footT) === '');
 
+console.log('\n════ 4.5) 点击历史某组 → 回填当前配置 ════');
+const fmtN = (n) => String(parseFloat(Number(n).toFixed(3)));
+const setWeight = { weight: 50, weight_unit: 'kg', reps: 10, duration_sec: null, distance_km: null };
+const setLb = { weight: 110, weight_unit: 'lb', reps: 8, duration_sec: null, distance_km: null };
+const setDur = { weight: 12, weight_unit: 'kg', reps: 0, duration_sec: 90, distance_km: null };
+const setDist = { weight: 8, weight_unit: 'kg', reps: 0, duration_sec: 60, distance_km: 5.2 };
+
+let p = hist.buildApplyPatch(setWeight, { isDuration: false, isDistance: false, formatNumber: fmtN });
+ck('次数类 → 填重量', p.weight === 50 && p.weightStr === '50', JSON.stringify(p));
+ck('次数类 → 填次数', p.reps === 10 && p.repsStr === '10');
+ck('次数类 → 带单位(kg)', p.weight_unit === 'kg');
+
+p = hist.buildApplyPatch(setLb, { isDuration: false, isDistance: false, formatNumber: fmtN });
+ck('**单位跟着历史走**(lb 不能被当成 kg)',
+  p.weight === 110 && p.weight_unit === 'lb', `weight=${p.weight} unit=${p.weight_unit}`);
+ck('单位是 lb 时数值不做换算(110 保持 110)', p.weight === 110);
+
+p = hist.buildApplyPatch(setDur, { isDuration: true, isDistance: false, formatNumber: fmtN });
+ck('计时类 → 填时长', p.durationSec === 90, `durationSec=${p.durationSec}`);
+ck('计时类 → 填负重', p.weight === 12 && p.weightStr === '12');
+ck('计时类 → 不填次数(次数对计时动作无意义)', p.reps === undefined, JSON.stringify(p));
+
+p = hist.buildApplyPatch(setDist, { isDuration: false, isDistance: true, formatNumber: fmtN });
+ck('距离类 → 填距离', p.distanceKm === 5.2 && p.distanceStr === '5.2', JSON.stringify(p));
+ck('距离类 → 填负重', p.weight === 8);
+
+p = hist.buildApplyPatch({ weight: 0, weight_unit: 'kg', reps: 0, duration_sec: null, distance_km: null },
+  { isDuration: false, isDistance: false, formatNumber: fmtN });
+ck('空记录 → 不产生任何 patch(不动当前配置)', Object.keys(p).length === 0, JSON.stringify(p));
+
+p = hist.buildApplyPatch({ weight: 40, weight_unit: 'kg', reps: 10, duration_sec: null, distance_km: null },
+  { isDuration: true, isDistance: false, formatNumber: fmtN });
+ck('计时类遇到"老记录(只有次数)" → 只填负重, 不写 0 到时长',
+  p.durationSec === undefined && p.weight === 40, JSON.stringify(p));
+ck('**绝不写 0**(0 会被当成用户真的想填 0)',
+  !Object.values(p).includes(0), JSON.stringify(p));
+
+const grpSets = hist.buildHistoryGroups(payload, { isZh: true, t: T })[1].sets[0];
+ck('chip 带着原始数值(回填不能从展示文本反解)',
+  grpSets.weight === 40 && grpSets.weight_unit === 'kg' && grpSets.reps === 10,
+  JSON.stringify(grpSets));
+
 console.log('\n════ 5) WXML: 没历史就不渲染 ════');
 const panelMatch = wxml.match(/<view wx:if="\{\{historyGroups\.length > 0\}\}" class="history-panel">/);
 ck('历史面板有 wx:if="historyGroups.length > 0" 的守卫', !!panelMatch);
@@ -151,8 +193,19 @@ ck('重置处至少 4 处(初始/打开弹层/返回上一步/选中动作)',
 ck('拉不到历史不影响主流程(只 console.error, 不抛)', /catch \(err\)[\s\S]{0,200}console\.error/.test(wjs));
 ck('用了纯函数模块而不是自己拼', wjs.includes("require('../../utils/exercise-history.js')"));
 
+console.log('\n════ 7.5) 点击回填的接线 ════');
+ck('chip 是 catchtap 可点的', /class="history-set-chip"[\s\S]{0,300}catchtap="onHistorySetTap"/.test(wxml));
+ck('把原始 set 传给 handler', /catchtap="onHistorySetTap" data-set="\{\{s\}\}"/.test(wxml));
+ck('有按压反馈(hover-class)', wxml.includes('hover-class="history-set-chip-active"'));
+ck('handler 存在', /onHistorySetTap\(e\)/.test(wjs));
+ck('handler 调纯函数 buildApplyPatch', /buildApplyPatch\(/.test(wjs));
+ck('填完同步提交按钮状态', /buildApplyPatch[\s\S]{0,600}_syncCanSubmit\(\)/.test(wjs));
+ck('有 toast 反馈(历史面板在输入框下面, 点完可能看不见)', /onHistorySetTap[\s\S]{0,900}showToast/.test(wjs));
+ck('没填上任何字段时不 setData(不误报"已填入")',
+  /buildApplyPatch[\s\S]{0,300}Object\.keys\(patch\)\.length\) return;/.test(wjs));
+
 console.log('\n════ 8) i18n 词条 ════');
-['EXERCISE_HISTORY', 'EXERCISE_HISTORY_MORE_SETS', 'EXERCISE_HISTORY_DAYS'].forEach((k) => {
+['EXERCISE_HISTORY', 'EXERCISE_HISTORY_MORE_SETS', 'EXERCISE_HISTORY_DAYS', 'EXERCISE_HISTORY_APPLIED'].forEach((k) => {
   ck(`zh 有 ${k}`, typeof zh[k] === 'string' && zh[k].length > 0, zh[k]);
   ck(`en 有 ${k}`, typeof en[k] === 'string' && en[k].length > 0, en[k]);
 });

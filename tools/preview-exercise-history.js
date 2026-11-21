@@ -46,7 +46,7 @@ function panel(days, opts) {
   const chips = days.map((d) => `        <view class="history-day">
           <view class="history-day-date">${d.date}</view>
           <view class="history-day-sets">
-${d.sets.map((s) => `            <text class="history-set-chip">${s}</text>`).join('\n')}
+${d.sets.map((s) => `            <view class="history-set-chip">${s}</view>`).join('\n')}
           </view>${d.moreText ? `
           <view class="history-day-more">${d.moreText}</view>` : ''}
         </view>`).join('\n');
@@ -129,6 +129,7 @@ ${rpx2px(css)}
     <p>
       在「动作配置」界面的下方新增: <b>这个动作以前每次练了什么(按日期分组)</b>。<br>
       没练过这个动作 → <b>整个模块不渲染</b>, 不是显示一个空标题。<br>
+      <b>点某一组 → 直接填进上面的输入框</b>(重量/次数/时长/距离 + 单位)。<br>
       样式直接内联自 <code>miniprogram/components/add-exercise-modal/index.wxss</code>(真实文件)。<br>
       ⚠️ rpx 按 375px 宽折算 → 请用 375px 宽的窗口看, 1:1 还原真机。
     </p>
@@ -182,6 +183,25 @@ ${panel(OVERFLOW, {})}
         <view class="selected-exercise-card">
           <view class="selected-info">
             <view class="selected-name">杠铃深蹲</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </div>
+  <div class="case">
+    <h3>F · chip 按下时的样子(hover-class 激活态)</h3>
+    <view class="modal-mask theme-night">
+      <view class="modal-sheet">
+        <view class="fake-header"><view class="fake-title">动作配置</view><view class="fake-btn">✕</view></view>
+        <view class="history-panel">
+          <view class="history-panel-title">历史配置</view>
+          <view class="history-day">
+            <view class="history-day-date">2026年11月20日</view>
+            <view class="history-day-sets">
+              <view class="history-set-chip history-set-chip-active">50kg × 5</view>
+              <view class="history-set-chip">40kg × 10</view>
+              <view class="history-set-chip">40kg × 10</view>
+            </view>
           </view>
         </view>
       </view>

@@ -3,7 +3,7 @@ const app = getApp();
 const api = require('../../utils/api.js');
 const { BODY_PART_MAP, BODY_PART_MAP_ZH, MUSCLE_ICON_MAP, EQUIP_MAP, EQUIP_MAP_ZH, EQUIP_ICON_MAP } = require('../../utils/maps.js');
 const { syncDecimalValue, formatNumberForInput } = require('../../utils/numberInput.js');
-const { buildHistoryGroups, buildHistoryFootText } = require('../../utils/exercise-history.js');
+const { buildHistoryGroups, buildHistoryFootText, buildApplyPatch } = require('../../utils/exercise-history.js');
 
 /**
  * 取 i18n 字典, 并补齐可能缺失的 key。
@@ -666,6 +666,38 @@ Component({
         });
       }
       this._syncCanSubmit();
+    },
+
+    /**
+     * 点击历史配置里的某一组 → 快速填入当前配置
+     *
+     * 真正的回填规则在 utils/exercise-history.js 的 buildApplyPatch 里
+     * (纯函数, 可被 node 脚本直接测)。这里只负责取数据 + setData + 反馈。
+     *
+     * ⚠️ 为什么要 toast:
+     *   历史面板在配置区**下面**, 点完时输入框很可能已经被滚出屏幕 →
+     *   不给反馈用户会以为没点上。
+     */
+    onHistorySetTap(e) {
+      const s = e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.set;
+      if (!s) return;
+
+      const { isDuration, isDistance } = this.data;
+      const patch = buildApplyPatch(s, {
+        isDuration,
+        isDistance,
+        formatNumber: formatNumberForInput,
+      });
+
+      // 一条都没填上 → 不动当前配置, 也不弹"已填入"(免得误导)
+      if (!Object.keys(patch).length) return;
+
+      this.setData(patch);
+      this._syncCanSubmit();
+
+      const t = app.globalData.t || {};
+      const label = t.EXERCISE_HISTORY_APPLIED || '已填入';
+      wx.showToast({ title: `${label} ${s.text || ''}`.trim(), icon: 'none' });
     },
 
     /**

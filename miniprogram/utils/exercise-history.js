@@ -105,7 +105,17 @@ function buildHistoryGroups(payload, opts) {
     out.push({
       date: d.date,
       dateText: formatHistoryDate(d.date, isZh),
-      sets: sets.map((s, i) => ({ idx: i, text: formatSetText(s, { t }) })),
+      sets: sets.map((s, i) => ({
+        idx: i,
+        text: formatSetText(s, { t }),
+        // 原始值一起带出去 —— chip 要能点击回填, 回填时需要拿到真实数值,
+        // 不能从展示文本里反解(单位/时长/距离三种形态都不一样)
+        weight: Number(s.weight) || 0,
+        weight_unit: s.weight_unit || 'kg',
+        reps: Number(s.reps) || 0,
+        duration_sec: s.duration_sec == null ? null : Number(s.duration_sec),
+        distance_km: s.distance_km == null ? null : Number(s.distance_km),
+      })),
       totalSets: total,
       // 该天实际组数 > 返回组数 → 还有没显示出来的(不静默丢)
       moreSets,
@@ -128,10 +138,66 @@ function buildHistoryFootText(payload, t) {
   });
 }
 
+/**
+ * 点击历史里的某一组 → 算出要写进当前配置的字段
+ *
+ * 返回 setData 的部分对象; 空对象 = 这条记录在当前计量方式下没有可填的内容。
+ *
+ * ⚠️ 单位必须一起带上:
+ *   setUnit() 只改单位字符串、**不做数值换算** —— 输入框里的数字永远按当前
+ *   选中的单位解释。只填数字 50 而当前单位是 lb → 变成「50 lb」= 静默填错。
+ *
+ * ⚠️ 填不上的字段**不动**, 绝不写 0:
+ *   0 会被当成"用户真的想填 0"(提交时又会被当成有效值)。
+ *
+ * @param {object} set      历史里的一条(带 weight/weight_unit/reps/duration_sec/distance_km)
+ * @param {object} opts     { isDuration, isDistance, formatNumber }
+ */
+function buildApplyPatch(set, opts) {
+  const s = set || {};
+  const isDuration = !!opts.isDuration;
+  const isDistance = !!opts.isDistance;
+  const fmt = opts.formatNumber || ((n) => String(n));
+  const patch = {};
+
+  const weight = Number(s.weight) || 0;
+  const reps = Number(s.reps) || 0;
+  const duration = Number(s.duration_sec) || 0;
+  const distance = Number(s.distance_km) || 0;
+
+  const applyWeight = () => {
+    if (weight > 0) {
+      patch.weight = weight;
+      patch.weightStr = fmt(weight);
+      patch.weight_unit = s.weight_unit || 'kg';
+    }
+  };
+
+  if (isDuration) {
+    if (duration > 0) patch.durationSec = duration;
+    applyWeight();
+  } else if (isDistance) {
+    if (distance > 0) {
+      patch.distanceKm = distance;
+      patch.distanceStr = fmt(distance);
+    }
+    applyWeight();
+  } else {
+    applyWeight();
+    if (reps > 0) {
+      patch.reps = reps;
+      patch.repsStr = String(reps);
+    }
+  }
+
+  return patch;
+}
+
 module.exports = {
   formatHistoryDate,
   formatSetText,
   fillTemplate,
   buildHistoryGroups,
   buildHistoryFootText,
+  buildApplyPatch,
 };
