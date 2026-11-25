@@ -6,9 +6,6 @@
 //  只有 token 这一条路能读。)
 const app = getApp();
 const api = require('../../utils/api.js');
-// 动作元信息的口径统一收口到 utils/exerciseMeta.js
-// (动作库页 / 训练分享页 / 动作分享页三处共用, 别再各写一份)
-const { modeLabel } = require('../../utils/exerciseMeta.js');
 const { normalizeAvatar } = require('../../utils/avatar.js');
 // 海报绘制(canvas 2d 手绘) —— 为什么不用"截图": 小程序截不了 WXML
 const poster = require('../../utils/poster.js');
@@ -143,16 +140,12 @@ Page({
     try {
       const res = await api.callCloud('share.view', { token });
       const body = res.result || {};
-      const t = this.data.t || {};
       const isZh = (this.data.locale || 'zh') === 'zh';
 
-      const groups = (body.groups || []).map((g) => ({
-        ...g,
-        // ⚠️ totalVolume / totalCalories 由**后端**算好(用的是分享者 A 的体重)。
-        //    前端要是自己用 app.globalData.userWeight 算, 算的是**浏览者 B**的体重,
-        //    每组卡路里会跟总卡路里对不上。所以这里直接用后端给的, 不重算。
-        modeLabel: modeLabel(g.exercise_type, t),
-      }));
+      // ⚠️ totalVolume / totalCalories 由**后端**算好(用的是分享者 A 的体重)。
+      //    前端要是自己用 app.globalData.userWeight 算, 算的是**浏览者 B**的体重,
+      //    每组卡路里会跟总卡路里对不上。所以这里直接用后端给的, 不重算。
+      const groups = body.groups || [];
 
       this.setData({
         loading: false,
@@ -409,7 +402,6 @@ Page({
     const groups = (d.groups || []).map((g) => ({
       key: String(g.exercise_id),
       name: isZh ? (g.name_zh || g.name_en) : (g.name_en || g.name_zh),
-      sub: g.sets.length + ' ' + (g.sets.length === 1 ? (t.SET || '组') : (t.SETS || '组')) + ' · ' + g.modeLabel,
       calories: g.totalCalories + ' ' + (t.CAL_UNIT_SHORT || '大卡'),
       sets: (g.sets || []).map((s, i) => ({ num: i + 1, text: poster.setText(s, t) })),
     }));

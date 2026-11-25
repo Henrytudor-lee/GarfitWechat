@@ -44,52 +44,67 @@
   font-weight: 800;
 }
 
-/* ── 分享者 ── */
+/* ── 分享者 + 训练摘要(同一行, 跟海报一致) ── */
 .share-head {
-  margin-bottom: 28rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .owner {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 .owner-avatar {
-  width: 76rpx;
-  height: 76rpx;
+  width: 68rpx;
+  height: 68rpx;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  margin-right: 20rpx;
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 .owner-avatar-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 32rpx;
+}
+.owner-info {
+  min-width: 0;
 }
 .owner-name {
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 800;
   color: #f2f2f2;
-  margin-bottom: 6rpx;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .theme-day .owner-name { color: #1a1a1a; }
 .owner-label {
-  font-size: 22rpx;
+  font-size: 20rpx;
   color: #8a8a8a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ── 训练摘要 ── */
+/* 摘要三块: 缩成小方块, 贴在头像那一行的右边 */
 .summary {
   display: flex;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+  gap: 8rpx;
+  margin-left: 12rpx;
+  flex-shrink: 0;
 }
 .summary-card {
-  flex: 1;
+  width: 112rpx;
   background: rgba(255, 255, 255, 0.05);
   border: 1rpx solid rgba(255, 255, 255, 0.07);
-  border-radius: 20rpx;
-  padding: 26rpx 16rpx;
+  border-radius: 14rpx;
+  padding: 10rpx 4rpx;
   text-align: center;
   box-sizing: border-box;
 }
@@ -98,16 +113,21 @@
   border-color: rgba(0, 0, 0, 0.06);
 }
 .summary-val {
-  font-size: 40rpx;
+  font-size: 24rpx;
   font-weight: 900;
   color: #ccf200;
-  line-height: 1.1;
-  margin-bottom: 10rpx;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .summary-label {
-  font-size: 20rpx;
+  font-size: 18rpx;
   color: #8a8a8a;
-  letter-spacing: 0.08em;
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .date-line {
@@ -118,29 +138,37 @@
 }
 
 /* ── 动作分组 ── */
+/* 动作卡: 图 + 动作名(下面挂大卡 tag) │ 竖虚线 │ 每组明细网格
+   —— 跟分享海报同一套版式(海报那边是 canvas 手绘, 这里是 WXML) */
 .group {
   background: rgba(255, 255, 255, 0.05);
   border: 1rpx solid rgba(255, 255, 255, 0.07);
   border-radius: 22rpx;
-  padding: 22rpx;
+  padding: 18rpx;
   margin-bottom: 18rpx;
 }
 .theme-day .group {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.06);
 }
-
+.group-body {
+  display: flex;
+  align-items: stretch;
+}
+/* 宽度 = 图 64 + 间距 12 + 名字列 124 —— 名字列再宽就把右侧明细挤成两列了 */
 .group-head {
   display: flex;
   align-items: center;
+  width: 200rpx;
+  flex-shrink: 0;
 }
 .group-img-wrap {
-  width: 92rpx;
-  height: 92rpx;
-  border-radius: 16rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 14rpx;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
-  margin-right: 20rpx;
+  margin-right: 12rpx;
   flex-shrink: 0;
 }
 .group-img {
@@ -151,54 +179,62 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
+  font-size: 32rpx;
 }
+/* 名字 + 大卡 tag 上下排 —— tag 跟在名字后面会把名字挤成两三个字 */
 .group-info {
-  flex: 1;
+  width: 124rpx;
+  flex-shrink: 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4rpx;
 }
 .group-name {
-  font-size: 28rpx;
+  font-size: 24rpx;
   font-weight: 800;
   color: #f2f2f2;
-  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  line-height: 1.2;
+}
+.theme-day .group-name { color: #1a1a1a; }
+/* 大卡 tag —— 在动作名下面独占一行 */
+.group-tag {
+  align-self: flex-start;
+  max-width: 100%;
+  font-size: 16rpx;
+  font-weight: 800;
+  color: #ccf200;
+  background: rgba(204, 242, 0, 0.14);
+  border-radius: 999rpx;
+  padding: 2rpx 10rpx;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.theme-day .group-name { color: #1a1a1a; }
-.group-sub {
-  font-size: 22rpx;
-  color: #8a8a8a;
+.theme-day .group-tag {
+  background: rgba(204, 242, 0, 0.2);
 }
-.group-dot {
-  margin: 0 8rpx;
+/* 竖虚线: 把「动作身份」和「训练数据」分开 */
+.group-divider {
+  width: 2rpx;
+  align-self: stretch;
+  margin: 0 10rpx;
+  border-left: 2rpx dashed #333;
 }
-.group-right {
-  text-align: right;
-  flex-shrink: 0;
-}
-.group-cal {
-  font-size: 26rpx;
-  font-weight: 800;
-  color: #ccf200;
-}
-.group-detail-hint {
-  font-size: 19rpx;
-  color: #6a6a6a;
-  margin-top: 6rpx;
-}
-
-/* ── sets ── */
-/* 组列表: 一行两条, 每条**撑满半宽**
-   ⚠️ 原来用 flex + 内容宽度(wrap), 卡片右边空一大块(2026-11-19 用户截图)。
-      改成 grid 两列等分 —— 跟 workout-summary-modal / session-detail-modal
-      的 .sets-grid / .ec-sets-grid 一个口径, 全 app 的组列表排版统一。 */
-.sets-grid {
+/* 明细网格: 一行三条(能塞几条塞几条, 跟海报同口径) */
+.group-sets {
+  flex: 1;
+  min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 12rpx;
-  margin-top: 20rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8rpx;
+  align-content: start;
 }
 .set-item {
   display: flex;
@@ -206,47 +242,43 @@
   /* 超长文案(距离+时长+负重)放不下时整段换行, 不横向溢出到隔壁格子 */
   flex-wrap: wrap;
   align-content: center;
-  gap: 8rpx;
-  padding: 10rpx 16rpx;
+  gap: 2rpx;
+  padding: 5rpx;
   border-radius: 12rpx;
   background: rgba(255, 255, 255, 0.05);
-  font-size: 24rpx;
+  font-size: 18rpx;
   color: #d8d8d8;
   min-width: 0;
 }
-/* 奇数条 → 最后一条独占整行, 不留半格空白 */
-.set-item.wide {
-  grid-column: span 2;
+/* 英文的 "60kg×12reps" 比中文的 "60kg×12次" 长一截, 缩一号才塞得进一列 */
+.locale-en .set-item {
+  font-size: 16rpx;
 }
 .theme-day .set-item {
   background: rgba(0, 0, 0, 0.04);
   color: #333;
 }
 .set-num {
-  width: 30rpx;
-  height: 30rpx;
+  width: 20rpx;
+  height: 20rpx;
   border-radius: 50%;
   background: #ccf200;
   color: #000;
-  font-size: 17rpx;
+  font-size: 12rpx;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.set-val { font-weight: 700; }
-.set-val.reps { color: #fff; }
-.theme-day .set-val.reps { color: #1a1a1a; }
-.set-unit {
-  font-size: 19rpx;
-  color: #8a8a8a;
-  font-weight: 600;
+.set-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+  word-break: break-all;
 }
-.set-sep {
-  color: #555;
-  margin: 0 2rpx;
-}
+.set-strong { font-weight: 700; color: #fff; }
+.theme-day .set-strong { color: #1a1a1a; }
 
 /* ── 底部按钮 ── */
 .foot {

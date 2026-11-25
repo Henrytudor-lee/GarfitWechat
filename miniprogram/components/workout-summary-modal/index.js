@@ -4,7 +4,6 @@ const api = require('../../utils/api.js');
 const { setVolume } = require('../../utils/unit.js');
 const { calcSetsCalories } = require('../../utils/calories.js');
 // 计量方式口径(次数/计时/距离)统一走 exerciseMeta —— 跟动作库、分享页保持一致
-const { modeLabel } = require('../../utils/exerciseMeta.js');
 // 海报绘制(canvas 2d 手绘) —— 为什么不用"截图": 小程序截不了 WXML
 const poster = require('../../utils/poster.js');
 // 相册是隐私接口 —— 后台没声明隐私类型会直接 errno 112, 调用前先过授权
@@ -323,10 +322,9 @@ Component({
       const groups = (d.exerciseList || []).map((g) => ({
         key: String(g.id),
         name: isZh ? (g.name_zh || g.name) : (g.name || g.name_zh),
-        sub: (g.sets.length || 0) + ' ' + (g.sets.length === 1 ? (t.SET || '组') : (t.SETS || '组'))
-          + ' · ' + modeLabel(g.countMode || g.exercise_type, t),
         calories: (g.totalCalories || 0) + ' ' + (t.CAL_UNIT_SHORT || '大卡'),
-        sets: (g.sets || []).map((s, i) => ({ num: i + 1, text: poster.setText(this._setToPoster(s), t) })),
+        // setText 内部自己认两套字段名(duration_sec / durationSec), 不用再转一道
+        sets: (g.sets || []).map((s, i) => ({ num: i + 1, text: poster.setText(s, t) })),
       }));
       return {
         ownerName: sharer.nickname || (isZh ? 'GFIT 用户' : 'GFIT User'),
@@ -339,23 +337,6 @@ Component({
         moreTemplate: isZh ? '等 {n} 个动作' : '+{n} more exercises',
         footerHint: isZh ? '扫码查看完整训练' : 'Scan to view the full workout',
         t,
-      };
-    },
-
-    /**
-     * set 的字段名有两套, 这里统一转成 poster.setText 要的驼峰
-     *
-     * ⚠️ 页面/会话详情用下划线(duration_sec / distance_km / weight_unit),
-     *    poster.setText 用驼峰(durationSec / distanceKm / weightUnit) —— 混用会画成 0。
-     */
-    _setToPoster(s) {
-      const src = s || {};
-      return {
-        weight: src.weight,
-        weightUnit: src.weight_unit || src.weightUnit || 'kg',
-        reps: src.reps,
-        durationSec: src.duration_sec != null ? src.duration_sec : (src.durationSec || 0),
-        distanceKm: src.distance_km != null ? src.distance_km : (src.distanceKm || 0),
       };
     },
 

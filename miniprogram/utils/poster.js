@@ -12,6 +12,23 @@
 //   所以按内容高度自适应降渲染倍率(3 → 2 → 1.5 → 1), 还超高就截断动作 + 标「等 N 个动作」。
 //
 // 版式跟分享页视觉对齐(深色底 + 荧光绿主色), 宽度按 750rpx 折算成 375 CSS px。
+//
+// 动作卡的版式(参考设计稿):
+//   ┌────┐ 杠铃卧推         ┆ (999kg×99次) (999kg×99次) (999kg×99次)
+//   │缩略图│ (120大卡)       ┆ (999kg×99次)
+//   └────┘                  ┆
+//  图 │ 动作名 + 大卡tag │ 竖虚线 │ 每组明细网格
+//
+// 为什么要这么排: 明细网格从"卡在图下面"挪到"独占右侧一列",
+// 卡高就由最高的块决定而不是各块叠起来 —— 同样高度能塞下更多动作卡。
+//
+// 组数/次数/大卡那三行统计已经删掉:
+//   组数从明细条的数量就看出来了, 大卡换成了动作名下面的 tag,
+//   再单列一列纯属浪费横向空间(挤得动作名只能显示两三个字)。
+//
+// 大卡 tag 放在动作名**下面**而不是名字后面:
+//   跟在名字后面时名字+tag 抢同一行, 名字只剩两三个字;
+//   独立成行后名字能占满整个名字列, 右侧明细也能多挤出一列。
 
 const DESIGN_W = 375;        // 750rpx → CSS px
 const MAX_EDGE_PX = 4096;    // 画布单边上限(设备像素, iOS 硬限制)
@@ -35,6 +52,7 @@ const C = {
   card: '#1f1f1f',
   cardBorder: '#262626',
   chip: '#252525',
+  tagBg: '#2e2e2e',
   text: '#f2f2f2',
   textSub: '#8a8a8a',
   textDim: '#6a6a6a',
@@ -45,17 +63,32 @@ const C = {
 };
 
 /** 版式常量 */
-const PAD = 16;            // 页面左右留白
-const CARD_PAD = 10;       // 动作卡内边距
-const THUMB = 44;          // 动作缩略图边长
-const CHIP_H = 20;         // 每组明细条高度
-const CHIP_GAP = 6;        // 组明细之间的间距
-const GROUP_GAP = 10;      // 动作卡之间的间距
-const QR_IMG = 76;         // 小程序码边长
+const PAD = 14;            // 页面左右留白
+const CARD_PAD = 8;        // 动作卡内边距
+const THUMB = 34;          // 动作缩略图边长
+const IMG_GAP = 8;         // 缩略图与动作名之间的间距
+const NAME_FS = 12;        // 动作名字号
+const NAME_COL_MIN = 62;   // 名字列最小宽度(tag 在名字下面, 这列至少要放得下 tag)
+const TAG_FS = 9;          // 大卡 tag 字号
+const TAG_H = 15;          // 大卡 tag 胶囊高度
+const TAG_PAD = 3;         // 大卡 tag 左右内边距
+const TAG_W_MAX = 46;      // 大卡 tag 最大宽度(超了截文案)
+const DIV_GAP = 6;         // 竖虚线分隔线左右留白
+const CHIP_FS = 9;         // 每组明细文字字号
+const CHIP_H = 18;         // 每组明细条高度
+const CHIP_GAP = 4;        // 组明细之间的间距
+const CHIP_COLS_MAX = 3;   // 每行最多几条明细(能塞几条塞几条)
+const CHIP_NUM_W = 20;     // 明细条里序号圆点占位(圆点+间距+右侧留白)
+const CHIP_TEXT_MAX = 66;  // 明细文字最大宽度(超了截, 把横向空间让给动作名)
+const GROUP_GAP = 6;       // 动作卡之间的间距
+const STAT_W = 62;         // 顶部摘要小块宽度
+const STAT_GAP = 5;        // 顶部摘要小块间距
+const STAT_H = 34;         // 顶部摘要小块高度(跟头像齐平)
+const QR_IMG = 68;         // 小程序码边长
 const QR_PAD = 6;          // 小程序码白边
 const QR_BOX = QR_IMG + QR_PAD * 2;
 /** 页脚固定高度(分隔线 + 码 + 底部留白) —— 截断动作卡时要用它留出预算 */
-const FOOTER_H = 4 + 1 + 14 + QR_BOX + 20;
+const FOOTER_H = 3 + 1 + 12 + QR_BOX + 18;
 
 /** 圆角矩形路径 —— ctx.roundRect 老基础库没有, 自己用 arcTo 拼 */
 function roundRectPath(ctx, x, y, w, h, r) {
@@ -85,6 +118,41 @@ function fitText(ctx, text, maxWidth) {
 }
 
 /**
+ * set 字段归一化 —— 页面/接口用下划线(duration_sec), poster 用驼峰(durationSec),
+ * 两套字段名都认, 免得每个调用方各写一份转换。
+ */
+function normalizeSet(s) {
+  const src = s || {};
+  const sec = src.durationSec != null ? src.durationSec : src.duration_sec;
+  const km = src.distanceKm != null ? src.distanceKm : src.distance_km;
+  return {
+    weight: Number(src.weight) || 0,
+    weightUnit: src.weightUnit || src.weight_unit || 'kg',
+    reps: Number(src.reps) || 0,
+    durationSec: Number(sec) || 0,
+    distanceKm: Number(km) || 0,
+  };
+}
+
+/**
+ * 估算一段文字的宽度
+ *
+ * 排版阶段手里没有 ctx(画布还没建), 没法 measureText, 只能按字宽粗估。
+ * 拉丁字宽取 0.58 —— 比真实字体略宽一点, 正好当安全垫(宁可列宽多一点,
+ * 也不能让文字被截); 真画的时候 paint() 里的 fitText 还会用真实 measureText 收口。
+ */
+function estimateWidth(text, fontSize) {
+  let w = 0;
+  for (const ch of String(text == null ? '' : text)) {
+    const code = ch.codePointAt(0);
+    if (code === 32) w += fontSize * 0.3;          // 空格
+    else if (code > 0x2e7f) w += fontSize;        // 中日韩 / 全角标点
+    else w += fontSize * 0.58;                    // 拉丁字母 / 数字
+  }
+  return w;
+}
+
+/**
  * 一组明细的文案
  *
  * 口径跟页面 .set-item 完全一致:
@@ -94,22 +162,40 @@ function fitText(ctx, text, maxWidth) {
  */
 function setText(s, t) {
   const dict = t || {};
-  const unit = s.weightUnit || 'kg';
-  const km = Number(s.distanceKm) || 0;
-  const sec = Number(s.durationSec) || 0;
-  const kg = Number(s.weight) || 0;
+  const n = normalizeSet(s);
+  const unit = n.weightUnit;
+  const km = n.distanceKm;
+  const sec = n.durationSec;
+  const kg = n.weight;
+  // ⚠️ 海报上的明细条只有 ~90px 宽, 单位必须用短的(REPS_UNIT "次" 而不是 REPS "次数"),
+  //    分隔符也不能带空格, 否则 "120kg × 12reps" 要被截成 "120kg × 12rep…"。
   if (km > 0) {
-    let out = km + ' ' + (dict.KM || 'km');
-    if (sec > 0) out += ' · ' + sec + ' ' + (dict.DURATION_UNIT || 's');
-    if (kg > 0) out += ' · ' + kg + ' ' + unit;
+    let out = km + (dict.KM || 'km');
+    // 距离 + 时长 + 负重 三者全放不下, 时长和负重二选一
+    if (sec > 0) out += '·' + sec + (dict.DURATION_UNIT || 's');
+    else if (kg > 0) out += '·' + kg + unit;
     return out;
   }
   if (sec > 0) {
-    let out = sec + ' ' + (dict.DURATION_UNIT || 's');
-    if (kg > 0) out += ' · ' + kg + ' ' + unit;
+    let out = sec + (dict.DURATION_UNIT || 's');
+    if (kg > 0) out += '·' + kg + unit;
     return out;
   }
-  return kg + ' ' + unit + ' × ' + (Number(s.reps) || 0) + ' ' + (dict.REPS || 'reps');
+  // ⚠️ "×" 两侧不留空格 —— 明细条只有 ~70px 宽, 带空格就得缩字号,
+  //    不带空格 "60kg×12次" 才塞得下, 英文 "120kg×12reps" 也够位置
+  return kg + unit + '×' + n.reps + (dict.REPS_UNIT || 'reps');
+}
+
+/**
+ * 动作名后面那个「大卡 tag」的文案
+ *
+ * 没有卡路里(0 / 缺失)就不画 tag —— 空标签不如没有。
+ */
+function tagTextOf(g, t) {
+  const raw = String((g && g.calories) || '').trim();
+  const m = /([\d.]+)/.exec(raw);
+  if (!m || !(Number(m[1]) > 0)) return '';
+  return raw;
 }
 
 /**
@@ -128,77 +214,115 @@ function buildLayout(model, maxHeight) {
     push({ k: 'text', x, y: yy, text: str, font, color, align: align || 'left', maxWidth: maxWidth || 0 });
   };
 
-  // ── 分享者 ──
-  const AVATAR = 38;
-  const headTop = 16;
+  // ── 分享者 + 摘要三卡(时长 / 动作 / 卡路里) ──
+  // 三个摘要块挤在头像这一行的右边 —— 海报是长图, 头部每占一行就少一个动作卡
+  const AVATAR = 34;
+  const headTop = 14;
   push({
     k: 'img', x: PAD, y: headTop, w: AVATAR, h: AVATAR, r: AVATAR / 2, src: 'avatar',
     fallbackBg: '#2a2a2a', fallbackFg: C.accent,
     fallbackText: String(model.ownerName || 'G').charAt(0).toUpperCase(),
   });
-  text(PAD + AVATAR + 12, headTop + 15, model.ownerName, 'bold 15px sans-serif', C.text, 'left', 210);
-  text(PAD + AVATAR + 12, headTop + 32, model.ownerLabel, '10px sans-serif', C.textSub, 'left', 210);
-  y = headTop + AVATAR + 16;
-
-  // ── 摘要三卡(时长 / 动作 / 卡路里) ──
-  const cardsTop = y;
-  const cardH = 54;
-  const gap = 8;
-  const cardW = (DESIGN_W - PAD * 2 - gap * 2) / 3;
+  const statTotalW = STAT_W * 3 + STAT_GAP * 2;
+  const statX0 = DESIGN_W - PAD - statTotalW;
+  const ownerX = PAD + AVATAR + 10;
+  const ownerMaxW = statX0 - 10 - ownerX;
+  text(ownerX, headTop + 14, model.ownerName, 'bold 15px sans-serif', C.text, 'left', ownerMaxW);
+  text(ownerX, headTop + 30, model.ownerLabel, '10px sans-serif', C.textSub, 'left', ownerMaxW);
   const cards = [
     { v: model.durationText, l: t.DURATION || '时长' },
     { v: model.exerciseCount, l: t.EXERCISES || '动作' },
     { v: model.calories, l: t.CAL_UNIT || '卡路里' },
   ];
   cards.forEach((it, i) => {
-    const x = PAD + i * (cardW + gap);
-    push({ k: 'rect', x, y: cardsTop, w: cardW, h: cardH, r: 10, fill: C.card, stroke: C.cardBorder, lw: 1 });
-    text(x + cardW / 2, cardsTop + 26, it.v, 'bold 19px sans-serif', C.accent, 'center');
-    text(x + cardW / 2, cardsTop + 43, it.l, '10px sans-serif', C.textSub, 'center');
+    const x = statX0 + i * (STAT_W + STAT_GAP);
+    push({ k: 'rect', x, y: headTop, w: STAT_W, h: STAT_H, r: 9, fill: C.card, stroke: C.cardBorder, lw: 1 });
+    text(x + STAT_W / 2, headTop + 15, String(it.v), 'bold 12px sans-serif', C.accent, 'center', STAT_W - 6);
+    text(x + STAT_W / 2, headTop + 27, it.l, '9px sans-serif', C.textSub, 'center', STAT_W - 4);
   });
-  y = cardsTop + cardH + 12;
+  y = headTop + STAT_H + 8;
 
   // ── 日期 ──
-  text(PAD, y + 10, model.dateText, '10px monospace', C.textDim, 'left');
-  y += 26;
+  text(PAD, y + 9, model.dateText, '10px monospace', C.textDim, 'left');
+  y += 20;
 
   // ── 动作卡 ──
   // 预算: 高度上限减去固定的头/摘要/页脚, 超了就把后面的动作截掉
   const groupsTop = y;
   const groupBudget = Math.max(0, (maxHeight || 0) - groupsTop - FOOTER_H);
   const innerW = DESIGN_W - PAD * 2 - CARD_PAD * 2;
-  const chipW = (innerW - CHIP_GAP) / 2;
+
+  // 明细条宽度: 全海报统一按"最长的一条明细"算 ——
+  // 每张卡各算各的, 列边缘会参差不齐, 看着很乱
+  let chipTextMax = 0;
+  for (const g of model.groups || []) {
+    for (const s of g.sets || []) {
+      // estimateWidth 的拉丁字宽按 0.58 算, 比真实字体略宽一点,
+      // 正好当安全垫 —— 不再额外加余量(加了就把列宽撑宽, 少显示一列)
+      chipTextMax = Math.max(chipTextMax, estimateWidth(s.text, CHIP_FS));
+    }
+  }
+  const minChipW = Math.min(Math.ceil(chipTextMax), CHIP_TEXT_MAX) + CHIP_NUM_W;
+  // 名字列 + 明细网格 = 卡内宽 - 缩略图 - 竖虚线(含左右留白)
+  const availW = innerW - (THUMB + IMG_GAP) - DIV_GAP * 2;
+  // 列数: 在"名字列至少留 NAME_COL_MIN"的前提下, 一行能塞几条塞几条
+  //   中文 "60kg×12次" → 三列放得下; 英文 "60kg×12reps" → 放不下, 自动退两列
+  let cols = 1;
+  for (let c = CHIP_COLS_MAX; c >= 1; c--) {
+    if (c * minChipW + (c - 1) * CHIP_GAP <= availW - NAME_COL_MIN) { cols = c; break; }
+  }
+  const gridW = cols * minChipW + (cols - 1) * CHIP_GAP;
+  // 名字列 = 剩下的空间(明细网格贴着卡片右边, 富余的全给名字)
+  const nameCol = availW - gridW;
+  const chipW = minChipW;
+  const imgX = PAD + CARD_PAD;
+  const nameX = imgX + THUMB + IMG_GAP;
+  const dividerX = nameX + nameCol + DIV_GAP;
+  const gridX = dividerX + DIV_GAP;
   let shown = 0;
 
   for (const g of model.groups || []) {
     const sets = g.sets || [];
-    const rows = Math.ceil(sets.length / 2);
-    const setsH = rows ? rows * CHIP_H + (rows - 1) * CHIP_GAP : 0;
-    const cardH = CARD_PAD + THUMB + 8 + setsH + CARD_PAD;
+    const rows = Math.ceil(sets.length / cols);
+    const gridH = rows ? rows * CHIP_H + (rows - 1) * CHIP_GAP : 0;
+
+    // 卡高 = 缩略图 / 明细网格 里最高的那个 + 上下内边距
+    const cardH = Math.max(THUMB, gridH) + CARD_PAD * 2;
     // 装不下了就停 —— 剩下的用「等 N 个动作」带过
     if (groupBudget && y - groupsTop + cardH > groupBudget && shown > 0) break;
 
     const top = y;
-    push({ k: 'rect', x: PAD, y: top, w: DESIGN_W - PAD * 2, h: cardH, r: 11, fill: C.card, stroke: C.cardBorder, lw: 1 });
-    push({ k: 'img', x: PAD + CARD_PAD, y: top + CARD_PAD, w: THUMB, h: THUMB, r: 8, src: 'thumb:' + g.key });
-    const nameX = PAD + CARD_PAD + THUMB + 10;
-    const calRight = DESIGN_W - PAD - CARD_PAD;
-    const nameMax = calRight - 16 - nameX;
-    text(nameX, top + CARD_PAD + 15, g.name, 'bold 14px sans-serif', C.text, 'left', nameMax);
-    text(nameX, top + CARD_PAD + 32, g.sub, '10px sans-serif', C.textSub, 'left', nameMax);
-    text(calRight, top + CARD_PAD + 15, g.calories, 'bold 13px sans-serif', C.accent, 'right');
+    push({ k: 'rect', x: PAD, y: top, w: DESIGN_W - PAD * 2, h: cardH, r: 10, fill: C.card, stroke: C.cardBorder, lw: 1 });
 
-    // 每组明细: 一行两条, 跟页面 .sets-grid 一个口径
-    const setsTop = top + CARD_PAD + THUMB + 8;
+    // 左: 缩略图
+    push({ k: 'img', x: imgX, y: top + CARD_PAD, w: THUMB, h: THUMB, r: 8, src: 'thumb:' + g.key });
+
+    // 动作名(在图右边), 大卡 tag 挪到名字**下面**独占一行
+    //   tag 放在名字后面会把名字挤成两三个字, 独立成行后名字能占满整列
+    const nameBaseline = top + CARD_PAD + 13;
+    text(nameX, nameBaseline, g.name, 'bold ' + NAME_FS + 'px sans-serif', C.text, 'left', nameCol);
+    const tagText = tagTextOf(g, t);
+    if (tagText) {
+      push({
+        k: 'tag', x: nameX, y: top + CARD_PAD + 17, h: TAG_H, fs: TAG_FS,
+        text: tagText, font: 'bold ' + TAG_FS + 'px sans-serif',
+        color: C.accent, bg: C.tagBg, pad: TAG_PAD, maxW: TAG_W_MAX,
+      });
+    }
+
+    // 竖虚线: 把「动作身份」和「训练数据」分开
+    push({ k: 'vline', x: dividerX, y1: top + CARD_PAD, y2: top + cardH - CARD_PAD, color: '#333333', lw: 1, dash: [2, 3] });
+
+    // 右侧每组明细: 一行 cols 条(能塞几条塞几条)
     sets.forEach((s, i) => {
-      const row = Math.floor(i / 2);
-      const col = i % 2;
-      const cx = PAD + CARD_PAD + col * (chipW + CHIP_GAP);
-      const cy = setsTop + row * (CHIP_H + CHIP_GAP);
-      push({ k: 'rect', x: cx, y: cy, w: chipW, h: CHIP_H, r: 6, fill: C.chip });
-      push({ k: 'circle', x: cx + 12, y: cy + CHIP_H / 2, r: 8, fill: C.accent });
-      text(cx + 12, cy + CHIP_H / 2 + 3.4, String(s.num), 'bold 8px sans-serif', C.black, 'center');
-      text(cx + 24, cy + CHIP_H / 2 + 3.6, s.text, '10px sans-serif', C.setText, 'left', chipW - 30);
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const cx = gridX + col * (chipW + CHIP_GAP);
+      const cy = top + CARD_PAD + row * (CHIP_H + CHIP_GAP);
+      push({ k: 'rect', x: cx, y: cy, w: chipW, h: CHIP_H, r: 5, fill: C.chip });
+      push({ k: 'circle', x: cx + 8, y: cy + CHIP_H / 2, r: 5, fill: C.accent });
+      text(cx + 8, cy + CHIP_H / 2 + 2.5, String(s.num), 'bold 7px sans-serif', C.black, 'center');
+      text(cx + 16, cy + CHIP_H / 2 + 3.1, s.text, CHIP_FS + 'px sans-serif', C.setText, 'left', chipW - CHIP_NUM_W);
     });
 
     y = top + cardH + GROUP_GAP;
@@ -213,15 +337,15 @@ function buildLayout(model, maxHeight) {
   }
 
   // ── 页脚: 品牌 + 小程序码 ──
-  y += 4;
+  y += 3;
   push({ k: 'line', x1: PAD, y1: y, x2: DESIGN_W - PAD, y2: y, color: '#2a2a2a', lw: 1 });
-  y += 14;
+  y += 12;
   const qrY = y;
-  push({ k: 'rect', x: DESIGN_W - PAD - QR_BOX, y: qrY, w: QR_BOX, h: QR_BOX, r: 10, fill: C.white });
+  push({ k: 'rect', x: DESIGN_W - PAD - QR_BOX, y: qrY, w: QR_BOX, h: QR_BOX, r: 9, fill: C.white });
   push({ k: 'img', x: DESIGN_W - PAD - QR_BOX + QR_PAD, y: qrY + QR_PAD, w: QR_IMG, h: QR_IMG, r: 4, src: 'qrcode' });
-  text(PAD, qrY + 30, 'GFIT', 'bold 15px sans-serif', C.accent, 'left');
-  text(PAD, qrY + 48, model.footerHint, '10px sans-serif', C.textSub, 'left');
-  y = qrY + QR_BOX + 20;
+  text(PAD, qrY + 26, 'GFIT', 'bold 15px sans-serif', C.accent, 'left');
+  text(PAD, qrY + 43, model.footerHint, '10px sans-serif', C.textSub, 'left');
+  y = qrY + QR_BOX + 18;
 
   return { ops, height: Math.round(y) };
 }
@@ -254,11 +378,39 @@ function paint(ctx, layout, assets) {
       ctx.strokeStyle = op.color;
       ctx.lineWidth = op.lw || 1;
       ctx.stroke();
+    } else if (op.k === 'vline') {
+      // 竖虚线分隔线 —— setLineDash 画完记得清掉, 不然后面的实线也变虚线
+      ctx.save();
+      ctx.setLineDash(op.dash || [2, 3]);
+      ctx.beginPath();
+      ctx.moveTo(op.x, op.y1);
+      ctx.lineTo(op.x, op.y2);
+      ctx.strokeStyle = op.color;
+      ctx.lineWidth = op.lw || 1;
+      ctx.stroke();
+      ctx.restore();
     } else if (op.k === 'text') {
       ctx.font = op.font;
       ctx.fillStyle = op.color;
       ctx.textAlign = op.align || 'left';
       ctx.fillText(op.maxWidth ? fitText(ctx, op.text, op.maxWidth) : op.text, op.x, op.y);
+    } else if (op.k === 'tag') {
+      // 大卡 tag: 一个圆角胶囊, 文字居中
+      //   宽度按真实 measureText 算 —— 布局阶段只有估算值, 画的时候才知道准不准
+      ctx.font = op.font;
+      let tagText = String(op.text || '');
+      if (!tagText) continue;
+      let tagW = ctx.measureText(tagText).width + op.pad * 2;
+      if (tagW > op.maxW) {
+        tagText = fitText(ctx, tagText, op.maxW - op.pad * 2);
+        tagW = ctx.measureText(tagText).width + op.pad * 2;
+      }
+      roundRectPath(ctx, op.x, op.y, tagW, op.h, op.h / 2);
+      ctx.fillStyle = op.bg;
+      ctx.fill();
+      ctx.fillStyle = op.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(tagText, op.x + tagW / 2, op.y + op.h / 2 + op.fs * 0.36);
     } else if (op.k === 'img') {
       const img = op.src.indexOf('thumb:') === 0
         ? (assets.thumbs || {})[op.src.slice(6)]
